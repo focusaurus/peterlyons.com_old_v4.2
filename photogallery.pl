@@ -14,7 +14,7 @@ $uri = $ENV{"REQUEST_URI"};
 $length = index($uri, ".pl")+3;
 $uri = substr($uri,0,$length);
 if ( ! $gallery ) {
-    $gallery = "portugal";
+    $gallery = "halloween_2002";
 }
 foreach (<$docroot/$galleryDir/$gallery/*.*>) {
     $_ = substr( $_, rindex($_, "/")+1);
