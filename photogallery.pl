@@ -42,7 +42,7 @@ print "<img alt=\"$pictAlt\" title=\"$pictAlt\" src=\"/$galleryDir/$gallery/$pic
 print "</td><td valign=\"top\">Galleries:<br /><br />";
 foreach ( @galleries ) {
     $dir = substr( $_, rindex($_, "/")+1);
-    print "<a href=\"$uri?gallery=$dir\">$dir</a><br /><br />";
+    print "<a href=\"$uri?gallery=$dir\">$dir</a><br />";
 }
 print "</td></tr></table>";
 
