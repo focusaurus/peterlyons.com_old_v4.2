@@ -1,0 +1,30 @@
+# ~/.bash_profile: executed by bash(1) for login shells.
+# see /usr/share/doc/bash/examples/startup-files for examples
+#plyons 2001/04/12:0148
+#get the system-wide environment if it exists
+if [ -f /etc/config_common/environment ]; then
+    source /etc/config_common/environment
+fi
+
+umask o=rw,g=r,o=
+
+# include .bashrc if it exists
+
+if [ -f ~/.bashrc ]; then
+    source ~/.bashrc
+fi
+
+CLASSPATH="/home/plyons/java:."
+CDPATH=".:~:~/personal:~/personal/oberlin"
+VISUAL="emacs -nw -f auto-fill-mode"
+#VISUAL="~/bin/visualEmacs"
+EDITOR=$VISUAL
+
+export EDITOR CLASSPATH CDPATH EDITOR VISUAL
+
+# the rest of this file is commented out.
+# set PATH so it includes user's private bin if it exists
+
+#if [ -d ~/bin ] ; then
+#    PATH="~/bin:${PATH}"
+#fi

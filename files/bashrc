@@ -1,0 +1,36 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files for examples
+
+#plyons 2001/01/23:2040
+#get the system-wide aliases
+# include system-wide aliases if they exist
+if [ -f /etc/config_common/alias ]; then
+    source /etc/config_common/alias
+fi
+
+# include my personal aliases
+if [ -f ~/.alias ]; then
+    source ~/.alias
+fi
+
+# If running interactively, then:
+if [ "$PS1" ]; then
+
+    # enable color support of ls and also add handy aliases
+
+    eval `dircolors`
+    alias ls='ls --color=auto '
+    #alias ll='ls -l'
+    #alias la='ls -A'
+    #alias l='ls -CF'
+    #alias dir='ls --color=auto --format=vertical'
+    #alias vdir='ls --color=auto --format=long'
+
+    # set a fancy prompt
+    if [ `id -un` = root ]; then
+    PS1='\[\033[1;31m\]\h:\w\$\[\033[0m\] '
+    else                        
+    PS1='\[\033[1;32m\]\h:\w\$\[\033[0m\] '                            
+    fi                        
+    # PS1='\u@\h:\w\$ '
+fi

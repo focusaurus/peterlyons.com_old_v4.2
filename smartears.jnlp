@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!-- JNLP File for SmartEars Ear Training Program --> 
+<jnlp 
+  spec="1.0+" 
+  codebase="http://www.peterlyons.com/" 
+  href="smartears.jnlp"> 
+  <information> 
+    <title>SmartEars Ear Training Program</title> 
+    <vendor>Peter Lyons</vendor> 
+    <homepage href="http://www.peterlyons.com/smartears.html"/> 
+    <description kind="short">An ear training program designed to help you quickly learn to recognize and identify intervals, scales, chords, and trichords</description> 
+    <description kind="one-line">An ear training program</description> 
+    <description kind="tooltip">An ear training program</description> 
+    <offline-allowed/> 
+  </information> 
+  <resources> 
+    <j2se version="1.3+"/> 
+    <jar href="smartears.jar"/> 
+  </resources> 
+  <application-desc main-class="net.codemusic.smartears.SmartEars"/> 
+</jnlp> 

@@ -1,0 +1,17 @@
+#aliases for plyons only
+alias email='ssh -2 -l spxl8084 mail.oberlin.edu'
+alias e='emacs &'
+alias igor='ssh igor.peterlyons.com'
+alias monk='ssh pete@monk.peterlyons.com'
+alias 4dcow='ssh pete@4dcow.net'
+alias statler='ssh statler.cs.oberlin.edu'
+alias fozzie='ssh fozzie.cs.oberlin.edu'
+alias krusty='ssh krusty.cs.oberlin.edu'
+alias gonzo='ssh gonzo.cs.oberlin.edu'
+alias thumbnails="zsh -c 'for stem in *.jpg(:r); 
+        do cp $stem.jpg $stem-TN.jpg; 
+        mogrify -geometry 80 $stem-TN.jpg; 
+        done'"
+alias c="javac net/codemusic/smartears/*.java net/codemusic/smartears/event/*.java net/codemusic/smartears/ui/*.java"
+alias r="java net/codemusic/smartears/SmartEars"
+alias msej="jar cmf SmartEarsManifest.txt SmartEars_1-0B1.jar net/codemusic/Strategy.class net/codemusic/smartears/*.class net/codemusic/smartears/event/*.class net/codemusic/smartears/ui/*.class incorrect.wav correct.wav"

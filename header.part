@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" href="./peterlyons.css" type="text/css" />
+<meta name="keywords" content="Peter Lyons, java, java programmer, java developer, java engineer, software engineer, programmer, Sun Certified Programmer for the Java 2 Platform, saxophone, saxophonist, musician, jazz, Oberlin, classical, computer, consultant, ear training, aural skills, SmartEars, Smart Ears" />
+<meta name="author" content="Peter Lyons" />
+<meta name="description" content="The web site for Peter Lyons, Software Engineer and saxophone player" />
+<meta name="copyright" content="2001, Peter Lyons" />
+<meta name="generator" content="GNU/Emacs" />
+<title>Peter Lyons on the web</title>
+</head>
+<body>
+<div class="topbanner">peterlyons.com</div>
+<div class="navigation">
+<a href="./index.html" class="navigation">Home</a> |
+<a href="./smartears.html" class="navigation">SmartEars</a> |
+<a href="./bigclock.html" class="navigation">BigClock</a> |
+<a href="./oberlin.html" class="navigation">Sounds From Oberlin</a> |
+<a href="./photogallery.pl" class="navigation">Photo Gallery</a> 
+</div>
+<div class="body">
