@@ -46,8 +46,9 @@ foreach ( @galleries ) {
 print "</td></tr></table>";
 
 print "<h1 class=\"caption\">$pictAlt</h1>\n";
-
-foreach (keys %thumbnails) {
+@thumbs = keys %thumbnails;
+@thumbs = sort @thumbs;
+foreach (@thumbs) {
     $thumbAlt = `cat $docroot/$galleryDir/$gallery/$altTxts{$_}`;
     chomp $thumbAlt;
     print "<a href=\"$uri?gallery=$gallery&picture=$_\">";
