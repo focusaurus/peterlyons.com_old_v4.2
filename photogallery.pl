@@ -37,7 +37,7 @@ if (! -e "$docroot/$galleryDir/$gallery/$picture.jpg" ) {
 $pictAlt = `cat $docroot/$galleryDir/$gallery/$altTxts{$picture}`;
 chomp $pictAlt;
 print "\n<table><tr><td valign=\"top\">\n";
-print "<img alt=\"$pictAlt\" src=\"/$galleryDir/$gallery/$picture.jpg\" />";
+print "<img alt=\"$pictAlt\" title=\"$pictAlt\" src=\"/$galleryDir/$gallery/$picture.jpg\" />";
 print "</td><td valign=\"top\">Galleries:<br /><br />";
 foreach ( @galleries ) {
     $dir = substr( $_, rindex($_, "/")+1);
@@ -52,7 +52,7 @@ foreach (@thumbs) {
     $thumbAlt = `cat $docroot/$galleryDir/$gallery/$altTxts{$_}`;
     chomp $thumbAlt;
     print "<a href=\"$uri?gallery=$gallery&picture=$_\">";
-    print "<img border=\"0\" src=\"/$galleryDir/$gallery/$_-TN.jpg\" alt=\"$thumbAlt\"></a> \n";
+    print "<img border=\"0\" src=\"/$galleryDir/$gallery/$_-TN.jpg\" alt=\"$thumbAlt\" title=\"$thumbAlt\"></a> \n";
 }
 print `cat ./footer.part`;
 
