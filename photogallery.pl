@@ -3,7 +3,7 @@ print "Content-type: text/html\r\n\r\n";
 print `cat ./header.part`;
 $docroot = "/opt/www/peterlyons.com";
 $galleryDir = "photos"; 
-$defaultGallery = "sax_quartet_thf_20030810";
+$defaultGallery = "sax_quartet_central_park_20030905";
 if( $ENV{"QUERY_STRING"} =~ /gallery=([^&]+)/ ) {
     $gallery = $1;
 }
