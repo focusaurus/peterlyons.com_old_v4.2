@@ -3,6 +3,7 @@ print "Content-type: text/html\r\n\r\n";
 print `cat ./header.part`;
 $docroot = "/opt/www/peterlyons.com";
 $galleryDir = "photos"; 
+$defaultGallery = "sax_quartet_thf_20030810";
 if( $ENV{"QUERY_STRING"} =~ /gallery=([^&]+)/ ) {
     $gallery = $1;
 }
@@ -14,7 +15,7 @@ $uri = $ENV{"REQUEST_URI"};
 $length = index($uri, ".pl")+3;
 $uri = substr($uri,0,$length);
 if ( ! $gallery ) {
-    $gallery = "halloween_2002";
+    $gallery = $defaultGallery;
 }
 foreach (<$docroot/$galleryDir/$gallery/*.*>) {
     $_ = substr( $_, rindex($_, "/")+1);
