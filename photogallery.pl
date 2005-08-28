@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 print "Content-type: text/html\r\n\r\n";
 print `cat ./header.part`;
-$docroot = "/opt/www/peterlyons.com";
+$docroot = "/var/www/peterlyons.com";
 $galleryDir = "photos"; 
-$defaultGallery = "sax_quartet_central_park_20030905";
+$defaultGallery = "curacao";
 if( $ENV{"QUERY_STRING"} =~ /gallery=([^&]+)/ ) {
     $gallery = $1;
 }
@@ -33,7 +33,7 @@ foreach (<$docroot/$galleryDir/$gallery/*.*>) {
     }
 }
 if (! -e "$docroot/$galleryDir/$gallery/$picture.jpg" ) {
-    $picture = (keys %pictures)[0];
+    $picture = (sort (keys %pictures))[0];
 }
 $pictAlt = `cat $docroot/$galleryDir/$gallery/$altTxts{$picture}`;
 chomp $pictAlt;
@@ -56,5 +56,3 @@ foreach (@thumbs) {
     print "<img border=\"0\" src=\"/$galleryDir/$gallery/$_-TN.jpg\" alt=\"$thumbAlt\" title=\"$thumbAlt\"></a> \n";
 }
 print `cat ./footer.part`;
-
-
