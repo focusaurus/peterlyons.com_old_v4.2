@@ -13,14 +13,8 @@ rsync -a --delete "${WORK}/servlets/" "${APP}/${SITE}"
 rsync -a --delete "${WORK}/lib" "${APP}"
 #data files used by servlets
 rsync -a --delete "${WORK}/data" "${APP}"
-echo cleaning up subversion, CVS, and editor files that are not needed
-#delete source control repository metadata directories
-for DIR in "${APP}" "${STATIC}"
-do
-    find "${DIR}" -name '.svn' -type d | xargs rm -rf
-    find "${DIR}" -name 'CVS' -type d | xargs rm -rf
-    find "${DIR}" -name \*~ -type f | xargs rm -f
-done
+echo overlaying webware config files
+/bin/cp -ar "${WORK}/webware/"* "${APP}"
 echo saving html for quasi-dynamic pages
 pushd "${APP}" > /dev/null
 ./AppServer >> ${WORK}/AppServer.log 2>&1 &
@@ -32,4 +26,12 @@ done
 #static files for the web server: html, css, js, etc
 echo copying static files to staging web server
 rsync -a "${WORK}/static/" "${STATIC}"
+echo cleaning up subversion, CVS, and editor files that are not needed
+#delete source control repository metadata directories
+for DIR in "${APP}" "${STATIC}"
+do
+    find "${DIR}" -name '.svn' -type d | xargs /bin/rm -rf
+    find "${DIR}" -name 'CVS' -type d | xargs /bin/rm -rf
+    find "${DIR}" -name \*~ -type f | xargs /bin/rm -f
+done
 popd > /dev/null

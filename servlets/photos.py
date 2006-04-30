@@ -17,6 +17,7 @@ class photos(baseservlet):
         self.gallery = trans.request().field('gallery', defaultGallery)
         photoName = trans.request().field('photo', None)
         self.galleries = os.listdir(photosDir)
+	self.galleries.sort()
         if self.gallery not in self.galleries:
             print 'WARNING: invalid gallery in request: "%s"' % self.gallery
             self.gallery = defaultGallery
