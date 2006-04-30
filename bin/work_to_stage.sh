@@ -1,16 +1,19 @@
 #!/bin/sh
 . `dirname ${0}`/site_conf.sh
-
+echo Deleting all .pyc files
 find ${WORK}/ -name '*.pyc' | xargs rm -f
 #compile all the templates into the lib directory
+echo compiling cheetah templates
 export PYTHONPATH="${WORK}/lib"
-/usr/bin/cheetah-compile -R --nobackup --idir ${WORK}/templates --odir ${APP}/lib > /dev/null
+/usr/bin/cheetah-compile -R --nobackup --idir ${WORK}/templates --odir ${WORK}/lib > /dev/null
+echo deploying webware servlets, python modules, and data files
 #webware servlets that actually get used in URLs on the site
-/bin/cp -rf "${WORK}/servlets/"* "${APP}/${SITE}"
+rsync -a --delete "${WORK}/servlets/" "${APP}/${SITE}"
 #python files used by servlets
-/bin/cp -rf "${WORK}/lib" "${APP}"
+rsync -a --delete "${WORK}/lib" "${APP}"
 #data files used by servlets
-/bin/cp -rf "${WORK}/data" "${APP}"
+rsync -a --delete "${WORK}/data" "${APP}"
+echo cleaning up subversion, CVS, and editor files that are not needed
 #delete source control repository metadata directories
 for DIR in "${APP}" "${STATIC}"
 do
@@ -18,6 +21,7 @@ do
     find "${DIR}" -name 'CVS' -type d | xargs rm -rf
     find "${DIR}" -name \*~ -type f | xargs rm -f
 done
+echo saving html for quasi-dynamic pages
 pushd "${APP}" > /dev/null
 ./AppServer >> ${WORK}/AppServer.log 2>&1 &
 for URL in home oberlin smartears bigclock
@@ -26,5 +30,6 @@ do
 done
 #copy files into testing deployment structure
 #static files for the web server: html, css, js, etc
-/bin/cp -rf ${WORK}/static/* ${STATIC}
+echo copying static files to staging web server
+rsync -a "${WORK}/static/" "${STATIC}"
 popd > /dev/null
