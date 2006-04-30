@@ -1,5 +1,5 @@
-<!--#include file="./header.part" -->
-
+#extends main_tmpl
+#def body
 <p>
 Check out my new (Summer 2001) ear training program.  This program
 will help you quickly learn to recognize and identify common musical
@@ -17,13 +17,13 @@ java -jar SmartEars.jar
 Unfortunately, for Windows 98, the Java Runtime Environment does not
 include any Sound Banks.  SmartEars should still run, but you will not
 be able to change the timbre of the sound. If you would like to be
-able to select different sounds, see the instructions 
+able to select different sounds, see the instructions
 <a href="http://java.sun.com/products/java-media/sound/soundbank-install.html">here</a>,
-and then download either the 
+and then download either the
 <a href="http://java.sun.com/products/java-media/sound/soundbank-min.gm.zip">minimal
-(0.35MB)</a>, 
+(0.35MB)</a>,
 <a href="http://java.sun.com/products/java-media/sound/soundbank-mid.gm.zip">midsize
-(1.09MB)</a>, or 
+(1.09MB)</a>, or
 <a href="http://java.sun.com/products/java-media/sound/soundbank-deluxe.gm.zip">deluxe
 (4.92MB)</a> soundbanks.
 </p>
@@ -34,6 +34,5 @@ Using SmartEars should be (I hope!) largely self-explanatory and easy.  Two quic
 <li>To hear sounds played simultaneously (as a chord) instead of arpeggiated, click into the Settings Tab and set the Note Delay to 0</li>
 </ul>
 </p>
-<!--#include file="./webstart.part" -->
-<!--#include file="./footer.part" -->
-
+${webstart}
+#end def

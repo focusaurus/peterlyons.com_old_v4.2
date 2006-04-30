@@ -1,16 +1,39 @@
-#attr title = "Peter Lyons on the web"
-#set global wkbase="/app"
-#set global staticbase=""
-#def body
 
-#end def
-
-#def footer
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Peter Lyons on the web</title>
+<link rel="stylesheet" href="/peterlyons.css" type="text/css" />
+<meta name="keywords" content="peter lyons, pete lyons, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, computer, computers, java, software engineer, programmer, Sun Certified Programmer for the Java 2 Platform,  musician, jazz, oberlin, classical, ear training, aural skills, smartears, smart ears" />
+<meta name="author" content="Peter Lyons" />
+<meta name="description" content="The web site for Peter Lyons, Saxophonist and Computer Programmer" />
+<meta name="copyright" content="2001, Peter Lyons" />
+<meta name="generator" content="GNU/Emacs, jEdit, vi, Webware, cheetah" />
+</head>
+<body>
+<div class="topbanner">peterlyons.com</div>
+<div class="navigation">
+<a href="./home.html" class="navigation">Home</a> |
+<a href="./smartears.html" class="navigation">SmartEars</a> |
+<a href="./bigclock.html" class="navigation">BigClock</a> |
+<a href="./oberlin.html" class="navigation">Sounds From Oberlin</a> |
+<a href="./app/photos" class="navigation">Photo Gallery</a>
 </div>
-</body>
-</html>
-#end def
-#def webstart
+<div class="body">
+<p>
+BigClock is a simple desktop clock utility that fills up the entire
+window with a clock, so you can get a clock of any size. It allows you
+to choose your own colors and time format (more time format options
+are coming soon). You can launch it through Java Web Start with the
+link below, or <a href="./dist/bigclock.jar">download the jar file
+directly</a> and run it with the command 'java -jar bigclock.jar'
+using JRE 1.3 or newer.
+</p>
+
+<p>
+<a href="./dist/bigclock.jnlp">Start BigClock!</a>
+</p>
 <p>
 I am distributing the program using a relatively new technology called Java Web
 Start which will let you launch it from the web or from your
@@ -54,28 +77,10 @@ stories of successes/failures on various platforms and browsers.  Note
 that the classic Macintosh OS does not support Java 2, so only OS X
 users can expect this to work.
 </p>
-#end def
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>$title</title>
-<link rel="stylesheet" href="${staticbase}/peterlyons.css" type="text/css" />
-<meta name="keywords" content="peter lyons, pete lyons, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, computer, computers, java, software engineer, programmer, Sun Certified Programmer for the Java 2 Platform,  musician, jazz, oberlin, classical, ear training, aural skills, smartears, smart ears" />
-<meta name="author" content="Peter Lyons" />
-<meta name="description" content="The web site for Peter Lyons, Saxophonist and Computer Programmer" />
-<meta name="copyright" content="2001, Peter Lyons" />
-<meta name="generator" content="GNU/Emacs, jEdit, vi, Webware, cheetah" />
-</head>
-<body>
-<div class="topbanner">peterlyons.com</div>
-<div class="navigation">
-<a href="./home.html" class="navigation">Home</a> |
-<a href="./smartears.html" class="navigation">SmartEars</a> |
-<a href="./bigclock.html" class="navigation">BigClock</a> |
-<a href="./oberlin.html" class="navigation">Sounds From Oberlin</a> |
-<a href="./app/photos" class="navigation">Photo Gallery</a>
+
+
 </div>
-<div class="body">
-$body
-$footer
+</body>
+</html>
+
+

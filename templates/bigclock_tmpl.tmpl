@@ -1,5 +1,5 @@
-<!--#include file="./header.part" -->
-
+#extends main_tmpl
+#def body
 <p>
 BigClock is a simple desktop clock utility that fills up the entire
 window with a clock, so you can get a clock of any size. It allows you
@@ -13,6 +13,5 @@ using JRE 1.3 or newer.
 <p>
 <a href="./dist/bigclock.jnlp">Start BigClock!</a>
 </p>
-<!--#include file="./webstart.part" -->
-<!--#include file="./footer.part" -->
-
+${webstart}
+#end def

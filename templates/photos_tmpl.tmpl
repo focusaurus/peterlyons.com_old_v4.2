@@ -1,0 +1,16 @@
+#extends main_tmpl
+#def body
+<img alt="$servlet.photo.caption" title="$servlet.photo.caption" src="$servlet.photo.fullSizeURI" />
+<h1 class="caption">$servlet.photo.caption</h1>
+<br />
+<br />
+#for $photo in $servlet.photos
+<a href="${wkbase}/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$photo.name">
+<img border="0" src="$photo.thumbnailURI" alt="$photo.caption" title="$photo.caption"></a>
+#end for
+<br />
+Other Galleries:<br />
+#for $gallery in $servlet.galleries
+<a href="${wkbase}/$servlet.request.servletURI()?gallery=$gallery">$gallery</a>&nbsp;
+#end for
+#end def
