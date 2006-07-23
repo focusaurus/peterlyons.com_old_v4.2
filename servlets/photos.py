@@ -49,7 +49,7 @@ class photos(baseservlet):
             from iptcinfo import IPTCInfo
             altTxt = IPTCInfo(os.path.join(self.galleryDir, photoName + Photo.fileExtension)).data[120]
             #strip trailing unicode null byte
-            if altTxt[-1] == '0x00':
+            if altTxt[-1] == u'\x00':
                 altTxt = altTxt[:-1]
             return string.strip(altTxt)
         except:
