@@ -25,6 +25,7 @@ class photos(baseservlet):
         self.galleryDir = os.path.join(photosDir, self.gallery)
         #this includes full paths to both full size and thumbnail image files
         thumbnailPaths= glob.glob(os.path.join(self.galleryDir, '*' + Photo.thumbnailExtension))
+        thumbnailPaths.sort()
         self.photos = []
         self.photo = None
         for path in thumbnailPaths:
