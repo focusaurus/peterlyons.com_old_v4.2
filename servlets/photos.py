@@ -54,15 +54,16 @@ class photos(baseservlet):
             return string.strip(altTxt)
         except Exception, message:
             #No problem.  Fall back to .alt.txt method
-            print 'WARNING: IPTC caption not found for image', photoName, message
-        try:
-            altFile = file(os.path.join(self.galleryDir, photoName + Photo.captionExtension))
-            altTxt = altFile.read()
-            altFile.close()
-            return string.strip(altTxt)
-        except IOError:
-            print 'WARNING:', sys.exc_info()[1]
-
+            pass
+        captionFile = os.path.join(self.galleryDir, photoName + Photo.captionExtension)
+        if os.path.isfile(captionFile):
+            try:
+                altFile = file(captionFile)
+                altTxt = altFile.read()
+                altFile.close()
+                return altTxt.strip()
+            except IOError:
+                print 'WARNING:', sys.exc_info()[1]
 
 class Photo(object):
     fileExtension = '.jpg'
