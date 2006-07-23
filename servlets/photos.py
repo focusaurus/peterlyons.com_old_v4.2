@@ -48,6 +48,7 @@ class photos(baseservlet):
         try:
             from iptcinfo import IPTCInfo
             altTxt = IPTCInfo(os.path.join(self.galleryDir, photoName + Photo.fileExtension)).data[120]
+            return string.strip(altTxt)
         except:
             #No problem.  Fall back to .alt.txt method
             pass
