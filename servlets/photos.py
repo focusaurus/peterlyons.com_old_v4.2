@@ -60,7 +60,8 @@ class photos(baseservlet):
             altTxt = altFile.read()
             altFile.close()
         except IOError:
-            print 'WARNING:', sys.exc_info()[1]
+            #print 'WARNING:', sys.exc_info()[1]
+            pass
         return string.strip(altTxt)
 
 class Photo(object):
