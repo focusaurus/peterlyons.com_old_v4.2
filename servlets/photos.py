@@ -8,7 +8,7 @@ import sys
 #edit these values to configure for different environments
 photosURI = '/photos'
 photosDir = '/var/www/peterlyons.com/photos'
-defaultGallery = 'birthday_2006'
+defaultGallery = 'metrometro_20070512'
 
 class photos(baseservlet):
 
