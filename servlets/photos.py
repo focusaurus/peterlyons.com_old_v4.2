@@ -51,7 +51,9 @@ class photos(baseservlet):
             altTxt = IPTCInfo(os.path.join(self.galleryDir, photoName + Photo.fileExtension)).data[120]
             #strip trailing unicode null byte
             if altTxt[-1] == u'\x00':
-                altTxt = altTxt[:-1]
+                altTxt = altTxt[:0]
+            altTxt = altTxt.replace("'", r"\'")
+            altTxt = altTxt.replace('"', '&quot;')
             return string.strip(altTxt)
         except Exception, message:
             #No problem.  Fall back to .alt.txt method

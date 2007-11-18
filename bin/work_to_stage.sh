@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/zsh
 . `dirname ${0}`/site_conf.sh
 echo Deleting all .pyc files
 find ${WORK}/ -name '*.pyc' | xargs rm -f

@@ -1,16 +1,45 @@
 #extends main_tmpl
 #def body
-<img alt="$servlet.photo.caption" title="$servlet.photo.caption" src="$servlet.photo.fullSizeURI" />
-<h1 class="caption">$servlet.photo.caption</h1>
+#set currentIndex = $servlet.photos.index($servlet.photo)
+#set prevPhotoName = $servlet.photos[currentIndex - 1].name
+#if currentIndex >= len($servlet.photos) - 1
+#set nextPhotoName = $servlet.photos[0].name
+#else
+#set nextPhotoName = $servlet.photos[currentIndex + 1].name
+#end if
+<script language="JavaScript" type="text/javascript">
+function showPhoto(img, caption) {
+    if(document.getElementById)   //gecko(NN6) + IE 5+
+    {
+        document.getElementById("photo").src = img;
+        document.getElementById("caption").innerHTML = caption;
+    }
+    else if(document.layers)       //NN4+
+    {
+        document.layers["photo"].src = img;
+        document.layers["caption"].innerHTML = caption;
+    }
+    else if(document.all)       // IE 4
+    {
+        document.all["photo"].src = img;
+        document.all["caption"].innerHTML = caption;
+    }
+    return true;
+}
+</script>
+<a href="$wkbase/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$prevPhotoName">&lt;&lt;previous</a>
+&nbsp;
+<a href="$wkbase/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$nextPhotoName">next&gt;&gt;</a>
 <br />
-<br />
+<img alt="$servlet.photo.caption" id="photo" title="$servlet.photo.caption" src="$servlet.photo.fullSizeURI" />
+<h1 class="caption" id="caption">$servlet.photo.caption</h1>
 #for $photo in $servlet.photos
-<a href="${wkbase}/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$photo.name">
+<a href="#" onClick="javascript:showPhoto('$photo.fullSizeURI', '$photo.caption');return true">
 <img border="0" src="$photo.thumbnailURI" alt="$photo.caption" title="$photo.caption"></a>
 #end for
 <br />
-Other Galleries:<br />
+<h1>Other Photo Galleries</h1>
 #for $gallery in $servlet.galleries
-<a href="${wkbase}/$servlet.request.servletURI()?gallery=$gallery">$gallery</a><br />
+<a href="$wkbase/$servlet.request.servletURI()?gallery=$gallery">$gallery</a><br />
 #end for
 #end def
