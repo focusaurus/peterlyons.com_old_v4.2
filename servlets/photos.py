@@ -8,7 +8,7 @@ import sys
 #edit these values to configure for different environments
 photosURI = '/photos'
 photosDir = '/var/www/peterlyons.com/photos'
-defaultGallery = 'puerto_rico_2007'
+defaultGallery = 'boulder_2007'
 
 class photos(baseservlet):
 
@@ -52,7 +52,7 @@ class photos(baseservlet):
             #strip trailing unicode null byte
             if altTxt[-1] == u'\x00':
                 altTxt = altTxt[:0]
-            altTxt = altTxt.replace("'", r"\'")
+            #altTxt = altTxt.replace("'", "\'")
             altTxt = altTxt.replace('"', '&quot;')
             return string.strip(altTxt)
         except Exception, message:
