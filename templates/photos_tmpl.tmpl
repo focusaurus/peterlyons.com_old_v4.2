@@ -34,7 +34,7 @@ function showPhoto(img, caption) {
 <img alt="$servlet.photo.caption" id="photo" title="$servlet.photo.caption" src="$servlet.photo.fullSizeURI" />
 <h1 class="caption" id="caption">$servlet.photo.caption</h1>
 #for $photo in $servlet.photos
-<a href="#" onClick="javascript:showPhoto('$photo.fullSizeURI', '$photo.caption.replace("'", "\\\'")');return true">
+<a href="#" onClick="javascript:showPhoto('$photo.fullSizeURI', '$photo.caption');return true">
 <img border="0" src="$photo.thumbnailURI" alt="$photo.caption" title="$photo.caption"></a>
 #end for
 <br />
