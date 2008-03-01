@@ -1,6 +1,7 @@
 #extends main_tmpl
 #def body
 #set currentIndex = $servlet.photos.index($servlet.photo)
+#set currentPhotoName = $servlet.photos[currentIndex].name
 #set prevPhotoName = $servlet.photos[currentIndex - 1].name
 #if currentIndex >= len($servlet.photos) - 1
 #set nextPhotoName = $servlet.photos[0].name
@@ -8,21 +9,24 @@
 #set nextPhotoName = $servlet.photos[currentIndex + 1].name
 #end if
 <script language="JavaScript" type="text/javascript">
-function showPhoto(img, caption) {
+function showPhoto(img, caption, name) {
     if(document.getElementById)   //gecko(NN6) + IE 5+
     {
         document.getElementById("photo").src = img;
         document.getElementById("caption").innerHTML = caption;
+        document.getElementById("photolink").href = '$wkbase/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=' + name;
     }
     else if(document.layers)       //NN4+
     {
         document.layers["photo"].src = img;
         document.layers["caption"].innerHTML = caption;
+        document.layers["photolink"].href = '$wkbase/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=' + name;
     }
     else if(document.all)       // IE 4
     {
         document.all["photo"].src = img;
         document.all["caption"].innerHTML = caption;
+        document.all["photolink"].href = '$wkbase/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=' + name;
     }
     return true;
 }
@@ -31,10 +35,10 @@ function showPhoto(img, caption) {
 &nbsp;
 <a href="$wkbase/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$nextPhotoName">next&gt;&gt;</a>
 <br />
-<img alt="$servlet.photo.caption" id="photo" title="$servlet.photo.caption" src="$servlet.photo.fullSizeURI" />
+<a href="$wkbase/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$currentPhotoName" id="photolink"><img alt="$servlet.photo.caption" id="photo" title="$servlet.photo.caption" src="$servlet.photo.fullSizeURI" border="0"/></a>
 <h1 class="caption" id="caption">$servlet.photo.caption</h1>
 #for $photo in $servlet.photos
-<a href="#" onClick="javascript:showPhoto('$photo.fullSizeURI', '$photo.caption');return true">
+<a href="#" onClick="javascript:showPhoto('$photo.fullSizeURI', '$photo.caption', '$photo.name');return true">
 <img border="0" src="$photo.thumbnailURI" alt="$photo.caption" title="$photo.caption"></a>
 #end for
 <br />
