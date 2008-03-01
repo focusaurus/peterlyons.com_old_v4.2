@@ -38,7 +38,8 @@ function showPhoto(img, caption, name) {
 <a href="$wkbase/$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$currentPhotoName" id="photolink"><img alt="$servlet.photo.caption" id="photo" title="$servlet.photo.caption" src="$servlet.photo.fullSizeURI" border="0"/></a>
 <h1 class="caption" id="caption">$servlet.photo.caption</h1>
 #for $photo in $servlet.photos
-<a href="#" onClick="javascript:showPhoto('$photo.fullSizeURI', '$photo.caption', '$photo.name');return true">
+#set jsCaption = $photo.caption.replace("'", "\\'").replace('"', "&quot;").strip()
+<a href="#" onClick="javascript:showPhoto('$photo.fullSizeURI', '$jsCaption', '$photo.name');return true">
 <img border="0" src="$photo.thumbnailURI" alt="$photo.caption" title="$photo.caption"></a>
 #end for
 <br />
