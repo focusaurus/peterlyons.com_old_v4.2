@@ -18,7 +18,7 @@ echo overlaying webware config files
 echo saving html for quasi-dynamic pages
 pushd "${APP}" > /dev/null
 ./AppServer >> ${WORK}/AppServer.log 2>&1 &
-for URL in home oberlin smartears bigclock
+for URL in home oberlin smartears bigclock code_conventions
 do
   wget -q "${STAGEURL}/app/${URL}" -O "${WORK}/static/${URL}.html"
 done

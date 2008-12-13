@@ -17,6 +17,13 @@ body {
     background-color: #FFFFFF;
 }
 
+code, pre {
+    background-color: #EEEEEE;
+    font-family: courier, serif;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
 div.body {
     margin:  15px;
 }
@@ -38,4 +45,24 @@ div.topbanner {
     font-size: 28px;
     font-weight: bolder;
     margin: 0px;
+}
+
+dd {
+    padding: 5px;
+}
+
+dt {
+    font-weight: bolder;
+}
+
+h1 {
+    font-size: 14pt;
+}
+
+img {
+    border: 0;   
+}
+
+li {
+    padding: 5px;
 }
