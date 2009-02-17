@@ -187,6 +187,8 @@ Why?
     </li>
     <li>I prefer <code>Collection.isEmpty()</code> over <code>Collection.size() == 0</code> because it is more directly expressive of the intent
     </li>
+    <li>Prefer java.util.List and the other collection classes to arrays.  In general they are easier to work with and convenient.  Arrays have a tendency to be annoying in java and require System.arraycopy or java.util.Arrays methods.</li>
+    <li>Prefer returning an empty collection instead of null.  Null requires the caller to explicitly check for it.  If you return an empty collection, the calling code that handles non-empty and empty are the same.  The caller can always call <code>isEmpty</code> and special case that as needed.</li>
     <li>When order of execution is not important (as is almost always the case in Java), imports should be sorted asciibetically (When In Doubt, Alphabetize). A blank line separating groups of related imports (standard java, each third party library, internal libraries, etc) are OK but I usually don't use them because the alphabetical sorting makes finding what the reader is looking for pretty easy already.
     </li>
     <li>Never omit the curly braces from an <code>if</code> statement or other block beginner. (Make One Choice)
