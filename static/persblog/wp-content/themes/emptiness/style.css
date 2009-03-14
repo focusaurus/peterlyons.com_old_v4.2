@@ -1,0 +1,178 @@
+/*
+Theme Name: Emptiness
+Theme URI: http://code.google.com/p/bitpress/wiki/Emptiness
+Description: A minimalist theme with a white background, containing mostly texts with a header image. Simple and clean, with very lightweight HTML and CSS.
+Version: 0.9
+Author: Cliffano Subagio
+Author URI: http://blog.qoqoa.com
+Tags: white, light, three-columns, fixed-width, custom-header, right-sidebar, microformats 
+*/
+body {
+    background-color: #ffffff;
+    color: #333333;
+    font: 83%/1.4 arial, helvetica, sans-serif;
+    line-height: 170%;
+    margin: 0;
+    padding: 20px 0 20px 0;
+}
+div#container {
+    margin: auto;
+    padding: 0 20px 0 20px;
+    width: 1020px;
+}
+div#header div.main {
+    font-weight: bold;
+}
+div#header div.main a {
+    font-size: 25px;
+    text-decoration: none;
+}
+div#header div.main h1 {
+    margin: 0;
+}
+div#body {
+    clear: both;
+}
+div#footer {
+    clear: both;
+    color: #333333;
+    font-size: 95%;
+}
+div#footer div.main {
+    text-align: right;
+}
+div#content {
+    float: left;
+}
+div.item {
+    clear: both;
+}
+div.side {
+    float: left;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+div.side li {
+    list-style-type: none;
+}
+div.side ul {
+    margin: 0;
+    padding: 0;
+}
+div.left {
+	margin-right: 20px;
+    text-align: right;
+    width: 150px;
+}
+div.right {
+	margin-left: 20px;
+    text-align: left;
+    width: 250px;
+}
+div.right ul {
+	margin-bottom: 20px;
+}
+div.main {
+    float: left;
+    margin: 10px 20px 10px 20px;
+    text-align: left;
+    width: 500px;
+}
+a {
+    color: #999999;
+    text-decoration: underline;
+}
+a:hover {
+    background-color: #efefef;
+    color: #999999;
+    text-decoration: none;
+}
+blockquote, div.comment {
+    background-color: #efefef;
+    color: #666666;
+    padding: 10px;
+}
+div.comment.highlight {
+	border-left: 5px solid #cccccc;
+}
+div.splash {
+    background-image: url(header.jpg);
+    height: 265px;
+}
+input {
+    color: #666666;
+}
+h2 {
+    font-size: 115%;
+    margin: 0;
+}
+h3 {
+    font-size: 100%;
+    margin: 0;
+}
+img {
+    border: 0;
+}
+hr {
+	color: #eeeeee;
+	height: 1px;
+	margin: 15px auto 15px auto;
+	width: 80%;
+}
+li.cat-item {
+    display: inline;
+}
+span.date {
+    font-weight: bold;
+}
+span.labels {
+    font-style: italic;
+}
+img.centered {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+img.alignright {
+    display: inline;
+}
+img.alignleft {
+    display: inline;
+}
+.alignright {
+    float: right;
+    margin: 0 0 8px 8px;
+}
+.alignleft {
+    float: left;
+    margin: 0 8px 8px 0;
+}
+.aligncenter {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin: 0 8px 0 8px;
+}
+.wp-caption {
+	border: 1px solid #ddd;
+	text-align: center;
+	background-color: #f3f3f3;
+	padding-top: 4px;
+	margin: 10px;
+	-moz-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+.wp-caption img {
+	margin: 0;
+	padding: 0;
+	border: 0 none;
+}
+.wp-caption-dd {
+	font-size: 11px;
+	line-height: 17px;
+	padding: 0 4px 5px;
+	margin: 0;
+}
+

@@ -23,7 +23,7 @@ do
   wget -q "${STAGEURL}/app/${URL}" -O "${WORK}/static/${URL}.html"
 done
 #copy files into testing deployment structure
-#static files for the web server: html, css, js, etc
+#static files for the web server: html, css, js, wordpress, etc
 echo copying static files to staging web server
 rsync -a "${WORK}/static/" "${STATIC}"
 echo cleaning up subversion, CVS, and editor files that are not needed
