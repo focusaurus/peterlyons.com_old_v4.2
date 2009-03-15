@@ -14,7 +14,6 @@
 
 <?php if ( have_comments() ) : ?>
 
-<div id="comments">
 	<h3><?php comments_number('No Comments', 'One Comment', '% Comments' );?> </h3>
 	<div class="navigation" style="clear:both">
 		<div class="alignleft"><?php previous_comments_link() ?></div>
@@ -38,7 +37,6 @@
 		<p class="nocomments">Comments are closed.</p>
 
 	<?php endif; ?>
-
 <?php endif; ?>
 
 
@@ -64,10 +62,10 @@
 
 <?php else : ?>
 
-<p><input type="text" name="author" id="author" value="<?php echo $comment_author; ?>" size="22" tabindex="1" <?php if ($req) echo "aria-required='true'"; ?> />
+<p><input type="text" name="author" id="author" value="<?php echo $comment_author; ?>" size="22" tabindex="1" />
 <label for="author"><small>Name <?php if ($req) echo "(required)"; ?></small></label></p>
 
-<p><input type="text" name="email" id="email" value="<?php echo $comment_author_email; ?>" size="22" tabindex="2" <?php if ($req) echo "aria-required='true'"; ?> />
+<p><input type="text" name="email" id="email" value="<?php echo $comment_author_email; ?>" size="22" tabindex="2" />
 <label for="email"><small>Mail (will not be published) <?php if ($req) echo "(required)"; ?></small></label></p>
 
 <p><input type="text" name="url" id="url" value="<?php echo $comment_author_url; ?>" size="22" tabindex="3" />
@@ -85,9 +83,8 @@
 <?php do_action('comment_form', $post->ID); ?>
 
 </form>
+</div> <!-- respond? -->
 
 <?php endif; // If registration required and not logged in ?>
-</div>
 <?php endif; // if you delete this the sky will fall on your head ?>
-</div>
 
