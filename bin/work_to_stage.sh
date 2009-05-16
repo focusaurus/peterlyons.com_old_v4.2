@@ -35,3 +35,5 @@ do
     find "${DIR}" -name \*~ -type f | xargs /bin/rm -f
 done
 popd > /dev/null
+echo setting 644 permissions on photos
+chmod 644 "${STATIC}"/photos/*/*
