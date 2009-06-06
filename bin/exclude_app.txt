@@ -1,0 +1,6 @@
+*.pyc
+appserver.pid
+Cache
+ErrorMsgs
+Logs
+Sessions

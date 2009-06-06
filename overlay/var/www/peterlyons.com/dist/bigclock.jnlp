@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!-- JNLP File for BigClock desktop clock utility --> 
+<jnlp 
+  spec="1.0+" 
+  codebase="http://www.peterlyons.com/" 
+  href="dist/bigclock.jnlp"> 
+  <information> 
+    <title>BigClock</title> 
+    <vendor>Peter Lyons</vendor> 
+    <homepage href="http://www.peterlyons.com/bigclock.html"/> 
+    <description kind="short">A simple clock that fills up the entire window
+so you can make it as big as you like. The colors can be customized via menu items on the pop-up menu (right-click). More formats are coming.
+</description> 
+    <description kind="one-line">A simple full-window clock</description> 
+    <description kind="tooltip">A simple full-window clock</description> 
+    <offline-allowed/> 
+  </information> 
+  <resources> 
+    <j2se version="1.3+"/> 
+    <jar href="dist/bigclock.jar"/> 
+  </resources> 
+  <application-desc main-class="net.codemusic.bigclock.BigClock"/> 
+</jnlp> 

@@ -1,39 +1,38 @@
-#!/usr/bin/zsh
+#!/bin/sh
 . `dirname ${0}`/site_conf.sh
 echo Deleting all .pyc files
 find ${WORK}/ -name '*.pyc' | xargs rm -f
 #compile all the templates into the lib directory
 echo compiling cheetah templates
-export PYTHONPATH="${WORK}/lib"
-/usr/bin/cheetah-compile -R --nobackup --idir ${WORK}/templates --odir ${WORK}/lib > /dev/null
-echo deploying webware servlets, python modules, and data files
-#webware servlets that actually get used in URLs on the site
-rsync -a --delete "${WORK}/servlets/" "${APP}/${SITE}"
-#python files used by servlets
-rsync -a --delete "${WORK}/lib" "${APP}"
-#data files used by servlets
-rsync -a --delete "${WORK}/data" "${APP}"
-echo overlaying webware config files
-/bin/cp -ar "${WORK}/webware/"* "${APP}"
+/usr/bin/env PYTHONPATH="${WORK}/overlay${APP}/lib" /usr/bin/cheetah-compile -R --nobackup --idir "${WORK}/templates" --odir "${WORK}/overlay${APP}/lib" > /dev/null
+echo Setting owner/perms on files in work area
+chgrp -R webadmin "${WORK}/overlay"
+find "${WORK}" -type f -print0 | xargs -0 chmod 664
+find "${WORK}" -type d -print0 | xargs -0 chmod 775
+chmod 775 "${WORK}"/overlay/etc/init.d/*
+chmod 775 "${WORK}"/overlay${APP}/AppServer
+chmod 775 "${WORK}"/bin/*.sh
+echo overlaying flat files into the filesystem
+#NOTA BENE the trailing slashes in the rsync commands below are important
+rsync -aiE --delete --exclude-from="${WORK}/bin/exclude_static.txt" "${WORK}/overlay${STATIC}/" "${STATIC}"
+rsync -aiE --delete --exclude-from="${WORK}/bin/exclude_app.txt" "--exclude=*.pyc" "${WORK}/overlay${APP}/" "${APP}"
+rsync -rliE "${WORK}/overlay/etc/" /etc
+perl -pi -e "s/ServerName.*/ServerName stage.${SITE}/" "/etc/apache2/sites-available/${SITE}"
 echo saving html for quasi-dynamic pages
-pushd "${APP}" > /dev/null
-./AppServer -l lib -w /usr/local/webware >> ${WORK}/AppServer.log 2>&1 &
-for URL in home oberlin smartears bigclock code_conventions
+"/etc/init.d/webware_${SITE}" restart
+for URL in `ls ${WORK}/templates/*.tmpl|xargs -n 1 basename|sed -e s/_tmpl.tmpl//|grep -v photos`
+#for URL in `ls ${WORK}/templates/*.tmpl|grep -v photos`
+#home oberlin smartears bigclock code_conventions
 do
-  wget -q "${STAGEURL}/app/${URL}" -O "${WORK}/static/${URL}.html"
+    wget -q "${STAGEURL}/app/${URL}" -O "${WORK}/overlay${STATIC}/${URL}.html"
+    cp "${WORK}/overlay${STATIC}/${URL}.html" "${STATIC}"
 done
-#copy files into testing deployment structure
-#static files for the web server: html, css, js, wordpress, etc
-echo copying static files to staging web server
-rsync -a "${WORK}/static/" "${STATIC}"
-echo cleaning up subversion, CVS, and editor files that are not needed
+chgrp webadmin "${STATIC}"/*.html
+echo setting permissions, cleaning up SCM and editor files that are not needed
 #delete source control repository metadata directories
 for DIR in "${APP}" "${STATIC}"
 do
-    find "${DIR}" -name '.svn' -type d | xargs /bin/rm -rf
-    find "${DIR}" -name 'CVS' -type d | xargs /bin/rm -rf
-    find "${DIR}" -name \*~ -type f | xargs /bin/rm -f
+    find "${DIR}" -name .svn -type d -print0 | xargs -0 /bin/rm -rf
+    find "${DIR}" -name CVS -type d -print0 | xargs -0 /bin/rm -rf
+    find "${DIR}" -type f -name \*~ -o -name .gitignore -print0 | xargs -0 /bin/rm -f
 done
-popd > /dev/null
-echo setting 644 permissions on photos
-chmod 644 "${STATIC}"/photos/*/*
