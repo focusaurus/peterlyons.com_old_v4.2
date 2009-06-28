@@ -4,7 +4,7 @@ echo Deleting all .pyc files
 find ${WORK}/ -name '*.pyc' | xargs rm -f
 #compile all the templates into the lib directory
 echo compiling cheetah templates
-/usr/bin/env PYTHONPATH="${WORK}/overlay${APP}/lib" /usr/bin/cheetah-compile -R --nobackup --idir "${WORK}/templates" --odir "${WORK}/overlay${APP}/lib" > /dev/null
+/usr/bin/env PYTHONPATH="${WORK}/overlay${APP}/lib" cheetah-compile -R --nobackup --idir "${WORK}/templates" --odir "${WORK}/overlay${APP}/lib" > /dev/null
 echo Setting owner/perms on files in work area
 chgrp -R webadmin "${WORK}/overlay"
 find "${WORK}" -type f -print0 | xargs -0 chmod 664

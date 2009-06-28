@@ -1,6 +1,6 @@
 #!/bin/bash
 SITE="peterlyons.com"
-WORK="${HOME}/projects/${SITE}"
+WORK="/home/plyons/projects/${SITE}"
 APP="/var/www/webware/${SITE}"
 STATIC="/var/www/${SITE}"
 RSYNC_CMD="rsync -aiE"
