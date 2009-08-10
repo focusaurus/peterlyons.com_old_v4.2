@@ -1,0 +1,236 @@
+ul.defensio_comments {
+  list-style: none;
+  padding: 0;
+	margin-top: 10px;
+	margin-bottom: 2px;
+}
+
+tr {
+  padding: 1px 0 1px 0;
+  margin: 2px 0 2px 0;
+}
+
+tr.defensio_check_all {
+	margin: 15px 0 5px 5px;
+}
+
+
+tr.defensio_comment_group {
+  background-color: #f8f8f8;
+}
+
+tr.defensio_comment_group td {
+  font-size: 9pt;
+  font-weight: bold;
+  padding: 7px 0 7px 10px;
+
+}
+
+tr.defensio_comment_group span {
+  font-size: 7pt;
+  font-weight: normal;
+}
+
+p.hide_obvious_spam {
+	display: inline;
+	float: right;
+	color: #999999;
+	font-size: 12px;
+	margin: 14px 0 8px;
+}
+
+
+tr li {
+	padding: 8px;
+}
+
+ul.defensio_comments p {
+  margin: 5px 5px 5px 20px;
+}
+
+tr td p.defensio_body_shrunk {
+  height: 4em;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+tr td p.defensio_body_expanded {
+  margin-bottom: 39px;  
+}
+
+tr span.defensio_comment_header {
+  font-weight: bold;
+}
+
+tr p.defensio_comment_meta {
+  filter:alpha(opacity=75);
+  -moz-opacity:.75;
+  opacity:.75;
+  font-size: 8pt;
+}
+
+li p.defensio_comment_meta a.defensio_quarantine_action {
+  font-weight: bold;
+}
+
+tr.defensio_spam0 {
+  background-color: #ffffff;
+  border-bottom: 1px solid #ccc;
+}
+
+tr.defensio_spam1 {
+  background-color: #faf0e1;
+}
+
+tr.defensio_spam2 {
+  background-color: #faebd4;
+}
+
+tr.defensio_spam3 {
+  background-color: #fae6c8;
+}
+
+tr.defensio_spam4 {
+  background-color: #fae1bb;
+}
+
+tr.defensio_spam5 {
+  background-color: #fadcaf;
+}
+
+tr.defensio_spam6 {
+  background-color: #fad7a2;
+}
+
+tr.defensio_spam7 {
+  background-color: #fad296;
+}
+
+tr.defensio_spam8 {
+  background-color: #facd89;
+}
+
+tr.defensio_spam9 {
+  background-color: #fac87d;
+}
+
+div.defensio_stats {
+  float:left;
+  width:62%;    
+}
+
+div.defensio_stats h3.defensio_learning {
+  font-weight:bold;
+  color: red;
+  font-size: 10pt;    
+}
+
+div.defensio_more_stats {
+  width: 30%;
+  background:url('../images/chart.gif') 0 15px no-repeat;
+  padding-left: 45px;
+  float: left;
+}
+
+div.defensio_more_stats h3 {  
+  font-size: 10pt;
+  margin-bottom: 4px;
+}
+
+div.defensio_more_stats p {
+  margin: 0;
+}
+
+p.defensio_comment_header img{
+  float: left;
+  margin-right: 9px;
+}
+
+p.defensio_comment_header {
+  margin-top: 0px;
+  font-size: 11px;
+}
+
+div.defensio_comment_checkbox{
+  float:left;
+  margin-right: 8px;
+}
+
+p.comment-author{
+  margin-top: 0;
+}
+
+div.defensio_quarantine div.defensio_header { 
+  clear:both;
+  margin-bottom:20px;
+  text-align:right;
+}
+
+div.defensio_spam table#defensio_quarantine_options tr td#defensio_quarantine_options_sort {
+  width:60%;
+}
+
+div.defensio_spam table#defensio_quarantine_options tr td#defensio_quarantine_options_search {
+  text-align: right;
+  width: 40%;
+}
+
+div.defensio_spam table#defensio_quarantine_options {
+  margin-bottom: 20px;
+  width: 100%;
+  clear: both;
+}
+
+div.defensio_spam table#defensio_quarantine_options tr {
+  vertical-align: top;
+}
+
+div.defensio_spam table#defensio_quarantine_options tr td {
+  line-height: 1.6em;
+}
+
+div.defensio_quarantine div.defensio_header {
+  clear:both;
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+div.defensio_quarantine div.defensio_header h2 {
+  float: left;
+  background: transparent;
+}
+
+div.defensio_quarantine div.defensio_header a {
+  border:none;
+}
+
+div.defensio_quarantine div.defensio_header img {
+  padding-top: 7px;
+}
+
+p#defensio_quarantine_empty {
+  margin-bottom: 30px;
+  clear: both;
+  text-align:center;
+}
+
+span.defensio_more_details a {
+/*  color: #cccccc;*/
+/*  font-size: 7pt;*/
+/*  text-decoration: none;*/
+}
+
+/* For warning boxes */
+
+#adminmenu { margin-bottom: 6em; }
+#adminmenu.large { margin-bottom: 8.5em; }
+#defensio_warning_controls_wrap { width:auto; margin-bottom:3px; display:none; }
+#defensio_warning p.defensio_error { color: red; }
+#defensio_warning p.defensio_success { color: green; }
+#defensio_progress_bar { width:300px; height:16px; border:1px solid black; padding:2px; float:left; margin-bottom:10px; }
+#defensio_progress_bar_value { width:0%; height:16px; background:blue; }
+#defensio_spinner { padding: 2px 10px 0 10px; float: left;}
+#defensio_start_processing { margin-left: 10px; clear:both; }
+#defensio_stop_processing { clear:both; }
+
+
