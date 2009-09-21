@@ -19,7 +19,7 @@
 
 <?php
 // Checks to see whether it needs a sidebar or not
-if ( !empty($withcomments) && !is_single() ) {
+if ( empty($withcomments) && !is_single() ) {
 ?>
 	#page { background: url("<?php bloginfo('stylesheet_directory'); ?>/images/kubrickbg-<?php bloginfo('text_direction'); ?>.jpg") repeat-y top; border: none; }
 <?php } else { // No sidebar ?>
@@ -36,7 +36,7 @@ if ( !empty($withcomments) && !is_single() ) {
 <div id="page">
 
 
-<div id="header">
+<div id="header" role="banner">
 	<div id="headerimg">
 		<h1><a href="<?php echo get_option('home'); ?>/"><?php bloginfo('name'); ?></a></h1>
 		<div class="description"><?php bloginfo('description'); ?></div>

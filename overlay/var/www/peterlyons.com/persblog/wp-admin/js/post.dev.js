@@ -36,7 +36,7 @@ function tag_update_quickclicks(taxbox) {
 
 	jQuery.each( current_tags, function( key, val ) {
 		var txt, button_id;
-		
+
 		val = jQuery.trim(val);
 		if ( !val.match(/^\s+$/) && '' != val ) {
 			button_id = jQuery(taxbox).attr('id') + '-check-num-' + key;
@@ -52,7 +52,7 @@ function tag_update_quickclicks(taxbox) {
 function tag_flush_to_text(id, a) {
 	a = a || false;
 	var taxbox, text, tags, newtags;
-	
+
 	taxbox = jQuery('#'+id);
 	text = a ? jQuery(a).text() : taxbox.find('input.newtag').val();
 
@@ -68,7 +68,7 @@ function tag_flush_to_text(id, a) {
 	newtags = array_unique_noempty(newtags.split(',')).join(',');
 	taxbox.find('.the-tags').val(newtags);
 	tag_update_quickclicks(taxbox);
-	
+
 	if ( ! a )
 		taxbox.find('input.newtag').val('').focus();
 
@@ -210,11 +210,7 @@ var commentsBox, tagCloud;
 })(jQuery);
 
 jQuery(document).ready( function($) {
-	var categoryTabs, noSyncChecks = false, syncChecks, catAddAfter, dotabkey = true, stamp = $('#timestamp').html(), visibility = $('#post-visibility-display').html(), sticky = '';
-
-	// for Press This
-	if ( typeof autosave != 'function' )
-		autosave = function(){};
+	var noSyncChecks = false, syncChecks, catAddAfter, stamp = $('#timestamp').html(), visibility = $('#post-visibility-display').html(), sticky = '';
 
 	// postboxes
 	postboxes.add_postbox_toggles('post');
@@ -225,7 +221,13 @@ jQuery(document).ready( function($) {
 	// prepare the tag UI
 	tag_init();
 
-	$('#title').blur( function() { if ( ($("#post_ID").val() > 0) || ($("#title").val().length == 0) ) return; autosave(); } );
+	$('#title').blur( function() {
+		if ( ($("#post_ID").val() > 0) || ($("#title").val().length == 0) )
+			return;
+
+		if ( typeof(autosave) != 'undefined' )
+			autosave();
+	});
 
 	// auto-suggest stuff
 	$('.newtag').each(function(){
@@ -234,11 +236,23 @@ jQuery(document).ready( function($) {
 	});
 
 	// category tabs
-	categoryTabs =jQuery('#category-tabs').tabs();
+	$('#category-tabs a').click(function(){
+		var t = $(this).attr('href');
+		$(this).parent().addClass('tabs').siblings('li').removeClass('tabs');
+		$('.tabs-panel').hide();
+		$(t).show();
+		if ( '#categories-all' == t )
+			deleteUserSetting('cats');
+		else
+			setUserSetting('cats','pop');
+		return false;
+	});
+	if ( getUserSetting('cats') )
+		$('#category-tabs a[href="#categories-pop"]').click();
 
 	// Ajax Cat
 	$('#newcat').one( 'focus', function() { $(this).val( '' ).removeClass( 'form-input-tip' ) } );
-	$('#category-add-sumbit').click( function() { $('#newcat').focus(); } );
+	$('#category-add-sumbit').click(function(){$('#newcat').focus();});
 
 	syncChecks = function() {
 		if ( noSyncChecks )
@@ -251,6 +265,8 @@ jQuery(document).ready( function($) {
 
 	popularCats = $('#categorychecklist-pop :checkbox').map( function() { return parseInt(jQuery(this).val(), 10); } ).get().join(',');
 	catAddBefore = function( s ) {
+		if ( !$('#newcat').val() )
+			return false;
 		s.data += '&popular_ids=' + popularCats + '&' + jQuery( '#categorychecklist :checked' ).serialize();
 		return s;
 	};
@@ -281,14 +297,9 @@ jQuery(document).ready( function($) {
 
 	$('#category-add-toggle').click( function() {
 		$('#category-adder').toggleClass( 'wp-hidden-children' );
-		categoryTabs.tabs( 'select', 0 );
+		$('#category-tabs a[href="#categories-all"]').click();
 		return false;
 	} );
-
-	$('a[href="#categories-all"]').click(function(){deleteUserSetting('cats');});
-	$('a[href="#categories-pop"]').click(function(){setUserSetting('cats','pop');});
-	if ( 'pop' == getUserSetting('cats') )
-		$('a[href="#categories-pop"]').click();
 
 	$('.categorychecklist .popular-category :checkbox').change( syncChecks ).filter( ':checked' ).change(), sticky = '';
 
@@ -308,7 +319,7 @@ jQuery(document).ready( function($) {
 
 	function updateText() {
 		var attemptedDate, originalDate, currentDate, publishOn;
-		
+
 		attemptedDate = new Date( $('#aa').val(), $('#mm').val() -1, $('#jj').val(), $('#hh').val(), $('#mn').val());
 		originalDate = new Date( $('#hidden_aa').val(), $('#hidden_mm').val() -1, $('#hidden_jj').val(), $('#hidden_hh').val(), $('#hidden_mn').val());
 		currentDate = new Date( $('#cur_aa').val(), $('#cur_mm').val() -1, $('#cur_jj').val(), $('#cur_hh').val(), $('#cur_mn').val());
@@ -466,43 +477,14 @@ jQuery(document).ready( function($) {
 	});
 
 	// Custom Fields
-	jQuery('#the-list').wpList( { addAfter: function( xml, s ) {
+	$('#the-list').wpList( { addAfter: function( xml, s ) {
 		$('table#list-table').show();
-		if ( jQuery.isFunction( autosave_update_post_ID ) ) {
+		if ( typeof( autosave_update_post_ID ) != 'undefined' ) {
 			autosave_update_post_ID(s.parsed.responses[0].supplemental.postid);
 		}
 	}, addBefore: function( s ) {
-		s.data += '&post_id=' + jQuery('#post_ID').val();
+		s.data += '&post_id=' + $('#post_ID').val();
 		return s;
 	}
 	});
-
-	// preview
-	$('#post-preview').click(function(e){
-		if ( 1 > $('#post_ID').val() && autosaveFirst ) {
-			autosaveDelayPreview = true;
-			autosave();
-			return false;
-		}
-
-		$('input#wp-preview').val('dopreview');
-		$('form#post').attr('target', 'wp-preview').submit().attr('target', '');
-		$('input#wp-preview').val('');
-		return false;
-	});
-
-	//  This code is meant to allow tabbing from Title to Post if tinyMCE is defined.
-	if ( typeof tinyMCE != 'undefined' ) {
-		$('#title')[$.browser.opera ? 'keypress' : 'keydown'](function (e) {
-			if (e.which == 9 && !e.shiftKey && !e.controlKey && !e.altKey) {
-				if ( ($("#post_ID").val() < 1) && ($("#title").val().length > 0) ) { autosave(); }
-				if ( tinyMCE.activeEditor && ! tinyMCE.activeEditor.isHidden() && dotabkey ) {
-					e.preventDefault();
-					dotabkey = false;
-					tinyMCE.activeEditor.focus();
-					return false;
-				}
-			}
-		});
-	}
 });

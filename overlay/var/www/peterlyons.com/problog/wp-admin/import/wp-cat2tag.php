@@ -103,7 +103,7 @@ function check_all_rows() {
 </script>
 
 <form name="catlist" id="catlist" action="admin.php?import=wp-cat2tag&amp;step=2" method="post">
-<p><input type="button" class="button-secondary" value="<?php _e('Check All'); ?>" onclick="this.value=check_all_rows()" />
+<p><input type="button" class="button-secondary" value="<?php esc_attr_e('Check All'); ?>" onclick="this.value=check_all_rows()" />
 <?php wp_nonce_field('import-cat2tag'); ?></p>
 <ul style="list-style:none">
 
@@ -128,7 +128,7 @@ function check_all_rows() {
 <?php	if ( ! empty($this->hybrids_ids) )
 			echo '<p><a name="note"></a>' . __('* This category is also a tag. Converting it will add that tag to all posts that are currently in the category.') . '</p>'; ?>
 
-<p class="submit"><input type="submit" name="submit" class="button" value="<?php _e('Convert Categories to Tags'); ?>" /></p>
+<p class="submit"><input type="submit" name="submit" class="button" value="<?php esc_attr_e('Convert Categories to Tags'); ?>" /></p>
 </form>
 
 <?php }
@@ -143,7 +143,7 @@ function check_all_rows() {
 			screen_icon();
 			echo '<h2>' . sprintf( _n( 'Convert Tag to Category.', 'Convert Tags (%d) to Categories.', $tags_num ), $tags_num ) . '</h2>';
 			echo '<div class="narrow">';
-			echo '<p>' . __('Here you can selectively converts existing tags to categories. To get started, check the tags you wish to be converted, then click the Convert button.') . '</p>';
+			echo '<p>' . __('Here you can selectively convert existing tags to categories. To get started, check the tags you wish to be converted, then click the Convert button.') . '</p>';
 			echo '<p>' . __('The newly created categories will still be associated with the same posts.') . '</p></div>';
 
 			$this->tags_form();
@@ -179,12 +179,12 @@ function check_all_tagrows() {
 </script>
 
 <form name="taglist" id="taglist" action="admin.php?import=wp-cat2tag&amp;step=4" method="post">
-<p><input type="button" class="button-secondary" value="<?php _e('Check All'); ?>" onclick="this.value=check_all_tagrows()" />
+<p><input type="button" class="button-secondary" value="<?php esc_attr_e('Check All'); ?>" onclick="this.value=check_all_tagrows()" />
 <?php wp_nonce_field('import-cat2tag'); ?></p>
 <ul style="list-style:none">
 
 <?php	foreach ( $this->all_tags as $tag ) { ?>
-	<li><label><input type="checkbox" name="tags_to_convert[]" value="<?php echo intval($tag->term_id); ?>" /> <?php echo attribute_escape($tag->name) . ' (' . $tag->count . ')'; ?></label><?php if ( in_array( intval($tag->term_id),  $this->hybrids_ids ) ) echo ' <a href="#note"> * </a>'; ?></li>
+	<li><label><input type="checkbox" name="tags_to_convert[]" value="<?php echo intval($tag->term_id); ?>" /> <?php echo esc_attr($tag->name) . ' (' . $tag->count . ')'; ?></label><?php if ( in_array( intval($tag->term_id),  $this->hybrids_ids ) ) echo ' <a href="#note"> * </a>'; ?></li>
 
 <?php	} ?>
 </ul>
@@ -192,7 +192,7 @@ function check_all_tagrows() {
 <?php	if ( ! empty($this->hybrids_ids) )
 			echo '<p><a name="note"></a>' . __('* This tag is also a category. When converted, all posts associated with the tag will also be in the category.') . '</p>'; ?>
 
-<p class="submit"><input type="submit" name="submit_tags" class="button" value="<?php _e('Convert Tags to Categories'); ?>" /></p>
+<p class="submit"><input type="submit" name="submit_tags" class="button" value="<?php esc_attr_e('Convert Tags to Categories'); ?>" /></p>
 </form>
 
 <?php }
@@ -249,7 +249,7 @@ function check_all_tagrows() {
 			$cat_id = (int) $cat_id;
 
 			if ( ! $this->_category_exists($cat_id) ) {
-				echo '<li>' . sprintf( __('Category %s doesn\'t exist!'),  $cat_id ) . "</li>\n";
+				echo '<li>' . sprintf( __('Category %s doesn&#8217;t exist!'),  $cat_id ) . "</li>\n";
 			} else {
 				$category =& get_category($cat_id);
 				echo '<li>' . sprintf(__('Converting category <strong>%s</strong> ... '),  $category->name);
@@ -406,7 +406,7 @@ function check_all_tagrows() {
 				echo __('Converted successfully.') . "</li>\n";
 
 			} else {
-				printf( '<li>' . __('Tag #%s doesn\'t exist!') . "</li>\n",  $tag_id );
+				printf( '<li>' . __('Tag #%s doesn&#8217;t exist!') . "</li>\n",  $tag_id );
 			}
 		}
 

@@ -60,7 +60,7 @@ class WP_Scripts extends WP_Dependencies {
 				$after = $val;
 				continue;
 			}
-			$data .= "$eol\t$var: \"" . js_escape( $val ) . '"';
+			$data .= "$eol\t$var: \"" . esc_js( $val ) . '"';
 			$eol = ",\n";
 		}
 		$data .= "\n};\n";
@@ -115,7 +115,7 @@ class WP_Scripts extends WP_Dependencies {
 		}
 
 		$src = add_query_arg('ver', $ver, $src);
-		$src = clean_url(apply_filters( 'script_loader_src', $src, $handle ));
+		$src = esc_url(apply_filters( 'script_loader_src', $src, $handle ));
 
 		if ( $this->do_concat )
 			$this->print_html .= "<script type='text/javascript' src='$src'></script>\n";
@@ -146,7 +146,7 @@ class WP_Scripts extends WP_Dependencies {
 		if ( false !== $group && $grp > $group )
 			$grp = $group;
 
-		parent::set_group( $handle, $recursion, $grp );
+		return parent::set_group( $handle, $recursion, $grp );
 	}
 
 	function all_deps( $handles, $recursion = false, $group = false ) {

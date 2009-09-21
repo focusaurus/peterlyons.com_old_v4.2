@@ -154,7 +154,7 @@ function get_permalink($id = 0, $leavename = false) {
 		$permalink = user_trailingslashit($permalink, 'single');
 		return apply_filters('post_link', $permalink, $post, $leavename);
 	} else { // if they're not using the fancy permalink option
-		$permalink = get_option('home') . '/?p=' . $post->ID;
+		$permalink = trailingslashit(get_option('home')) . '?p=' . $post->ID;
 		return apply_filters('post_link', $permalink, $post, $leavename);
 	}
 }
@@ -225,10 +225,10 @@ function _get_page_link( $id = false, $leavename = false, $sample = false ) {
 	if ( '' != $pagestruct && ( ( isset($post->post_status) && 'draft' != $post->post_status ) || $sample ) ) {
 		$link = get_page_uri($id);
 		$link = ( $leavename ) ? $pagestruct : str_replace('%pagename%', $link, $pagestruct);
-		$link = get_option('home') . "/$link";
+		$link = trailingslashit(get_option('home')) . "$link";
 		$link = user_trailingslashit($link, 'page');
 	} else {
-		$link = get_option('home') . "/?page_id=$id";
+		$link = trailingslashit(get_option('home')) . "?page_id=$id";
 	}
 
 	return apply_filters( '_get_page_link', $link, $id );
@@ -269,7 +269,7 @@ function get_attachment_link($id = false) {
 	}
 
 	if (! $link ) {
-		$link = get_bloginfo('url') . "/?attachment_id=$id";
+		$link = trailingslashit(get_bloginfo('url')) . "?attachment_id=$id";
 	}
 
 	return apply_filters('attachment_link', $link, $id);
@@ -292,7 +292,7 @@ function get_year_link($year) {
 		$yearlink = str_replace('%year%', $year, $yearlink);
 		return apply_filters('year_link', get_option('home') . user_trailingslashit($yearlink, 'year'), $year);
 	} else {
-		return apply_filters('year_link', get_option('home') . '/?m=' . $year, $year);
+		return apply_filters('year_link', trailingslashit(get_option('home')) . '?m=' . $year, $year);
 	}
 }
 
@@ -317,7 +317,7 @@ function get_month_link($year, $month) {
 		$monthlink = str_replace('%monthnum%', zeroise(intval($month), 2), $monthlink);
 		return apply_filters('month_link', get_option('home') . user_trailingslashit($monthlink, 'month'), $year, $month);
 	} else {
-		return apply_filters('month_link', get_option('home') . '/?m=' . $year . zeroise($month, 2), $year, $month);
+		return apply_filters('month_link', trailingslashit(get_option('home')) . '?m=' . $year . zeroise($month, 2), $year, $month);
 	}
 }
 
@@ -347,7 +347,7 @@ function get_day_link($year, $month, $day) {
 		$daylink = str_replace('%day%', zeroise(intval($day), 2), $daylink);
 		return apply_filters('day_link', get_option('home') . user_trailingslashit($daylink, 'day'), $year, $month, $day);
 	} else {
-		return apply_filters('day_link', get_option('home') . '/?m=' . $year . zeroise($month, 2) . zeroise($day, 2), $year, $month, $day);
+		return apply_filters('day_link', trailingslashit(get_option('home')) . '?m=' . $year . zeroise($month, 2) . zeroise($day, 2), $year, $month, $day);
 	}
 }
 
@@ -382,7 +382,7 @@ function get_feed_link($feed = '') {
 		if ( false !== strpos($feed, 'comments_') )
 			$feed = str_replace('comments_', 'comments-', $feed);
 
-		$output = get_option('home') . "/?feed={$feed}";
+		$output = trailingslashit(get_option('home')) . "?feed={$feed}";
 	}
 
 	return apply_filters('feed_link', $output, $feed);
@@ -414,9 +414,9 @@ function get_post_comments_feed_link($post_id = '', $feed = '') {
 	} else {
 		$type = get_post_field('post_type', $post_id);
 		if ( 'page' == $type )
-			$url = get_option('home') . "/?feed=$feed&amp;page_id=$post_id";
+			$url = trailingslashit(get_option('home')) . "?feed=$feed&amp;page_id=$post_id";
 		else
-			$url = get_option('home') . "/?feed=$feed&amp;p=$post_id";
+			$url = trailingslashit(get_option('home')) . "?feed=$feed&amp;p=$post_id";
 	}
 
 	return apply_filters('post_comments_feed_link', $url);
@@ -443,7 +443,7 @@ function post_comments_feed_link( $link_text = '', $post_id = '', $feed = '' ) {
 	if ( empty($link_text) )
 		$link_text = __('Comments Feed');
 
-	echo "<a href='$url'>$link_text</a>";
+	echo apply_filters( 'post_comments_feed_link_html', "<a href='$url'>$link_text</a>", $post_id, $feed );
 }
 
 /**
@@ -468,7 +468,7 @@ function get_author_feed_link( $author_id, $feed = '' ) {
 		$feed = get_default_feed();
 
 	if ( '' == $permalink_structure ) {
-		$link = get_option('home') . "?feed=$feed&amp;author=" . $author_id;
+		$link = trailingslashit(get_option('home')) . "?feed=$feed&amp;author=" . $author_id;
 	} else {
 		$link = get_author_posts_url($author_id);
 		if ( $feed == get_default_feed() )
@@ -512,7 +512,7 @@ function get_category_feed_link($cat_id, $feed = '') {
 	$permalink_structure = get_option('permalink_structure');
 
 	if ( '' == $permalink_structure ) {
-		$link = trailingslashit( get_option('home') ) . "?feed=$feed&amp;cat=" . $cat_id;
+		$link = trailingslashit(get_option('home')) . "?feed=$feed&amp;cat=" . $cat_id;
 	} else {
 		$link = get_category_link($cat_id);
 		if( $feed == get_default_feed() )
@@ -551,7 +551,7 @@ function get_tag_feed_link($tag_id, $feed = '') {
 		$feed = get_default_feed();
 
 	if ( '' == $permalink_structure ) {
-		$link = get_option('home') . "?feed=$feed&amp;tag=" . $tag->slug;
+		$link = trailingslashit(get_option('home')) . "?feed=$feed&amp;tag=" . $tag->slug;
 	} else {
 		$link = get_tag_link($tag->term_id);
 		if ( $feed == get_default_feed() )
@@ -619,14 +619,14 @@ function edit_tag_link( $link = '', $before = '', $after = '', $tag = null ) {
  */
 function get_search_feed_link($search_query = '', $feed = '') {
 	if ( empty($search_query) )
-		$search = attribute_escape(get_search_query());
+		$search = esc_attr(get_search_query());
 	else
-		$search = attribute_escape(stripslashes($search_query));
+		$search = esc_attr(stripslashes($search_query));
 
 	if ( empty($feed) )
 		$feed = get_default_feed();
 
-	$link = get_option('home') . "?s=$search&amp;feed=$feed";
+	$link = trailingslashit(get_option('home')) . "?s=$search&amp;feed=$feed";
 
 	$link = apply_filters('search_feed_link', $link);
 
@@ -644,14 +644,14 @@ function get_search_feed_link($search_query = '', $feed = '') {
  */
 function get_search_comments_feed_link($search_query = '', $feed = '') {
 	if ( empty($search_query) )
-		$search = attribute_escape(get_search_query());
+		$search = esc_attr(get_search_query());
 	else
-		$search = attribute_escape(stripslashes($search_query));
+		$search = esc_attr(stripslashes($search_query));
 
 	if ( empty($feed) )
 		$feed = get_default_feed();
 
-	$link = get_option('home') . "?s=$search&amp;feed=comments-$feed";
+	$link = trailingslashit(get_option('home')) . "?s=$search&amp;feed=comments-$feed";
 
 	$link = apply_filters('search_feed_link', $link);
 
@@ -711,26 +711,23 @@ function get_edit_post_link( $id = 0, $context = 'display' ) {
 }
 
 /**
- * Retrieve edit posts link for post.
+ * Display edit post link for post.
  *
  * @since 1.0.0
  *
  * @param string $link Optional. Anchor text.
  * @param string $before Optional. Display before edit link.
  * @param string $after Optional. Display after edit link.
+ * @param int $id Optional. Post ID.
  */
-function edit_post_link( $link = 'Edit This', $before = '', $after = '' ) {
-	global $post;
+function edit_post_link( $link = 'Edit This', $before = '', $after = '', $id = 0 ) {
+	if ( !$post = &get_post( $id ) )
+		return;
 
-	if ( $post->post_type == 'page' ) {
-		if ( !current_user_can( 'edit_page', $post->ID ) )
-			return;
-	} else {
-		if ( !current_user_can( 'edit_post', $post->ID ) )
-			return;
-	}
+	if ( !$url = get_edit_post_link( $post->ID ) )
+		return;
 
-	$link = '<a class="post-edit-link" href="' . get_edit_post_link( $post->ID ) . '" title="' . attribute_escape( __( 'Edit post' ) ) . '">' . $link . '</a>';
+	$link = '<a class="post-edit-link" href="' . $url . '" title="' . esc_attr( __( 'Edit post' ) ) . '">' . $link . '</a>';
 	echo $before . apply_filters( 'edit_post_link', $link, $post->ID ) . $after;
 }
 
@@ -771,8 +768,7 @@ function get_edit_comment_link( $comment_id = 0 ) {
 function edit_comment_link( $link = 'Edit This', $before = '', $after = '' ) {
 	global $comment, $post;
 
-	if ( $post->post_type == 'attachment' ) {
-	} elseif ( $post->post_type == 'page' ) {
+	if ( $post->post_type == 'page' ) {
 		if ( !current_user_can( 'edit_page', $post->ID ) )
 			return;
 	} else {
@@ -868,7 +864,7 @@ function get_next_post($in_same_cat = false, $excluded_categories = '') {
 function get_adjacent_post($in_same_cat = false, $excluded_categories = '', $previous = true) {
 	global $post, $wpdb;
 
-	if( empty($post) || !is_single() || is_attachment() )
+	if ( empty($post) || !is_single() || is_attachment() )
 		return null;
 
 	$current_post_date = $post->post_date;
@@ -905,7 +901,252 @@ function get_adjacent_post($in_same_cat = false, $excluded_categories = '', $pre
 	$where = apply_filters( "get_{$adjacent}_post_where", $wpdb->prepare("WHERE p.post_date $op %s AND p.post_type = 'post' AND p.post_status = 'publish' $posts_in_ex_cats_sql", $current_post_date), $in_same_cat, $excluded_categories );
 	$sort  = apply_filters( "get_{$adjacent}_post_sort", "ORDER BY p.post_date $order LIMIT 1" );
 
-	return $wpdb->get_row("SELECT p.* FROM $wpdb->posts AS p $join $where $sort");
+	$query = "SELECT p.* FROM $wpdb->posts AS p $join $where $sort";
+	$query_key = 'adjacent_post_' . md5($query);
+	$result = wp_cache_get($query_key, 'counts');
+	if ( false !== $result )
+		return $result;
+
+	$result = $wpdb->get_row("SELECT p.* FROM $wpdb->posts AS p $join $where $sort");
+	if ( null === $result )
+		$result = '';
+
+	wp_cache_set($query_key, $result, 'counts');
+	return $result;
+}
+
+/**
+ * Get adjacent post relational link.
+ *
+ * Can either be next or previous post relational link.
+ *
+ * @since 2.8.0
+ *
+ * @param string $title Optional. Link title format.
+ * @param bool $in_same_cat Optional. Whether link should be in same category.
+ * @param string $excluded_categories Optional. Excluded categories IDs.
+ * @param bool $previous Optional, default is true. Whether display link to previous post.
+ * @return string
+ */
+function get_adjacent_post_rel_link($title = '%title', $in_same_cat = false, $excluded_categories = '', $previous = true) {
+	if ( $previous && is_attachment() )
+		$post = & get_post($GLOBALS['post']->post_parent);
+	else
+		$post = get_adjacent_post($in_same_cat,$excluded_categories,$previous);
+
+	if ( empty($post) )
+		return;
+
+	if ( empty($post->post_title) )
+		$post->post_title = $previous ? __('Previous Post') : __('Next Post');
+
+	$date = mysql2date(get_option('date_format'), $post->post_date);
+
+	$title = str_replace('%title', $post->post_title, $title);
+	$title = str_replace('%date', $date, $title);
+	$title = apply_filters('the_title', $title, $post);
+
+	$link = $previous ? "<link rel='prev' title='" : "<link rel='next' title='";
+	$link .= esc_attr( $title );
+	$link .= "' href='" . get_permalink($post) . "' />\n";
+
+	$adjacent = $previous ? 'previous' : 'next';
+	return apply_filters( "{$adjacent}_post_rel_link", $link );
+}
+
+/**
+ * Display relational links for the posts adjacent to the current post.
+ *
+ * @since 2.8.0
+ *
+ * @param string $title Optional. Link title format.
+ * @param bool $in_same_cat Optional. Whether link should be in same category.
+ * @param string $excluded_categories Optional. Excluded categories IDs.
+ */
+function adjacent_posts_rel_link($title = '%title', $in_same_cat = false, $excluded_categories = '') {
+	echo get_adjacent_post_rel_link($title, $in_same_cat, $excluded_categories = '', true);
+	echo get_adjacent_post_rel_link($title, $in_same_cat, $excluded_categories = '', false);
+}
+
+/**
+ * Display relational link for the next post adjacent to the current post.
+ *
+ * @since 2.8.0
+ *
+ * @param string $title Optional. Link title format.
+ * @param bool $in_same_cat Optional. Whether link should be in same category.
+ * @param string $excluded_categories Optional. Excluded categories IDs.
+ */
+function next_post_rel_link($title = '%title', $in_same_cat = false, $excluded_categories = '') {
+	echo get_adjacent_post_rel_link($title, $in_same_cat, $excluded_categories = '', false);
+}
+
+/**
+ * Display relational link for the previous post adjacent to the current post.
+ *
+ * @since 2.8.0
+ *
+ * @param string $title Optional. Link title format.
+ * @param bool $in_same_cat Optional. Whether link should be in same category.
+ * @param string $excluded_categories Optional. Excluded categories IDs.
+ */
+function prev_post_rel_link($title = '%title', $in_same_cat = false, $excluded_categories = '') {
+	echo get_adjacent_post_rel_link($title, $in_same_cat, $excluded_categories = '', true);
+}
+
+/**
+ * Retrieve boundary post.
+ *
+ * Boundary being either the first or last post by publish date within the contraitns specified
+ * by in same category or excluded categories.
+ *
+ * @since 2.8.0
+ *
+ * @param bool $in_same_cat Optional. Whether returned post should be in same category.
+ * @param string $excluded_categories Optional. Excluded categories IDs.
+ * @param bool $previous Optional. Whether to retrieve first post.
+ * @return object
+ */
+function get_boundary_post($in_same_cat = false, $excluded_categories = '', $start = true) {
+	global $post, $wpdb;
+
+	if ( empty($post) || !is_single() || is_attachment() )
+		return null;
+
+	$cat_array = array();
+	$excluded_categories = array();
+	if ( !empty($in_same_cat) || !empty($excluded_categories) ) {
+		if ( !empty($in_same_cat) ) {
+			$cat_array = wp_get_object_terms($post->ID, 'category', 'fields=ids');
+		}
+
+		if ( !empty($excluded_categories) ) {
+			$excluded_categories = array_map('intval', explode(',', $excluded_categories));
+
+			if ( !empty($cat_array) )
+				$excluded_categories = array_diff($excluded_categories, $cat_array);
+
+			$inverse_cats = array();
+			foreach ( $excluded_categories as $excluded_category)
+				$inverse_cats[] = $excluded_category * -1;
+			$excluded_categories = $inverse_cats;
+		}
+	}
+
+	$categories = implode(',', array_merge($cat_array, $excluded_categories) );
+
+	$order = $start ? 'ASC' : 'DESC';
+
+	return get_posts( array('numberposts' => 1, 'order' => $order, 'orderby' => 'ID', 'category' => $categories) );
+}
+
+/**
+ * Get boundary post relational link.
+ *
+ * Can either be start or end post relational link.
+ *
+ * @since 2.8.0
+ *
+ * @param string $title Optional. Link title format.
+ * @param bool $in_same_cat Optional. Whether link should be in same category.
+ * @param string $excluded_categories Optional. Excluded categories IDs.
+ * @param bool $start Optional, default is true. Whether display link to first post.
+ * @return string
+ */
+function get_boundary_post_rel_link($title = '%title', $in_same_cat = false, $excluded_categories = '', $start = true) {
+	$posts = get_boundary_post($in_same_cat,$excluded_categories,$start);
+	// Even though we limited get_posts to return only 1 item it still returns an array of objects.
+	$post = $posts[0];
+
+	if ( empty($post) )
+			 return;
+
+		if ( empty($post->post_title) )
+				$post->post_title = $start ? __('First Post') : __('Last Post');
+
+	$date = mysql2date(get_option('date_format'), $post->post_date);
+
+	$title = str_replace('%title', $post->post_title, $title);
+	$title = str_replace('%date', $date, $title);
+	$title = apply_filters('the_title', $title, $post);
+
+	$link = $start ? "<link rel='start' title='" : "<link rel='end' title='";
+	$link .= esc_attr($title);
+	$link .= "' href='" . get_permalink($post) . "' />\n";
+
+	$boundary = $start ? 'start' : 'end';
+	return apply_filters( "{$boundary}_post_rel_link", $link );
+}
+
+/**
+ * Display relational link for the first post.
+ *
+ * @since 2.8.0
+ *
+ * @param string $title Optional. Link title format.
+ * @param bool $in_same_cat Optional. Whether link should be in same category.
+ * @param string $excluded_categories Optional. Excluded categories IDs.
+ */
+function start_post_rel_link($title = '%title', $in_same_cat = false, $excluded_categories = '') {
+	echo get_boundary_post_rel_link($title, $in_same_cat, $excluded_categories, true);
+}
+
+/**
+ * Get site index relational link.
+ *
+ * @since 2.8.0
+ *
+ * @return string
+ */
+function get_index_rel_link() {
+	$link = "<link rel='index' title='" . esc_attr(get_bloginfo('name')) . "' href='" . get_bloginfo('siteurl') . "' />\n";
+	return apply_filters( "index_rel_link", $link );
+}
+
+/**
+ * Display relational link for the site index.
+ *
+ * @since 2.8.0
+ */
+function index_rel_link() {
+	echo get_index_rel_link();
+}
+
+/**
+ * Get parent post relational link.
+ *
+ * @since 2.8.0
+ *
+ * @param string $title Optional. Link title format.
+ * @return string
+ */
+function get_parent_post_rel_link($title = '%title') {
+	if ( ! empty( $GLOBALS['post'] ) && ! empty( $GLOBALS['post']->post_parent ) )
+		$post = & get_post($GLOBALS['post']->post_parent);
+
+	if ( empty($post) )
+		return;
+
+	$date = mysql2date(get_option('date_format'), $post->post_date);
+
+	$title = str_replace('%title', $post->post_title, $title);
+	$title = str_replace('%date', $date, $title);
+	$title = apply_filters('the_title', $title, $post);
+
+	$link = "<link rel='up' title='";
+	$link .= esc_attr( $title );
+	$link .= "' href='" . get_permalink($post) . "' />\n";
+
+	return apply_filters( "parent_post_rel_link", $link );
+}
+
+/**
+ * Display relational link for parent item
+ *
+ * @since 2.8.0
+ */
+function parent_post_rel_link($title = '%title') {
+	echo get_parent_post_rel_link($title);
 }
 
 /**
@@ -1070,7 +1311,7 @@ function get_next_posts_page_link($max_page = 0) {
  * @param boolean $echo Optional. Echo or return;
  */
 function next_posts( $max_page = 0, $echo = true ) {
-	$output = clean_url( get_next_posts_page_link( $max_page ) );
+	$output = esc_url( get_next_posts_page_link( $max_page ) );
 
 	if ( $echo )
 		echo $output;
@@ -1148,7 +1389,7 @@ function get_previous_posts_page_link() {
  * @param boolean $echo Optional. Echo or return;
  */
 function previous_posts( $echo = true ) {
-	$output = clean_url( get_previous_posts_page_link() );
+	$output = esc_url( get_previous_posts_page_link() );
 
 	if ( $echo )
 		echo $output;
@@ -1186,6 +1427,45 @@ function previous_posts_link( $label = '&laquo; Previous Page' ) {
 }
 
 /**
+ * Return post pages link navigation for previous and next pages.
+ *
+ * @since 2.8
+ *
+ * @param string|array $args Optional args.
+ * @return string The posts link navigation.
+ */
+function get_posts_nav_link( $args = array() ) {
+	global $wp_query;
+
+	$return = '';
+
+	if ( !is_singular() ) {
+		$defaults = array(
+			'sep' => ' &#8212; ',
+			'prelabel' => __('&laquo; Previous Page'),
+			'nxtlabel' => __('Next Page &raquo;'),
+		);
+		$args = wp_parse_args( $args, $defaults );
+
+		$max_num_pages = $wp_query->max_num_pages;
+		$paged = get_query_var('paged');
+
+		//only have sep if there's both prev and next results
+		if ($paged < 2 || $paged >= $max_num_pages) {
+			$args['sep'] = '';
+		}
+
+		if ( $max_num_pages > 1 ) {
+			$return = get_previous_posts_link($args['prelabel']);
+			$return .= preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $args['sep']);
+			$return .= get_next_posts_link($args['nxtlabel']);
+		}
+	}
+	return $return;
+
+}
+
+/**
  * Display post pages link navigation for previous and next pages.
  *
  * @since 0.71
@@ -1194,23 +1474,9 @@ function previous_posts_link( $label = '&laquo; Previous Page' ) {
  * @param string $prelabel Optional. Label for previous pages.
  * @param string $nxtlabel Optional Label for next pages.
  */
-function posts_nav_link( $sep = ' &#8212; ', $prelabel = '&laquo; Previous Page', $nxtlabel = 'Next Page &raquo;' ) {
-	global $wp_query;
-	if ( !is_singular() ) {
-		$max_num_pages = $wp_query->max_num_pages;
-		$paged = get_query_var('paged');
-
-		//only have sep if there's both prev and next results
-		if ($paged < 2 || $paged >= $max_num_pages) {
-			$sep = '';
-		}
-
-		if ( $max_num_pages > 1 ) {
-			previous_posts_link($prelabel);
-			echo preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $sep);
-			next_posts_link($nxtlabel);
-		}
-	}
+function posts_nav_link( $sep = '', $prelabel = '', $nxtlabel = '' ) {
+	$args = array_filter( compact('sep', 'prelabel', 'nxtlabel') );
+	echo get_posts_nav_link($args);
 }
 
 /**
@@ -1280,7 +1546,7 @@ function get_next_comments_link( $label = '', $max_page = 0 ) {
 	if ( empty($label) )
 		$label = __('Newer Comments &raquo;');
 
-	return '<a href="' . clean_url( get_comments_pagenum_link( $nextpage, $max_page ) ) . '" ' . apply_filters( 'next_comments_link_attributes', '' ) . '>'. preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $label) .'</a>';
+	return '<a href="' . esc_url( get_comments_pagenum_link( $nextpage, $max_page ) ) . '" ' . apply_filters( 'next_comments_link_attributes', '' ) . '>'. preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $label) .'</a>';
 }
 
 /**
@@ -1317,7 +1583,7 @@ function get_previous_comments_link( $label = '' ) {
 	if ( empty($label) )
 		$label = __('&laquo; Older Comments');
 
-	return '<a href="' . clean_url( get_comments_pagenum_link( $prevpage ) ) . '" ' . apply_filters( 'previous_comments_link_attributes', '' ) . '>' . preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $label) .'</a>';
+	return '<a href="' . esc_url( get_comments_pagenum_link( $prevpage ) ) . '" ' . apply_filters( 'previous_comments_link_attributes', '' ) . '>' . preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $label) .'</a>';
 }
 
 /**
@@ -1426,7 +1692,7 @@ function site_url($path = '', $scheme = null) {
 	// should the list of allowed schemes be maintained elsewhere?
 	$orig_scheme = $scheme;
 	if ( !in_array($scheme, array('http', 'https')) ) {
-		if ( ('login_post' == $scheme) && ( force_ssl_login() || force_ssl_admin() ) )
+		if ( ( 'login_post' == $scheme || 'rpc' == $scheme ) && ( force_ssl_login() || force_ssl_admin() ) )
 			$scheme = 'https';
 		elseif ( ('login' == $scheme) && ( force_ssl_admin() ) )
 			$scheme = 'https';
@@ -1459,7 +1725,7 @@ function admin_url($path = '') {
 	if ( !empty($path) && is_string($path) && strpos($path, '..') === false )
 		$url .= ltrim($path, '/');
 
-	return $url;
+	return apply_filters('admin_url', $url, $path);
 }
 
 /**
@@ -1477,7 +1743,7 @@ function includes_url($path = '') {
 	if ( !empty($path) && is_string($path) && strpos($path, '..') === false )
 		$url .= ltrim($path, '/');
 
-	return $url;
+	return apply_filters('includes_url', $url, $path);
 }
 
 /**
@@ -1500,7 +1766,7 @@ function content_url($path = '') {
 	if ( !empty($path) && is_string($path) && strpos($path, '..') === false )
 		$url .= '/' . ltrim($path, '/');
 
-	return $url;
+	return apply_filters('content_url', $url, $path);
 }
 
 /**
@@ -1516,23 +1782,28 @@ function content_url($path = '') {
 */
 function plugins_url($path = '', $plugin = '') {
 	$scheme = ( is_ssl() ? 'https' : 'http' );
-	$url = WP_PLUGIN_URL;
+
+	if ( $plugin !== '' && preg_match('#^' . preg_quote(WPMU_PLUGIN_DIR . DIRECTORY_SEPARATOR, '#') . '#', $plugin) ) {
+		$url = WPMU_PLUGIN_URL;
+	} else {
+		$url = WP_PLUGIN_URL;
+	}
+
 	if ( 0 === strpos($url, 'http') ) {
 		if ( is_ssl() )
 			$url = str_replace( 'http://', "{$scheme}://", $url );
 	}
 
-	if ( !empty($plugin) && is_string($plugin) )
-	{
+	if ( !empty($plugin) && is_string($plugin) ) {
 		$folder = dirname(plugin_basename($plugin));
 		if ('.' != $folder)
 			$url .= '/' . ltrim($folder, '/');
 	}
-	
+
 	if ( !empty($path) && is_string($path) && strpos($path, '..') === false )
 		$url .= '/' . ltrim($path, '/');
 
-	return $url;
+	return apply_filters('plugins_url', $url, $path, $plugin);
 }
 
 ?>

@@ -4,7 +4,7 @@ jQuery(document).ready( function($) {
 
 	$('#title').blur( function() { if ( ($("#post_ID").val() > 0) || ($("#title").val().length == 0) ) return; autosave(); } );
 
-	var stamp = $('#timestamp').html(), visibility = $('#post-visibility-display').html(), dotabkey = true;
+	var stamp = $('#timestamp').html(), visibility = $('#post-visibility-display').html();
 
 	function updateVisibility() {
 		if ( $('#post-visibility-select input:radio:checked').val() != 'public' ) {
@@ -22,7 +22,7 @@ jQuery(document).ready( function($) {
 
 	function updateText() {
 		var attemptedDate, originalDate, currentDate, publishOn;
-		
+
 		attemptedDate = new Date( $('#aa').val(), $('#mm').val() -1, $('#jj').val(), $('#hh').val(), $('#mn').val());
 		originalDate = new Date( $('#hidden_aa').val(), $('#hidden_mm').val() -1, $('#hidden_jj').val(), $('#hidden_hh').val(), $('#hidden_mn').val());
 		currentDate = new Date( $('#cur_aa').val(), $('#cur_mm').val() -1, $('#cur_jj').val(), $('#cur_hh').val(), $('#cur_mn').val());
@@ -182,33 +182,4 @@ jQuery(document).ready( function($) {
 		return s;
 	}
 	});
-
-	// preview
-	$('#post-preview').click(function(e){
-		if ( 1 > $('#post_ID').val() && autosaveFirst ) {
-			autosaveDelayPreview = true;
-			autosave();
-			return false;
-		}
-
-		$('input#wp-preview').val('dopreview');
-		$('form#post').attr('target', 'wp-preview').submit().attr('target', '');
-		$('input#wp-preview').val('');
-		return false;
-	});
-
-	//  This code is meant to allow tabbing from Title to Post if tinyMCE is defined.
-	if ( typeof tinyMCE != 'undefined' ) {
-		$('#title')[$.browser.opera ? 'keypress' : 'keydown'](function (e) {
-			if (e.which == 9 && !e.shiftKey && !e.controlKey && !e.altKey) {
-				if ( ($("#post_ID").val() < 1) && ($("#title").val().length > 0) ) { autosave(); }
-				if ( tinyMCE.activeEditor && ! tinyMCE.activeEditor.isHidden() && dotabkey ) {
-					e.preventDefault();
-					dotabkey = false;
-					tinyMCE.activeEditor.focus();
-					return false;
-				}
-			}
-		});
-	}
 });

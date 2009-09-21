@@ -132,8 +132,8 @@ function _wp_ajax_delete_comment_response( $comment_id ) {
 	$total = (int) @$_POST['_total'];
 	$per_page = (int) @$_POST['_per_page'];
 	$page = (int) @$_POST['_page'];
-	$url = clean_url( @$_POST['_url'], null, 'url' );
-	// JS didn't send us everything we need to know.  Just die with success message
+	$url = esc_url_raw( @$_POST['_url'] );
+	// JS didn't send us everything we need to know. Just die with success message
 	if ( !$total || !$per_page || !$page || !$url )
 		die( (string) time() );
 
@@ -242,8 +242,10 @@ case 'delete-link-cat' :
 
 	$cat_name = get_term_field('name', $id, 'link_category');
 
+	$default = get_option('default_link_category');
+
 	// Don't delete the default cats.
-	if ( $id == get_option('default_link_category') ) {
+	if ( $id == $default ) {
 		$x = new WP_AJAX_Response( array(
 			'what' => 'link-cat',
 			'id' => $id,
@@ -252,7 +254,7 @@ case 'delete-link-cat' :
 		$x->send();
 	}
 
-	$r = wp_delete_term($id, 'link_category');
+	$r = wp_delete_term($id, 'link_category', array('default' => $default));
 	if ( !$r )
 		die('0');
 	if ( is_wp_error($r) ) {
@@ -422,11 +424,11 @@ case 'add-link-category' : // On the Fly
 			$cat_id = wp_insert_term( $cat_name, 'link_category' );
 		}
 		$cat_id = $cat_id['term_id'];
-		$cat_name = wp_specialchars(stripslashes($cat_name));
+		$cat_name = esc_html(stripslashes($cat_name));
 		$x->add( array(
 			'what' => 'link-category',
 			'id' => $cat_id,
-			'data' => "<li id='link-category-$cat_id'><label for='in-link-category-$cat_id' class='selectit'><input value='$cat_id' type='checkbox' checked='checked' name='link_category[]' id='in-link-category-$cat_id'/> $cat_name</label></li>",
+			'data' => "<li id='link-category-$cat_id'><label for='in-link-category-$cat_id' class='selectit'><input value='" . esc_attr($cat_id) . "' type='checkbox' checked='checked' name='link_category[]' id='in-link-category-$cat_id'/> $cat_name</label></li>",
 			'position' => -1
 		) );
 	}
@@ -445,7 +447,7 @@ case 'add-cat' : // From Manage->Categories
 		$x->send();
 	}
 
-	if ( category_exists( trim( $_POST['cat_name'] ) ) ) {
+	if ( category_exists( trim( $_POST['cat_name'] ), $_POST['category_parent'] ) ) {
 		$x = new WP_Ajax_Response( array(
 			'what' => 'cat',
 			'id' => new WP_Error( 'cat_exists', __('The category you are trying to create already exists.'), array( 'form-field' => 'cat_name' ) ),
@@ -474,7 +476,7 @@ case 'add-cat' : // From Manage->Categories
 		$cat_full_name = $_cat->name . ' &#8212; ' . $cat_full_name;
 		$level++;
 	}
-	$cat_full_name = attribute_escape($cat_full_name);
+	$cat_full_name = esc_attr($cat_full_name);
 
 	$x = new WP_Ajax_Response( array(
 		'what' => 'cat',
@@ -552,19 +554,19 @@ case 'add-tag' : // From Manage->Tags
 		die('0');
 
 	$tag_full_name = $tag->name;
-	$tag_full_name = attribute_escape($tag_full_name);
+	$tag_full_name = esc_attr($tag_full_name);
 
 	$x = new WP_Ajax_Response( array(
 		'what' => 'tag',
 		'id' => $tag->term_id,
 		'position' => '-1',
-		'data' => _tag_row( $tag ),
+		'data' => _tag_row( $tag, '', $taxonomy ),
 		'supplemental' => array('name' => $tag_full_name, 'show-link' => sprintf(__( 'Tag <a href="#%s">%s</a> added' ), "tag-$tag->term_id", $tag_full_name))
 	) );
 	$x->send();
 	break;
 case 'get-tagcloud' :
-	if ( !current_user_can( 'manage_categories' ) )
+	if ( !current_user_can( 'edit_posts' ) )
 		die('-1');
 
 	if ( isset($_POST['tax']) )
@@ -585,7 +587,8 @@ case 'get-tagcloud' :
 		$tags[ $key ]->id = $tag->term_id;
 	}
 
-	$return = wp_generate_tag_cloud( $tags );
+	// We need raw tag names here, so don't filter the output
+	$return = wp_generate_tag_cloud( $tags, array('filter' => 0) );
 
 	if ( empty($return) )
 		die('0');
@@ -599,8 +602,12 @@ case 'add-comment' :
 	if ( !current_user_can( 'edit_post', $id ) )
 		die('-1');
 	$search = isset($_POST['s']) ? $_POST['s'] : false;
-	$start = isset($_POST['page']) ? intval($_POST['page']) * 25 - 1: 24;
-	$status = isset($_POST['comment_status']) ? $_POST['comment_status'] : false;
+	$status = isset($_POST['comment_status']) ? $_POST['comment_status'] : 'all';
+	$per_page = isset($_POST['per_page']) ?  (int) $_POST['per_page'] + 8 : 28;
+	$start = isset($_POST['page']) ? ( intval($_POST['page']) * $per_page ) -1 : $per_page - 1;
+	if ( 1 > $start )
+		$start = 27;
+
 	$mode = isset($_POST['mode']) ? $_POST['mode'] : 'detail';
 	$p = isset($_POST['p']) ? $_POST['p'] : 0;
 	$comment_type = isset($_POST['comment_type']) ? $_POST['comment_type'] : '';
@@ -770,7 +777,7 @@ case 'add-meta' :
 	if ( isset($_POST['metakeyselect']) || isset($_POST['metakeyinput']) ) {
 		if ( !current_user_can( 'edit_post', $pid ) )
 			die('-1');
-		if ( '#NONE#' == $_POST['metakeyselect'] && empty($_POST['metakeyinput']) )
+		if ( isset($_POST['metakeyselect']) && '#NONE#' == $_POST['metakeyselect'] && empty($_POST['metakeyinput']) )
 			die('1');
 		if ( $pid < 0 ) {
 			$now = current_time('timestamp', 1);
@@ -784,12 +791,13 @@ case 'add-meta' :
 					) );
 					$x->send();
 				}
-				$mid = add_meta( $pid );
+				if ( !$mid = add_meta( $pid ) )
+					die(__('Please provide a custom field value.'));
 			} else {
 				die('0');
 			}
 		} else if ( !$mid = add_meta( $pid ) ) {
-			die('0');
+			die(__('Please provide a custom field value.'));
 		}
 
 		$meta = get_post_meta_by_id( $mid );
@@ -810,8 +818,11 @@ case 'add-meta' :
 			die('0'); // if meta doesn't exist
 		if ( !current_user_can( 'edit_post', $meta->post_id ) )
 			die('-1');
-		if ( !$u = update_meta( $mid, $key, $value ) )
-			die('1'); // We know meta exists; we also know it's unchanged (or DB error, in which case there are bigger problems).
+		if ( $meta->meta_value != stripslashes($value) ) {
+			if ( !$u = update_meta( $mid, $key, $value ) )
+				die('0'); // We know meta exists; we also know it's unchanged (or DB error, in which case there are bigger problems).
+		}
+
 		$key = stripslashes($key);
 		$value = stripslashes($value);
 		$x = new WP_Ajax_Response( array(
@@ -895,7 +906,7 @@ case 'autosave' : // The name of this action is hardcoded in edit_post()
 			$last_user_name = $last_user ? $last_user->display_name : __( 'Someone' );
 			$data = new WP_Error( 'locked', sprintf(
 				$_POST['post_type'] == 'page' ? __( 'Autosave disabled: %s is currently editing this page.' ) : __( 'Autosave disabled: %s is currently editing this post.' ),
-				wp_specialchars( $last_user_name )
+				esc_html( $last_user_name )
 			) );
 
 			$supplemental['disable_autosave'] = 'disable';
@@ -973,30 +984,32 @@ case 'closed-postboxes' :
 	$page = isset( $_POST['page'] ) ? $_POST['page'] : '';
 
 	if ( !preg_match( '/^[a-z_-]+$/', $page ) )
-		die(-1);
+		die('-1');
 
 	if ( ! $user = wp_get_current_user() )
-		die(-1);
+		die('-1');
 
 	if ( is_array($closed) )
 		update_usermeta($user->ID, 'closedpostboxes_'.$page, $closed);
 
-	if ( is_array($hidden) )
+	if ( is_array($hidden) ) {
+		$hidden = array_diff( $hidden, array('submitdiv', 'pagesubmitdiv', 'linksubmitdiv') ); // postboxes that are always shown
 		update_usermeta($user->ID, 'meta-box-hidden_'.$page, $hidden);
+	}
 
 	die('1');
 	break;
 case 'hidden-columns' :
-	check_ajax_referer( 'hiddencolumns', 'hiddencolumnsnonce' );
+	check_ajax_referer( 'screen-options-nonce', 'screenoptionnonce' );
 	$hidden = isset( $_POST['hidden'] ) ? $_POST['hidden'] : '';
 	$hidden = explode( ',', $_POST['hidden'] );
 	$page = isset( $_POST['page'] ) ? $_POST['page'] : '';
 
 	if ( !preg_match( '/^[a-z_-]+$/', $page ) )
-		die(-1);
+		die('-1');
 
 	if ( ! $user = wp_get_current_user() )
-		die(-1);
+		die('-1');
 
 	if ( is_array($hidden) )
 		update_usermeta($user->ID, "manage-$page-columns-hidden", $hidden);
@@ -1010,10 +1023,10 @@ case 'meta-box-order':
 	$page = isset( $_POST['page'] ) ? $_POST['page'] : '';
 
 	if ( !preg_match( '/^[a-z_-]+$/', $page ) )
-		die(-1);
+		die('-1');
 
 	if ( ! $user = wp_get_current_user() )
-		die(-1);
+		die('-1');
 
 	if ( $order )
 		update_user_option($user->ID, "meta-box-order_$page", $order);
@@ -1052,12 +1065,15 @@ case 'inline-save':
 	if ( $last = wp_check_post_lock( $post_ID ) ) {
 		$last_user = get_userdata( $last );
 		$last_user_name = $last_user ? $last_user->display_name : __( 'Someone' );
-		printf( $_POST['post_type'] == 'page' ? __( 'Saving is disabled: %s is currently editing this page.' ) : __( 'Saving is disabled: %s is currently editing this post.' ),	wp_specialchars( $last_user_name ) );
+		printf( $_POST['post_type'] == 'page' ? __( 'Saving is disabled: %s is currently editing this page.' ) : __( 'Saving is disabled: %s is currently editing this post.' ),	esc_html( $last_user_name ) );
 		exit;
 	}
 
 	$data = &$_POST;
+
 	$post = get_post( $post_ID, ARRAY_A );
+	$post = add_magic_quotes($post); //since it is from db
+
 	$data['content'] = $post['post_content'];
 	$data['excerpt'] = $post['post_excerpt'];
 
@@ -1079,7 +1095,6 @@ case 'inline-save':
 		$data['ping_status'] = 'closed';
 
 	// update the post
-	$_POST = $data;
 	edit_post();
 
 	$post = array();
@@ -1138,6 +1153,9 @@ case 'inline-save-tax':
 			else
 				$taxonomy = 'post_tag';
 
+			$tag = get_term( $id, $taxonomy );
+			$_POST['description'] = $tag->description;
+
 			$updated = wp_update_term($id, $taxonomy, $_POST);
 			if ( $updated && !is_wp_error($updated) ) {
 				$tag = get_term( $updated['term_id'], $taxonomy );
@@ -1180,7 +1198,7 @@ case 'find_posts':
 	if ( ! $posts )
 		exit( __('No posts found.') );
 
-	$html = '<table class="widefat"><thead><tr><th class="found-radio"><br /></th><th>'.__('Title').'</th><th>'.__('Time').'</th><th>'.__('Status').'</th></tr></thead><tbody>';
+	$html = '<table class="widefat" cellspacing="0"><thead><tr><th class="found-radio"><br /></th><th>'.__('Title').'</th><th>'.__('Time').'</th><th>'.__('Status').'</th></tr></thead><tbody>';
 	foreach ( $posts as $post ) {
 
 		switch ( $post->post_status ) {
@@ -1206,8 +1224,8 @@ case 'find_posts':
 			$time = mysql2date(__('Y/m/d'), $post->post_date);
 		}
 
-		$html .= '<tr class="found-posts"><td class="found-radio"><input type="radio" id="found-'.$post->ID.'" name="found_post_id" value="'.$post->ID.'"></td>';
-		$html .= '<td><label for="found-'.$post->ID.'">'.wp_specialchars($post->post_title, true).'</label></td><td>'.wp_specialchars($time, true).'</td><td>'.wp_specialchars($stat, true).'</td></tr>'."\n\n";
+		$html .= '<tr class="found-posts"><td class="found-radio"><input type="radio" id="found-'.$post->ID.'" name="found_post_id" value="' . esc_attr($post->ID) . '"></td>';
+		$html .= '<td><label for="found-'.$post->ID.'">'.esc_html( $post->post_title ).'</label></td><td>'.esc_html( $time ).'</td><td>'.esc_html( $stat ).'</td></tr>'."\n\n";
 	}
 	$html .= '</tbody></table>';
 
@@ -1231,6 +1249,104 @@ case 'lj-importer' :
 	if ( is_wp_error( $result ) )
 		echo $result->get_error_message();
 	die;
+	break;
+case 'widgets-order' :
+	check_ajax_referer( 'save-sidebar-widgets', 'savewidgets' );
+
+	if ( !current_user_can('switch_themes') )
+		die('-1');
+
+	unset( $_POST['savewidgets'], $_POST['action'] );
+
+	// save widgets order for all sidebars
+	if ( is_array($_POST['sidebars']) ) {
+		$sidebars = array();
+		foreach ( $_POST['sidebars'] as $key => $val ) {
+			$sb = array();
+			if ( !empty($val) ) {
+				$val = explode(',', $val);
+				foreach ( $val as $k => $v ) {
+					if ( strpos($v, 'widget-') === false )
+						continue;
+
+					$sb[$k] = substr($v, strpos($v, '_') + 1);
+				}
+			}
+			$sidebars[$key] = $sb;
+		}
+		wp_set_sidebars_widgets($sidebars);
+		die('1');
+	}
+
+	die('-1');
+	break;
+case 'save-widget' :
+	check_ajax_referer( 'save-sidebar-widgets', 'savewidgets' );
+
+	if ( !current_user_can('switch_themes') || !isset($_POST['id_base']) )
+		die('-1');
+
+	unset( $_POST['savewidgets'], $_POST['action'] );
+
+	do_action('load-widgets.php');
+	do_action('widgets.php');
+	do_action('sidebar_admin_setup');
+
+	$id_base = $_POST['id_base'];
+	$widget_id = $_POST['widget-id'];
+	$sidebar_id = $_POST['sidebar'];
+	$multi_number = !empty($_POST['multi_number']) ? (int) $_POST['multi_number'] : 0;
+	$settings = isset($_POST['widget-' . $id_base]) && is_array($_POST['widget-' . $id_base]) ? $_POST['widget-' . $id_base] : false;
+	$error = '<p>' . __('An error has occured. Please reload the page and try again.') . '</p>';
+
+	$sidebars = wp_get_sidebars_widgets();
+	$sidebar = isset($sidebars[$sidebar_id]) ? $sidebars[$sidebar_id] : array();
+
+	// delete
+	if ( isset($_POST['delete_widget']) && $_POST['delete_widget'] ) {
+
+		if ( !isset($wp_registered_widgets[$widget_id]) )
+			die($error);
+
+		$sidebar = array_diff( $sidebar, array($widget_id) );
+		$_POST = array('sidebar' => $sidebar_id, 'widget-' . $id_base => array(), 'the-widget-id' => $widget_id, 'delete_widget' => '1');
+	} elseif ( $settings && preg_match( '/__i__|%i%/', key($settings) ) ) {
+		if ( !$multi_number )
+			die($error);
+
+		$_POST['widget-' . $id_base] = array( $multi_number => array_shift($settings) );
+		$widget_id = $id_base . '-' . $multi_number;
+		$sidebar[] = $widget_id;
+	}
+	$_POST['widget-id'] = $sidebar;
+
+	foreach ( (array) $wp_registered_widget_updates as $name => $control ) {
+
+		if ( $name == $id_base ) {
+			if ( !is_callable( $control['callback'] ) )
+				continue;
+
+			ob_start();
+				call_user_func_array( $control['callback'], $control['params'] );
+			ob_end_clean();
+			break;
+		}
+	}
+
+	if ( isset($_POST['delete_widget']) && $_POST['delete_widget'] ) {
+		$sidebars[$sidebar_id] = $sidebar;
+		wp_set_sidebars_widgets($sidebars);
+		echo "deleted:$widget_id";
+		die();
+	}
+
+	if ( !empty($_POST['add_new']) )
+		die();
+
+	if ( $form = $wp_registered_widget_controls[$widget_id] )
+		call_user_func_array( $form['callback'], $form['params'] );
+
+	die();
 	break;
 default :
 	do_action( 'wp_ajax_' . $_POST['action'] );

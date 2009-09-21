@@ -53,7 +53,7 @@
  * @subpackage Plugin
  * @since 0.71
  * @global array $wp_filter Stores all of the filters added in the form of
- *	wp_filter['tag']['array of priorities']['array of functions serialized']['array of ['array (functions, accepted_args)]']
+ *	wp_filter['tag']['array of priorities']['array of functions serialized']['array of ['array (functions, accepted_args)']']
  * @global array $merged_filters Tracks the tags that need to be merged for later. If the hook is added, it doesn't need to run through that process.
  *
  * @param string $tag The name of the filter to hook the $function_to_add to.
@@ -492,7 +492,10 @@ function plugin_basename($file) {
 	$file = preg_replace('|/+|','/', $file); // remove any duplicate slash
 	$plugin_dir = str_replace('\\','/',WP_PLUGIN_DIR); // sanitize for Win32 installs
 	$plugin_dir = preg_replace('|/+|','/', $plugin_dir); // remove any duplicate slash
-	$file = preg_replace('|^' . preg_quote($plugin_dir, '|') . '/|','',$file); // get relative path from plugins dir
+	$mu_plugin_dir = str_replace('\\','/',WPMU_PLUGIN_DIR); // sanitize for Win32 installs
+	$mu_plugin_dir = preg_replace('|/+|','/', $mu_plugin_dir); // remove any duplicate slash
+	$file = preg_replace('#^' . preg_quote($plugin_dir, '#') . '/|^' . preg_quote($mu_plugin_dir, '#') . '/#','',$file); // get relative path from plugins dir
+	$file = trim($file, '/');
 	return $file;
 }
 
@@ -663,13 +666,14 @@ function _wp_call_all_hook($args) {
  *
  * @global array $wp_filter Storage for all of the filters and actions
  * @param string $tag Used in counting how many hooks were applied
- * @param string|array $function Used for creating unique id
+ * @param callback $function Used for creating unique id
  * @param int|bool $priority Used in counting how many hooks were applied.  If === false and $function is an object reference, we return the unique id only if it already has one, false otherwise.
  * @param string $type filter or action
- * @return string Unique ID for usage as array key
+ * @return string|bool Unique ID for usage as array key or false if $priority === false and $function is an object reference, and it does not already have a uniqe id.
  */
 function _wp_filter_build_unique_id($tag, $function, $priority) {
 	global $wp_filter;
+	static $filter_id_count = 0;
 
 	// If function then just skip all of the tests and not overwrite the following.
 	if ( is_string($function) )
@@ -680,10 +684,8 @@ function _wp_filter_build_unique_id($tag, $function, $priority) {
 		if ( !isset($function[0]->wp_filter_id) ) {
 			if ( false === $priority )
 				return false;
-			$count = isset($wp_filter[$tag][$priority]) ? count((array)$wp_filter[$tag][$priority]) : 0;
-			$function[0]->wp_filter_id = $count;
-			$obj_idx .= $count;
-			unset($count);
+			$obj_idx .= isset($wp_filter[$tag][$priority]) ? count((array)$wp_filter[$tag][$priority]) : 0;
+			$function[0]->wp_filter_id = $filter_id_count++;
 		} else
 			$obj_idx .= $function[0]->wp_filter_id;
 		return $obj_idx;

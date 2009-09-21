@@ -30,7 +30,7 @@ class LJ_API_Import {
 	var $postmap;
 	var $commentmap;
 	var $pointers = array();
-	
+
 	// This list taken from LJ, they don't appear to have an API for it
 	var $moods = array( '1' => 'aggravated',
 						'10' => 'discontent',
@@ -181,19 +181,19 @@ class LJ_API_Import {
 		<form action="admin.php?import=livejournal" method="post">
 		<?php wp_nonce_field( 'lj-api-import' ) ?>
 		<?php if ( get_option( 'ljapi_username' ) && get_option( 'ljapi_password' ) ) : ?>
-			<input type="hidden" name="step" value="<?php echo get_option( 'ljapi_step' ) ?>" />
+			<input type="hidden" name="step" value="<?php echo esc_attr( get_option( 'ljapi_step' ) ) ?>" />
 			<p><?php _e( 'It looks like you attempted to import your LiveJournal posts previously and got interrupted.' ) ?></p>
 			<p class="submit">
-				<input type="submit" class="button-primary" value="<?php echo attribute_escape( __( 'Continue previous import' ) ) ?>" />
+				<input type="submit" class="button-primary" value="<?php esc_attr_e( 'Continue previous import' ) ?>" />
 			</p>
-			<p class="submitbox"><a href="<?php echo $_SERVER['PHP_SELF'] . '?import=livejournal&amp;step=-1&amp;_wpnonce=' . wp_create_nonce( 'lj-api-import' ) . '&amp;_wp_http_referer=' . attribute_escape( $_SERVER['REQUEST_URI'] ) ?>" class="deletion submitdelete"><?php _e( 'Cancel &amp; start a new import' ) ?></a></p>
+			<p class="submitbox"><a href="<?php echo esc_url($_SERVER['PHP_SELF'] . '?import=livejournal&amp;step=-1&amp;_wpnonce=' . wp_create_nonce( 'lj-api-import' ) . '&amp;_wp_http_referer=' . esc_attr( $_SERVER['REQUEST_URI'] )) ?>" class="deletion submitdelete"><?php _e( 'Cancel &amp; start a new import' ) ?></a></p>
 			<p>
 		<?php else : ?>
 			<input type="hidden" name="step" value="1" />
 			<input type="hidden" name="login" value="true" />
 			<p><?php _e( 'Howdy! This importer allows you to connect directly to LiveJournal and download all your entries and comments' ) ?></p>
 			<p><?php _e( 'Enter your LiveJournal username and password below so we can connect to your account:' ) ?></p>
-		
+
 			<table class="form-table">
 
 			<tr>
@@ -205,11 +205,11 @@ class LJ_API_Import {
 			<th scope="row"><label for="lj_password"><?php _e( 'LiveJournal Password' ) ?></label></th>
 			<td><input type="password" name="lj_password" id="lj_password" class="regular-text" /></td>
 			</tr>
-      
+
 			</table>
-      
+
 			<p><?php _e( 'If you have any entries on LiveJournal which are marked as private, they will be password-protected when they are imported so that only people who know the password can see them.' ) ?></p>
-			<p><?php _e( "If you don't enter a password, ALL ENTRIES from your LiveJournal will be imported as public posts in WordPress." ) ?></p>
+			<p><?php _e( 'If you don&#8217;t enter a password, ALL ENTRIES from your LiveJournal will be imported as public posts in WordPress.' ) ?></p>
 			<p><?php _e( 'Enter the password you would like to use for all protected entries here:' ) ?></p>
 			<table class="form-table">
 
@@ -221,11 +221,11 @@ class LJ_API_Import {
 			</table>
 
 			<p><?php _e( "<strong>WARNING:</strong> This can take a really long time if you have a lot of entries in your LiveJournal, or a lot of comments. Ideally, you should only start this process if you can leave your computer alone while it finishes the import." ) ?></p>
-		
+
 			<p class="submit">
-				<input type="submit" class="button-primary" value="<?php echo attribute_escape( __( 'Connect to LiveJournal and Import' ) ) ?>" />
+				<input type="submit" class="button-primary" value="<?php esc_attr_e( 'Connect to LiveJournal and Import' ) ?>" />
 			</p>
-		
+
 			<p><?php _e( '<strong>NOTE:</strong> If the import process is interrupted for <em>any</em> reason, come back to this page and it will continue from where it stopped automatically.' ) ?></p>
 
 			<noscript>
@@ -236,7 +236,7 @@ class LJ_API_Import {
 		</div>
 		<?php
 	}
-	
+
 	function download_post_meta() {
 		$total           = (int) get_option( 'ljapi_total' );
 		$count           = (int) get_option( 'ljapi_count' );
@@ -247,17 +247,17 @@ class LJ_API_Import {
 		$sync_item_times = get_option( 'ljapi_sync_item_times' );
 		if ( !is_array( $sync_item_times ) )
 			$sync_item_times = array();
-		
+
 		do {
 			$lastsync = date( 'Y-m-d H:i:s', strtotime( get_option( 'ljapi_lastsync' ) ) );
 			$synclist = $this->lj_ixr( 'syncitems', array( 'ver' => 1, 'lastsync' => $lastsync ) );
 			if ( is_wp_error( $synclist ) )
 				return $synclist;
-				
+
 			// Keep track of if we've downloaded everything
 			$total = $synclist['total'];
 			$count = $synclist['count'];
-		
+
 			foreach ( $synclist['syncitems'] as $event ) {
 				if ( substr( $event['item'], 0, 2 ) == 'L-' ) {
 					$sync_item_times[ str_replace( 'L-', '', $event['item'] ) ] = $event['time'];
@@ -276,7 +276,7 @@ class LJ_API_Import {
 
 		echo '<p>' . __( 'Post metadata has been downloaded, proceeding with posts...' ) . '</p>';
 	}
-	
+
 	function download_post_bodies() {
 		$imported_count  = (int) get_option( 'ljapi_imported_count' );
 		$sync_item_times = get_option( 'ljapi_sync_item_times' );
@@ -285,10 +285,10 @@ class LJ_API_Import {
 			update_option( 'ljapi_lastsync_posts', date( 'Y-m-d H:i:s', 0 ) );
 
 		$count = 0;
-		echo '<ol>';		
+		echo '<ol>';
 		do {
 			$lastsync = date( 'Y-m-d H:i:s', strtotime( get_option( 'ljapi_lastsync_posts' ) ) );
-			
+
 			// Get the batch of items that match up with the syncitems list
 			$itemlist = $this->lj_ixr( 'getevents', array( 'ver' => 1,
 															'selecttype' => 'syncitems',
@@ -296,7 +296,7 @@ class LJ_API_Import {
 															'lastsync' => $lastsync ) );
 			if ( is_wp_error( $itemlist ) )
 				return $itemlist;
-			
+
 			if ( $num = count( $itemlist['events'] ) ) {
 				for ( $e = 0; $e < count( $itemlist['events'] ); $e++ ) {
 					$event = $itemlist['events'][$e];
@@ -314,23 +314,23 @@ class LJ_API_Import {
 			}
 			$count++;
 		} while ( $num > 0 && $count < 3 ); // Doing up to 3 requests at a time to avoid memory problems
-		
+
 		// Used so that step1 knows when to stop posting back on itself
 		update_option( 'ljapi_last_sync_count', $num );
-		
+
 		// Counter just used to show progress to user
 		update_option( 'ljapi_post_batch', ( (int) get_option( 'ljapi_post_batch' ) + 1 ) );
 
 		echo '</ol>';
 	}
-	
+
 	function import_post( $post ) {
 		global $wpdb;
-		
+
 		// Make sure we haven't already imported this one
 		if ( $this->get_wp_post_ID( $post['itemid'] ) )
 			return;
-		
+
 		$user = wp_get_current_user();
 		$post_author      = $user->ID;
 		$post['security'] = !empty( $post['security'] ) ? $post['security'] : '';
@@ -341,13 +341,13 @@ class LJ_API_Import {
 		$post_date = $post['eventtime'];
 		if ( 18 == strlen( $post_date ) )
 			$post_date = substr( $post_date, 0, 10 ) . ' ' . substr( $post_date, 10 );
-		
+
 		// Cleaning up and linking the title
 		$post_title = isset( $post['subject'] ) ? trim( $post['subject'] ) : '';
 		$post_title = $this->translate_lj_user( $post_title ); // Translate it, but then we'll strip the link
 		$post_title = strip_tags( $post_title ); // Can't have tags in the title in WP
 		$post_title = $wpdb->escape( $post_title );
-		
+
 		// Clean up content
 		$post_content = $post['event'];
 		$post_content = preg_replace_callback( '|<(/?[A-Z]+)|', create_function( '$match', 'return "<" . strtolower( $match[1] );' ), $post_content );
@@ -361,12 +361,12 @@ class LJ_API_Import {
 		$post_content = substr( $post_content, 0, $first + 1 ) . preg_replace( '|<!--more(.*)?-->|sUi', '', substr( $post_content, $first + 1 ) );
 		// lj-user ==>  a href
 		$post_content = $this->translate_lj_user( $post_content );
-		$post_content = force_balance_tags( $post_content );
+		//$post_content = force_balance_tags( $post_content );
 		$post_content = $wpdb->escape( $post_content );
-		
+
 		// Handle any tags associated with the post
 		$tags_input = !empty( $post['props']['taglist'] ) ? $post['props']['taglist'] : '';
-		
+
 		// Check if comments are closed on this post
 		$comment_status = !empty( $post['props']['opt_nocomments'] ) ? 'closed' : 'open';
 
@@ -383,29 +383,29 @@ class LJ_API_Import {
 				return $post_id;
 			}
 			if ( !$post_id ) {
-				_e( "Couldn't get post ID (creating post failed!)" );
+				_e( 'Couldn&#8217;t get post ID (creating post failed!)' );
 				echo '</li>';
 				return new WP_Error( 'insert_post_failed', __( 'Failed to create post.' ) );
 			}
-			
+
 			// Handle all the metadata for this post
 			$this->insert_postmeta( $post_id, $post );
 		}
 		echo '</li>';
 	}
-	
+
 	// Convert lj-user tags to links to that user
 	function translate_lj_user( $str ) {
 		return preg_replace( '|<lj\s+user\s*=\s*["\']([\w-]+)["\']>|', '<a href="http://$1.livejournal.com/" class="lj-user">$1</a>', $str );
 	}
-	
+
 	function insert_postmeta( $post_id, $post ) {
 		// Need the original LJ id for comments
 		add_post_meta( $post_id, 'lj_itemid', $post['itemid'] );
-		
+
 		// And save the permalink on LJ in case we want to link back or something
 		add_post_meta( $post_id, 'lj_permalink', $post['url'] );
-		
+
 		// Supports the following "props" from LJ, saved as lj_<prop_name> in wp_postmeta
 		// 		Adult Content - adult_content
 		// 		Location - current_coords + current_location
@@ -424,7 +424,7 @@ class LJ_API_Import {
 			}
 		}
 	}
-	
+
 	// Set up a session (authenticate) with LJ
 	function get_session() {
 		// Get a session via XMLRPC
@@ -433,18 +433,18 @@ class LJ_API_Import {
 			return new WP_Error( 'cookie', __( 'Could not get a cookie from LiveJournal. Please try again soon.' ) );
 		return new WP_Http_Cookie( array( 'name' => 'ljsession', 'value' => $cookie['ljsession'] ) );
 	}
-	
+
 	// Loops through and gets comment meta from LJ in batches
 	function download_comment_meta() {
 		$cookie = $this->get_session();
 		if ( is_wp_error( $cookie ) )
 			return $cookie;
-		
+
 		// Load previous state (if any)
 		$this->usermap = (array) get_option( 'ljapi_usermap' );
 		$maxid         = get_option( 'ljapi_maxid' ) ? get_option( 'ljapi_maxid' ) : 1;
 		$highest_id    = get_option( 'ljapi_highest_id' ) ? get_option( 'ljapi_highest_id' ) : 0;
-		
+
 		// We need to loop over the metadata request until we have it all
 		while ( $maxid > $highest_id ) {
 			// Now get the meta listing
@@ -452,9 +452,9 @@ class LJ_API_Import {
 										array( 'cookies' => array( $cookie ), 'timeout' => 20 ) );
 			if ( is_wp_error( $results ) )
 				return new WP_Error( 'comment_meta', __( 'Failed to retrieve comment meta information from LiveJournal. Please try again soon.' ) );
-			
+
 			$results = wp_remote_retrieve_body( $results );
-			
+
 			// Get the maxid so we know if we have them all yet
 			preg_match( '|<maxid>(\d+)</maxid>|', $results, $matches );
 			if ( 0 == $matches[1] ) {
@@ -465,7 +465,7 @@ class LJ_API_Import {
 				return false; // Bail out of comment importing entirely
 			}
 			$maxid = !empty( $matches[1] ) ? $matches[1] : $maxid;
-			
+
 			// Parse comments and get highest id available
 			preg_match_all( '|<comment id=\'(\d+)\'|is', $results, $matches );
 			foreach ( $matches[1] as $id ) {
@@ -477,7 +477,7 @@ class LJ_API_Import {
 			preg_match_all( '|<usermap id=\'(\d+)\' user=\'([^\']+)\' />|', $results, $matches );
 			foreach ( $matches[1] as $count => $userid )
 				$this->usermap[$userid] = $matches[2][$count]; // need this in memory for translating ids => names
-				
+
 			wp_cache_flush();
 		}
 		// endwhile - should have seen all comment meta at this point
@@ -485,12 +485,12 @@ class LJ_API_Import {
 		update_option( 'ljapi_usermap',    $this->usermap );
 		update_option( 'ljapi_maxid',      $maxid );
 		update_option( 'ljapi_highest_id', $highest_id );
-		
+
 		echo '<p>' . __( ' Comment metadata downloaded successfully, proceeding with comment bodies...' ) . '</p>';
-		
+
 		return true;
 	}
-	
+
 	// Downloads actual comment bodies from LJ
 	// Inserts them all directly to the DB, with additional info stored in "spare" fields
 	function download_comment_bodies() {
@@ -498,7 +498,7 @@ class LJ_API_Import {
 		$cookie = $this->get_session();
 		if ( is_wp_error( $cookie ) )
 			return $cookie;
-		
+
 		// Load previous state (if any)
 		$this->usermap = (array) get_option( 'ljapi_usermap' );
 		$maxid         = get_option( 'ljapi_maxid' ) ? (int) get_option( 'ljapi_maxid' ) : 1;
@@ -506,15 +506,15 @@ class LJ_API_Import {
 		$loop = 0;
 		while ( $maxid > $highest_id && $loop < 5 ) { // We do 5 loops per call to avoid memory limits
 			$loop++;
-			
+
 			// Get a batch of comments, using the highest_id we've already got as a starting point
 			$results = wp_remote_get( $this->comments_url . '?get=comment_body&startid=' . ( $highest_id + 1 ),
 										array( 'cookies' => array( $cookie ), 'timeout' => 20 ) );
 			if ( is_wp_error( $results ) )
 				return new WP_Error( 'comment_bodies', __( 'Failed to retrieve comment bodies from LiveJournal. Please try again soon.' ) );
-			
+
 			$results = wp_remote_retrieve_body( $results );
-			
+
 			// Parse out each comment and insert directly
 			preg_match_all( '|<comment id=\'(\d+)\'.*</comment>|iUs', $results, $matches );
 			for ( $c = 0; $c < count( $matches[0] ); $c++ ) {
@@ -523,7 +523,7 @@ class LJ_API_Import {
 					$highest_id = $matches[1][$c];
 					update_option( 'ljapi_highest_comment_id', $highest_id );
 				}
-					
+
 				$comment = $matches[0][$c];
 
 				// Filter out any captured, deleted comments (nothing useful to import)
@@ -536,22 +536,22 @@ class LJ_API_Import {
 				// Clear cache
 				clean_comment_cache( $id );
 			}
-			
+
 			// Clear cache to preseve memory
 			wp_cache_flush();
 		}
 		// endwhile - all comments downloaded and ready for bulk processing
-		
+
 		// Counter just used to show progress to user
 		update_option( 'ljapi_comment_batch', ( (int) get_option( 'ljapi_comment_batch' ) + 1 ) );
-		
+
 		return true;
 	}
-	
+
 	// Takes a block of XML and parses out all the elements of the comment
 	function parse_comment( $comment ) {
 		global $wpdb;
-		
+
 		// Get the top-level attributes
 		preg_match( '|<comment([^>]+)>|i', $comment, $attribs );
 		preg_match( '| id=\'(\d+)\'|i', $attribs[1], $matches );
@@ -564,7 +564,7 @@ class LJ_API_Import {
 		$lj_comment_parent = isset( $matches[1] ) ? $matches[1] : 0;
 		preg_match( '| state=\'([SDFA])\'|i', $attribs[1], $matches ); // optional
 		$lj_comment_state = isset( $matches[1] ) ? $matches[1] : 'A';
-		
+
 		// Clean up "subject" - this will become the first line of the comment in WP
 		preg_match( '|<subject>(.*)</subject>|is', $comment, $matches );
 		if ( isset( $matches[1] ) ) {
@@ -572,26 +572,26 @@ class LJ_API_Import {
 			if ( 'Re:' == $comment_subject )
 				$comment_subject = '';
 		}
-		
+
 		// Get the body and HTMLize it
 		preg_match( '|<body>(.*)</body>|is', $comment, $matches );
 		$comment_content = !empty( $comment_subject ) ? $comment_subject . "\n\n" . $matches[1] : $matches[1];
-		$comment_content = html_entity_decode( $comment_content );
+		$comment_content = @html_entity_decode( $comment_content, ENT_COMPAT, get_option('blog_charset') );
 		$comment_content = str_replace( '&apos;', "'", $comment_content );
 		$comment_content = wpautop( $comment_content );
 		$comment_content = str_replace( '<br>', '<br />', $comment_content );
 		$comment_content = str_replace( '<hr>', '<hr />', $comment_content );
 		$comment_content = preg_replace_callback( '|<(/?[A-Z]+)|', create_function( '$match', 'return "<" . strtolower( $match[1] );' ), $comment_content );
 		$comment_content = $wpdb->escape( trim( $comment_content ) );
-		
+
 		// Get and convert the date
 		preg_match( '|<date>(.*)</date>|i', $comment, $matches );
 		$comment_date = trim( str_replace( array( 'T', 'Z' ), ' ', $matches[1] ) );
-		
+
 		// Grab IP if available
 		preg_match( '|<property name=\'poster_ip\'>(.*)</property>|i', $comment, $matches ); // optional
 		$comment_author_IP = isset( $matches[1] ) ? $matches[1] : '';
-		
+
 		// Try to get something useful for the comment author, especially if it was "my" comment
 		$author = ( empty( $comment_author_ID ) || empty( $this->usermap[$comment_author_ID] ) || substr( $this->usermap[$comment_author_ID], 0, 4 ) == 'ext_' ) ? __( 'Anonymous' ) : $this->usermap[$comment_author_ID];
 		if ( get_option( 'ljapi_username' ) == $author ) {
@@ -601,9 +601,9 @@ class LJ_API_Import {
 			$url     = trailingslashit( get_option( 'home' ) );
 		} else {
 			$user_id = 0;
-			$url     = ( __( 'Anonymous' ) == $author ) ? '' : 'http://' . $author . '.livejournal.com/';			
+			$url     = ( __( 'Anonymous' ) == $author ) ? '' : 'http://' . $author . '.livejournal.com/';
 		}
-		
+
 		// Send back the array of details
 		return array( 'lj_comment_ID' => $lj_comment_ID,
 						'lj_comment_post_ID' => $lj_comment_post_ID,
@@ -623,18 +623,18 @@ class LJ_API_Import {
 						'user_ID' => $user_id
 					);
 	}
-	
-	
+
+
 	// Gets the post_ID that a LJ post has been saved as within WP
 	function get_wp_post_ID( $post ) {
 		global $wpdb;
-		
+
 		if ( empty( $this->postmap[$post] ) )
 		 	$this->postmap[$post] = (int) $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'lj_itemid' AND meta_value = %d", $post ) );
-		
+
 		return $this->postmap[$post];
 	}
-	
+
 	// Gets the comment_ID that a LJ comment has been saved as within WP
 	function get_wp_comment_ID( $comment ) {
 		global $wpdb;
@@ -642,7 +642,7 @@ class LJ_API_Import {
 		 	$this->commentmap[$comment] = $wpdb->get_var( $wpdb->prepare( "SELECT comment_ID FROM $wpdb->comments WHERE comment_karma = %d", $comment ) );
 		return $this->commentmap[$comment];
 	}
-			
+
 	function lj_ixr() {
 		if ( $challenge = $this->ixr->query( 'LJ.XMLRPC.getchallenge' ) ) {
 			$challenge = $this->ixr->getResponse();
@@ -655,7 +655,7 @@ class LJ_API_Import {
 		} else {
 			return new WP_Error( 'IXR', __( 'LiveJournal is not responding to authentication requests. Please wait a while and then try again.' ) );
 		}
-		
+
 		$args = func_get_args();
         $method = array_shift( $args );
 		if ( isset( $args[0] ) )
@@ -666,7 +666,7 @@ class LJ_API_Import {
 			return new WP_Error( 'IXR', __( 'XML-RPC Request Failed -- ' ) . $this->ixr->getErrorCode() . ': ' . $this->ixr->getErrorMessage() );
 		}
 	}
-	
+
 	function dispatch() {
 		if ( empty( $_REQUEST['step'] ) )
 			$step = 0;
@@ -674,7 +674,7 @@ class LJ_API_Import {
 			$step = (int) $_REQUEST['step'];
 
 		$this->header();
-		
+
 		switch ( $step ) {
 			case -1 :
 				$this->cleanup();
@@ -711,7 +711,7 @@ class LJ_API_Import {
 			$this->username = get_option( 'ljapi_username' );
 			$this->password = get_option( 'ljapi_password' );
 		}
-	
+
 		// This is the password to set on protected posts
 		if ( !empty( $_POST['protected_password'] ) ) {
 			$this->protected_password = $_POST['protected_password'];
@@ -719,12 +719,12 @@ class LJ_API_Import {
 		} else {
 			$this->protected_password = get_option( 'ljapi_protected_password' );
 		}
-		
+
 		// Login to confirm the details are correct
 		if ( empty( $this->username ) || empty( $this->password ) ) {
 			?>
 			<p><?php _e( 'Please enter your LiveJournal username <em>and</em> password so we can download your posts and comments.' ) ?></p>
-			<p><a href="<?php echo $_SERVER['PHP_SELF'] . '?import=livejournal&amp;step=-1&amp;_wpnonce=' . wp_create_nonce( 'lj-api-import' ) . '&amp;_wp_http_referer=' . attribute_escape( str_replace( '&step=1', '', $_SERVER['REQUEST_URI'] ) ) ?>"><?php _e( 'Start again' ) ?></a></p>
+			<p><a href="<?php echo esc_url($_SERVER['PHP_SELF'] . '?import=livejournal&amp;step=-1&amp;_wpnonce=' . wp_create_nonce( 'lj-api-import' ) . '&amp;_wp_http_referer=' . esc_attr( str_replace( '&step=1', '', $_SERVER['REQUEST_URI'] ) ) ) ?>"><?php _e( 'Start again' ) ?></a></p>
 			<?php
 			return false;
 		}
@@ -736,7 +736,7 @@ class LJ_API_Import {
 				delete_option( 'ljapi_protected_password' );
 				?>
 				<p><?php _e( 'Logging in to LiveJournal failed. Check your username and password and try again.' ) ?></p>
-				<p><a href="<?php echo $_SERVER['PHP_SELF'] . '?import=livejournal&amp;step=-1&amp;_wpnonce=' . wp_create_nonce( 'lj-api-import' ) . '&amp;_wp_http_referer=' . attribute_escape( str_replace( '&step=1', '', $_SERVER['REQUEST_URI'] ) ) ?>"><?php _e( 'Start again' ) ?></a></p>
+				<p><a href="<?php echo esc_url($_SERVER['PHP_SELF'] . '?import=livejournal&amp;step=-1&amp;_wpnonce=' . wp_create_nonce( 'lj-api-import' ) . '&amp;_wp_http_referer=' . esc_attr( str_replace( '&step=1', '', $_SERVER['REQUEST_URI'] ) ) ) ?>"><?php _e( 'Start again' ) ?></a></p>
 				<?php
 				return false;
 			} else {
@@ -745,12 +745,12 @@ class LJ_API_Import {
 		} else {
 			update_option( 'ljapi_verified', 'yes' );
 		}
-		
+
 		// Set up some options to avoid them autoloading (these ones get big)
 		add_option( 'ljapi_sync_item_times',  '', '', 'no' );
 		add_option( 'ljapi_usermap',          '', '', 'no' );
 		update_option( 'ljapi_comment_batch', 0 );
-		
+
 		return true;
 	}
 
@@ -775,17 +775,17 @@ class LJ_API_Import {
 				return false;
 			}
 		}
-		
+
 		echo '<div id="ljapi-status">';
 		echo '<h3>' . __( 'Importing Posts' ) . '</h3>';
-		echo '<p>' . __( "We're downloading and importing your LiveJournal posts..." ) . '</p>';
+		echo '<p>' . __( 'We&#8217;re downloading and importing your LiveJournal posts...' ) . '</p>';
 		if ( get_option( 'ljapi_post_batch' ) && count( get_option( 'ljapi_sync_item_times' ) ) ) {
 			$batch = count( get_option( 'ljapi_sync_item_times' ) );
 			$batch = $count > 300 ? ceil( $batch / 300 ) : 1;
 			echo '<p><strong>' . sprintf( __( 'Imported post batch %d of <strong>approximately</strong> %d' ), ( get_option( 'ljapi_post_batch' ) + 1 ), $batch ) . '</strong></p>';
 		}
 		ob_flush(); flush();
-		
+
 		if ( !get_option( 'ljapi_lastsync' ) || '1900-01-01 00:00:00' == get_option( 'ljapi_lastsync' ) ) {
 			// We haven't downloaded meta yet, so do that first
 			$result = $this->download_post_meta();
@@ -801,7 +801,7 @@ class LJ_API_Import {
 			if ( 406 == $this->ixr->getErrorCode() ) {
 				?>
 				<p><strong><?php _e( 'Uh oh &ndash; LiveJournal has disconnected us because we made too many requests to their servers too quickly.' ) ?></strong></p>
-				<p><strong><?php _e( "We've saved where you were up to though, so if you come back to this importer in about 30 minutes, you should be able to continue from where you were." ) ?></strong></p>
+				<p><strong><?php _e( 'We&#8217;ve saved where you were up to though, so if you come back to this importer in about 30 minutes, you should be able to continue from where you were.' ) ?></strong></p>
 				<?php
 				echo $this->next_step( 1, __( 'Try Again' ) );
 				return false;
@@ -816,18 +816,18 @@ class LJ_API_Import {
 			<form action="admin.php?import=livejournal" method="post" id="ljapi-auto-repost">
 			<?php wp_nonce_field( 'lj-api-import' ) ?>
 			<input type="hidden" name="step" id="step" value="1" />
-			<p><input type="submit" class="button-primary" value="<?php echo attribute_escape( __( 'Import the next batch' ) ) ?>" /> <span id="auto-message"></span></p>
+			<p><input type="submit" class="button-primary" value="<?php esc_attr_e( 'Import the next batch' ) ?>" /> <span id="auto-message"></span></p>
 			</form>
 			<?php $this->auto_ajax( 'ljapi-auto-repost', 'auto-message', 0 ); ?>
 		<?php
 		} else {
-			echo '<p>' . __( "Your posts have all been imported, but wait - there's more! Now we need to download &amp; import your comments." ) . '</p>';
+			echo '<p>' . __( 'Your posts have all been imported, but wait &#8211; there&#8217;s more! Now we need to download &amp; import your comments.' ) . '</p>';
 			echo $this->next_step( 2, __( 'Download my comments &raquo;' ) );
 			$this->auto_submit();
 		}
 		echo '</div>';
 	}
-	
+
 	// Download comments to local XML
 	function step2() {
 		set_time_limit( 0 );
@@ -835,12 +835,12 @@ class LJ_API_Import {
 		$this->username = get_option( 'ljapi_username' );
 		$this->password = get_option( 'ljapi_password' );
 		$this->ixr = new IXR_Client( $this->ixr_url, false, 80, 30 );
-		
+
 		echo '<div id="ljapi-status">';
 		echo '<h3>' . __( 'Downloading Comments' ) . '</h3>';
 		echo '<p>' . __( 'Now we will download your comments so we can import them (this could take a <strong>long</strong> time if you have lots of comments)...' ) . '</p>';
 		ob_flush(); flush();
-		
+
 		if ( !get_option( 'ljapi_usermap' ) ) {
 			// We haven't downloaded meta yet, so do that first
 			$result = $this->download_comment_meta();
@@ -866,7 +866,7 @@ class LJ_API_Import {
 			<p><strong><?php printf( __( 'Imported comment batch %d of <strong>approximately</strong> %d' ), get_option( 'ljapi_comment_batch' ), $batch ) ?></strong></p>
 			<?php wp_nonce_field( 'lj-api-import' ) ?>
 			<input type="hidden" name="step" id="step" value="2" />
-			<p><input type="submit" class="button-primary" value="<?php echo attribute_escape( __( 'Import the next batch' ) ) ?>" /> <span id="auto-message"></span></p>
+			<p><input type="submit" class="button-primary" value="<?php esc_attr_e( 'Import the next batch' ) ?>" /> <span id="auto-message"></span></p>
 			</form>
 			<?php $this->auto_ajax( 'ljapi-auto-repost', 'auto-message', 0 ); ?>
 		<?php
@@ -877,18 +877,18 @@ class LJ_API_Import {
 		}
 		echo '</div>';
 	}
-	
+
 	// Re-thread comments already in the DB
 	function step3() {
 		global $wpdb;
 		set_time_limit( 0 );
 		update_option( 'ljapi_step', 3 );
-		
+
 		echo '<div id="ljapi-status">';
 		echo '<h3>' . __( 'Threading Comments' ) . '</h3>';
 		echo '<p>' . __( 'We are now re-building the threading of your comments (this can also take a while if you have lots of comments)...' ) . '</p>';
 		ob_flush(); flush();
-		
+
 		// Only bother adding indexes if they have over 5000 comments (arbitrary number)
 		$imported_comments = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->comments} WHERE comment_type = 'livejournal'" );
 		$added_indices = false;
@@ -899,18 +899,18 @@ class LJ_API_Import {
 			add_clean_index( $wpdb->comments, 'comment_karma' );
 			add_clean_index( $wpdb->comments, 'comment_agent' );
 		}
-		
+
 		// Get LJ comments, which haven't been threaded yet, 5000 at a time and thread them
 		while ( $comments = $wpdb->get_results( "SELECT comment_ID, comment_agent FROM {$wpdb->comments} WHERE comment_type = 'livejournal' AND comment_agent != '0' LIMIT 5000", OBJECT ) ) {
 			foreach ( $comments as $comment ) {
-				$wpdb->update( $wpdb->comments, 
-								array( 'comment_parent' => $this->get_wp_comment_ID( $comment->comment_agent ), 'comment_type' => 'livejournal-done' ), 
+				$wpdb->update( $wpdb->comments,
+								array( 'comment_parent' => $this->get_wp_comment_ID( $comment->comment_agent ), 'comment_type' => 'livejournal-done' ),
 								array( 'comment_ID' => $comment->comment_ID ) );
 			}
 			wp_cache_flush();
 			$wpdb->flush();
 		}
-		
+
 		// Revert the comments table back to normal and optimize it to reclaim space
 		if ( $added_indices ) {
 			drop_index( $wpdb->comments, 'comment_type'  );
@@ -918,7 +918,7 @@ class LJ_API_Import {
 			drop_index( $wpdb->comments, 'comment_agent' );
 			$wpdb->query( "OPTIMIZE TABLE {$wpdb->comments}" );
 		}
-		
+
 		// Clean up database and we're out
 		$this->cleanup();
 		do_action( 'import_done', 'livejournal' );
@@ -929,25 +929,25 @@ class LJ_API_Import {
 		echo '</h3>';
 		echo '</div>';
 	}
-	
+
 	// Output an error message with a button to try again.
 	function throw_error( $error, $step ) {
 		echo '<p><strong>' . $error->get_error_message() . '</strong></p>';
 		echo $this->next_step( $step, __( 'Try Again' ) );
 	}
-	
+
 	// Returns the HTML for a link to the next page
 	function next_step( $next_step, $label, $id = 'ljapi-next-form' ) {
 		$str  = '<form action="admin.php?import=livejournal" method="post" id="' . $id . '">';
 		$str .= wp_nonce_field( 'lj-api-import', '_wpnonce', true, false );
 		$str .= wp_referer_field( false );
-		$str .= '<input type="hidden" name="step" id="step" value="' . $next_step . '" />';
-		$str .= '<p><input type="submit" class="button-primary" value="' . attribute_escape( $label ) . '" /> <span id="auto-message"></span></p>';
+		$str .= '<input type="hidden" name="step" id="step" value="' . esc_attr($next_step) . '" />';
+		$str .= '<p><input type="submit" class="button-primary" value="' . esc_attr( $label ) . '" /> <span id="auto-message"></span></p>';
 		$str .= '</form>';
-		
+
 		return $str;
 	}
-	
+
 	// Automatically submit the specified form after $seconds
 	// Include a friendly countdown in the element with id=$msg
 	function auto_submit( $id = 'ljapi-next-form', $msg = 'auto-message', $seconds = 10 ) {
@@ -956,14 +956,14 @@ class LJ_API_Import {
 			jQuery(document).ready(function(){
 				ljapi_msg();
 			});
-			
+
 			function ljapi_msg() {
 				str = '<?php _e( "Continuing in %d" ) ?>';
 				jQuery( '#<?php echo $msg ?>' ).text( str.replace( /%d/, next_counter ) );
 				if ( next_counter <= 0 ) {
 					if ( jQuery( '#<?php echo $id ?>' ).length ) {
 						jQuery( "#<?php echo $id ?> input[type='submit']" ).hide();
-						str = '<?php _e( "Continuing" ) ?> <img src="images/loading-publish.gif" alt="" id="processing" align="top" />';
+						str = '<?php _e( "Continuing" ) ?> <img src="images/wpspin_light.gif" alt="" id="processing" align="top" />';
 						jQuery( '#<?php echo $msg ?>' ).html( str );
 						jQuery( '#<?php echo $id ?>' ).submit();
 						return;
@@ -974,7 +974,7 @@ class LJ_API_Import {
 			}
 		</script><?php
 	}
-	
+
 	// Automatically submit the form with #id to continue the process
 	// Hide any submit buttons to avoid people clicking them
 	// Display a countdown in the element indicated by $msg for "Continuing in x"
@@ -984,7 +984,7 @@ class LJ_API_Import {
 			jQuery(document).ready(function(){
 				ljapi_msg();
 			});
-			
+
 			function ljapi_msg() {
 				str = '<?php _e( "Continuing in %d" ) ?>';
 				jQuery( '#<?php echo $msg ?>' ).text( str.replace( /%d/, next_counter ) );
@@ -992,7 +992,7 @@ class LJ_API_Import {
 					if ( jQuery( '#<?php echo $id ?>' ).length ) {
 						jQuery( "#<?php echo $id ?> input[type='submit']" ).hide();
 						jQuery.ajaxSetup({'timeout':3600000});
-						str = '<?php _e( "Processing next batch." ) ?> <img src="images/loading-publish.gif" alt="" id="processing" align="top" />';
+						str = '<?php _e( "Processing next batch." ) ?> <img src="images/wpspin_light.gif" alt="" id="processing" align="top" />';
 						jQuery( '#<?php echo $msg ?>' ).html( str );
 						jQuery('#ljapi-status').load(ajaxurl, {'action':'lj-importer',
 																'step':jQuery('#step').val(),
@@ -1011,7 +1011,7 @@ class LJ_API_Import {
 	// set wp_comments entries back to "normal" values
 	function cleanup() {
 		global $wpdb;
-		
+
 		delete_option( 'ljapi_username' );
 		delete_option( 'ljapi_password' );
 		delete_option( 'ljapi_protected_password' );
@@ -1030,19 +1030,19 @@ class LJ_API_Import {
 		delete_option( 'ljapi_highest_comment_id' );
 		delete_option( 'ljapi_comment_batch' );
 		delete_option( 'ljapi_step' );
-		
-		$wpdb->update( $wpdb->comments, 
-						array( 'comment_karma' => 0, 'comment_agent' => 'WP LJ Importer', 'comment_type' => '' ), 
+
+		$wpdb->update( $wpdb->comments,
+						array( 'comment_karma' => 0, 'comment_agent' => 'WP LJ Importer', 'comment_type' => '' ),
 						array( 'comment_type' => 'livejournal-done' ) );
-		$wpdb->update( $wpdb->comments, 
-						array( 'comment_karma' => 0, 'comment_agent' => 'WP LJ Importer', 'comment_type' => '' ), 
+		$wpdb->update( $wpdb->comments,
+						array( 'comment_karma' => 0, 'comment_agent' => 'WP LJ Importer', 'comment_type' => '' ),
 						array( 'comment_type' => 'livejournal' ) );
 	}
-	
+
 	function LJ_API_Import() {
 		$this->__construct();
 	}
-	
+
 	function __construct() {
 		// Nothing
 	}

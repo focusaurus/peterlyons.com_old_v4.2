@@ -9,6 +9,9 @@
 /** WordPress Administration Bootstrap */
 require_once('admin.php');
 
+if ( !current_user_can('edit_posts') )
+	wp_die(__('Cheatin&#8217; uh?'));
+
 // Back-compat for viewing comments of an entry
 if ( $_redirect = intval( max( @$_GET['p'], @$_GET['attachment_id'], @$_GET['page_id'] ) ) ) {
 	wp_redirect( admin_url('edit-comments.php?p=' . $_redirect ) );
@@ -92,13 +95,13 @@ if ( !isset( $_GET['paged'] ) )
 if ( empty($_GET['mode']) )
 	$mode = 'list';
 else
-	$mode = attribute_escape($_GET['mode']); ?>
+	$mode = esc_attr($_GET['mode']); ?>
 
 <div class="wrap">
 <?php screen_icon(); ?>
-<h2><?php echo wp_specialchars( $title );
+<h2><?php echo esc_html( $title );
 if ( isset($_GET['s']) && $_GET['s'] )
-	printf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', wp_specialchars( get_search_query() ) ); ?>
+	printf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', esc_html( get_search_query() ) ); ?>
 </h2>
 
 <?php
@@ -141,7 +144,7 @@ $status_links = array();
 $num_posts = wp_count_posts( 'post', 'readable' );
 $total_posts = array_sum( (array) $num_posts );
 $class = empty( $_GET['post_status'] ) ? ' class="current"' : '';
-$status_links[] = "<li><a href='edit.php' $class>" . sprintf( _n( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts ), number_format_i18n( $total_posts ) ) . '</a>';
+$status_links[] = "<li><a href='edit.php' $class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
 
 
 foreach ( $post_stati as $status => $label ) {
@@ -164,15 +167,15 @@ endif;
 </ul>
 
 <p class="search-box">
-	<label class="hidden" for="post-search-input"><?php _e( 'Search Posts' ); ?>:</label>
-	<input type="text" class="search-input" id="post-search-input" name="s" value="<?php the_search_query(); ?>" />
-	<input type="submit" value="<?php _e( 'Search Posts' ); ?>" class="button" />
+	<label class="screen-reader-text" for="post-search-input"><?php _e( 'Search Posts' ); ?>:</label>
+	<input type="text" id="post-search-input" name="s" value="<?php the_search_query(); ?>" />
+	<input type="submit" value="<?php esc_attr_e( 'Search Posts' ); ?>" class="button" />
 </p>
 
 <?php if ( isset($_GET['post_status'] ) ) : ?>
-<input type="hidden" name="post_status" value="<?php echo attribute_escape($_GET['post_status']) ?>" />
+<input type="hidden" name="post_status" value="<?php echo esc_attr($_GET['post_status']) ?>" />
 <?php endif; ?>
-<input type="hidden" name="mode" value="<?php echo $mode; ?>" />
+<input type="hidden" name="mode" value="<?php echo esc_attr($mode); ?>" />
 
 <?php if ( have_posts() ) { ?>
 
@@ -195,7 +198,7 @@ $page_links = paginate_links( array(
 <option value="edit"><?php _e('Edit'); ?></option>
 <option value="delete"><?php _e('Delete'); ?></option>
 </select>
-<input type="submit" value="<?php _e('Apply'); ?>" name="doaction" id="doaction" class="button-secondary action" />
+<input type="submit" value="<?php esc_attr_e('Apply'); ?>" name="doaction" id="doaction" class="button-secondary action" />
 <?php wp_nonce_field('bulk-posts'); ?>
 
 <?php // view filters
@@ -222,7 +225,7 @@ foreach ($arc_result as $arc_row) {
 	else
 		$default = '';
 
-	echo "<option$default value='$arc_row->yyear$arc_row->mmonth'>";
+	echo "<option$default value='" . esc_attr("$arc_row->yyear$arc_row->mmonth") . "'>";
 	echo $wp_locale->get_month($arc_row->mmonth) . " $arc_row->yyear";
 	echo "</option>\n";
 }
@@ -236,7 +239,7 @@ $dropdown_options = array('show_option_all' => __('View all categories'), 'hide_
 wp_dropdown_categories($dropdown_options);
 do_action('restrict_manage_posts');
 ?>
-<input type="submit" id="post-query-submit" value="<?php _e('Filter'); ?>" class="button-secondary" />
+<input type="submit" id="post-query-submit" value="<?php esc_attr_e('Filter'); ?>" class="button-secondary" />
 
 <?php } ?>
 </div>
@@ -251,8 +254,8 @@ do_action('restrict_manage_posts');
 <?php } ?>
 
 <div class="view-switch">
-	<a href="<?php echo clean_url(add_query_arg('mode', 'list', $_SERVER['REQUEST_URI'])) ?>"><img <?php if ( 'list' == $mode ) echo 'class="current"'; ?> id="view-switch-list" src="../wp-includes/images/blank.gif" width="20" height="20" title="<?php _e('List View') ?>" alt="<?php _e('List View') ?>" /></a>
-	<a href="<?php echo clean_url(add_query_arg('mode', 'excerpt', $_SERVER['REQUEST_URI'])) ?>"><img <?php if ( 'excerpt' == $mode ) echo 'class="current"'; ?> id="view-switch-excerpt" src="../wp-includes/images/blank.gif" width="20" height="20" title="<?php _e('Excerpt View') ?>" alt="<?php _e('Excerpt View') ?>" /></a>
+	<a href="<?php echo esc_url(add_query_arg('mode', 'list', $_SERVER['REQUEST_URI'])) ?>"><img <?php if ( 'list' == $mode ) echo 'class="current"'; ?> id="view-switch-list" src="../wp-includes/images/blank.gif" width="20" height="20" title="<?php _e('List View') ?>" alt="<?php _e('List View') ?>" /></a>
+	<a href="<?php echo esc_url(add_query_arg('mode', 'excerpt', $_SERVER['REQUEST_URI'])) ?>"><img <?php if ( 'excerpt' == $mode ) echo 'class="current"'; ?> id="view-switch-excerpt" src="../wp-includes/images/blank.gif" width="20" height="20" title="<?php _e('Excerpt View') ?>" alt="<?php _e('Excerpt View') ?>" /></a>
 </div>
 
 <div class="clear"></div>
@@ -275,7 +278,7 @@ if ( $page_links )
 <option value="edit"><?php _e('Edit'); ?></option>
 <option value="delete"><?php _e('Delete'); ?></option>
 </select>
-<input type="submit" value="<?php _e('Apply'); ?>" name="doaction2" id="doaction2" class="button-secondary action" />
+<input type="submit" value="<?php esc_attr_e('Apply'); ?>" name="doaction2" id="doaction2" class="button-secondary action" />
 <br class="clear" />
 </div>
 <br class="clear" />

@@ -10,24 +10,24 @@ adminMenu = {
 			else
 				$(this).hide();
 		});
-		$('#adminmenu li.menu-top .wp-menu-image').click( function() { window.location = $(this).siblings('a.menu-top')[0].href; } );
+
 		this.favorites();
 
-		$('.wp-menu-separator').click(function(){
-			if ( $('#wpcontent').hasClass('folded') ) {
+		$('a.separator').click(function(){
+			if ( $('body').hasClass('folded') ) {
 				adminMenu.fold(1);
-				setUserSetting( 'mfold', 'o' );
+				deleteUserSetting( 'mfold' );
 			} else {
 				adminMenu.fold();
 				setUserSetting( 'mfold', 'f' );
 			}
+			return false;
 		});
 
-		if ( 'f' != getUserSetting( 'mfold' ) ) {
-			this.restoreMenuState();
-		} else {
+		if ( $('body').hasClass('folded') ) {
 			this.fold();
 		}
+		this.restoreMenuState();
 	},
 
 	restoreMenuState : function() {
@@ -54,16 +54,22 @@ adminMenu = {
 
 	fold : function(off) {
 		if (off) {
-			$('#wpcontent').removeClass('folded');
+			$('body').removeClass('folded');
 			$('#adminmenu li.wp-has-submenu').unbind();
 		} else {
-			$('#wpcontent').addClass('folded');
+			$('body').addClass('folded');
 			$('#adminmenu li.wp-has-submenu').hoverIntent({
 				over: function(e){
-					var m = $(this).find('.wp-submenu'), t = e.clientY, H = $(window).height(), h = m.height(), o;
-
-					if ( (t+h+10) > H ) {
-						o = (t+h+10) - H;
+					var m, b, h, o, f;
+					m = $(this).find('.wp-submenu');
+					b = m.parent().offset().top + m.height() + 1; // Bottom offset of the menu
+					h = $('#wpwrap').height(); // Height of the entire page
+					o = 60 + b - h;
+					f = $(window).height() + $('body').scrollTop() - 15; // The fold
+					if (f < (b - o)) {
+						o = b - f;
+					}
+					if (o > 1) {
 						m.css({'marginTop':'-'+o+'px'});
 					} else if ( m.css('marginTop') ) {
 						m.css({'marginTop':''});
@@ -108,12 +114,14 @@ columns = {
 		$.post(ajaxurl, {
 			action: 'hidden-columns',
 			hidden: hidden,
-			hiddencolumnsnonce: $('#hiddencolumnsnonce').val(),
+			screenoptionnonce: $('#screenoptionnonce').val(),
 			page: pagenow
 		});
 	}
 }
+
 $(document).ready(function(){columns.init();});
+
 })(jQuery);
 
 // stub for doing better warnings
@@ -134,7 +142,7 @@ showNotice = {
 
 jQuery(document).ready( function($) {
 	var lastClicked = false, checks, first, last, checked;
-	
+
 	// pulse
 	$('.fade').animate( { backgroundColor: '#ffffe0' }, 300).animate( { backgroundColor: '#fffbcc' }, 300).animate( { backgroundColor: '#ffffe0' }, 300).animate( { backgroundColor: '#fffbcc' }, 300);
 
@@ -144,7 +152,7 @@ jQuery(document).ready( function($) {
 
 	// show warnings
 	$('#doaction, #doaction2').click(function(){
-		if ( $('select[name^="action"]').val() == 'delete' ) {
+		if ( $('select[name="action"]').val() == 'delete' || $('select[name="action2"]').val() == 'delete' ) {
 			return showNotice.warn();
 		}
 	});
@@ -152,14 +160,13 @@ jQuery(document).ready( function($) {
 	// screen settings tab
 	$('#show-settings-link').click(function () {
 		if ( ! $('#screen-options-wrap').hasClass('screen-options-open') ) {
-			$('#contextual-help-link-wrap').addClass('invisible');
+			$('#contextual-help-link-wrap').css('visibility', 'hidden');
 		}
 		$('#screen-options-wrap').slideToggle('fast', function(){
 			if ( $(this).hasClass('screen-options-open') ) {
 				$('#show-settings-link').css({'backgroundImage':'url("images/screen-options-right.gif")'});
-				$('#contextual-help-link-wrap').removeClass('invisible');
+				$('#contextual-help-link-wrap').css('visibility', '');
 				$(this).removeClass('screen-options-open');
-
 			} else {
 				$('#show-settings-link').css({'backgroundImage':'url("images/screen-options-right-up.gif")'});
 				$(this).addClass('screen-options-open');
@@ -171,12 +178,12 @@ jQuery(document).ready( function($) {
 	// help tab
 	$('#contextual-help-link').click(function () {
 		if ( ! $('#contextual-help-wrap').hasClass('contextual-help-open') ) {
-			$('#screen-options-link-wrap').addClass('invisible');
+			$('#screen-options-link-wrap').css('visibility', 'hidden');
 		}
 		$('#contextual-help-wrap').slideToggle('fast', function(){
 			if ( $(this).hasClass('contextual-help-open') ) {
 				$('#contextual-help-link').css({'backgroundImage':'url("images/screen-options-right.gif")'});
-				$('#screen-options-link-wrap').removeClass('invisible');
+				$('#screen-options-link-wrap').css('visibility', '');
 				$(this).removeClass('contextual-help-open');
 			} else {
 				$('#contextual-help-link').css({'backgroundImage':'url("images/screen-options-right-up.gif")'});
@@ -229,32 +236,32 @@ jQuery(document).ready( function($) {
 			return '';
 		});
 	});
+	$('#default-password-nag-no').click( function() {
+		setUserSetting('default_password_nag', 'hide');
+		$('div.default-password-nag').hide();
+		return false;
+	});
+	
+	
 });
 
-(function(){
-	if ( 'undefined' != typeof google && google.gears ) return;
+jQuery(document).ready( function($){
+	var turboNag = $('.turbo-nag');
 
-	var gf = false;
-	if ( 'undefined' != typeof GearsFactory ) {
-		gf = new GearsFactory();
-	} else {
-		try {
-			gf = new ActiveXObject('Gears.Factory');
-			if ( factory.getBuildInfo().indexOf('ie_mobile') != -1 )
-				gf.privateSetGlobalObject(this);
-		} catch (e) {
-			if ( ( 'undefined' != typeof navigator.mimeTypes ) && navigator.mimeTypes['application/x-googlegears'] ) {
-				gf = document.createElement("object");
-				gf.style.display = "none";
-				gf.width = 0;
-				gf.height = 0;
-				gf.type = "application/x-googlegears";
-				document.documentElement.appendChild(gf);
-			}
-		}
-	}
-	if ( gf && gf.hasPermission )
+	if ( !turboNag.length || ('undefined' != typeof(google) && google.gears) )
 		return;
 
-	jQuery('.turbo-nag').show();
-})();
+	if ( 'undefined' != typeof GearsFactory ) {
+		return;
+	} else {
+		try {
+			if ( ( 'undefined' != typeof window.ActiveXObject && ActiveXObject('Gears.Factory') ) ||
+				( 'undefined' != typeof navigator.mimeTypes && navigator.mimeTypes['application/x-googlegears'] ) ) {
+					return;
+			}
+		} catch(e){}
+	}
+
+	turboNag.show();
+
+});

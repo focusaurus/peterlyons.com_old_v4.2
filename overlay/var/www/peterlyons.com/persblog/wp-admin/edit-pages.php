@@ -9,6 +9,9 @@
 /** WordPress Administration Bootstrap */
 require_once('admin.php');
 
+if ( !current_user_can('edit_pages') )
+	wp_die(__('Cheatin&#8217; uh?'));
+
 // Handle bulk actions
 if ( isset($_GET['action']) && ( -1 != $_GET['action'] || -1 != $_GET['action2'] ) ) {
 	$doaction = ( -1 != $_GET['action'] ) ? $_GET['action'] : $_GET['action2'];
@@ -77,12 +80,14 @@ wp_enqueue_script('inline-edit-post');
 $post_stati  = array(	//	array( adj, noun )
 		'publish' => array(_x('Published', 'page'), __('Published pages'), _nx_noop('Published <span class="count">(%s)</span>', 'Published <span class="count">(%s)</span>', 'page')),
 		'future' => array(_x('Scheduled', 'page'), __('Scheduled pages'), _nx_noop('Scheduled <span class="count">(%s)</span>', 'Scheduled <span class="count">(%s)</span>', 'page')),
-		'pending' => array(_x('Pending Review', 'page'), __('Pending pages'), _n_noop('Pending Review <span class="count">(%s)</span>', 'Pending Review <span class="count">(%s)</span>', 'page')),
+		'pending' => array(_x('Pending Review', 'page'), __('Pending pages'), _nx_noop('Pending Review <span class="count">(%s)</span>', 'Pending Review <span class="count">(%s)</span>', 'page')),
 		'draft' => array(_x('Draft', 'page'), _x('Drafts', 'manage posts header'), _nx_noop('Draft <span class="count">(%s)</span>', 'Drafts <span class="count">(%s)</span>', 'page')),
 		'private' => array(_x('Private', 'page'), __('Private pages'), _nx_noop('Private <span class="count">(%s)</span>', 'Private <span class="count">(%s)</span>', 'page'))
 	);
 
-$query = array('post_type' => 'page', 'orderby' => 'menu_order title', 'what_to_show' => 'posts',
+$post_stati = apply_filters('page_stati', $post_stati);
+
+$query = array('post_type' => 'page', 'orderby' => 'menu_order title',
 	'posts_per_page' => -1, 'posts_per_archive_page' => -1, 'order' => 'asc');
 
 $post_status_label = __('Pages');
@@ -104,9 +109,9 @@ require_once('admin-header.php'); ?>
 
 <div class="wrap">
 <?php screen_icon(); ?>
-<h2><?php echo wp_specialchars( $title );
+<h2><?php echo esc_html( $title );
 if ( isset($_GET['s']) && $_GET['s'] )
-	printf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', wp_specialchars( get_search_query() ) ); ?>
+	printf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', esc_html( get_search_query() ) ); ?>
 </h2>
 
 <?php if ( isset($_GET['locked']) || isset($_GET['skipped']) || isset($_GET['updated']) || isset($_GET['deleted']) ) { ?>
@@ -150,7 +155,7 @@ $status_links = array();
 $num_posts = wp_count_posts('page', 'readable');
 $total_posts = array_sum( (array) $num_posts );
 $class = empty($_GET['post_status']) ? ' class="current"' : '';
-$status_links[] = "<li><a href='edit-pages.php'$class>" . sprintf( _n( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts ), number_format_i18n( $total_posts ) ) . '</a>';
+$status_links[] = "<li><a href='edit-pages.php'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'pages' ), number_format_i18n( $total_posts ) ) . '</a>';
 foreach ( $post_stati as $status => $label ) {
 	$class = '';
 
@@ -169,13 +174,13 @@ endif;
 </ul>
 
 <p class="search-box">
-	<label class="hidden" for="page-search-input"><?php _e( 'Search Pages' ); ?>:</label>
-	<input type="text" class="search-input" id="page-search-input" name="s" value="<?php _admin_search_query(); ?>" />
-	<input type="submit" value="<?php _e( 'Search Pages' ); ?>" class="button" />
+	<label class="screen-reader-text" for="page-search-input"><?php _e( 'Search Pages' ); ?>:</label>
+	<input type="text" id="page-search-input" name="s" value="<?php _admin_search_query(); ?>" />
+	<input type="submit" value="<?php esc_attr_e( 'Search Pages' ); ?>" class="button" />
 </p>
 
 <?php if ( isset($_GET['post_status'] ) ) : ?>
-<input type="hidden" name="post_status" value="<?php echo attribute_escape($_GET['post_status']) ?>" />
+<input type="hidden" name="post_status" value="<?php echo esc_attr($_GET['post_status']) ?>" />
 <?php endif; ?>
 
 <?php if ($posts) { ?>
@@ -186,7 +191,8 @@ endif;
 $pagenum = isset( $_GET['pagenum'] ) ? absint( $_GET['pagenum'] ) : 0;
 if ( empty($pagenum) )
 	$pagenum = 1;
-if( ! isset( $per_page ) || $per_page < 0 )
+$per_page = get_user_option('edit_pages_per_page');
+if ( empty( $per_page ) || $per_page < 0 )
 	$per_page = 20;
 
 $num_pages = ceil($wp_query->post_count / $per_page);
@@ -214,7 +220,7 @@ if ( $page_links ) : ?>
 <option value="edit"><?php _e('Edit'); ?></option>
 <option value="delete"><?php _e('Delete'); ?></option>
 </select>
-<input type="submit" value="<?php _e('Apply'); ?>" name="doaction" id="doaction" class="button-secondary action" />
+<input type="submit" value="<?php esc_attr_e('Apply'); ?>" name="doaction" id="doaction" class="button-secondary action" />
 <?php wp_nonce_field('bulk-pages'); ?>
 </div>
 
@@ -253,7 +259,7 @@ if ( $page_links )
 <option value="edit"><?php _e('Edit'); ?></option>
 <option value="delete"><?php _e('Delete'); ?></option>
 </select>
-<input type="submit" value="<?php _e('Apply'); ?>" name="doaction2" id="doaction2" class="button-secondary action" />
+<input type="submit" value="<?php esc_attr_e('Apply'); ?>" name="doaction2" id="doaction2" class="button-secondary action" />
 </div>
 
 <br class="clear" />

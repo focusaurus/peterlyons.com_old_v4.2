@@ -48,13 +48,13 @@ class WP_Styles extends WP_Dependencies {
 		}
 
 		if ( isset($this->registered[$handle]->args) )
-			$media = attribute_escape( $this->registered[$handle]->args );
+			$media = esc_attr( $this->registered[$handle]->args );
 		else
 			$media = 'all';
 
 		$href = $this->_css_href( $this->registered[$handle]->src, $ver, $handle );
 		$rel = isset($this->registered[$handle]->extra['alt']) && $this->registered[$handle]->extra['alt'] ? 'alternate stylesheet' : 'stylesheet';
-		$title = isset($this->registered[$handle]->extra['title']) ? "title='" . attribute_escape( $this->registered[$handle]->extra['title'] ) . "'" : '';
+		$title = isset($this->registered[$handle]->extra['title']) ? "title='" . esc_attr( $this->registered[$handle]->extra['title'] ) . "'" : '';
 
 		$end_cond = $tag = '';
 		if ( isset($this->registered[$handle]->extra['conditional']) && $this->registered[$handle]->extra['conditional'] ) {
@@ -62,14 +62,14 @@ class WP_Styles extends WP_Dependencies {
 			$end_cond = "<![endif]-->\n";
 		}
 
-		$tag .= apply_filters( 'style_loader_tag', "<link rel='$rel' id='$handle' $title href='$href' type='text/css' media='$media' />\n", $handle );
+		$tag .= apply_filters( 'style_loader_tag', "<link rel='$rel' id='$handle-css' $title href='$href' type='text/css' media='$media' />\n", $handle );
 		if ( 'rtl' === $this->text_direction && isset($this->registered[$handle]->extra['rtl']) && $this->registered[$handle]->extra['rtl'] ) {
 			if ( is_bool( $this->registered[$handle]->extra['rtl'] ) )
-				$rtl_href = str_replace( '.css', '-rtl.css', $href );
+				$rtl_href = str_replace( '.css', '-rtl.css', $this->_css_href( $this->registered[$handle]->src , $ver, "$handle-rtl" ));
 			else
 				$rtl_href = $this->_css_href( $this->registered[$handle]->extra['rtl'], $ver, "$handle-rtl" );
 
-			$tag .= apply_filters( 'style_loader_tag', "<link rel='$rel' id='$handle' $title href='$rtl_href' type='text/css' media='$media' />\n", $handle );
+			$tag .= apply_filters( 'style_loader_tag', "<link rel='$rel' id='$handle-rtl-css' $title href='$rtl_href' type='text/css' media='$media' />\n", $handle );
 		}
 
 		$tag .= $end_cond;
@@ -102,7 +102,7 @@ class WP_Styles extends WP_Dependencies {
 
 		$src = add_query_arg('ver', $ver, $src);
 		$src = apply_filters( 'style_loader_src', $src, $handle );
-		return clean_url( $src );
+		return esc_url( $src );
 	}
 
 	function in_default_dir($src) {

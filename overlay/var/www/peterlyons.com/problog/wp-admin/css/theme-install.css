@@ -72,6 +72,71 @@ div.star img {
 }
 
 .theme-listing br.line {
-	border-bottom: thin solid #ccc;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
 	margin-bottom: 3px;
+}
+
+.available-theme {
+	padding: 20px 15px;
+}
+
+#theme-information .theme-preview-img {
+	float: left;
+	margin: 5px 25px 10px 15px;
+	width: 300px;
+}
+
+#theme-information .action-button {
+	border-top-width: 1px;
+	border-top-style: solid;
+	margin: 10px 5px 20px;
+}
+
+#theme-information .action-button #cancel {
+	float: left;
+	margin: 10px 15px;
+}
+
+#theme-information .action-button #install {
+	float: right;
+	margin: 10px 15px;
+}
+
+#theme-information .available-theme h3 {
+	margin: 1em 0;
+}
+
+body#theme-information {
+	height: auto;
+}
+
+.feature-filter {
+	-moz-border-radius: 8px;
+	-khtml-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	border-width: 1px;
+	border-style: solid;
+	padding: 8px 12px 0;
+}
+
+.feature-filter .feature-group {
+	float: left;
+	margin-bottom: 20px;
+	width: 695px;
+}
+
+.feature-filter .feature-name {
+	float: left;
+	text-align: right;
+	width: 95px;
+}
+
+.feature-filter .feature-group li {
+	display: inline;
+	float: left;
+	list-style-type: none;
+	padding-right: 25px;
+	min-width: 145px;
 }

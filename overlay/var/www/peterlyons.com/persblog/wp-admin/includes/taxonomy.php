@@ -18,8 +18,8 @@
  * @param unknown_type $cat_name
  * @return unknown
  */
-function category_exists($cat_name) {
-	$id = is_term($cat_name, 'category');
+function category_exists($cat_name, $parent = 0) {
+	$id = is_term($cat_name, 'category', $parent);
 	if ( is_array($id) )
 		$id = $id['term_id'];
 	return $id;
@@ -218,11 +218,11 @@ function get_terms_to_edit( $post_id, $taxonomy = 'post_tag' ) {
 
 	if ( is_wp_error($tags) )
 		return $tags;
-	
+
 	foreach ( $tags as $tag )
 		$tag_names[] = $tag->name;
 	$tags_to_edit = join( ',', $tag_names );
-	$tags_to_edit = attribute_escape( $tags_to_edit );
+	$tags_to_edit = esc_attr( $tags_to_edit );
 	$tags_to_edit = apply_filters( 'terms_to_edit', $tags_to_edit, $taxonomy );
 
 	return $tags_to_edit;

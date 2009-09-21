@@ -11,16 +11,17 @@
  *
  * @since unknown
  */
-define('WP_ADMIN', TRUE);
+if ( !defined('WP_ADMIN') )
+	define('WP_ADMIN', TRUE);
 
 if ( defined('ABSPATH') )
 	require_once(ABSPATH . 'wp-load.php');
 else
 	require_once('../wp-load.php');
 
-if ( get_option('db_version') == 'db_upgraded' ) {
+if ( get_option('db_upgraded') ) {
 	$wp_rewrite->flush_rules();
-	update_option('db_version', $wp_db_version);
+	update_option( 'db_upgraded',  false );
 
 	/**
 	 * Runs on the next page load after successful upgrade
@@ -41,8 +42,9 @@ nocache_headers();
 
 update_category_cache();
 
+set_screen_options();
+
 $posts_per_page = get_option('posts_per_page');
-$what_to_show = get_option('what_to_show');
 $date_format = get_option('date_format');
 $time_format = get_option('time_format');
 
@@ -144,7 +146,7 @@ if (isset($plugin_page)) {
 
 	// Make sure rules are flushed
 	global $wp_rewrite;
-	$wp_rewrite->flush_rules();
+	$wp_rewrite->flush_rules(false);
 
 	exit();
 } else {

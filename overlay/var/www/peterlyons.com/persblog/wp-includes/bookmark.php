@@ -185,9 +185,14 @@ function get_bookmarks($args = '') {
 	if (!empty($exclusions))
 		$exclusions .= ')';
 
-	if ( ! empty($category_name) ) {
-		if ( $category = get_term_by('name', $category_name, 'link_category') )
+	if ( !empty($category_name) ) {
+		if ( $category = get_term_by('name', $category_name, 'link_category') ) {
 			$category = $category->term_id;
+		} else {
+			$cache[ $key ] = array();
+			wp_cache_set( 'get_bookmarks', $cache, 'bookmark' );
+			return apply_filters( 'get_bookmarks', array(), $r );
+		}
 	}
 
 	if ( ! empty($search) ) {
@@ -340,7 +345,7 @@ function sanitize_bookmark_field($field, $value, $bookmark_id, $context) {
 		if ( in_array($field, $format_to_edit) ) {
 			$value = format_to_edit($value);
 		} else {
-			$value = attribute_escape($value);
+			$value = esc_attr($value);
 		}
 	} else if ( 'db' == $context ) {
 		$value = apply_filters("pre_$field", $value);
@@ -350,9 +355,9 @@ function sanitize_bookmark_field($field, $value, $bookmark_id, $context) {
 	}
 
 	if ( 'attribute' == $context )
-		$value = attribute_escape($value);
+		$value = esc_attr($value);
 	else if ( 'js' == $context )
-		$value = js_escape($value);
+		$value = esc_js($value);
 
 	return $value;
 }

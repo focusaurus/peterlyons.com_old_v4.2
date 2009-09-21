@@ -35,7 +35,7 @@ $tabs['featured'] = __('Featured');
 $tabs['new']      = __('Newest');
 $tabs['updated']  = __('Recently Updated');
 
-$nonmenu_tabs = array('install', 'theme-information', 'do_upload'); //Valid actions to perform which do not have a Menu item.
+$nonmenu_tabs = array('theme-information'); //Valid actions to perform which do not have a Menu item.
 
 $tabs = apply_filters('install_themes_tabs', $tabs );
 $nonmenu_tabs = apply_filters('install_themes_nonmenu_tabs', $nonmenu_tabs);
@@ -56,7 +56,7 @@ include('admin-header.php');
 ?>
 <div class="wrap">
 <?php screen_icon(); ?>
-<h2><?php echo wp_specialchars( $title ); ?></h2>
+<h2><?php echo esc_html( $title ); ?></h2>
 
 	<ul class="subsubsub">
 <?php

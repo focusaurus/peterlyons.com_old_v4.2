@@ -1,11 +1,60 @@
-var autosaveLast = '', autosavePeriodical, autosaveOldMessage = '', autosaveDelayPreview = false, autosaveFirst = true;
+var autosave, autosaveLast = '', autosavePeriodical, autosaveOldMessage = '', autosaveDelayPreview = false, notSaved = true;
 
-jQuery(function($) {
-	autosaveLast = $('#post #title').val()+$('#post #content').val();
+jQuery(document).ready( function($) {
+	var dotabkey = true;
+	
+	autosaveLast = $('#post #title').val() + $('#post #content').val();
 	autosavePeriodical = $.schedule({time: autosaveL10n.autosaveInterval * 1000, func: function() { autosave(); }, repeat: true, protect: true});
 
 	//Disable autosave after the form has been submitted
 	$("#post").submit(function() { $.cancel(autosavePeriodical); });
+
+	$('.submitbox input[type="submit"], .submitbox a.submitdelete').click(function(){window.onbeforeunload = null;});
+
+	window.onbeforeunload = function(){
+		var mce = typeof(tinyMCE) != 'undefined' ? tinyMCE.activeEditor : false, title, content;
+
+		if ( mce && !mce.isHidden() ) {
+			if ( mce.isDirty() )
+				return autosaveL10n.saveAlert;
+		} else {
+			title = $('#post #title').val(), content = $('#post #content').val();
+			if ( ( title || content ) && title + content != autosaveLast )
+				return autosaveL10n.saveAlert;
+		}
+	};
+
+	// preview
+	$('#post-preview').click(function(){
+		if ( 1 > $('#post_ID').val() && notSaved ) {
+			autosaveDelayPreview = true;
+			autosave();
+			return false;
+		}
+		doPreview();
+		return false;
+	});
+
+	doPreview = function() {
+		$('input#wp-preview').val('dopreview');
+		$('form#post').attr('target', 'wp-preview').submit().attr('target', '');
+		$('input#wp-preview').val('');
+	}
+
+	//  This code is meant to allow tabbing from Title to Post if tinyMCE is defined.
+	if ( typeof tinyMCE != 'undefined' ) {
+		$('#title')[$.browser.opera ? 'keypress' : 'keydown'](function (e) {
+			if ( e.which == 9 && !e.shiftKey && !e.controlKey && !e.altKey ) {
+				if ( ($("#post_ID").val() < 1) && ($("#title").val().length > 0) ) { autosave(); }
+				if ( tinyMCE.activeEditor && ! tinyMCE.activeEditor.isHidden() && dotabkey ) {
+					e.preventDefault();
+					dotabkey = false;
+					tinyMCE.activeEditor.focus();
+					return false;
+				}
+			}
+		});
+	}
 });
 
 function autosave_parse_response(response) {
@@ -53,14 +102,16 @@ function autosave_saved_new(response) {
 		tempID = jQuery('#post_ID').val();
 		postID = parseInt( res.responses[0].id, 10 );
 		autosave_update_post_ID( postID ); // disabled form buttons are re-enabled here
-		if ( tempID < 0 && postID > 0 ) // update media buttons
+		if ( tempID < 0 && postID > 0 ) { // update media buttons
+			notSaved = false;
 			jQuery('#media-buttons a').each(function(){
 				this.href = this.href.replace(tempID, postID);
 			});
-		// activate preview
-		autosaveFirst = false;
-		if ( autosaveDelayPreview )
-			jQuery('#post-preview').click();
+		}
+		if ( autosaveDelayPreview ) {
+			autosaveDelayPreview = false;
+			doPreview();
+		}
 	} else {
 		autosave_enable_buttons(); // re-enable disabled form buttons
 	}
@@ -114,10 +165,11 @@ function autosave_enable_buttons() {
 
 function autosave_disable_buttons() {
 	jQuery(".submitbox :button:enabled, .submitbox :submit:enabled").attr('disabled', 'disabled');
-	setTimeout(autosave_enable_buttons, 5000); // Re-enable 5 sec later.  Just gives autosave a head start to avoid collisions.
+	// Re-enable 5 sec later.  Just gives autosave a head start to avoid collisions.
+	setTimeout(autosave_enable_buttons, 5000);
 }
 
-var autosave = function() {
+autosave = function() {
 	// (bool) is rich editor enabled and active
 	var rich = (typeof tinyMCE != "undefined") && tinyMCE.activeEditor && !tinyMCE.activeEditor.isHidden(), post_data, doAutoSave, ed, origStatus, successCallback;
 
@@ -156,8 +208,8 @@ var autosave = function() {
 		post_data["post_name"] = jQuery('#post_name').val();
 
 	// Nothing to save or no change.
-	if( (post_data["post_title"].length==0 && post_data["content"].length==0) || post_data["post_title"] + post_data["content"] == autosaveLast) {
-		doAutoSave = false
+	if( ( post_data["post_title"].length == 0 && post_data["content"].length == 0 ) || post_data["post_title"] + post_data["content"] == autosaveLast) {
+		doAutoSave = false;
 	}
 
 	autosave_disable_buttons();
@@ -181,7 +233,7 @@ var autosave = function() {
 		post_data["post_author"] = jQuery("#post_author").val();
 	post_data["user_ID"] = jQuery("#user-id").val();
 
-	// Don't run while the TinyMCE spellcheck is on.  Why?  Who knows.
+	// Don't run while the TinyMCE spellcheck is on. It resets all found words.
 	if ( rich && tinyMCE.activeEditor.plugins.spellchecker && tinyMCE.activeEditor.plugins.spellchecker.active ) {
 		doAutoSave = false;
 	}

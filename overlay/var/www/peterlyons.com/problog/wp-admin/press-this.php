@@ -10,21 +10,8 @@
 require_once('admin.php');
 header('Content-Type: ' . get_option('html_type') . '; charset=' . get_option('blog_charset'));
 
-if ( ! current_user_can('publish_posts') ) wp_die( __( 'Cheatin&#8217; uh?' ) );
-
-/**
- * Replace forward slash with backslash and slash.
- *
- * @package WordPress
- * @subpackage Press_This
- * @since 2.6.0
- *
- * @param string $string
- * @return string
- */
-function preg_quote2($string) {
-	return str_replace('/', '\/', preg_quote($string));
-}
+if ( ! current_user_can('edit_posts') )
+	wp_die( __( 'Cheatin&#8217; uh?' ) );
 
 /**
  * Convert characters.
@@ -55,25 +42,25 @@ function aposfix($text) {
 function press_it() {
 	// define some basic variables
 	$quick['post_status'] = 'draft'; // set as draft first
-	$quick['post_category'] = $_REQUEST['post_category'];
-	$quick['tax_input'] = $_REQUEST['tax_input'];
-	$quick['post_title'] = $_REQUEST['title'];
+	$quick['post_category'] = isset($_REQUEST['post_category']) ? $_REQUEST['post_category'] : null;
+	$quick['tax_input'] = isset($_REQUEST['tax_input']) ? $_REQUEST['tax_input'] : '';
+	$quick['post_title'] = isset($_REQUEST['title']) ? $_REQUEST['title'] : '';
 	$quick['post_content'] = '';
 
 	// insert the post with nothing in it, to get an ID
 	$post_ID = wp_insert_post($quick, true);
-	$content = $_REQUEST['content'];
+	$content = isset($_REQUEST['content']) ? $_REQUEST['content'] : '';
 
-	if($_REQUEST['photo_src'])
+	$upload = false;
+	if( !empty($_REQUEST['photo_src']) && current_user_can('upload_files') )
 		foreach( (array) $_REQUEST['photo_src'] as $key => $image)
 			// see if files exist in content - we don't want to upload non-used selected files.
 			if( strpos($_REQUEST['content'], $image) !== false ) {
-				$upload = media_sideload_image($image, $post_ID, $_REQUEST['photo_description'][$key]);
+				$desc = isset($_REQUEST['photo_description'][$key]) ? $_REQUEST['photo_description'][$key] : '';
+				$upload = media_sideload_image($image, $post_ID, $desc);
 
-				// Replace the POSTED content <img> with correct uploaded ones.
-				// escape quote for matching
-				$quoted = preg_quote2($image);
-				if( !is_wp_error($upload) ) $content = preg_replace('/<img ([^>]*)src=(\"|\')'.$quoted.'(\2)([^>\/]*)\/*>/is', $upload, $content);
+				// Replace the POSTED content <img> with correct uploaded ones. Regex contains fix for Magic Quotes
+				if( !is_wp_error($upload) ) $content = preg_replace('/<img ([^>]*)src=\\\?(\"|\')'.preg_quote($image, '/').'\\\?(\2)([^>\/]*)\/*>/is', $upload, $content);
 			}
 
 	// set the post_content and status
@@ -95,23 +82,25 @@ function press_it() {
 }
 
 // For submitted posts.
-if ( 'post' == $_REQUEST['action'] ) {
+if ( isset($_REQUEST['action']) && 'post' == $_REQUEST['action'] ) {
 	check_admin_referer('press-this');
 	$post_ID = press_it();
 	$posted =  $post_ID;
+} else {
+	$post_ID = 0;
 }
 
 // Set Variables
-$title = wp_specialchars(aposfix(stripslashes($_GET['t'])));
-$selection = trim( aposfix( stripslashes($_GET['s']) ) );
+$title = isset($_GET['t']) ? esc_html(aposfix(stripslashes($_GET['t']))) : '';
+$selection = isset($_GET['s']) ? trim( aposfix( stripslashes($_GET['s']) ) ) : '';
 if ( ! empty($selection) ) {
 	$selection = preg_replace('/(\r?\n|\r)/', '</p><p>', $selection);
 	$selection = '<p>'.str_replace('<p></p>', '', $selection).'</p>';
 }
-$url = clean_url($_GET['u']);
-$image = $_GET['i'];
+$url = isset($_GET['u']) ? esc_url($_GET['u']) : '';
+$image = isset($_GET['i']) ? $_GET['i'] : '';
 
-if($_REQUEST['ajax']) {
+if ( !empty($_REQUEST['ajax']) ) {
 switch ($_REQUEST['ajax']) {
 	case 'video': ?>
 		<script type="text/javascript" charset="utf-8">
@@ -146,12 +135,12 @@ switch ($_REQUEST['ajax']) {
 		<h3 class="tb"><label for="this_photo_description"><?php _e('Description') ?></label></h3>
 		<div class="titlediv">
 		<div class="titlewrap">
-			<input id="this_photo_description" name="photo_description" class="tbtitle text" onkeypress="if(event.keyCode==13) image_selector();" value="<?php echo attribute_escape($title);?>"/>
+			<input id="this_photo_description" name="photo_description" class="tbtitle text" onkeypress="if(event.keyCode==13) image_selector();" value="<?php echo esc_attr($title);?>"/>
 		</div>
 		</div>
 
-		<p class="centered"><input type="hidden" name="this_photo" value="<?php echo attribute_escape($image); ?>" id="this_photo" />
-			<a href="#" class="select"><img src="<?php echo clean_url($image); ?>" alt="<?php echo attribute_escape(__('Click to insert.')); ?>" title="<?php echo attribute_escape(__('Click to insert.')); ?>" /></a></p>
+		<p class="centered"><input type="hidden" name="this_photo" value="<?php echo esc_attr($image); ?>" id="this_photo" />
+			<a href="#" class="select"><img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr(__('Click to insert.')); ?>" title="<?php echo esc_attr(__('Click to insert.')); ?>" /></a></p>
 
 		<p id="options"><a href="#" class="select button"><?php _e('Insert Image'); ?></a> <a href="#" class="cancel button"><?php _e('Cancel'); ?></a></p>
 
@@ -179,7 +168,7 @@ switch ($_REQUEST['ajax']) {
 		<h3 class="tb"><label for="photo_description"><?php _e('Description') ?></label></h3>
 		<div id="titlediv">
 			<div class="titlewrap">
-			<input id="this_photo_description" name="photo_description" class="tbtitle text" onkeypress="if(event.keyCode==13) image_selector();" value="<?php echo attribute_escape($title);?>"/>
+			<input id="this_photo_description" name="photo_description" class="tbtitle text" onkeypress="if(event.keyCode==13) image_selector();" value="<?php echo esc_attr($title);?>"/>
 			</div>
 		</div>
 
@@ -216,7 +205,7 @@ switch ($_REQUEST['ajax']) {
 						$src = 'http://'.str_replace('//','/', $host['host'].'/'.$src);
 					else
 						$src = 'http://'.str_replace('//','/', $host['host'].'/'.dirname($host['path']).'/'.$src);
-				$sources[] = clean_url($src);
+				$sources[] = esc_url($src);
 			}
 			return "'" . implode("','", $sources) . "'";
 		}
@@ -233,7 +222,7 @@ switch ($_REQUEST['ajax']) {
 			var my_src = eval(
 				jQuery.ajax({
 			   		type: "GET",
-			   		url: "<?php echo clean_url($_SERVER['PHP_SELF']); ?>",
+			   		url: "<?php echo esc_url($_SERVER['PHP_SELF']); ?>",
 					cache : false,
 					async : false,
 			   		data: "ajax=photo_images&u=<?php echo urlencode($url); ?>",
@@ -244,7 +233,7 @@ switch ($_REQUEST['ajax']) {
 				var my_src = eval(
 				jQuery.ajax({
 			   		type: "GET",
-			   		url: "<?php echo clean_url($_SERVER['PHP_SELF']); ?>",
+			   		url: "<?php echo esc_url($_SERVER['PHP_SELF']); ?>",
 					cache : false,
 					async : false,
 			   		data: "ajax=photo_images&u=<?php echo urlencode($url); ?>",
@@ -388,15 +377,17 @@ var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 		jQuery('#extra_fields').show();
 		switch(tab_name) {
 			case 'video' :
-				jQuery('#extra_fields').load('<?php echo clean_url($_SERVER['PHP_SELF']); ?>', { ajax: 'video', s: '<?php echo attribute_escape($selection); ?>'}, function() {
+				jQuery('#extra_fields').load('<?php echo esc_url($_SERVER['PHP_SELF']); ?>', { ajax: 'video', s: '<?php echo esc_attr($selection); ?>'}, function() {
 					<?php
 					$content = '';
 					if ( preg_match("/youtube\.com\/watch/i", $url) ) {
 						list($domain, $video_id) = split("v=", $url);
+						$video_id = esc_attr($video_id);
 						$content = '<object width="425" height="350"><param name="movie" value="http://www.youtube.com/v/' . $video_id . '"></param><param name="wmode" value="transparent"></param><embed src="http://www.youtube.com/v/' . $video_id . '" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"></embed></object>';
 
 					} elseif ( preg_match("/vimeo\.com\/[0-9]+/i", $url) ) {
 						list($domain, $video_id) = split(".com/", $url);
+						$video_id = esc_attr($video_id);
 						$content = '<object width="400" height="225"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=' . $video_id . '&amp;server=www.vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" />	<embed src="http://www.vimeo.com/moogaloop.swf?clip_id=' . $video_id . '&amp;server=www.vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="400" height="225"></embed></object>';
 
 						if ( trim($selection) == '' )
@@ -411,11 +402,11 @@ var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 				return false;
 				break;
 			case 'photo' :
-				jQuery('#extra_fields').before('<p id="waiting"><img src="images/loading.gif" alt="" /> <?php echo js_escape( __( 'Loading...' ) ); ?></p>');
+				jQuery('#extra_fields').before('<p id="waiting"><img src="images/wpspin_light.gif" alt="" /> <?php echo esc_js( __( 'Loading...' ) ); ?></p>');
 				jQuery.ajax({
 					type: "GET",
 					cache : false,
-					url: "<?php echo clean_url($_SERVER['PHP_SELF']); ?>",
+					url: "<?php echo esc_url($_SERVER['PHP_SELF']); ?>",
 					data: "ajax=photo_js&u=<?php echo urlencode($url)?>",
 					dataType : "script",
 					success : function() {
@@ -462,22 +453,37 @@ var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 			<!-- This div holds the photo metadata -->
 			<div class="photolist"></div>
 
+			<div id="submitdiv" class="stuffbox">
+				<h3><?php _e('Publish') ?></h3>
+				<div class="inside">
+					<p>
+						<input class="button" type="submit" name="draft" value="<?php esc_attr_e('Save Draft') ?>" id="save" />
+						<?php if ( current_user_can('publish_posts') ) { ?>
+							<input class="button-primary" type="submit" name="publish" value="<?php esc_attr_e('Publish') ?>" id="publish" />
+						<?php } else { ?>
+							<br /><br /><input class="button-primary" type="submit" name="review" value="<?php esc_attr_e('Submit for Review') ?>" id="review" />
+						<?php } ?>
+						<img src="images/wpspin_light.gif" alt="" id="saving" style="display:none;" />
+					</p>
+				</div>
+			</div>
+
 			<div id="categorydiv" class="stuffbox">
 				<h3><?php _e('Categories') ?></h3>
 				<div class="inside">
 
-					<div id="categories-all" class="ui-tabs-panel">
+					<div id="categories-all" class="tabs-panel">
 						<ul id="categorychecklist" class="list:category categorychecklist form-no-clear">
-							<?php wp_category_checklist($post->ID, false, false, $popular_ids) ?>
+							<?php wp_category_checklist($post_ID, false) ?>
 						</ul>
 					</div>
 
 					<div id="category-adder" class="wp-hidden-children">
 						<a id="category-add-toggle" href="#category-add" class="hide-if-no-js" tabindex="3"><?php _e( '+ Add New Category' ); ?></a>
 						<p id="category-add" class="wp-hidden-child">
-							<label class="hidden" for="newcat"><?php _e( 'Add New Category' ); ?></label><input type="text" name="newcat" id="newcat" class="form-required form-input-tip" value="<?php _e( 'New category name' ); ?>" tabindex="3" aria-required="true"/>
-							<label class="hidden" for="newcat_parent"><?php _e('Parent category'); ?>:</label><?php wp_dropdown_categories( array( 'hide_empty' => 0, 'name' => 'newcat_parent', 'orderby' => 'name', 'hierarchical' => 1, 'show_option_none' => __('Parent category'), 'tab_index' => 3 ) ); ?>
-							<input type="button" id="category-add-sumbit" class="add:categorychecklist:category-add button" value="<?php _e( 'Add' ); ?>" tabindex="3" />
+							<label class="screen-reader-text" for="newcat"><?php _e( 'Add New Category' ); ?></label><input type="text" name="newcat" id="newcat" class="form-required form-input-tip" value="<?php esc_attr_e( 'New category name' ); ?>" tabindex="3" aria-required="true"/>
+							<label class="screen-reader-text" for="newcat_parent"><?php _e('Parent category'); ?>:</label><?php wp_dropdown_categories( array( 'hide_empty' => 0, 'name' => 'newcat_parent', 'orderby' => 'name', 'hierarchical' => 1, 'show_option_none' => __('Parent category'), 'tab_index' => 3 ) ); ?>
+							<input type="button" id="category-add-sumbit" class="add:categorychecklist:category-add button" value="<?php esc_attr_e( 'Add' ); ?>" tabindex="3" />
 							<?php wp_nonce_field( 'add-category', '_ajax_nonce', false ); ?>
 							<span id="category-ajax-response"></span>
 						</p>
@@ -488,28 +494,18 @@ var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 			<div id="tagsdiv-post_tag" class="stuffbox" >
 				<h3><span><?php _e('Post Tags'); ?></span></h3>
 				<div class="inside">
-					<div class="tagsdiv" id="post_tag"> 
+					<div class="tagsdiv" id="post_tag">
 						<p class="jaxtag">
-							<label class="hidden" for="newtag"><?php _e('Post Tags'); ?></label>
-							<input type="hidden" name="tax_input[post_tag]" class="the-tags" id="tax-input[post_tag]" value="" /> 
+							<label class="screen-reader-text" for="newtag"><?php _e('Post Tags'); ?></label>
+							<input type="hidden" name="tax_input[post_tag]" class="the-tags" id="tax-input[post_tag]" value="" />
 							<span class="ajaxtag" style="display:none;">
-								<input type="text" name="newtag[post_tag]" class="newtag form-input-tip" size="16" autocomplete="off" value="<?php _e('Add new tag'); ?>" />
-								<input type="button" class="button tagadd" value="Add" tabindex="3" />
+								<input type="text" name="newtag[post_tag]" class="newtag form-input-tip" size="16" autocomplete="off" value="<?php esc_attr_e('Add new tag'); ?>" />
+								<input type="button" class="button tagadd" value="<?php esc_attr_e('Add'); ?>" tabindex="3" />
 							</span>
-						</p> 
-						<div class="tagchecklist"></div> 
+						</p>
+						<div class="tagchecklist"></div>
 					</div>
 					<p class="tagcloud-link"><a href="#titlediv" class="tagcloud-link" id="link-post_tag"><?php _e('Choose from the most used tags in Post Tags'); ?></a></p>
-				</div>
-			</div>
-			<div id="submitdiv" class="stuffbox">
-				<h3><?php _e('Publish') ?></h3>
-				<div class="inside">
-					<p>
-						<input class="button" type="submit" name="draft" value="<?php _e('Save Draft') ?>" id="save" />
-						<input class="button-primary" type="submit" name="publish" value="<?php _e('Publish') ?>" id="publish" />
-						<img src="images/loading-publish.gif" alt="" id="saving" style="display:none;" />
-					</p>
 				</div>
 			</div>
 		</div>
@@ -522,7 +518,7 @@ var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 
 		<div id="titlediv">
 			<div class="titlewrap">
-				<input name="title" id="title" class="text" value="<?php echo attribute_escape($title);?>"/>
+				<input name="title" id="title" class="text" value="<?php echo esc_attr($title);?>"/>
 			</div>
 		</div>
 
@@ -530,9 +526,11 @@ var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 
 		<div class="postdivrich">
 			<ul id="actions">
+
 				<li id="photo_button">
-					Add: <a title="<?php _e('Insert an Image'); ?>" href="#">
+					Add: <?php if ( current_user_can('upload_files') ) { ?><a title="<?php _e('Insert an Image'); ?>" href="#">
 <img alt="<?php _e('Insert an Image'); ?>" src="images/media-button-image.gif"/></a>
+					<?php } ?>
 				</li>
 				<li id="video_button">
 					<a title="<?php _e('Embed a Video'); ?>" href="#"><img alt="<?php _e('Embed a Video'); ?>" src="images/media-button-video.gif"/></a>

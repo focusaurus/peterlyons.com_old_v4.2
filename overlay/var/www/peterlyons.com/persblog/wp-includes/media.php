@@ -200,10 +200,10 @@ function get_image_tag($id, $alt, $title, $align, $size='medium') {
 	list( $img_src, $width, $height ) = image_downsize($id, $size);
 	$hwstring = image_hwstring($width, $height);
 
-	$class = 'align'.attribute_escape($align).' size-'.attribute_escape($size).' wp-image-'.$id;
+	$class = 'align' . esc_attr($align) .' size-' . esc_attr($size) . ' wp-image-' . $id;
 	$class = apply_filters('get_image_tag_class', $class, $id, $align, $size);
 
-	$html = '<img src="'.attribute_escape($img_src).'" alt="'.attribute_escape($alt).'" title="'.attribute_escape($title).'" '.$hwstring.'class="'.$class.'" />';
+	$html = '<img src="' . esc_attr($img_src) . '" alt="' . esc_attr($alt) . '" title="' . esc_attr($title).'" '.$hwstring.'class="'.$class.'" />';
 
 	$html = apply_filters( 'get_image_tag', $html, $id, $alt, $title, $align, $size );
 
@@ -503,6 +503,8 @@ function wp_get_attachment_image_src($attachment_id, $size='thumbnail', $icon = 
 	if ( $image = image_downsize($attachment_id, $size) )
 		return $image;
 
+	$src = false;
+
 	if ( $icon && $src = wp_mime_type_icon($attachment_id) ) {
 		$icon_dir = apply_filters( 'icon_dir', ABSPATH . WPINC . '/images/crystal' );
 		$src_file = $icon_dir . '/' . basename($src);
@@ -542,7 +544,7 @@ function wp_get_attachment_image($attachment_id, $size = 'thumbnail', $icon = fa
 			'title'	=> trim(strip_tags( $attachment->post_title )),
 			);
 		$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment );
-		$attr = array_map( 'attribute_escape', $attr );
+		$attr = array_map( 'esc_attr', $attr );
 		$html = rtrim("<img $hwstring");
 		foreach ( $attr as $name => $value ) {
 			$html .= " $name=" . '"' . $value . '"';
@@ -611,6 +613,9 @@ add_shortcode('gallery', 'gallery_shortcode');
 function gallery_shortcode($attr) {
 	global $post;
 
+	static $instance = 0;
+	$instance++;
+
 	// Allow plugins/themes to override the default gallery template.
 	$output = apply_filters('post_gallery', '', $attr);
 	if ( $output != '' )
@@ -642,8 +647,8 @@ function gallery_shortcode($attr) {
 
 	if ( is_feed() ) {
 		$output = "\n";
-		foreach ( $attachments as $id => $attachment )
-			$output .= wp_get_attachment_link($id, $size, true) . "\n";
+		foreach ( $attachments as $att_id => $attachment )
+			$output .= wp_get_attachment_link($att_id, $size, true) . "\n";
 		return $output;
 	}
 
@@ -652,25 +657,27 @@ function gallery_shortcode($attr) {
 	$columns = intval($columns);
 	$itemwidth = $columns > 0 ? floor(100/$columns) : 100;
 
+	$selector = "gallery-{$instance}";
+
 	$output = apply_filters('gallery_style', "
 		<style type='text/css'>
-			.gallery {
+			#{$selector} {
 				margin: auto;
 			}
-			.gallery-item {
+			#{$selector} .gallery-item {
 				float: left;
 				margin-top: 10px;
 				text-align: center;
 				width: {$itemwidth}%;			}
-			.gallery img {
+			#{$selector} img {
 				border: 2px solid #cfcfcf;
 			}
-			.gallery-caption {
+			#{$selector} .gallery-caption {
 				margin-left: 0;
 			}
 		</style>
 		<!-- see gallery_shortcode() in wp-includes/media.php -->
-		<div class='gallery'>");
+		<div id='$selector' class='gallery galleryid-{$id}'>");
 
 	$i = 0;
 	foreach ( $attachments as $id => $attachment ) {
@@ -684,7 +691,7 @@ function gallery_shortcode($attr) {
 		if ( $captiontag && trim($attachment->post_excerpt) ) {
 			$output .= "
 				<{$captiontag} class='gallery-caption'>
-				{$attachment->post_excerpt}
+				" . wptexturize($attachment->post_excerpt) . "
 				</{$captiontag}>";
 		}
 		$output .= "</{$itemtag}>";

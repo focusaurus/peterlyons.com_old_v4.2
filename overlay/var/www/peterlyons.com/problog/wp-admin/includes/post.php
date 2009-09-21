@@ -319,9 +319,9 @@ function bulk_edit_posts( $post_data = null ) {
  */
 function get_default_post_to_edit() {
 	if ( !empty( $_REQUEST['post_title'] ) )
-		$post_title = wp_specialchars( stripslashes( $_REQUEST['post_title'] ));
+		$post_title = esc_html( stripslashes( $_REQUEST['post_title'] ));
 	else if ( !empty( $_REQUEST['popuptitle'] ) ) {
-		$post_title = wp_specialchars( stripslashes( $_REQUEST['popuptitle'] ));
+		$post_title = esc_html( stripslashes( $_REQUEST['popuptitle'] ));
 		$post_title = funky_javascript_fix( $post_title );
 	} else {
 		$post_title = '';
@@ -329,16 +329,16 @@ function get_default_post_to_edit() {
 
 	$post_content = '';
 	if ( !empty( $_REQUEST['content'] ) )
-		$post_content = wp_specialchars( stripslashes( $_REQUEST['content'] ));
+		$post_content = esc_html( stripslashes( $_REQUEST['content'] ));
 	else if ( !empty( $post_title ) ) {
-		$text       = wp_specialchars( stripslashes( urldecode( $_REQUEST['text'] ) ) );
+		$text       = esc_html( stripslashes( urldecode( $_REQUEST['text'] ) ) );
 		$text       = funky_javascript_fix( $text);
-		$popupurl   = clean_url($_REQUEST['popupurl']);
+		$popupurl   = esc_url($_REQUEST['popupurl']);
 		$post_content = '<a href="'.$popupurl.'">'.$post_title.'</a>'."\n$text";
 	}
 
 	if ( !empty( $_REQUEST['excerpt'] ) )
-		$post_excerpt = wp_specialchars( stripslashes( $_REQUEST['excerpt'] ));
+		$post_excerpt = esc_html( stripslashes( $_REQUEST['excerpt'] ));
 	else
 		$post_excerpt = '';
 
@@ -411,7 +411,7 @@ function post_exists($title, $content = '', $date = '') {
 	global $wpdb;
 
 	$post_title = stripslashes( sanitize_post_field( 'post_title', $title, 0, 'db' ) );
-	$post_content = stripslashes( sanitize_post_field( 'post_content', $content, 0, 'db' ) );    
+	$post_content = stripslashes( sanitize_post_field( 'post_content', $content, 0, 'db' ) );
 	$post_date = stripslashes( sanitize_post_field( 'post_date', $date, 0, 'db' ) );
 
 	$query = "SELECT ID FROM $wpdb->posts WHERE 1=1";
@@ -431,7 +431,7 @@ function post_exists($title, $content = '', $date = '') {
 		$query .= 'AND post_content = %s';
 		$args[] = $post_content;
 	}
-    
+
 	if ( !empty ( $args ) )
 		return $wpdb->get_var( $wpdb->prepare($query, $args) );
 
@@ -677,10 +677,13 @@ function update_meta( $meta_id, $meta_key, $meta_value ) {
 	if ( in_array($meta_key, $protected) )
 		return false;
 
+	if ( '' === trim( $meta_value ) )
+		return false;
+
 	$post_id = $wpdb->get_var( $wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_id = %d", $meta_id) );
 	wp_cache_delete($post_id, 'post_meta');
 
-	$meta_value = maybe_serialize( stripslashes( $meta_value ));
+	$meta_value = maybe_serialize( stripslashes( $meta_value ) );
 	$meta_id = (int) $meta_id;
 
 	$data  = compact( 'meta_key', 'meta_value' );
@@ -815,9 +818,12 @@ function wp_edit_posts_query( $q = false ) {
 		$orderby = 'date';
 	}
 
-	$posts_per_page = apply_filters('edit_posts_per_page', 15);
+	$posts_per_page = get_user_option('edit_per_page');
+	if ( empty($posts_per_page) )
+		$posts_per_page = 15;
+	$posts_per_page = apply_filters('edit_posts_per_page', $posts_per_page);
 
-	wp("post_type=post&what_to_show=posts$post_status_q&posts_per_page=$posts_per_page&order=$order&orderby=$orderby");
+	wp("post_type=post&$post_status_q&posts_per_page=$posts_per_page&order=$order&orderby=$orderby");
 
 	return array($post_stati, $avail_post_stati);
 }
@@ -853,7 +859,10 @@ function wp_edit_attachments_query( $q = false ) {
 	$q['cat'] = isset( $q['cat'] ) ? (int) $q['cat'] : 0;
 	$q['post_type'] = 'attachment';
 	$q['post_status'] = 'any';
-	$q['posts_per_page'] = 15;
+	$media_per_page = get_user_option('upload_per_page');
+	if ( empty($media_per_page) )
+		$media_per_page = 20;
+	$q['posts_per_page'] = $media_per_page;
 	$post_mime_types = array(	//	array( adj, noun )
 				'image' => array(__('Images'), __('Manage Images'), _n_noop('Image <span class="count">(%s)</span>', 'Images <span class="count">(%s)</span>')),
 				'audio' => array(__('Audio'), __('Manage Audio'), _n_noop('Audio <span class="count">(%s)</span>', 'Audio <span class="count">(%s)</span>')),
@@ -918,13 +927,15 @@ function get_sample_permalink($id, $title=null, $name = null) {
 		$post->post_name = sanitize_title($post->post_name? $post->post_name : $post->post_title, $post->ID);
 	}
 
+	$post->post_name = wp_unique_post_slug($post->post_name, $post->ID, $post->post_status, $post->post_type, $post->post_parent);
+
 	// If the user wants to set a new name -- override the current one
 	// Note: if empty name is supplied -- use the title instead, see #6072
 	if (!is_null($name)) {
 		$post->post_name = sanitize_title($name? $name : $title, $post->ID);
 	}
 
-	$post->filter = 'sample'; 
+	$post->filter = 'sample';
 
 	$permalink = get_permalink($post, true);
 
@@ -963,10 +974,11 @@ function get_sample_permalink_html( $id, $new_title = null, $new_slug = null ) {
 	list($permalink, $post_name) = get_sample_permalink($post->ID, $new_title, $new_slug);
 	if ( 'publish' == $post->post_status )
 		$view_post = 'post' == $post->post_type ? __('View Post') : __('View Page');
-	
+
 	if ( false === strpos($permalink, '%postname%') && false === strpos($permalink, '%pagename%') ) {
 		$return = '<strong>' . __('Permalink:') . "</strong>\n" . '<span id="sample-permalink">' . $permalink . "</span>\n";
-		$return .= '<span id="change-permalinks"><a href="options-permalink.php" class="button" target="_blank">' . __('Change Permalinks') . "</a></span>\n";
+		if ( current_user_can( 'manage_options' ) )
+			$return .= '<span id="change-permalinks"><a href="options-permalink.php" class="button" target="_blank">' . __('Change Permalinks') . "</a></span>\n";
 		if ( isset($view_post) )
 			$return .= "<span id='view-post-btn'><a href='$permalink' class='button' target='_blank'>$view_post</a></span>\n";
 
@@ -992,7 +1004,7 @@ function get_sample_permalink_html( $id, $new_title = null, $new_slug = null ) {
 	$display_link = str_replace(array('%pagename%','%postname%'), $post_name_html, $permalink);
 	$view_link = str_replace(array('%pagename%','%postname%'), $post_name, $permalink);
 	$return = '<strong>' . __('Permalink:') . "</strong>\n" . '<span id="sample-permalink">' . $display_link . "</span>\n";
-	$return .= '<span id="edit-slug-buttons"><a href="#post_name" class="edit-slug button" onclick="edit_permalink(' . $id . '); return false;">' . __('Edit') . "</a></span>\n";
+	$return .= '<span id="edit-slug-buttons"><a href="#post_name" class="edit-slug button hide-if-no-js" onclick="edit_permalink(' . $id . '); return false;">' . __('Edit') . "</a></span>\n";
 	$return .= '<span id="editable-post-name-full">' . $post_name . "</span>\n";
 	if ( isset($view_post) )
 		$return .= "<span id='view-post-btn'><a href='$view_link' class='button' target='_blank'>$view_post</a></span>\n";
@@ -1069,6 +1081,9 @@ function wp_create_post_autosave( $post_id ) {
 		return wp_update_post( $new_autosave );
 	}
 
+	// _wp_put_post_revision() expects unescaped.
+	$_POST = stripslashes_deep($_POST);
+
 	// Otherwise create the new autosave as a special post revision
 	return _wp_put_post_revision( $_POST, true );
 }
@@ -1137,14 +1152,19 @@ function post_preview() {
 /**
  * Adds the TinyMCE editor used on the Write and Edit screens.
  *
- * Has option to output a trimmed down version used in Press This.
- *
  * @package WordPress
  * @since 2.7
+ *
+ * TinyMCE is loaded separately from other Javascript by using wp-tinymce.php. It outputs concatenated
+ * and optionaly pre-compressed version of the core and all default plugins. Additional plugins are loaded
+ * directly by TinyMCE using non-blocking method. Custom plugins can be refreshed by adding a query string
+ * to the URL when queueing them with the mce_external_plugins filter.
+ *
+ * @param bool $teeny optional Output a trimmed down version used in Press This.
  */
 function wp_tiny_mce( $teeny = false ) {
-	global $concatenate_scripts, $compress_scripts;
-	
+	global $concatenate_scripts, $compress_scripts, $tinymce_version;
+
 	if ( ! user_can_richedit() )
 		return;
 
@@ -1164,7 +1184,7 @@ function wp_tiny_mce( $teeny = false ) {
 		$plugins = apply_filters( 'teeny_mce_plugins', array('safari', 'inlinepopups', 'media', 'autosave', 'fullscreen') );
 		$ext_plugins = '';
 	} else {
-		$plugins = array( 'safari', 'inlinepopups', 'autosave', 'spellchecker', 'paste', 'wordpress', 'media', 'fullscreen', 'wpeditimage', 'wpgallery' );
+		$plugins = array( 'safari', 'inlinepopups', 'spellchecker', 'paste', 'wordpress', 'media', 'fullscreen', 'wpeditimage', 'wpgallery', 'tabfocus' );
 
 		/*
 		The following filter takes an associative array of external plugins for TinyMCE in the form 'plugin_name' => 'url'.
@@ -1268,8 +1288,8 @@ function wp_tiny_mce( $teeny = false ) {
 
 	// TinyMCE init settings
 	$initArray = array (
-		'mode' => 'none',
-		'onpageload' => 'switchEditors.edInit',
+		'mode' => 'specific_textareas',
+		'editor_selector' => 'theEditor',
 		'width' => '100%',
 		'theme' => 'advanced',
 		'skin' => 'wp_theme',
@@ -1290,13 +1310,11 @@ function wp_tiny_mce( $teeny = false ) {
 		'convert_urls' => false,
 		'apply_source_formatting' => false,
 		'remove_linebreaks' => true,
-		'paste_convert_middot_lists' => true,
-		'paste_remove_spans' => true,
-		'paste_remove_styles' => true,
 		'gecko_spellcheck' => true,
 		'entities' => '38,amp,60,lt,62,gt',
 		'accessibility_focus' => true,
-		'tab_focus' => ':prev,:next',
+		'tabfocus_elements' => 'major-publishing-actions',
+		'media_strict' => false,
 		'save_callback' => 'switchEditors.saveCallback',
 		'wpeditimage_disable_captions' => $no_captions,
 		'plugins' => "$plugins"
@@ -1317,12 +1335,26 @@ function wp_tiny_mce( $teeny = false ) {
 		$initArray = apply_filters('tiny_mce_before_init', $initArray);
 	}
 
+	if ( empty($initArray['theme_advanced_buttons3']) && !empty($initArray['theme_advanced_buttons4']) ) {
+		$initArray['theme_advanced_buttons3'] = $initArray['theme_advanced_buttons4'];
+		$initArray['theme_advanced_buttons4'] = '';
+	}
+
 	if ( ! isset($concatenate_scripts) )
 		script_concat_settings();
 
 	$language = $initArray['language'];
 	$zip = $compress_scripts ? 1 : 0;
-	$ver = apply_filters('tiny_mce_version', '3211');
+
+	/**
+	 * Deprecated
+	 *
+	 * The tiny_mce_version filter is not needed since external plugins are loaded directly by TinyMCE.
+	 * These plugins can be refreshed by appending query string to the URL passed to mce_external_plugins filter.
+	 * If the plugin has a popup dialog, a query string can be added to the button action that opens it (in the plugin's code).
+	 */
+	$version = apply_filters('tiny_mce_version', '');
+	$version = 'ver=' . $tinymce_version . $version;
 
 	if ( 'en' != $language )
 		include_once(ABSPATH . WPINC . '/js/tinymce/langs/wp-langs.php');
@@ -1338,7 +1370,7 @@ function wp_tiny_mce( $teeny = false ) {
 tinyMCEPreInit = {
 	base : "<?php echo $baseurl; ?>",
 	suffix : "",
-	query : "ver=<?php echo $ver; ?>",
+	query : "<?php echo $version; ?>",
 	mceInit : {<?php echo $mce_options; ?>},
 	load_ext : function(url,lang){var sl=tinymce.ScriptLoader;sl.markDone(url+'/langs/'+lang+'.js');sl.markDone(url+'/langs/'+lang+'_dlg.js');}
 };
@@ -1347,17 +1379,18 @@ tinyMCEPreInit = {
 
 <?php
 	if ( $concatenate_scripts )
-		echo "<script type='text/javascript' src='$baseurl/wp-tinymce.php?c=$zip&ver=$ver'></script>\n";
+		echo "<script type='text/javascript' src='$baseurl/wp-tinymce.php?c=$zip&amp;$version'></script>\n";
 	else
-		echo "<script type='text/javascript' src='$baseurl/tiny_mce.js?ver=$ver'></script>\n";
+		echo "<script type='text/javascript' src='$baseurl/tiny_mce.js?$version'></script>\n";
 
 	if ( 'en' != $language && isset($lang) )
 		echo "<script type='text/javascript'>\n$lang\n</script>\n";
 	else
-		echo "<script type='text/javascript' src='$baseurl/langs/wp-langs-en.js?ver=$ver'></script>\n";
+		echo "<script type='text/javascript' src='$baseurl/langs/wp-langs-en.js?$version'></script>\n";
 ?>
 
 <script type="text/javascript">
+/* <![CDATA[ */
 <?php if ( $ext_plugins ) echo "$ext_plugins\n"; ?>
 <?php if ( $concatenate_scripts ) { ?>
 tinyMCEPreInit.go();
@@ -1365,6 +1398,7 @@ tinyMCEPreInit.go();
 (function(){var t=tinyMCEPreInit,sl=tinymce.ScriptLoader,ln=t.mceInit.language,th=t.mceInit.theme,pl=t.mceInit.plugins;sl.markDone(t.base+'/langs/'+ln+'.js');sl.markDone(t.base+'/themes/'+th+'/langs/'+ln+'.js');sl.markDone(t.base+'/themes/'+th+'/langs/'+ln+'_dlg.js');tinymce.each(pl.split(','),function(n){if(n&&n.charAt(0)!='-'){sl.markDone(t.base+'/plugins/'+n+'/langs/'+ln+'.js');sl.markDone(t.base+'/plugins/'+n+'/langs/'+ln+'_dlg.js');}});})();
 <?php } ?>
 tinyMCE.init(tinyMCEPreInit.mceInit);
+/* ]]> */
 </script>
 <?php
 }

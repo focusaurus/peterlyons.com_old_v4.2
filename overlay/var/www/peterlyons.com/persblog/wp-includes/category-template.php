@@ -293,11 +293,7 @@ function the_category( $separator = '', $parents='', $post_id = false ) {
  * @return string Category description, available.
  */
 function category_description( $category = 0 ) {
-	global $cat;
-	if ( !$category )
-		$category = $cat;
-
-	return get_term_field( 'description', $category, 'category' );
+	return term_description( $category, 'category' );
 }
 
 /**
@@ -336,7 +332,7 @@ function category_description( $category = 0 ) {
 function wp_dropdown_categories( $args = '' ) {
 	$defaults = array(
 		'show_option_all' => '', 'show_option_none' => '',
-		'orderby' => 'ID', 'order' => 'ASC',
+		'orderby' => 'id', 'order' => 'ASC',
 		'show_last_update' => 0, 'show_count' => 0,
 		'hide_empty' => 1, 'child_of' => 0,
 		'exclude' => '', 'echo' => 1,
@@ -526,7 +522,7 @@ function wp_tag_cloud( $args = '' ) {
 	$defaults = array(
 		'smallest' => 8, 'largest' => 22, 'unit' => 'pt', 'number' => 45,
 		'format' => 'flat', 'orderby' => 'name', 'order' => 'ASC',
-		'exclude' => '', 'include' => '', 'link' => 'view', 'taxonomy' => 'post_tag'
+		'exclude' => '', 'include' => '', 'link' => 'view', 'taxonomy' => 'post_tag', 'echo' => true
 	);
 	$args = wp_parse_args( $args, $defaults );
 
@@ -551,7 +547,7 @@ function wp_tag_cloud( $args = '' ) {
 
 	$return = apply_filters( 'wp_tag_cloud', $return, $args );
 
-	if ( 'array' == $args['format'] )
+	if ( 'array' == $args['format'] || empty($args['echo']) )
 		return $return;
 
 	echo $return;
@@ -577,6 +573,9 @@ function default_topic_count_text( $count ) {
  * 'format' argument will format the tags in a UL HTML list. The array value for
  * the 'format' argument will return in PHP array type format.
  *
+ * The 'tag_cloud_sort' filter allows you to override the sorting done
+ * by the 'orderby' argument; passed to the filter: $tags array and $args array.
+ *
  * The 'orderby' argument will accept 'name' or 'count' and defaults to 'name'.
  * The 'order' is the direction to sort, defaults to 'ASC' and can be 'DESC' or
  * 'RAND'.
@@ -600,6 +599,7 @@ function wp_generate_tag_cloud( $tags, $args = '' ) {
 		'smallest' => 8, 'largest' => 22, 'unit' => 'pt', 'number' => 0,
 		'format' => 'flat', 'orderby' => 'name', 'order' => 'ASC',
 		'topic_count_text_callback' => 'default_topic_count_text',
+		'filter' => 1,
 	);
 
 	if ( !isset( $args['topic_count_text_callback'] ) && isset( $args['single_text'] ) && isset( $args['multiple_text'] ) ) {
@@ -621,6 +621,8 @@ function wp_generate_tag_cloud( $tags, $args = '' ) {
 		uasort( $tags, create_function('$a, $b', 'return strnatcasecmp($a->name, $b->name);') );
 	else
 		uasort( $tags, create_function('$a, $b', 'return ($a->count > $b->count);') );
+
+        $tags = apply_filters( 'tag_cloud_sort', $tags, $args );
 
 	if ( 'DESC' == $order )
 		$tags = array_reverse( $tags, true );
@@ -657,10 +659,10 @@ function wp_generate_tag_cloud( $tags, $args = '' ) {
 
 	foreach ( $tags as $key => $tag ) {
 		$count = $counts[ $key ];
-		$tag_link = '#' != $tag->link ? clean_url( $tag->link ) : '#';
+		$tag_link = '#' != $tag->link ? esc_url( $tag->link ) : '#';
 		$tag_id = isset($tags[ $key ]->id) ? $tags[ $key ]->id : $key;
 		$tag_name = $tags[ $key ]->name;
-		$a[] = "<a href='$tag_link' class='tag-link-$tag_id' title='" . attribute_escape( $topic_count_text_callback( $count ) ) . "'$rel style='font-size: " .
+		$a[] = "<a href='$tag_link' class='tag-link-$tag_id' title='" . esc_attr( $topic_count_text_callback( $count ) ) . "'$rel style='font-size: " .
 			( $smallest + ( ( $count - $min_count ) * $font_step ) )
 			. "$unit;'>$tag_name</a>";
 	}
@@ -679,7 +681,10 @@ function wp_generate_tag_cloud( $tags, $args = '' ) {
 		break;
 	endswitch;
 
-	return apply_filters( 'wp_generate_tag_cloud', $return, $tags, $args );
+    if ( $filter )
+		return apply_filters( 'wp_generate_tag_cloud', $return, $tags, $args );
+    else
+		return $return;
 }
 
 //
@@ -779,7 +784,7 @@ function get_the_tags( $id = 0 ) {
  * @return string
  */
 function get_the_tag_list( $before = '', $sep = '', $after = '' ) {
-	return apply_filters( 'the_tags', get_the_term_list( 0, 'post_tag', $before, $sep, $after ) );
+	return apply_filters( 'the_tags', get_the_term_list( 0, 'post_tag', $before, $sep, $after ), $before, $sep, $after);
 }
 
 /**
@@ -792,8 +797,40 @@ function get_the_tag_list( $before = '', $sep = '', $after = '' ) {
  * @param string $after Optional. After list.
  * @return string
  */
-function the_tags( $before = 'Tags: ', $sep = ', ', $after = '' ) {
-	return the_terms( 0, 'post_tag', $before, $sep, $after );
+function the_tags( $before = null, $sep = ', ', $after = '' ) {
+	if ( null === $before )
+		$before = __('Tags: ');
+	echo get_the_tag_list($before, $sep, $after);
+}
+
+/**
+ * Retrieve tag description.
+ *
+ * @since 2.8
+ *
+ * @param int $tag Optional. Tag ID. Will use global tag ID by default.
+ * @return string Tag description, available.
+ */
+function tag_description( $tag = 0 ) {
+	return term_description( $tag );
+}
+
+/**
+ * Retrieve term description.
+ *
+ * @since 2.8
+ *
+ * @param int $term Optional. Term ID. Will use global term ID by default.
+ * @return string Term description, available.
+ */
+function term_description( $term = 0, $taxonomy = 'post_tag' ) {
+	if ( !$term && ( is_tax() || is_tag() || is_category() ) ) {
+		global $wp_query;
+		$term = $wp_query->get_queried_object();
+		$taxonomy = $term->taxonomy;
+		$term = $term->term_id;
+	}
+	return get_term_field( 'description', $term, $taxonomy );
 }
 
 /**

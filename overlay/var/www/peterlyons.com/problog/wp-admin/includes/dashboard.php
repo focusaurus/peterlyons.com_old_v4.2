@@ -115,12 +115,12 @@ function wp_add_dashboard_widget( $widget_id, $widget_name, $callback, $control_
 		$wp_dashboard_control_callbacks[$widget_id] = $control_callback;
 		if ( isset( $_GET['edit'] ) && $widget_id == $_GET['edit'] ) {
 			list($url) = explode( '#', add_query_arg( 'edit', false ), 2 );
-			$widget_name .= ' <span class="postbox-title-action"><a href="' . clean_url( $url ) . '">' . __( 'Cancel' ) . '</a></span>';
+			$widget_name .= ' <span class="postbox-title-action"><a href="' . esc_url( $url ) . '">' . __( 'Cancel' ) . '</a></span>';
 			add_meta_box( $widget_id, $widget_name, '_wp_dashboard_control_callback', 'dashboard', 'normal', 'core' );
 			return;
 		}
 		list($url) = explode( '#', add_query_arg( 'edit', $widget_id ), 2 );
-		$widget_name .= ' <span class="postbox-title-action"><a href="' . clean_url( "$url#$widget_id" ) . '" class="edit-box open-box">' . __( 'Configure' ) . '</a></span>';
+		$widget_name .= ' <span class="postbox-title-action"><a href="' . esc_url( "$url#$widget_id" ) . '" class="edit-box open-box">' . __( 'Configure' ) . '</a></span>';
 	}
 	$side_widgets = array('dashboard_quick_press', 'dashboard_recent_drafts', 'dashboard_primary', 'dashboard_secondary');
 	$location = 'normal';
@@ -132,7 +132,7 @@ function wp_add_dashboard_widget( $widget_id, $widget_name, $callback, $control_
 function _wp_dashboard_control_callback( $dashboard, $meta_box ) {
 	echo '<form action="" method="post" class="dashboard-widget-control-form">';
 	wp_dashboard_trigger_widget_control( $meta_box['id'] );
-	echo "<p class='submit'><input type='hidden' name='widget_id' value='$meta_box[id]' /><input type='submit' value='" . __( 'Submit' ) . "' /></p>";
+	echo "<p class='submit'><input type='hidden' name='widget_id' value='" . esc_attr($meta_box['id']) . "' /><input type='submit' value='" . esc_attr__( 'Submit' ) . "' /></p>";
 
 	echo '</form>';
 }
@@ -167,7 +167,7 @@ function wp_dashboard() {
 <?php
 	echo "\t<div class='postbox-container' style='$width'>\n";
 	do_meta_boxes( 'dashboard', 'normal', '' );
-	
+
 	echo "\t</div><div class='postbox-container' style='{$hide2}$width'>\n";
 	do_meta_boxes( 'dashboard', 'side', '' );
 
@@ -194,6 +194,8 @@ function wp_dashboard() {
 /* Dashboard Widgets */
 
 function wp_dashboard_right_now() {
+	global $wp_registered_sidebars;
+
 	$num_posts = wp_count_posts( 'post' );
 	$num_pages = wp_count_posts( 'page' );
 
@@ -315,18 +317,33 @@ function wp_dashboard_right_now() {
 
 	echo "\n\t".'<div class="versions">';
 	$ct = current_theme_info();
-	$sidebars_widgets = wp_get_sidebars_widgets();
-	$num_widgets = array_reduce( $sidebars_widgets, create_function( '$prev, $curr', 'return $prev+count($curr);' ), 0 );
-	$num = number_format_i18n( $num_widgets );
 
 	echo "\n\t<p>";
-	if ( current_user_can( 'switch_themes' ) ) {
-		echo '<a href="themes.php" class="button rbutton">' . __('Change Theme') . '</a>';
-		printf(_n('Theme <span class="b"><a href="themes.php">%1$s</a></span> with <span class="b"><a href="widgets.php">%2$s Widget</a></span>', 'Theme <span class="b"><a href="themes.php">%1$s</a></span> with <span class="b"><a href="widgets.php">%2$s Widgets</a></span>', $num_widgets), $ct->title, $num);
-	} else {
-		printf(_n('Theme <span class="b">%1$s</span> with <span class="b">%2$s Widget</span>', 'Theme <span class="b">%1$s</span> with <span class="b">%2$s Widgets</span>', $num_widgets), $ct->title, $num);
-	}
+	if ( !empty($wp_registered_sidebars) ) {
+		$sidebars_widgets = wp_get_sidebars_widgets();
+		$num_widgets = 0;
+		foreach ( (array) $sidebars_widgets as $k => $v ) {
+			if ( 'wp_inactive_widgets' == $k )
+				continue;
+			if ( is_array($v) )
+				$num_widgets = $num_widgets + count($v);
+		}
+		$num = number_format_i18n( $num_widgets );
 
+		if ( current_user_can( 'switch_themes' ) ) {
+			echo '<a href="themes.php" class="button rbutton">' . __('Change Theme') . '</a>';
+			printf(_n('Theme <span class="b"><a href="themes.php">%1$s</a></span> with <span class="b"><a href="widgets.php">%2$s Widget</a></span>', 'Theme <span class="b"><a href="themes.php">%1$s</a></span> with <span class="b"><a href="widgets.php">%2$s Widgets</a></span>', $num_widgets), $ct->title, $num);
+		} else {
+			printf(_n('Theme <span class="b">%1$s</span> with <span class="b">%2$s Widget</span>', 'Theme <span class="b">%1$s</span> with <span class="b">%2$s Widgets</span>', $num_widgets), $ct->title, $num);
+		}
+	} else {
+		if ( current_user_can( 'switch_themes' ) ) {
+			echo '<a href="themes.php" class="button rbutton">' . __('Change Theme') . '</a>';
+			printf('Theme <span class="b"><a href="themes.php">%1$s</a></span>', $ct->title);
+		} else {
+			printf('Theme <span class="b">%1$s</span>', $ct->title);
+		}
+	}
 	echo '</p>';
 
 	update_right_now_message();
@@ -340,17 +357,16 @@ function wp_dashboard_quick_press() {
 	$drafts = false;
 	if ( 'post' === strtolower( $_SERVER['REQUEST_METHOD'] ) && isset( $_POST['action'] ) && 0 === strpos( $_POST['action'], 'post-quickpress' ) && (int) $_POST['post_ID'] ) {
 		$view = get_permalink( $_POST['post_ID'] );
-		$edit = clean_url( get_edit_post_link( $_POST['post_ID'] ) );
+		$edit = esc_url( get_edit_post_link( $_POST['post_ID'] ) );
 		if ( 'post-quickpress-publish' == $_POST['action'] ) {
 			if ( current_user_can('publish_posts') )
-				printf( '<div class="message"><p>' . __( 'Post Published. <a href="%s">View post</a> | <a href="%s">Edit post</a>' ) . '</p></div>', clean_url( $view ), $edit );
+				printf( '<div class="message"><p>' . __( 'Post Published. <a href="%s">View post</a> | <a href="%s">Edit post</a>' ) . '</p></div>', esc_url( $view ), $edit );
 			else
-				printf( '<div class="message"><p>' . __( 'Post submitted. <a href="%s">Preview post</a> | <a href="%s">Edit post</a>' ) . '</p></div>', clean_url( add_query_arg( 'preview', 1, $view ) ), $edit );
+				printf( '<div class="message"><p>' . __( 'Post submitted. <a href="%s">Preview post</a> | <a href="%s">Edit post</a>' ) . '</p></div>', esc_url( add_query_arg( 'preview', 1, $view ) ), $edit );
 		} else {
-			printf( '<div class="message"><p>' . __( 'Draft Saved. <a href="%s">Preview post</a> | <a href="%s">Edit post</a>' ) . '</p></div>', clean_url( add_query_arg( 'preview', 1, $view ) ), $edit );
+			printf( '<div class="message"><p>' . __( 'Draft Saved. <a href="%s">Preview post</a> | <a href="%s">Edit post</a>' ) . '</p></div>', esc_url( add_query_arg( 'preview', 1, $view ) ), $edit );
 			$drafts_query = new WP_Query( array(
 				'post_type' => 'post',
-				'what_to_show' => 'posts',
 				'post_status' => 'draft',
 				'author' => $GLOBALS['current_user']->ID,
 				'posts_per_page' => 1,
@@ -368,10 +384,10 @@ function wp_dashboard_quick_press() {
 	$post = get_default_post_to_edit();
 ?>
 
-	<form name="post" action="<?php echo clean_url( admin_url( 'post.php' ) ); ?>" method="post" id="quick-press">
+	<form name="post" action="<?php echo esc_url( admin_url( 'post.php' ) ); ?>" method="post" id="quick-press">
 		<h4 id="quick-post-title"><label for="title"><?php _e('Title') ?></label></h4>
 		<div class="input-text-wrap">
-			<input type="text" name="post_title" id="title" tabindex="1" autocomplete="off" value="<?php echo attribute_escape( $post->post_title ); ?>" />
+			<input type="text" name="post_title" id="title" tabindex="1" autocomplete="off" value="<?php echo esc_attr( $post->post_title ); ?>" />
 		</div>
 
 		<?php if ( current_user_can( 'upload_files' ) ) : ?>
@@ -396,12 +412,12 @@ function wp_dashboard_quick_press() {
 			<input type="hidden" name="action" id="quickpost-action" value="post-quickpress-save" />
 			<input type="hidden" name="quickpress_post_ID" value="<?php echo (int) $post->ID; ?>" />
 			<?php wp_nonce_field('add-post'); ?>
-			<input type="submit" name="save" id="save-post" class="button" tabindex="4" value="<?php _e('Save Draft'); ?>" />
-			<input type="reset" value="<?php _e( 'Reset' ); ?>" class="button" />
+			<input type="submit" name="save" id="save-post" class="button" tabindex="4" value="<?php esc_attr_e('Save Draft'); ?>" />
+			<input type="reset" value="<?php esc_attr_e( 'Reset' ); ?>" class="button" />
 			<?php if ( current_user_can('publish_posts') ) { ?>
-			<input type="submit" name="publish" id="publish" accesskey="p" tabindex="5" class="button-primary" value="<?php _e('Publish'); ?>" />
+			<input type="submit" name="publish" id="publish" accesskey="p" tabindex="5" class="button-primary" value="<?php esc_attr_e('Publish'); ?>" />
 			<?php } else { ?>
-			<input type="submit" name="publish" id="publish" accesskey="p" tabindex="5" class="button-primary" value="<?php _e('Submit for Review'); ?>" />
+			<input type="submit" name="publish" id="publish" accesskey="p" tabindex="5" class="button-primary" value="<?php esc_attr_e('Submit for Review'); ?>" />
 			<?php } ?>
 			<br class="clear" />
 		</p>
@@ -417,7 +433,6 @@ function wp_dashboard_recent_drafts( $drafts = false ) {
 	if ( !$drafts ) {
 		$drafts_query = new WP_Query( array(
 			'post_type' => 'post',
-			'what_to_show' => 'posts',
 			'post_status' => 'draft',
 			'author' => $GLOBALS['current_user']->ID,
 			'posts_per_page' => 5,
@@ -432,7 +447,7 @@ function wp_dashboard_recent_drafts( $drafts = false ) {
 		foreach ( $drafts as $draft ) {
 			$url = get_edit_post_link( $draft->ID );
 			$title = _draft_or_post_title( $draft->ID );
-			$item = "<h4><a href='$url' title='" . sprintf( __( 'Edit "%s"' ), attribute_escape( $title ) ) . "'>$title</a> <abbr title='" . get_the_time(__('Y/m/d g:i:s A'), $draft) . "'>" . get_the_time( get_option( 'date_format' ), $draft ) . '</abbr></h4>';
+			$item = "<h4><a href='$url' title='" . sprintf( __( 'Edit &#8220;%s&#8221;' ), esc_attr( $title ) ) . "'>$title</a> <abbr title='" . get_the_time(__('Y/m/d g:i:s A'), $draft) . "'>" . get_the_time( get_option( 'date_format' ), $draft ) . '</abbr></h4>';
 			if ( $the_content = preg_split( '#\s#', strip_tags( $draft->post_content ), 11, PREG_SPLIT_NO_EMPTY ) )
 				$item .= '<p>' . join( ' ', array_slice( $the_content, 0, 10 ) ) . ( 10 < count( $the_content ) ? '&hellip;' : '' ) . '</p>';
 			$list[] = $item;
@@ -508,14 +523,14 @@ function _wp_dashboard_recent_comments_row( &$comment, $show_date = true ) {
 	$GLOBALS['comment'] =& $comment;
 
 	$comment_post_url = get_edit_post_link( $comment->comment_post_ID );
-	$comment_post_title = get_the_title( $comment->comment_post_ID );
+	$comment_post_title = strip_tags(get_the_title( $comment->comment_post_ID ));
 	$comment_post_link = "<a href='$comment_post_url'>$comment_post_title</a>";
-	$comment_link = '<a class="comment-link" href="' . get_comment_link() . '">#</a>';
+	$comment_link = '<a class="comment-link" href="' . esc_url(get_comment_link()) . '">#</a>';
 
-	$delete_url = clean_url( wp_nonce_url( "comment.php?action=deletecomment&p=$comment->comment_post_ID&c=$comment->comment_ID", "delete-comment_$comment->comment_ID" ) );
-	$approve_url = clean_url( wp_nonce_url( "comment.php?action=approvecomment&p=$comment->comment_post_ID&c=$comment->comment_ID", "approve-comment_$comment->comment_ID" ) );
-	$unapprove_url = clean_url( wp_nonce_url( "comment.php?action=unapprovecomment&p=$comment->comment_post_ID&c=$comment->comment_ID", "unapprove-comment_$comment->comment_ID" ) );
-	$spam_url = clean_url( wp_nonce_url( "comment.php?action=deletecomment&dt=spam&p=$comment->comment_post_ID&c=$comment->comment_ID", "delete-comment_$comment->comment_ID" ) );
+	$delete_url = esc_url( wp_nonce_url( "comment.php?action=deletecomment&p=$comment->comment_post_ID&c=$comment->comment_ID", "delete-comment_$comment->comment_ID" ) );
+	$approve_url = esc_url( wp_nonce_url( "comment.php?action=approvecomment&p=$comment->comment_post_ID&c=$comment->comment_ID", "approve-comment_$comment->comment_ID" ) );
+	$unapprove_url = esc_url( wp_nonce_url( "comment.php?action=unapprovecomment&p=$comment->comment_post_ID&c=$comment->comment_ID", "unapprove-comment_$comment->comment_ID" ) );
+	$spam_url = esc_url( wp_nonce_url( "comment.php?action=deletecomment&dt=spam&p=$comment->comment_post_ID&c=$comment->comment_ID", "delete-comment_$comment->comment_ID" ) );
 
 	$actions = array();
 
@@ -566,7 +581,7 @@ function _wp_dashboard_recent_comments_row( &$comment, $show_date = true ) {
 				default :
 					$type = ucwords( $comment->comment_type );
 				endswitch;
-				$type = wp_specialchars( $type );
+				$type = esc_html( $type );
 			?>
 			<div class="dashboard-comment-wrap">
 			<?php /* translators: %1$s is type of comment, %2$s is link to the post */ ?>
@@ -579,9 +594,9 @@ function _wp_dashboard_recent_comments_row( &$comment, $show_date = true ) {
 
 			<div id="inline-<?php echo $comment->comment_ID; ?>" class="hidden">
 				<textarea class="comment" rows="3" cols="10"><?php echo $comment->comment_content; ?></textarea>
-				<div class="author-email"><?php echo attribute_escape( $comment->comment_author_email ); ?></div>
-				<div class="author"><?php echo attribute_escape( $comment->comment_author ); ?></div>
-				<div class="author-url"><?php echo attribute_escape( $comment->comment_author_url ); ?></div>
+				<div class="author-email"><?php echo esc_attr( $comment->comment_author_email ); ?></div>
+				<div class="author"><?php echo esc_attr( $comment->comment_author ); ?></div>
+				<div class="author-url"><?php echo esc_attr( $comment->comment_author_url ); ?></div>
 				<div class="comment_status"><?php echo $comment->comment_approved; ?></div>
 			</div>
 			</div>
@@ -590,7 +605,7 @@ function _wp_dashboard_recent_comments_row( &$comment, $show_date = true ) {
 }
 
 function wp_dashboard_incoming_links() {
-	wp_dashboard_cached_rss_widget( 'dashboard_incoming_links', 'wp_dashboard_incoming_links_output' );
+	echo '<p class="widget-loading hide-if-no-js">' . __( 'Loading&#8230;' ) . '</p><p class="describe hide-if-js">' . __('This widget requires JavaScript.') . '</p>';
 }
 
 /**
@@ -619,20 +634,26 @@ function wp_dashboard_incoming_links_output() {
 
 	echo "<ul>\n";
 
-	$count = 0;
-	foreach ( $rss->get_items() as $item ) {
+	if ( !isset($items) )
+		$items = 10;
+
+	foreach ( $rss->get_items(0, $items) as $item ) {
 		$publisher = '';
 		$site_link = '';
 		$link = '';
 		$content = '';
 		$date = '';
-		$link = clean_url( strip_tags( $item->get_link() ) );
+		$link = esc_url( strip_tags( $item->get_link() ) );
 
 		$author = $item->get_author();
-		$site_link = clean_url( strip_tags( $author->get_link() ) );
+		if ( $author ) {
+			$site_link = esc_url( strip_tags( $author->get_link() ) );
 
-		if ( !$publisher = wp_specialchars( strip_tags( $author->get_name() ) ) )
-			$publisher = __( 'Somebody' );
+			if ( !$publisher = esc_html( strip_tags( $author->get_name() ) ) )
+				$publisher = __( 'Somebody' );
+		} else {
+		  $publisher = __( 'Somebody' );
+		}
 		if ( $site_link )
 			$publisher = "<a href='$site_link'>$publisher</a>";
 		else
@@ -652,7 +673,7 @@ function wp_dashboard_incoming_links_output() {
 			if ( $show_author || $show_summary )
 				/* translators: incoming links feed, %4$s is the date */
 				$text .= ' ' . __( 'on %4$s' );
-			$date = wp_specialchars( strip_tags( $item->get_date() ) );
+			$date = esc_html( strip_tags( $item->get_date() ) );
 			$date = strtotime( $date );
 			$date = gmdate( get_option( 'date_format' ), $date );
 		}
@@ -669,7 +690,7 @@ function wp_dashboard_incoming_links_control() {
 }
 
 function wp_dashboard_primary() {
-	wp_dashboard_cached_rss_widget( 'dashboard_primary', 'wp_dashboard_rss_output' );
+	echo '<p class="widget-loading hide-if-no-js">' . __( 'Loading&#8230;' ) . '</p><p class="describe hide-if-js">' . __('This widget requires JavaScript.') . '</p>';
 }
 
 function wp_dashboard_primary_control() {
@@ -691,7 +712,7 @@ function wp_dashboard_rss_output( $widget_id ) {
 }
 
 function wp_dashboard_secondary() {
-	wp_dashboard_cached_rss_widget( 'dashboard_secondary', 'wp_dashboard_secondary_output' );
+	echo '<p class="widget-loading hide-if-no-js">' . __( 'Loading&#8230;' ) . '</p><p class="describe hide-if-js">' . __('This widget requires JavaScript.') . '</p>';
 }
 
 function wp_dashboard_secondary_control() {
@@ -726,11 +747,7 @@ function wp_dashboard_secondary_output() {
 }
 
 function wp_dashboard_plugins() {
-	wp_dashboard_cached_rss_widget( 'dashboard_plugins', 'wp_dashboard_plugins_output', array(
-		'http://wordpress.org/extend/plugins/rss/browse/popular/',
-		'http://wordpress.org/extend/plugins/rss/browse/new/',
-		'http://wordpress.org/extend/plugins/rss/browse/updated/'
-	) );
+	echo '<p class="widget-loading hide-if-no-js">' . __( 'Loading&#8230;' ) . '</p><p class="describe hide-if-js">' . __('This widget requires JavaScript.') . '</p>';
 }
 
 /**
@@ -765,7 +782,7 @@ function wp_dashboard_plugins_output() {
 
 			list($link, $frag) = explode( '#', $item->get_link() );
 
-			$link = clean_url($link);
+			$link = esc_url($link);
 			if ( preg_match( '|/([^/]+?)/?$|', $link, $matches ) )
 				$slug = $matches[1];
 			else {
@@ -798,9 +815,9 @@ function wp_dashboard_plugins_output() {
 			$title = $matches[1];
 		else // but let's make it forward compatible if things change
 			$title = $item->get_title();
-		$title = wp_specialchars( $title );
+		$title = esc_html( $title );
 
-		$description = wp_specialchars( strip_tags(html_entity_decode($item->get_description(), ENT_QUOTES, get_option('blog_charset'))) );
+		$description = esc_html( strip_tags(@html_entity_decode($item->get_description(), ENT_QUOTES, get_option('blog_charset'))) );
 
 		$ilink = wp_nonce_url('plugin-install.php?tab=plugin-information&plugin=' . $slug, 'install-plugin_' . $slug) .
 							'&amp;TB_iframe=true&amp;width=600&amp;height=800';
@@ -838,20 +855,14 @@ function wp_dashboard_cached_rss_widget( $widget_id, $callback, $check_urls = ar
 		$check_urls = array( $widgets[$widget_id]['url'] );
 	}
 
-
-	/* TODO Cache check here.
+	include_once ABSPATH . WPINC . '/class-feed.php';
 	foreach ( $check_urls as $check_url ) {
-
-		if ( 'HIT' !== $status ) {
+		$cache = new WP_Feed_Cache_Transient('', md5($check_url), '');
+		if ( ! $cache->load() ) {
 			echo $loading;
 			return false;
 		}
 	}
-	*/
-
-	// Always load async until above fixed.
-	echo $loading;
-	return false;
 
 	if ( $callback && is_callable( $callback ) ) {
 		$args = array_slice( func_get_args(), 2 );

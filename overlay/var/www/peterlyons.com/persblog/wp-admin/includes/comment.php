@@ -89,8 +89,8 @@ function get_comment_to_edit( $id ) {
 
 	$comment->comment_author = format_to_edit( $comment->comment_author );
 	$comment->comment_author_email = format_to_edit( $comment->comment_author_email );
-	$comment->comment_author_url = clean_url($comment->comment_author_url);
 	$comment->comment_author_url = format_to_edit( $comment->comment_author_url );
+	$comment->comment_author_url = esc_url($comment->comment_author_url);
 
 	return $comment;
 }
@@ -159,7 +159,7 @@ function enqueue_comment_hotkeys_js() {
 		wp_enqueue_script( 'jquery-table-hotkeys' );
 }
 
-if ( is_admin() && ('edit-comments.php' == $pagenow || 'edit.php' == $pagenow) ) {
+if ( is_admin() && isset($pagenow) && ('edit-comments.php' == $pagenow || 'edit.php' == $pagenow) ) {
 	if ( get_option('show_avatars') )
 		add_filter( 'comment_author', 'floated_admin_avatar' );
 }

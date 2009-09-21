@@ -72,14 +72,11 @@ function delete_theme($template) {
 		return;
 	}
 
-	if ( $wp_filesystem->errors->get_error_code() ) {
-		return $wp_filesystem->errors;
-	}
 
 	if ( ! is_object($wp_filesystem) )
 		return new WP_Error('fs_unavailable', __('Could not access filesystem.'));
 
-	if ( $wp_filesystem->errors->get_error_code() )
+	if ( is_wp_error($wp_filesystem->errors) && $wp_filesystem->errors->get_error_code() )
 		return new WP_Error('fs_error', __('Filesystem error'), $wp_filesystem->errors);
 
 	//Get the base plugin folder
@@ -136,7 +133,7 @@ function get_page_templates() {
 
 			$name = '';
 			if ( preg_match( '|Template Name:(.*)$|mi', $template_data, $name ) )
-				$name = $name[1];
+				$name = _cleanup_header_comment($name[1]);
 
 			if ( !empty( $name ) ) {
 				$page_templates[trim( $name )] = basename( $template );

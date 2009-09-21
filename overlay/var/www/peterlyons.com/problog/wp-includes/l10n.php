@@ -38,9 +38,7 @@ function get_locale() {
 	if (empty($locale))
 		$locale = 'en_US';
 
-	$locale = apply_filters('locale', $locale);
-
-	return $locale;
+	return apply_filters('locale', $locale);
 }
 
 /**
@@ -70,7 +68,7 @@ function before_last_bar( $string ) {
 }
 
 /**
- * Translate $text like translate(), but assumes that the text
+ * Translates $text like translate(), but assumes that the text
  * contains a context after its last vertical bar.
  *
  * @since 2.5
@@ -106,9 +104,41 @@ function __( $text, $domain = 'default' ) {
 }
 
 /**
+ * Retrieves the translation of $text and escapes it for safe use in an attribute.
+ * If there is no translation, or the domain isn't loaded the original text is returned.
+ *
+ * @see translate() An alias of translate()
+ * @see esc_attr()
+ * @since 2.8.0
+ *
+ * @param string $text Text to translate
+ * @param string $domain Optional. Domain to retrieve the translated text
+ * @return string Translated text
+ */
+function esc_attr__( $text, $domain = 'default' ) {
+	return esc_attr( translate( $text, $domain ) );
+}
+
+/**
+ * Retrieves the translation of $text and escapes it for safe use in HTML output.
+ * If there is no translation, or the domain isn't loaded the original text is returned.
+ *
+ * @see translate() An alias of translate()
+ * @see esc_html()
+ * @since 2.8.0
+ *
+ * @param string $text Text to translate
+ * @param string $domain Optional. Domain to retrieve the translated text
+ * @return string Translated text
+ */
+function esc_html__( $text, $domain = 'default' ) {
+	return esc_html( translate( $text, $domain ) );
+}
+
+/**
  * Displays the returned translated text from translate().
  *
- * @see translate() Echos returned translate() string
+ * @see translate() Echoes returned translate() string
  * @since 1.2.0
  *
  * @param string $text Text to translate
@@ -116,6 +146,34 @@ function __( $text, $domain = 'default' ) {
  */
 function _e( $text, $domain = 'default' ) {
 	echo translate( $text, $domain );
+}
+
+/**
+ * Displays translated text that has been escaped for safe use in an attribute.
+ *
+ * @see translate() Echoes returned translate() string
+ * @see esc_attr()
+ * @since 2.8.0
+ *
+ * @param string $text Text to translate
+ * @param string $domain Optional. Domain to retrieve the translated text
+ */
+function esc_attr_e( $text, $domain = 'default' ) {
+	echo esc_attr( translate( $text, $domain ) );
+}
+
+/**
+ * Displays translated text that has been escaped for safe use in HTML output.
+ *
+ * @see translate() Echoes returned translate() string
+ * @see esc_html()
+ * @since 2.8.0
+ *
+ * @param string $text Text to translate
+ * @param string $domain Optional. Domain to retrieve the translated text
+ */
+function esc_html_e( $text, $domain = 'default' ) {
+	echo esc_html( translate( $text, $domain ) );
 }
 
 /**
@@ -145,6 +203,10 @@ function _x( $single, $context, $domain = 'default' ) {
 	return translate_with_gettext_context( $single, $context, $domain );
 }
 
+function esc_attr_x( $single, $context, $domain = 'default' ) {
+	return esc_attr( translate_with_gettext_context( $single, $context, $domain ) );
+}
+
 function __ngettext() {
 	_deprecated_function( __FUNCTION__, '2.8', '_n()' );
 	$args = func_get_args();
@@ -154,7 +216,7 @@ function __ngettext() {
 /**
  * Retrieve the plural or single form based on the amount.
  *
- * If the domain is not set in the $l10n list, then a comparsion will be made
+ * If the domain is not set in the $l10n list, then a comparison will be made
  * and either $plural or $single parameters returned.
  *
  * If the domain does exist, then the parameters $single, $plural, and $number
@@ -230,7 +292,7 @@ function _n_noop( $single, $plural ) {
 
 /**
  * Register plural strings with context in POT file, but don't translate them.
- * 
+ *
  * @see _n_noop()
  */
 function _nx_noop( $single, $plural, $context ) {
@@ -239,35 +301,34 @@ function _nx_noop( $single, $plural, $context ) {
 
 
 /**
- * Loads MO file into the list of domains.
+ * Loads a MO file into the domain $domain.
  *
- * If the domain already exists, the inclusion will fail. If the MO file is not
- * readable, the inclusion will fail.
+ * If the domain already exists, the translations will be merged. If both
+ * sets have the same string, the translation from the original value will be taken.
  *
- * On success, the mofile will be placed in the $l10n global by $domain and will
- * be an gettext_reader object.
+ * On success, the .mo file will be placed in the $l10n global by $domain
+ * and will be a MO object.
  *
  * @since 1.5.0
- * @uses $l10n Gets list of domain translated string (gettext_reader) objects
- * @uses CacheFileReader Reads the MO file
- * @uses gettext_reader Allows for retrieving translated strings
+ * @uses $l10n Gets list of domain translated string objects
  *
  * @param string $domain Unique identifier for retrieving translated strings
  * @param string $mofile Path to the .mo file
- * @return null On failure returns null and also on success returns nothing.
+ * @return bool true on success, false on failure
  */
 function load_textdomain($domain, $mofile) {
 	global $l10n;
 
-	if ( !is_readable($mofile)) return;
-	
-	$mo = new MO();
-	$mo->import_from_file( $mofile );
+	if ( !is_readable( $mofile ) ) return false;
 
-	if (isset($l10n[$domain]))
+	$mo = new MO();
+	if ( !$mo->import_from_file( $mofile ) ) return false;
+
+	if ( isset( $l10n[$domain] ) )
 		$mo->merge_with( $l10n[$domain] );
-		
+
 	$l10n[$domain] = &$mo;
+	return true;
 }
 
 /**
@@ -283,15 +344,14 @@ function load_default_textdomain() {
 
 	$mofile = WP_LANG_DIR . "/$locale.mo";
 
-	load_textdomain('default', $mofile);
+	return load_textdomain('default', $mofile);
 }
 
 /**
  * Loads the plugin's translated strings.
  *
  * If the path is not given then it will be the root of the plugin directory.
- * The .mo file should be named based on the domain with a dash followed by a
- * dash, and then the locale exactly.
+ * The .mo file should be named based on the domain with a dash, and then the locale exactly.
  *
  * @since 1.5.0
  *
@@ -311,7 +371,7 @@ function load_plugin_textdomain($domain, $abs_rel_path = false, $plugin_rel_path
 		$path = WP_PLUGIN_DIR;
 
 	$mofile = $path . '/'. $domain . '-' . $locale . '.mo';
-	load_textdomain($domain, $mofile);
+	return load_textdomain($domain, $mofile);
 }
 
 /**
@@ -332,33 +392,36 @@ function load_theme_textdomain($domain, $path = false) {
 	$path = ( empty( $path ) ) ? get_template_directory() : $path;
 
 	$mofile = "$path/$locale.mo";
-	load_textdomain($domain, $mofile);
+	return load_textdomain($domain, $mofile);
 }
 
 /**
  * Returns the Translations instance for a domain. If there isn't one,
  * returns empty Translations instance.
- * 
+ *
  * @param string $domain
  * @return object A Translation instance
  */
-function get_translations_for_domain( $domain ) {
+function &get_translations_for_domain( $domain ) {
 	global $l10n;
 	$empty = &new Translations;
-	return isset($l10n[$domain])? $l10n[$domain] : $empty;
+	if ( isset($l10n[$domain]) )
+		return $l10n[$domain];
+	else
+		return $empty;
 }
 
 /**
  * Translates role name. Since the role names are in the database and
  * not in the source there are dummy gettext calls to get them into the POT
  * file and this function properly translates them back.
- * 
+ *
  * The before_last_bar() call is needed, because older installs keep the roles
  * using the old context format: 'Role name|User role' and just skipping the
  * content after the last bar is easier than fixing them in the DB. New installs
  * won't suffer from that problem.
  */
 function translate_user_role( $name ) {
-	return before_last_bar( translate_with_gettext_context( $name, 'User role' ) );
+	return translate_with_gettext_context( before_last_bar($name), 'User role' );
 }
 ?>

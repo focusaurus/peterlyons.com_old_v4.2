@@ -1,3 +1,4 @@
+
 function fileDialogStart() {
 	jQuery("#media-upload-error").empty();
 }
@@ -8,23 +9,29 @@ function fileQueued(fileObj) {
 	jQuery('.media-blank').remove();
 	// Collapse a single item
 	if ( jQuery('.type-form #media-items>*').length == 1 && jQuery('#media-items .hidden').length > 0 ) {
-		jQuery('.toggle').toggle();
+		jQuery('.describe-toggle-on').show();
+		jQuery('.describe-toggle-off').hide();
 		jQuery('.slidetoggle').slideUp(200).siblings().removeClass('hidden');
 	}
 	// Create a progress bar containing the filename
-	jQuery('#media-items').append('<div id="media-item-' + fileObj.id + '" class="media-item child-of-' + post_id + '"><div class="progress"><div class="bar"></div></div><div class="filename original">' + fileObj.name + '</div></div>');
+	jQuery('#media-items').append('<div id="media-item-' + fileObj.id + '" class="media-item child-of-' + post_id + '"><div class="progress"><div class="bar"></div></div><div class="filename original"><span class="percent"></span> ' + fileObj.name + '</div></div>');
 	// Display the progress div
 	jQuery('#media-item-' + fileObj.id + ' .progress').show();
 
-	// Disable the submit button
+	// Disable submit and enable cancel
 	jQuery('#insert-gallery').attr('disabled', 'disabled');
+	jQuery('#cancel-upload').attr('disabled', '');
 }
 
-function uploadStart(fileObj) { return true; }
+function uploadStart(fileObj) {
+	return true;
+}
 
 function uploadProgress(fileObj, bytesDone, bytesTotal) {
 	// Lengthen the progress bar
-	jQuery('#media-item-' + fileObj.id + ' .bar').width(620*bytesDone/bytesTotal);
+	var w = jQuery('#media-items').width() - 2;
+	jQuery('#media-item-' + fileObj.id + ' .bar').width( w * bytesDone / bytesTotal );
+	jQuery('#media-item-' + fileObj.id + ' .percent').html( Math.ceil(bytesDone / bytesTotal * 100) + '%' );
 
 	if ( bytesDone == bytesTotal )
 		jQuery('#media-item-' + fileObj.id + ' .bar').html('<strong class="crunching">' + swfuploadL10n.crunching + '</strong>');
@@ -56,10 +63,18 @@ function prepareMediaItemInit(fileObj) {
 	jQuery('#media-item-' + fileObj.id + ' .filename.original').replaceWith(jQuery('#media-item-' + fileObj.id + ' .filename.new'));
 
 	// Also bind toggle to the links
-	jQuery('#media-item-' + fileObj.id + ' a.toggle').bind('click', function(){jQuery(this).siblings('.slidetoggle').slideToggle(150, function(){var o=jQuery(this).offset();window.scrollTo(0,o.top-36);});jQuery(this).parent().eq(0).children('.toggle').toggle();jQuery(this).siblings('a.toggle').focus();return false;});
+	jQuery('#media-item-' + fileObj.id + ' a.toggle').click(function(){
+		jQuery(this).siblings('.slidetoggle').slideToggle(150, function(){
+			var o = jQuery(this).offset();
+			window.scrollTo(0, o.top-36);
+		});
+		jQuery(this).parent().children('.toggle').toggle();
+		jQuery(this).siblings('a.toggle').focus();
+		return false;
+	});
 
 	// Bind AJAX to the new Delete button
-	jQuery('#media-item-' + fileObj.id + ' a.delete').bind('click',function(){
+	jQuery('#media-item-' + fileObj.id + ' a.delete').click(function(){
 		// Tell the server to delete it. TODO: handle exceptions
 		jQuery.ajax({url:'admin-ajax.php',type:'post',success:deleteSuccess,error:deleteError,id:fileObj.id,data:{
 			id : this.id.replace(/[^0-9]/g,''),
@@ -70,10 +85,7 @@ function prepareMediaItemInit(fileObj) {
 	});
 
 	// Open this item if it says to start open (e.g. to display an error)
-	jQuery('#media-item-' + fileObj.id + '.startopen')
-		.removeClass('startopen')
-		.slideToggle(500)
-		.parent().eq(0).children('.toggle').toggle();
+	jQuery('#media-item-' + fileObj.id + '.startopen').removeClass('startopen').slideToggle(500).parent().children('.toggle').toggle();
 }
 
 function itemAjaxError(id, html) {
@@ -156,8 +168,10 @@ function uploadSuccess(fileObj, serverData) {
 
 function uploadComplete(fileObj) {
 	// If no more uploads queued, enable the submit button
-	if ( swfu.getStats().files_queued == 0 )
+	if ( swfu.getStats().files_queued == 0 ) {
+		jQuery('#cancel-upload').attr('disabled', 'disabled');
 		jQuery('#insert-gallery').attr('disabled', '');
+	}
 }
 
 
@@ -206,47 +220,62 @@ function fileDialogComplete(num_files_queued) {
 	}
 }
 
+function switchUploader(s) {
+	var f = document.getElementById(swfu.customSettings.swfupload_element_id), h = document.getElementById(swfu.customSettings.degraded_element_id);
+	if ( s ) {
+		f.style.display = 'block';
+		h.style.display = 'none';
+	} else {
+		f.style.display = 'none';
+		h.style.display = 'block';
+	}
+}
+
 function swfuploadPreLoad() {
-	var swfupload_element = jQuery('#'+swfu.customSettings.swfupload_element_id).get(0);
-	jQuery('#' + swfu.customSettings.degraded_element_id).hide();
-	// Doing this directly because jQuery().show() seems to have timing problems
-	if ( swfupload_element && ! swfupload_element.style.display )
-			swfupload_element.style.display = 'block';
+	if ( !uploaderMode ) {
+		switchUploader(1);
+	} else {
+		switchUploader(0);
+	}
 }
 
 function swfuploadLoadFailed() {
-	jQuery('#' + swfu.customSettings.swfupload_element_id).hide();
-	jQuery('#' + swfu.customSettings.degraded_element_id).show();
+	switchUploader(0);
+	jQuery('.upload-html-bypass').hide();
 }
 
-function uploadError(fileObj, error_code, message) {
-	// first the file specific error
-	if ( error_code == SWFUpload.UPLOAD_ERROR.MISSING_UPLOAD_URL ) {
-		wpFileError(fileObj, swfuploadL10n.missing_upload_url);
+function uploadError(fileObj, errorCode, message) {
+	
+	switch (errorCode) {
+		case SWFUpload.UPLOAD_ERROR.MISSING_UPLOAD_URL:
+			wpFileError(fileObj, swfuploadL10n.missing_upload_url);
+			break;
+		case SWFUpload.UPLOAD_ERROR.UPLOAD_LIMIT_EXCEEDED:
+			wpFileError(fileObj, swfuploadL10n.upload_limit_exceeded);
+			break;
+		case SWFUpload.UPLOAD_ERROR.HTTP_ERROR:
+			wpQueueError(swfuploadL10n.http_error);
+			break;
+		case SWFUpload.UPLOAD_ERROR.UPLOAD_FAILED:
+			wpQueueError(swfuploadL10n.upload_failed);
+			break;
+		case SWFUpload.UPLOAD_ERROR.IO_ERROR:
+			wpQueueError(swfuploadL10n.io_error);
+			break;
+		case SWFUpload.UPLOAD_ERROR.SECURITY_ERROR:
+			wpQueueError(swfuploadL10n.security_error);
+			break;
+		case SWFUpload.UPLOAD_ERROR.UPLOAD_STOPPED:
+		case SWFUpload.UPLOAD_ERROR.FILE_CANCELLED:
+			jQuery('#media-item-' + fileObj.id).remove();
+			break;
+		default:
+			wpFileError(fileObj, swfuploadL10n.default_error);
 	}
-	else if ( error_code == SWFUpload.UPLOAD_ERROR.UPLOAD_LIMIT_EXCEEDED ) {
-		wpFileError(fileObj, swfuploadL10n.upload_limit_exceeded);
-	}
-	else {
-		wpFileError(fileObj, swfuploadL10n.default_error);
-	}
+}
 
-	// now the general upload status
-	if ( error_code == SWFUpload.UPLOAD_ERROR.HTTP_ERROR ) {
-		wpQueueError(swfuploadL10n.http_error);
-	}
-	else if ( error_code == SWFUpload.UPLOAD_ERROR.UPLOAD_FAILED ) {
-		wpQueueError(swfuploadL10n.upload_failed);
-	}
-	else if ( error_code == SWFUpload.UPLOAD_ERROR.IO_ERROR ) {
-		wpQueueError(swfuploadL10n.io_error);
-	}
-	else if ( error_code == SWFUpload.UPLOAD_ERROR.SECURITY_ERROR ) {
-		wpQueueError(swfuploadL10n.security_error);
-	}
-	else if ( error_code == SWFUpload.UPLOAD_ERROR.FILE_CANCELLED ) {
-		wpQueueError(swfuploadL10n.security_error);
-	}
+function cancelUpload() {
+	swfu.cancelQueue();
 }
 
 // remember the last used image size, alignment and url

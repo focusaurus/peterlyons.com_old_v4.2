@@ -6,6 +6,7 @@ define('DB_PASSWORD', 'Strap...it3'); // ...and password
 define('DB_HOST', 'localhost');    // 99% chance you won't need to change this value
 define('DB_CHARSET', 'utf8');
 define('DB_COLLATE', '');
+define('ENABLE_CACHE', TRUE);
 
 // Change SECRET_KEY to a unique phrase.  You won't have to remember it later,
 // so make it long and complicated.  You can visit http://api.wordpress.org/secret-key/1.0/

@@ -85,8 +85,8 @@ function wp_authenticate_username_password($user, $username, $password) {
 
 	$userdata = get_userdatabylogin($username);
 
-	if ( !$userdata || ($userdata->user_login != $username) ) {
-		return new WP_Error('invalid_username', __('<strong>ERROR</strong>: Invalid username.'));
+	if ( !$userdata ) {
+		return new WP_Error('invalid_username', sprintf(__('<strong>ERROR</strong>: Invalid username. <a href="%s" title="Password Lost and Found">Lost your password</a>?'), site_url('wp-login.php?action=lostpassword', 'login')));
 	}
 
 	$userdata = apply_filters('wp_authenticate_user', $userdata, $password);
@@ -95,7 +95,7 @@ function wp_authenticate_username_password($user, $username, $password) {
 	}
 
 	if ( !wp_check_password($password, $userdata->user_pass, $userdata->ID) ) {
-		return new WP_Error('incorrect_password', __('<strong>ERROR</strong>: Incorrect password.'));
+		return new WP_Error('incorrect_password', sprintf(__('<strong>ERROR</strong>: Incorrect password. <a href="%s" title="Password Lost and Found">Lost your password</a>?'), site_url('wp-login.php?action=lostpassword', 'login')));
 	}
 
 	$user =  new WP_User($userdata->ID);
@@ -242,7 +242,7 @@ function get_user_option( $option, $user = 0, $check_blog_options = true ) {
  * Update user option with global blog capability.
  *
  * User options are just like user metadata except that they have support for
- * global blog options. If the 'global' parameter is false, which it is by false
+ * global blog options. If the 'global' parameter is false, which it is by default
  * it will prepend the WordPress table prefix to the option name.
  *
  * @since 2.0.0
@@ -540,7 +540,7 @@ function wp_dropdown_users( $args = '' ) {
 			$user->ID = (int) $user->ID;
 			$_selected = $user->ID == $selected ? " selected='selected'" : '';
 			$display = !empty($user->$show) ? $user->$show : '('. $user->user_login . ')';
-			$output .= "\t<option value='$user->ID'$_selected>" . wp_specialchars($display) . "</option>\n";
+			$output .= "\t<option value='$user->ID'$_selected>" . esc_html($display) . "</option>\n";
 		}
 
 		$output .= "</select>";
@@ -597,6 +597,7 @@ function _fill_user( &$user ) {
 	wp_cache_add($user->ID, $user, 'users');
 	wp_cache_add($user->user_login, $user->ID, 'userlogins');
 	wp_cache_add($user->user_email, $user->ID, 'useremail');
+	wp_cache_add($user->user_nicename, $user->ID, 'userslugs');
 }
 
 ?>

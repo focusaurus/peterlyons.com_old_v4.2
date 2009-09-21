@@ -63,7 +63,7 @@ function the_title($before = '', $after = '', $echo = true) {
  * an array. See the function for what can be override in the $args parameter.
  *
  * The title before it is displayed will have the tags stripped and {@link
- * attribute_escape()} before it is passed to the user or displayed. The default
+ * esc_attr()} before it is passed to the user or displayed. The default
  * as with {@link the_title()}, is to display the title.
  *
  * @since 2.3.0
@@ -83,7 +83,7 @@ function the_title_attribute( $args = '' ) {
 
 
 	$title = $before . $title . $after;
-	$title = attribute_escape(strip_tags($title));
+	$title = esc_attr(strip_tags($title));
 
 	if ( $echo )
 		echo $title;
@@ -109,12 +109,15 @@ function get_the_title( $id = 0 ) {
 	$title = $post->post_title;
 
 	if ( !is_admin() ) {
-		if ( !empty($post->post_password) )
-			$title = sprintf(__('Protected: %s'), $title);
-		else if ( isset($post->post_status) && 'private' == $post->post_status )
-			$title = sprintf(__('Private: %s'), $title);
+		if ( !empty($post->post_password) ) {
+			$protected_title_format = apply_filters('protected_title_format', __('Protected: %s'));
+			$title = sprintf($protected_title_format, $title);
+		} else if ( isset($post->post_status) && 'private' == $post->post_status ) {
+			$private_title_format = apply_filters('private_title_format', __('Private: %s'));
+			$title = sprintf($private_title_format, $title);
+		}
 	}
-	return apply_filters( 'the_title', $title );
+	return apply_filters( 'the_title', $title, $post->ID );
 }
 
 /**
@@ -183,6 +186,7 @@ function get_the_content($more_link_text = null, $stripteaser = 0, $more_file = 
 		$more_link_text = __( '(more...)' );
 
 	$output = '';
+	$hasTeaser = false;
 
 	// If post password required and it doesn't match the cookie.
 	if ( post_password_required($post) ) {
@@ -203,22 +207,24 @@ function get_the_content($more_link_text = null, $stripteaser = 0, $more_file = 
 		$content = explode($matches[0], $content, 2);
 		if ( !empty($matches[1]) && !empty($more_link_text) )
 			$more_link_text = strip_tags(wp_kses_no_null(trim($matches[1])));
+
+		$hasTeaser = true;
 	} else {
 		$content = array($content);
 	}
 	if ( (false !== strpos($post->post_content, '<!--noteaser-->') && ((!$multipage) || ($page==1))) )
 		$stripteaser = 1;
 	$teaser = $content[0];
-	if ( ($more) && ($stripteaser) )
+	if ( ($more) && ($stripteaser) && ($hasTeaser) )
 		$teaser = '';
 	$output .= $teaser;
 	if ( count($content) > 1 ) {
 		if ( $more ) {
-			$output .= '<span id="more-'.$id.'"></span>'.$content[1];
+			$output .= '<span id="more-' . $id . '"></span>' . $content[1];
 		} else {
-			$output = balanceTags($output);
 			if ( ! empty($more_link_text) )
-				$output .= ' <a href="'. get_permalink() . "#more-$id\" class=\"more-link\">$more_link_text</a>";
+				$output .= apply_filters( 'the_content_more_link', ' <a href="' . get_permalink() . "#more-$id\" class=\"more-link\">$more_link_text</a>", $more_link_text );
+			$output = force_balance_tags($output);
 		}
 
 	}
@@ -306,6 +312,7 @@ function get_post_class( $class = '', $post_id = null ) {
 
 	$classes = array();
 
+	$classes[] = 'post-' . $post->ID;
 	$classes[] = $post->post_type;
 
 	// sticky for Sticky Posts
@@ -319,14 +326,14 @@ function get_post_class( $class = '', $post_id = null ) {
 	foreach ( (array) get_the_category($post->ID) as $cat ) {
 		if ( empty($cat->slug ) )
 			continue;
-		$classes[] = 'category-' . $cat->slug;
+		$classes[] = 'category-' . sanitize_html_class($cat->slug, $cat->cat_ID);
 	}
 
 	// Tags
 	foreach ( (array) get_the_tags($post->ID) as $tag ) {
 		if ( empty($tag->slug ) )
 			continue;
-		$classes[] = 'tag-' . $tag->slug;
+		$classes[] = 'tag-' . sanitize_html_class($tag->slug, $tag->term_id);
 	}
 
 	if ( !empty($class) ) {
@@ -359,13 +366,13 @@ function body_class( $class = '' ) {
  * @return array Array of classes.
  */
 function get_body_class( $class = '' ) {
-	global $wp_query, $current_user;
-	
+	global $wp_query, $wpdb, $current_user;
+
 	$classes = array();
-	
+
 	if ( 'rtl' == get_bloginfo('text_direction') )
 		$classes[] = 'rtl';
-	
+
 	if ( is_front_page() )
 		$classes[] = 'home';
 	if ( is_home() )
@@ -382,72 +389,73 @@ function get_body_class( $class = '' ) {
 		$classes[] = 'attachment';
 	if ( is_404() )
 		$classes[] = 'error404';
-	
+
 	if ( is_single() ) {
-		the_post();
-		
+		$wp_query->post = $wp_query->posts[0];
+		setup_postdata($wp_query->post);
+
 		$postID = $wp_query->post->ID;
 		$classes[] = 'single postid-' . $postID;
-		
+
 		if ( is_attachment() ) {
 			$mime_type = get_post_mime_type();
 			$mime_prefix = array( 'application/', 'image/', 'text/', 'audio/', 'video/', 'music/' );
-			$classes[] = 'attachmentid-' . $postID . ' attachment-' . str_replace( $mime_prefix, "", "$mime_type" );
+			$classes[] = 'attachmentid-' . $postID;
+			$classes[] = 'attachment-' . str_replace($mime_prefix, '', $mime_type);
 		}
-		
-		rewind_posts();
 	} elseif ( is_archive() ) {
 		if ( is_author() ) {
 			$author = $wp_query->get_queried_object();
 			$classes[] = 'author';
-			$classes[] = 'author-' . $author->user_nicename;
+			$classes[] = 'author-' . sanitize_html_class($author->user_nicename , $author->user_id);
 		} elseif ( is_category() ) {
 			$cat = $wp_query->get_queried_object();
 			$classes[] = 'category';
-			$classes[] = 'category-' . $cat->slug;
+			$classes[] = 'category-' . sanitize_html_class($cat->slug, $cat->cat_ID);
 		} elseif ( is_tag() ) {
 			$tags = $wp_query->get_queried_object();
 			$classes[] = 'tag';
-			$classes[] = 'tag-' . $tags->slug;
+			$classes[] = 'tag-' . sanitize_html_class($tags->slug, $tags->term_id);
 		}
 	} elseif ( is_page() ) {
-		the_post();
-		
+		$classes[] = 'page';
+
+		$wp_query->post = $wp_query->posts[0];
+		setup_postdata($wp_query->post);
+
 		$pageID = $wp_query->post->ID;
-		$page_children = wp_list_pages("child_of=$pageID&echo=0");
-		
-		if ( $page_children )
+
+		$classes[] = 'page-id-' . $pageID;
+
+		if ( $wpdb->get_var( $wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_parent = %d AND post_type = 'page' LIMIT 1", $pageID) ) )
 			$classes[] = 'page-parent';
-		
-		if ( $wp_query->post->post_parent )
-			$classes[] = 'page-child parent-pageid-' . $wp_query->post->post_parent;
-		
-		if ( is_page_template() )
-			$classes[] = 'page-template page-template-' . str_replace( '.php', '-php', get_post_meta( $pageID, '_wp_page_template', true ) );
-		
-		rewind_posts();
+
+		if ( $wp_query->post->post_parent ) {
+			$classes[] = 'page-child';
+			$classes[] = 'parent-pageid-' . $wp_query->post->post_parent;
+		}
+		if ( is_page_template() ) {
+			$classes[] = 'page-template';
+			$classes[] = 'page-template-' . str_replace( '.php', '-php', get_post_meta( $pageID, '_wp_page_template', true ) );
+		}
 	} elseif ( is_search() ) {
-		the_post();
-		
-		if ( have_posts() )
+		if ( !empty($wp_query->posts) )
 			$classes[] = 'search-results';
 		else
 			$classes[] = 'search-no-results';
-		
-		rewind_posts();
 	}
-	
+
 	if ( is_user_logged_in() )
 		$classes[] = 'logged-in';
-	
+
 	$page = $wp_query->get('page');
-	
+
 	if ( !$page || $page < 2)
 		$page = $wp_query->get('paged');
-	
+
 	if ( $page && $page > 1 ) {
 		$classes[] = 'paged-' . $page;
-		
+
 		if ( is_single() )
 			$classes[] = 'single-paged-' . $page;
 		elseif ( is_page() )
@@ -463,13 +471,13 @@ function get_body_class( $class = '' ) {
 		elseif ( is_search() )
 			$classes[] = 'search-paged-' . $page;
 	}
-	
+
 	if ( !empty($class) ) {
 		if ( !is_array( $class ) )
 			$class = preg_split('#\s+#', $class);
 		$classes = array_merge($classes, $class);
 	}
-	
+
 	return apply_filters('body_class', $classes, $class);
 }
 
@@ -704,7 +712,7 @@ function wp_dropdown_pages($args = '') {
 		if ( $show_option_no_change )
 			$output .= "\t<option value=\"-1\">$show_option_no_change</option>";
 		if ( $show_option_none )
-			$output .= "\t<option value=\"$option_none_value\">$show_option_none</option>\n";
+			$output .= "\t<option value=\"" . esc_attr($option_none_value) . "\">$show_option_none</option>\n";
 		$output .= walk_page_dropdown_tree($pages, $depth, $r);
 		$output .= "</select>\n";
 	}
@@ -756,7 +764,7 @@ function wp_list_pages($args = '') {
 			$output .= '<li class="pagenav">' . $r['title_li'] . '<ul>';
 
 		global $wp_query;
-		if ( is_page() || $wp_query->is_posts_page )
+		if ( is_page() || is_attachment() || $wp_query->is_posts_page )
 			$current_page = $wp_query->get_queried_object_id();
 		$output .= walk_page_tree($pages, $r['depth'], $current_page, $r);
 
@@ -798,7 +806,7 @@ function wp_list_pages($args = '') {
  * @param array|string $args
  */
 function wp_page_menu( $args = array() ) {
-	$defaults = array('sort_column' => 'post_title', 'menu_class' => 'menu', 'echo' => true, 'link_before' => '', 'link_after' => '');
+	$defaults = array('sort_column' => 'menu_order, post_title', 'menu_class' => 'menu', 'echo' => true, 'link_before' => '', 'link_after' => '');
 	$args = wp_parse_args( $args, $defaults );
 	$args = apply_filters( 'wp_page_menu_args', $args );
 
@@ -854,7 +862,7 @@ function wp_page_menu( $args = array() ) {
  * @see Walker_Page::walk() for parameters and return description.
  */
 function walk_page_tree($pages, $depth, $current_page, $r) {
-	if ( empty($r['walker']) ) 
+	if ( empty($r['walker']) )
 		$walker = new Walker_Page;
 	else
 		$walker = $r['walker'];
@@ -924,17 +932,17 @@ function wp_get_attachment_link($id = 0, $size = 'thumbnail', $permalink = false
 	if ( $permalink )
 		$url = get_attachment_link($_post->ID);
 
-	$post_title = attribute_escape($_post->post_title);
-	
+	$post_title = esc_attr($_post->post_title);
+
 	if ( $text ) {
-		$link_text = attribute_escape($text);
+		$link_text = esc_attr($text);
 	} elseif ( ( is_int($size) && $size != 0 ) or ( is_string($size) && $size != 'none' ) or $size != false ) {
 		$link_text = wp_get_attachment_image($id, $size, $icon);
 	}
 
 	if( trim($link_text) == '' )
 		$link_text = $_post->post_title;
-	
+
 	return apply_filters( 'wp_get_attachment_link', "<a href='$url' title='$post_title'>$link_text</a>", $id, $size, $permalink, $icon, $text );
 }
 
@@ -961,7 +969,7 @@ function get_the_attachment_link($id = 0, $fullsize = false, $max_dims = false, 
 	if ( $permalink )
 		$url = get_attachment_link($_post->ID);
 
-	$post_title = attribute_escape($_post->post_title);
+	$post_title = esc_attr($_post->post_title);
 
 	$innerHTML = get_attachment_innerHTML($_post->ID, $fullsize, $max_dims);
 	return "<a href='$url' title='$post_title'>$innerHTML</a>";
@@ -1057,7 +1065,7 @@ function get_attachment_icon( $id = 0, $fullsize = false, $max_dims = false ) {
 		$constraint = '';
 	}
 
-	$post_title = attribute_escape($post->post_title);
+	$post_title = esc_attr($post->post_title);
 
 	$icon = "<img src='$src' title='$post_title' alt='$post_title' $constraint/>";
 
@@ -1085,7 +1093,7 @@ function get_attachment_innerHTML($id = 0, $fullsize = false, $max_dims = false)
 		return $innerHTML;
 
 
-	$innerHTML = attribute_escape($post->post_title);
+	$innerHTML = esc_attr($post->post_title);
 
 	return apply_filters('attachment_innerHTML', $innerHTML, $post->ID);
 }
@@ -1131,7 +1139,7 @@ function get_the_password_form() {
 	$label = 'pwbox-'.(empty($post->ID) ? rand() : $post->ID);
 	$output = '<form action="' . get_option('siteurl') . '/wp-pass.php" method="post">
 	<p>' . __("This post is password protected. To view it please enter your password below:") . '</p>
-	<p><label for="' . $label . '">' . __("Password:") . ' <input name="post_password" id="' . $label . '" type="password" size="20" /></label> <input type="submit" name="Submit" value="' . __("Submit") . '" /></p>
+	<p><label for="' . $label . '">' . __("Password:") . ' <input name="post_password" id="' . $label . '" type="password" size="20" /></label> <input type="submit" name="Submit" value="' . esc_attr__("Submit") . '" /></p>
 	</form>
 	';
 	return apply_filters('the_password_form', $output);
@@ -1234,7 +1242,7 @@ function wp_post_revision_title( $revision, $link = true ) {
  * @uses wp_get_post_revisions()
  * @uses wp_post_revision_title()
  * @uses get_edit_post_link()
- * @uses get_author_name()
+ * @uses get_the_author_meta()
  *
  * @todo split into two functions (list, form-table) ?
  *
@@ -1279,7 +1287,7 @@ function wp_list_post_revisions( $post_id = 0, $args = null ) {
 			continue;
 
 		$date = wp_post_revision_title( $revision );
-		$name = get_author_name( $revision->post_author );
+		$name = get_the_author_meta( 'display_name', $revision->post_author );
 
 		if ( 'form-table' == $format ) {
 			if ( $left )
@@ -1313,7 +1321,7 @@ function wp_list_post_revisions( $post_id = 0, $args = null ) {
 
 <div class="tablenav">
 	<div class="alignleft">
-		<input type="submit" class="button-secondary" value="<?php _e( 'Compare Revisions' ); ?>" />
+		<input type="submit" class="button-secondary" value="<?php esc_attr_e( 'Compare Revisions' ); ?>" />
 		<input type="hidden" name="action" value="diff" />
 	</div>
 </div>

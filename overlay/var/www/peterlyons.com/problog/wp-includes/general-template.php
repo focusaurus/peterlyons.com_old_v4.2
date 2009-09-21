@@ -23,7 +23,7 @@
  * @param string $name The name of the specialised header.
  */
 function get_header( $name = null ) {
-	do_action( 'get_header' );
+	do_action( 'get_header', $name );
 
 	$templates = array();
 	if ( isset($name) )
@@ -52,7 +52,7 @@ function get_header( $name = null ) {
  * @param string $name The name of the specialised footer.
  */
 function get_footer( $name = null ) {
-	do_action( 'get_footer' );
+	do_action( 'get_footer', $name );
 
 	$templates = array();
 	if ( isset($name) )
@@ -81,7 +81,7 @@ function get_footer( $name = null ) {
  * @param string $name The name of the specialised sidebar.
  */
 function get_sidebar( $name = null ) {
-	do_action( 'get_sidebar' );
+	do_action( 'get_sidebar', $name );
 
 	$templates = array();
 	if ( isset($name) )
@@ -115,13 +115,16 @@ function get_sidebar( $name = null ) {
 function get_search_form() {
 	do_action( 'get_search_form' );
 
-	if ( '' != locate_template(array('searchform.php'), true) )
+	$search_form_template = locate_template(array('searchform.php'));
+	if ( '' != $search_form_template ) {
+		require($search_form_template);
 		return;
+	}
 
-	$form = '<form method="get" id="searchform" action="' . get_option('home') . '/" >
-	<div><label class="hidden" for="s">' . __('Search for:') . '</label>
-	<input type="text" value="' . attribute_escape(apply_filters('the_search_query', get_search_query())) . '" name="s" id="s" />
-	<input type="submit" id="searchsubmit" value="'.attribute_escape(__('Search')).'" />
+	$form = '<form role="search" method="get" id="searchform" action="' . get_option('home') . '/" >
+	<div><label class="screen-reader-text" for="s">' . __('Search for:') . '</label>
+	<input type="text" value="' . esc_attr(apply_filters('the_search_query', get_search_query())) . '" name="s" id="s" />
+	<input type="submit" id="searchsubmit" value="'. esc_attr__('Search') .'" />
 	</div>
 	</form>';
 
@@ -136,12 +139,14 @@ function get_search_form() {
  *
  * @since 1.5.0
  * @uses apply_filters() Calls 'loginout' hook on HTML link content.
+ *
+ * @param string $redirect Optional path to redirect to on login/logout.
  */
-function wp_loginout() {
+function wp_loginout($redirect = '') {
 	if ( ! is_user_logged_in() )
-		$link = '<a href="' . wp_login_url() . '">' . __('Log in') . '</a>';
+		$link = '<a href="' . esc_url( wp_login_url($redirect) ) . '">' . __('Log in') . '</a>';
 	else
-		$link = '<a href="' . wp_logout_url() . '">' . __('Log out') . '</a>';
+		$link = '<a href="' . esc_url( wp_logout_url($redirect) ) . '">' . __('Log out') . '</a>';
 
 	echo apply_filters('loginout', $link);
 }
@@ -154,14 +159,20 @@ function wp_loginout() {
  * @since 2.7
  * @uses wp_nonce_url() To protect against CSRF
  * @uses site_url() To generate the log in URL
+ * @uses apply_filters() calls 'logout_url' hook on final logout url
  *
  * @param string $redirect Path to redirect to on logout.
  */
 function wp_logout_url($redirect = '') {
-	if ( strlen($redirect) )
-		$redirect = "&redirect_to=$redirect";
+	$args = array( 'action' => 'logout' );
+	if ( !empty($redirect) ) {
+		$args['redirect_to'] = $redirect;
+	}
 
-	return wp_nonce_url( site_url("wp-login.php?action=logout$redirect", 'login'), 'log-out' );
+	$logout_url = add_query_arg($args, site_url('wp-login.php', 'login'));
+	$logout_url = wp_nonce_url( $logout_url, 'log-out' );
+
+	return apply_filters('logout_url', $logout_url, $redirect);
 }
 
 /**
@@ -171,14 +182,39 @@ function wp_logout_url($redirect = '') {
  *
  * @since 2.7
  * @uses site_url() To generate the log in URL
+ * @uses apply_filters() calls 'login_url' hook on final login url
  *
  * @param string $redirect Path to redirect to on login.
  */
 function wp_login_url($redirect = '') {
-	if ( strlen($redirect) )
-		$redirect = "?redirect_to=$redirect";
+	$login_url = site_url('wp-login.php', 'login');
 
-	return site_url("wp-login.php$redirect", 'login');
+	if ( !empty($redirect) ) {
+		$login_url = add_query_arg('redirect_to', urlencode($redirect), $login_url);
+	}
+
+	return apply_filters('login_url', $login_url, $redirect);
+}
+
+/**
+ * Returns the Lost Password URL.
+ *
+ * Returns the URL that allows the user to retrieve the lost password
+ *
+ * @since 2.8.0
+ * @uses site_url() To generate the lost password URL
+ * @uses apply_filters() calls 'lostpassword_url' hook on the lostpassword url
+ *
+ * @param string $redirect Path to redirect to on login.
+ */
+function wp_lostpassword_url($redirect = '') {
+	$args = array( 'action' => 'lostpassword' );
+	if ( !empty($redirect) ) {
+		$args['redirect_to'] = $redirect;
+	}
+
+	$lostpassword_url = add_query_arg($args, site_url('wp-login.php', 'login'));
+	return apply_filters('lostpassword_url', $lostpassword_url, $redirect);
 }
 
 /**
@@ -443,7 +479,7 @@ function wp_title($sep = '&raquo;', $display = true, $seplocation = '') {
 	}
 
 	// If there is a post
-	if ( is_single() ||  ( is_page() && !is_front_page() ) ) {
+	if ( is_single() || ( is_home() && !is_front_page() ) || ( is_page() && !is_front_page() ) ) {
 		$post = $wp_query->get_queried_object();
 		$title = strip_tags( apply_filters( 'single_post_title', $post->post_title ) );
 	}
@@ -457,10 +493,11 @@ function wp_title($sep = '&raquo;', $display = true, $seplocation = '') {
 		$term = $term->name;
 		$title = "$tax$t_sep$term";
 	}
-	
+
 	//If it's a search
 	if ( is_search() ) {
-		$title = sprintf(__('Search Results %s %s'), $t_sep, strip_tags($search));
+		/* translators: 1: separator, 2: search phrase */
+		$title = sprintf(__('Search Results %1$s %2$s'), $t_sep, strip_tags($search));
 	}
 
 	if ( is_404() ) {
@@ -676,8 +713,8 @@ function single_month_title($prefix = '', $display = true ) {
  */
 function get_archives_link($url, $text, $format = 'html', $before = '', $after = '') {
 	$text = wptexturize($text);
-	$title_text = attribute_escape($text);
-	$url = clean_url($url);
+	$title_text = esc_attr($text);
+	$url = esc_url($url);
 
 	if ('link' == $format)
 		$link_html = "\t<link rel='archives' title='$title_text' href='$url' />\n";
@@ -932,7 +969,7 @@ function get_calendar($initial = true) {
 
 	// Quick check. If we have no posts at all, abort!
 	if ( !$posts ) {
-		$gotsome = $wpdb->get_var("SELECT 1 FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' LIMIT 1");
+		$gotsome = $wpdb->get_var("SELECT 1 as test FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' LIMIT 1");
 		if ( !$gotsome ) {
 			$cache[ $key ] = '';
 			wp_cache_set( 'get_calendar', $cache, 'calendar' );
@@ -1064,8 +1101,7 @@ function get_calendar($initial = true) {
 	if ( $ak_post_titles ) {
 		foreach ( (array) $ak_post_titles as $ak_post_title ) {
 
-				$post_title = apply_filters( "the_title", $ak_post_title->post_title );
-				$post_title = str_replace('"', '&quot;', wptexturize( $post_title ));
+				$post_title = esc_attr( apply_filters( 'the_title', $ak_post_title->post_title ) );
 
 				if ( empty($ak_titles_for_day['day_'.$ak_post_title->dom]) )
 					$ak_titles_for_day['day_'.$ak_post_title->dom] = '';
@@ -1166,7 +1202,7 @@ function allowed_tags() {
  */
 function the_date_xml() {
 	global $post;
-	echo mysql2date('Y-m-d', $post->post_date);
+	echo mysql2date('Y-m-d', $post->post_date, false);
 }
 
 /**
@@ -1225,9 +1261,9 @@ function the_modified_date($d = '') {
  */
 function get_the_modified_date($d = '') {
 	if ( '' == $d )
-		$the_time = get_post_modified_time(get_option('date_format'));
+		$the_time = get_post_modified_time(get_option('date_format'), null, null, true);
 	else
-		$the_time = get_post_modified_time($d);
+		$the_time = get_post_modified_time($d, null, null, true);
 	return apply_filters('get_the_modified_date', $the_time, $d);
 }
 
@@ -1255,9 +1291,9 @@ function get_the_time( $d = '', $post = null ) {
 	$post = get_post($post);
 
 	if ( '' == $d )
-		$the_time = get_post_time(get_option('time_format'), false, $post);
+		$the_time = get_post_time(get_option('time_format'), false, $post, true);
 	else
-		$the_time = get_post_time($d, false, $post);
+		$the_time = get_post_time($d, false, $post, true);
 	return apply_filters('get_the_time', $the_time, $d, $post);
 }
 
@@ -1269,9 +1305,10 @@ function get_the_time( $d = '', $post = null ) {
  * @param string $d Either 'G', 'U', or php date format.
  * @param bool $gmt Whether of not to return the gmt time.
  * @param int|object $post Optional post ID or object. Default is global $post object.
+ * @param bool $translate Whether to translate the time string or not
  * @return string
  */
-function get_post_time( $d = 'U', $gmt = false, $post = null ) { // returns timestamp
+function get_post_time( $d = 'U', $gmt = false, $post = null, $translate = false ) { // returns timestamp
 	$post = get_post($post);
 
 	if ( $gmt )
@@ -1279,7 +1316,7 @@ function get_post_time( $d = 'U', $gmt = false, $post = null ) { // returns time
 	else
 		$time = $post->post_date;
 
-	$time = mysql2date($d, $time);
+	$time = mysql2date($d, $time, $translate);
 	return apply_filters('get_post_time', $time, $d, $gmt);
 }
 
@@ -1304,9 +1341,9 @@ function the_modified_time($d = '') {
  */
 function get_the_modified_time($d = '') {
 	if ( '' == $d )
-		$the_time = get_post_modified_time(get_option('time_format'));
+		$the_time = get_post_modified_time(get_option('time_format'), null, null, true);
 	else
-		$the_time = get_post_modified_time($d);
+		$the_time = get_post_modified_time($d, null, null, true);
 	return apply_filters('get_the_modified_time', $the_time, $d);
 }
 
@@ -1317,18 +1354,20 @@ function get_the_modified_time($d = '') {
  *
  * @param string $d Either 'G', 'U', or php date format.
  * @param bool $gmt Whether of not to return the gmt time.
+ * @param int|object $post A post_id or post object
+ * @param bool translate Whether to translate the result or not
  * @return string Returns timestamp
  */
-function get_post_modified_time( $d = 'U', $gmt = false ) {
-	global $post;
+function get_post_modified_time( $d = 'U', $gmt = false, $post = null, $translate = false ) {
+	$post = get_post($post);
 
 	if ( $gmt )
 		$time = $post->post_modified_gmt;
 	else
 		$time = $post->post_modified;
-	$time = mysql2date($d, $time);
+	$time = mysql2date($d, $time, $translate);
 
-	return apply_filters('get_the_modified_time', $time, $d, $gmt);
+	return apply_filters('get_post_modified_time', $time, $d, $gmt);
 }
 
 /**
@@ -1340,7 +1379,7 @@ function get_post_modified_time( $d = 'U', $gmt = false ) {
  */
 function the_weekday() {
 	global $wp_locale, $post;
-	$the_weekday = $wp_locale->get_weekday(mysql2date('w', $post->post_date));
+	$the_weekday = $wp_locale->get_weekday(mysql2date('w', $post->post_date, false));
 	$the_weekday = apply_filters('the_weekday', $the_weekday);
 	echo $the_weekday;
 }
@@ -1361,7 +1400,7 @@ function the_weekday_date($before='',$after='') {
 	$the_weekday_date = '';
 	if ( $day != $previousweekday ) {
 		$the_weekday_date .= $before;
-		$the_weekday_date .= $wp_locale->get_weekday(mysql2date('w', $post->post_date));
+		$the_weekday_date .= $wp_locale->get_weekday(mysql2date('w', $post->post_date, false));
 		$the_weekday_date .= $after;
 		$previousweekday = $day;
 	}
@@ -1415,15 +1454,17 @@ function automatic_feed_links( $add = true ) {
 function feed_links( $args ) {
 	$defaults = array(
 		/* translators: Separator between blog name and feed type in feed links */
-		'separator'   => _x('&raquo;', 'feed link'),
-		'feedtitle' => __('%s Feed'),
-		'comstitle' => __('%s Comments Feed'),
+		'separator'	=> _x('&raquo;', 'feed link'),
+		/* translators: 1: blog title, 2: separator (raquo) */
+		'feedtitle'	=> __('%1$s %2$s Feed'),
+		/* translators: %s: blog title, 2: separator (raquo) */
+		'comstitle'	=> __('%1$s %2$s Comments Feed'),
 	);
 
 	$args = wp_parse_args( $args, $defaults );
 
-	echo '<link rel="alternate" type="' . feed_content_type() . '" title="' . attribute_escape(sprintf( $args['feedtitle'], get_bloginfo('name') )) . '" href="' . get_feed_link() . "\" />\n";
-	echo '<link rel="alternate" type="' . feed_content_type() . '" title="' . attribute_escape(sprintf( $args['comstitle'], get_bloginfo('name') )) . '" href="' . get_feed_link( 'comments_' . get_default_feed() ) . "\" />\n";
+	echo '<link rel="alternate" type="' . feed_content_type() . '" title="' . esc_attr(sprintf( $args['feedtitle'], get_bloginfo('name'), $args['separator'] )) . '" href="' . get_feed_link() . "\" />\n";
+	echo '<link rel="alternate" type="' . feed_content_type() . '" title="' . esc_attr(sprintf( $args['comstitle'], get_bloginfo('name'), $args['separator'] )) . '" href="' . get_feed_link( 'comments_' . get_default_feed() ) . "\" />\n";
 }
 
 /**
@@ -1446,7 +1487,7 @@ function feed_links_extra( $args ) {
 		/* translators: 1: blog name, 2: separator(raquo), 3: author name  */
 		'authortitle' => __('%1$s %2$s Posts by %3$s Feed'),
 		/* translators: 1: blog name, 2: separator(raquo), 3: search phrase */
-		'searchtitle' => __('%1$s %2$s Search Results for &quot;%3$s&quot; Feed'),
+		'searchtitle' => __('%1$s %2$s Search Results for &#8220;%3$s&#8221; Feed'),
 	);
 
 	$args = wp_parse_args( $args, $defaults );
@@ -1455,27 +1496,27 @@ function feed_links_extra( $args ) {
 		$post = &get_post( $id = 0 );
 
 		if ( comments_open() || pings_open() || $post->comment_count > 0 ) {
-			$title = attribute_escape(sprintf( $args['singletitle'], get_bloginfo('name'), $args['separator'], wp_specialchars( get_the_title() ) ));
+			$title = esc_attr(sprintf( $args['singletitle'], get_bloginfo('name'), $args['separator'], esc_html( get_the_title() ) ));
 			$href = get_post_comments_feed_link( $post->ID );
 		}
 	} elseif ( is_category() ) {
 		$cat_id = intval( get_query_var('cat') );
 
-		$title = attribute_escape(sprintf( $args['cattitle'], get_bloginfo('name'), $args['separator'], get_cat_name( $cat_id ) ));
+		$title = esc_attr(sprintf( $args['cattitle'], get_bloginfo('name'), $args['separator'], get_cat_name( $cat_id ) ));
 		$href = get_category_feed_link( $cat_id );
 	} elseif ( is_tag() ) {
 		$tag_id = intval( get_query_var('tag_id') );
 		$tag = get_tag( $tag_id );
 
-		$title = attribute_escape(sprintf( $args['tagtitle'], get_bloginfo('name'), $args['separator'], $tag->name ));
+		$title = esc_attr(sprintf( $args['tagtitle'], get_bloginfo('name'), $args['separator'], $tag->name ));
 		$href = get_tag_feed_link( $tag_id );
 	} elseif ( is_author() ) {
 		$author_id = intval( get_query_var('author') );
 
-		$title = attribute_escape(sprintf( $args['authortitle'], get_bloginfo('name'), $args['separator'], get_author_name( $author_id ) ));
+		$title = esc_attr(sprintf( $args['authortitle'], get_bloginfo('name'), $args['separator'], get_the_author_meta( 'display_name', $author_id ) ));
 		$href = get_author_feed_link( $author_id );
 	} elseif ( is_search() ) {
-		$title = attribute_escape(sprintf( $args['searchtitle'], get_bloginfo('name'), $args['separator'], get_search_query() ));
+		$title = esc_attr(sprintf( $args['searchtitle'], get_bloginfo('name'), $args['separator'], get_search_query() ));
 		$href = get_search_feed_link();
 	}
 
@@ -1607,49 +1648,52 @@ function the_editor($content, $id = 'content', $prev_id = 'title', $media_button
 		$media_buttons = false;
 
 	$richedit =  user_can_richedit();
-	$rows = "rows='$rows'";
+	$class = '';
 
 	if ( $richedit || $media_buttons ) { ?>
 	<div id="editor-toolbar">
-	<?php if ( $richedit ) {
+<?php
+	if ( $richedit ) {
 		$wp_default_editor = wp_default_editor(); ?>
 		<div class="zerosize"><input accesskey="e" type="button" onclick="switchEditors.go('<?php echo $id; ?>')" /></div>
-		<?php if ( 'html' == $wp_default_editor ) {
+<?php	if ( 'html' == $wp_default_editor ) {
 			add_filter('the_editor_content', 'wp_htmledit_pre'); ?>
-			<a id="edButtonHTML" class="active" onclick="switchEditors.go('<?php echo $id; ?>', 'html');"><?php _e('HTML'); ?></a>
-			<a id="edButtonPreview" onclick="switchEditors.go('<?php echo $id; ?>', 'tinymce');"><?php _e('Visual'); ?></a>
-		<?php } else {
+			<a id="edButtonHTML" class="active hide-if-no-js" onclick="switchEditors.go('<?php echo $id; ?>', 'html');"><?php _e('HTML'); ?></a>
+			<a id="edButtonPreview" class="hide-if-no-js" onclick="switchEditors.go('<?php echo $id; ?>', 'tinymce');"><?php _e('Visual'); ?></a>
+<?php	} else {
+			$class = " class='theEditor'";
 			add_filter('the_editor_content', 'wp_richedit_pre'); ?>
-			<a id="edButtonHTML" onclick="switchEditors.go('<?php echo $id; ?>', 'html');"><?php _e('HTML'); ?></a>
-			<a id="edButtonPreview" class="active" onclick="switchEditors.go('<?php echo $id; ?>', 'tinymce');"><?php _e('Visual'); ?></a>
-		<?php }
-		}
+			<a id="edButtonHTML" class="hide-if-no-js" onclick="switchEditors.go('<?php echo $id; ?>', 'html');"><?php _e('HTML'); ?></a>
+			<a id="edButtonPreview" class="active hide-if-no-js" onclick="switchEditors.go('<?php echo $id; ?>', 'tinymce');"><?php _e('Visual'); ?></a>
+<?php	}
+	}
 
-		if ( $media_buttons ) { ?>
-			<div id="media-buttons" class="hide-if-no-js">
-			<?php do_action( 'media_buttons' ); ?>
-			</div>
-		<?php } ?>
+	if ( $media_buttons ) { ?>
+		<div id="media-buttons" class="hide-if-no-js">
+<?php	do_action( 'media_buttons' ); ?>
+		</div>
+<?php
+	} ?>
 	</div>
-	<?php } ?>
-
-	<div id="quicktags">
-	<?php wp_print_scripts( 'quicktags' ); ?>
+<?php
+	}
+?>
+	<div id="quicktags"><?php
+	wp_print_scripts( 'quicktags' ); ?>
 	<script type="text/javascript">edToolbar()</script>
 	</div>
 
-	<?php $the_editor = apply_filters('the_editor', "<div id='editorcontainer'><textarea $rows cols='40' name='$id' tabindex='$tab_index' id='$id'>%s</textarea></div>\n");
+<?php
+	$the_editor = apply_filters('the_editor', "<div id='editorcontainer'><textarea rows='$rows'$class cols='40' name='$id' tabindex='$tab_index' id='$id'>%s</textarea></div>\n");
 	$the_editor_content = apply_filters('the_editor_content', $content);
 
 	printf($the_editor, $the_editor_content);
 
-	?>
+?>
 	<script type="text/javascript">
-	/* <![CDATA[ */
 	edCanvas = document.getElementById('<?php echo $id; ?>');
-	/* ]]> */
 	</script>
-	<?php
+<?php
 }
 
 /**
@@ -1666,14 +1710,14 @@ function get_search_query() {
 /**
  * Display the contents of the search query variable.
  *
- * The search query string is passed through {@link attribute_escape()}
+ * The search query string is passed through {@link esc_attr()}
  * to ensure that it is safe for placing in an html attribute.
  *
- * @uses attribute_escape
+ * @uses attr
  * @since 2.1.0
  */
 function the_search_query() {
-	echo attribute_escape( apply_filters( 'the_search_query', get_search_query() ) );
+	echo esc_attr( apply_filters( 'the_search_query', get_search_query() ) );
 }
 
 /**
@@ -1790,7 +1834,7 @@ function paginate_links( $args = '' ) {
 		if ( $add_args )
 			$link = add_query_arg( $add_args, $link );
 		$link .= $add_fragment;
-		$page_links[] = "<a class='prev page-numbers' href='" . clean_url($link) . "'>$prev_text</a>";
+		$page_links[] = "<a class='prev page-numbers' href='" . esc_url($link) . "'>$prev_text</a>";
 	endif;
 	for ( $n = 1; $n <= $total; $n++ ) :
 		$n_display = number_format_i18n($n);
@@ -1804,7 +1848,7 @@ function paginate_links( $args = '' ) {
 				if ( $add_args )
 					$link = add_query_arg( $add_args, $link );
 				$link .= $add_fragment;
-				$page_links[] = "<a class='page-numbers' href='" . clean_url($link) . "'>$n_display</a>";
+				$page_links[] = "<a class='page-numbers' href='" . esc_url($link) . "'>$n_display</a>";
 				$dots = true;
 			elseif ( $dots && !$show_all ) :
 				$page_links[] = "<span class='page-numbers dots'>...</span>";
@@ -1818,7 +1862,7 @@ function paginate_links( $args = '' ) {
 		if ( $add_args )
 			$link = add_query_arg( $add_args, $link );
 		$link .= $add_fragment;
-		$page_links[] = "<a class='next page-numbers' href='" . clean_url($link) . "'>$next_text</a>";
+		$page_links[] = "<a class='next page-numbers' href='" . esc_url($link) . "'>$next_text</a>";
 	endif;
 	switch ( $type ) :
 		case 'array' :
@@ -1918,9 +1962,9 @@ function wp_admin_css( $file = 'wp-admin', $force_echo = false ) {
 		return;
 	}
 
-	echo apply_filters( 'wp_admin_css', "<link rel='stylesheet' href='" . clean_url( wp_admin_css_uri( $file ) ) . "' type='text/css' />\n", $file );
+	echo apply_filters( 'wp_admin_css', "<link rel='stylesheet' href='" . esc_url( wp_admin_css_uri( $file ) ) . "' type='text/css' />\n", $file );
 	if ( 'rtl' == get_bloginfo( 'text_direction' ) )
-		echo apply_filters( 'wp_admin_css', "<link rel='stylesheet' href='" . clean_url( wp_admin_css_uri( "$file-rtl" ) ) . "' type='text/css' />\n", "$file-rtl" );
+		echo apply_filters( 'wp_admin_css', "<link rel='stylesheet' href='" . esc_url( wp_admin_css_uri( "$file-rtl" ) ) . "' type='text/css' />\n", "$file-rtl" );
 }
 
 /**

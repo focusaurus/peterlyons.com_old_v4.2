@@ -70,10 +70,10 @@ function _walk_bookmarks($bookmarks, $args = '' ) {
 
 		$the_link = '#';
 		if ( !empty($bookmark->link_url) )
-			$the_link = clean_url($bookmark->link_url);
+			$the_link = esc_url($bookmark->link_url);
 
-		$desc = attribute_escape(sanitize_bookmark_field('link_description', $bookmark->link_description, $bookmark->link_id, 'display'));
-		$name = attribute_escape(sanitize_bookmark_field('link_name', $bookmark->link_name, $bookmark->link_id, 'display'));
+		$desc = esc_attr(sanitize_bookmark_field('link_description', $bookmark->link_description, $bookmark->link_id, 'display'));
+		$name = esc_attr(sanitize_bookmark_field('link_name', $bookmark->link_name, $bookmark->link_id, 'display'));
  		$title = $desc;
 
 		if ( $show_updated )
@@ -106,7 +106,8 @@ function _walk_bookmarks($bookmarks, $args = '' ) {
 			else // If it's a relative path
 				$output .= "<img src=\"" . get_option('siteurl') . "$bookmark->link_image\" $alt $title />";
 
-			if ($show_name) $output .= $name;
+			if ( $show_name )
+				$output .= " $name";
 		} else {
 			$output .= $name;
 		}

@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-	var gallerySortable, gallerySortableInit, galleryReorder, w;
+	var gallerySortable, gallerySortableInit, w, desc = false;
 
 	gallerySortableInit = function() {
 		gallerySortable = $('#media-items').sortable( {
@@ -7,23 +7,51 @@ jQuery(document).ready(function($) {
 			placeholder: 'sorthelper',
 			axis: 'y',
 			distance: 2,
-			update: galleryReorder
+			stop: function(e, ui) {
+				// When an update has occurred, adjust the order for each item
+				var all = $('#media-items').sortable('toArray'), len = all.length;
+				$.each(all, function(i, id) {
+					var order = desc ? (len - i) : (1 + i);
+					$('#' + id + ' .menu_order input').val(order);
+				});
+			}
 		} );
 	}
 
-	// When an update has occurred, adjust the order for each item
-	galleryReorder = function(e, sort) {
-		jQuery.each(sort['element'].sortable('toArray'), function(i, id) {
-			jQuery('#' + id + ' .menu_order input')[0].value = (1+i);
+	sortIt = function() {
+		var all = $('.menu_order_input'), len = all.length;
+		all.each(function(i){
+			var order = desc ? (len - i) : (1 + i);
+			$(this).val(order);
 		});
 	}
 
+	clearAll = function(c) {
+		c = c || 0;
+		$('.menu_order_input').each(function(){
+			if ( this.value == '0' || c ) this.value = '';
+		});
+	}
+
+	$('#asc').click(function(){desc = false; sortIt(); return false;});
+	$('#desc').click(function(){desc = true; sortIt(); return false;});
+	$('#clear').click(function(){clearAll(1); return false;});
+	$('#showall').click(function(){
+		$('#sort-buttons span a').toggle();
+		$('a.describe-toggle-on').hide();
+		$('a.describe-toggle-off, table.slidetoggle').show();
+		return false;
+	});
+	$('#hideall').click(function(){
+		$('#sort-buttons span a').toggle();
+		$('a.describe-toggle-on').show();
+		$('a.describe-toggle-off, table.slidetoggle').hide();
+		return false;
+	});
+
 	// initialize sortable
 	gallerySortableInit();
-
-	$('.menu_order_input').each(function(){
-		if ( this.value == '0' ) this.value = '';
-	});
+	clearAll();
 
 	if ( $('#media-items>*').length > 1 ) {
 		w = wpgallery.getWin();
@@ -89,7 +117,7 @@ wpgallery = {
 	},
 
 	setup : function() {
-		var t = this, a, ed = t.editor, g;
+		var t = this, a, ed = t.editor, g, columns, link, order, orderby;
 		if ( ! t.mcemode ) return;
 
 		t.restoreSelection();
@@ -115,8 +143,10 @@ wpgallery = {
 			jQuery('#update-gallery').show();
 			t.is_update = true;
 
-			var columns = a.match(/columns=['"]([0-9]+)['"]/), link = a.match(/link=['"]([^'"]+)['"]/i),
-			order = a.match(/order=['"]([^'"]+)['"]/i), orderby = a.match(/orderby=['"]([^'"]+)['"]/i);
+			columns = a.match(/columns=['"]([0-9]+)['"]/);
+			link = a.match(/link=['"]([^'"]+)['"]/i);
+			order = a.match(/order=['"]([^'"]+)['"]/i);
+			orderby = a.match(/orderby=['"]([^'"]+)['"]/i);
 
 			if ( link && link[1] ) t.I('linkto-file').checked = "checked";
 			if ( order && order[1] ) t.I('order-desc').checked = "checked";

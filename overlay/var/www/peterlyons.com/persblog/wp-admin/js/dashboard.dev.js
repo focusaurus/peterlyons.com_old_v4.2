@@ -1,6 +1,6 @@
+var ajaxWidgets, ajaxPopulateWidgets, quickPressLoad;
 
 jQuery(document).ready( function($) {
-	var ajaxWidgets, ajaxPopulateWidgets, quickPressLoad;
 	// These widgets are sometimes populated via ajax
 	ajaxWidgets = [
 		'dashboard_incoming_links',
@@ -9,21 +9,41 @@ jQuery(document).ready( function($) {
 		'dashboard_plugins'
 	];
 
-	ajaxPopulateWidgets = function() {
-		$.each( ajaxWidgets, function() {
-			var e = jQuery('#' + this + ':visible div.inside').find('.widget-loading');
-			if ( e.size() ) { e.parent().load('index-extra.php?jax=' + this); }
-		} );
+	ajaxPopulateWidgets = function(el) {
+		show = function(id, i) {
+			var p, e = $('#' + id + ' div.inside:visible').find('.widget-loading');
+			if ( e.length ) {
+				p = e.parent();
+				setTimeout( function(){
+					p.load('index-extra.php?jax=' + id, '', function() {
+						p.hide().slideDown('normal', function(){
+							$(this).css('display', '');
+							if ( 'dashboard_plugins' == id && $.isFunction(tb_init) )
+								tb_init('#dashboard_plugins a.thickbox');
+						});
+					});
+				}, i * 500 );
+			}
+		}
+		if ( el ) {
+			el = el.toString();
+			if ( $.inArray(el, ajaxWidgets) != -1 )
+				show(el, 0);
+		} else {
+			$.each( ajaxWidgets, function(i) {
+				show(this, i);
+			});
+		}
 	};
 	ajaxPopulateWidgets();
 
-	postboxes.add_postbox_toggles('dashboard', { onShow: ajaxPopulateWidgets } );
+	postboxes.add_postbox_toggles('dashboard', { pbshow: ajaxPopulateWidgets } );
 
 	/* QuickPress */
 	quickPressLoad = function() {
 		var act = $('#quickpost-action'), t;
 		t = $('#quick-press').submit( function() {
-			$('#dashboard_quick_press h3').append( '<img src="images/loading.gif" style="margin: 0 6px 0 0; vertical-align: middle" />' );
+			$('#dashboard_quick_press h3').append( '<img src="images/wpspin_light.gif" style="margin: 0 6px 0 0; vertical-align: middle" />' );
 			$('#quick-press .submit input[type="submit"], #quick-press .submit input[type="reset"]').attr('disabled','disabled');
 
 			if ( 'post' == act.val() ) {

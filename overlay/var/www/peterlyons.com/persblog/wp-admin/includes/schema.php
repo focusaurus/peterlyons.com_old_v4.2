@@ -28,7 +28,7 @@ if ( $wpdb->has_cap( 'collation' ) ) {
 
 /** Create WordPress database tables SQL */
 $wp_queries = "CREATE TABLE $wpdb->terms (
- term_id bigint(20) NOT NULL auto_increment,
+ term_id bigint(20) unsigned NOT NULL auto_increment,
  name varchar(200) NOT NULL default '',
  slug varchar(200) NOT NULL default '',
  term_group bigint(10) NOT NULL default 0,
@@ -37,26 +37,26 @@ $wp_queries = "CREATE TABLE $wpdb->terms (
  KEY name (name)
 ) $charset_collate;
 CREATE TABLE $wpdb->term_taxonomy (
- term_taxonomy_id bigint(20) NOT NULL auto_increment,
- term_id bigint(20) NOT NULL default 0,
+ term_taxonomy_id bigint(20) unsigned NOT NULL auto_increment,
+ term_id bigint(20) unsigned NOT NULL default 0,
  taxonomy varchar(32) NOT NULL default '',
  description longtext NOT NULL,
- parent bigint(20) NOT NULL default 0,
+ parent bigint(20) unsigned NOT NULL default 0,
  count bigint(20) NOT NULL default 0,
  PRIMARY KEY  (term_taxonomy_id),
  UNIQUE KEY term_id_taxonomy (term_id,taxonomy),
  KEY taxonomy (taxonomy)
 ) $charset_collate;
 CREATE TABLE $wpdb->term_relationships (
- object_id bigint(20) NOT NULL default 0,
- term_taxonomy_id bigint(20) NOT NULL default 0,
+ object_id bigint(20) unsigned NOT NULL default 0,
+ term_taxonomy_id bigint(20) unsigned NOT NULL default 0,
  term_order int(11) NOT NULL default 0,
  PRIMARY KEY  (object_id,term_taxonomy_id),
  KEY term_taxonomy_id (term_taxonomy_id)
 ) $charset_collate;
 CREATE TABLE $wpdb->comments (
   comment_ID bigint(20) unsigned NOT NULL auto_increment,
-  comment_post_ID int(11) NOT NULL default '0',
+  comment_post_ID bigint(20) unsigned NOT NULL default '0',
   comment_author tinytext NOT NULL,
   comment_author_email varchar(100) NOT NULL default '',
   comment_author_url varchar(200) NOT NULL default '',
@@ -68,8 +68,8 @@ CREATE TABLE $wpdb->comments (
   comment_approved varchar(20) NOT NULL default '1',
   comment_agent varchar(255) NOT NULL default '',
   comment_type varchar(20) NOT NULL default '',
-  comment_parent bigint(20) NOT NULL default '0',
-  user_id bigint(20) NOT NULL default '0',
+  comment_parent bigint(20) unsigned NOT NULL default '0',
+  user_id bigint(20) unsigned NOT NULL default '0',
   PRIMARY KEY  (comment_ID),
   KEY comment_approved (comment_approved),
   KEY comment_post_ID (comment_post_ID),
@@ -77,26 +77,24 @@ CREATE TABLE $wpdb->comments (
   KEY comment_date_gmt (comment_date_gmt)
 ) $charset_collate;
 CREATE TABLE $wpdb->links (
-  link_id bigint(20) NOT NULL auto_increment,
+  link_id bigint(20) unsigned NOT NULL auto_increment,
   link_url varchar(255) NOT NULL default '',
   link_name varchar(255) NOT NULL default '',
   link_image varchar(255) NOT NULL default '',
   link_target varchar(25) NOT NULL default '',
-  link_category bigint(20) NOT NULL default '0',
   link_description varchar(255) NOT NULL default '',
   link_visible varchar(20) NOT NULL default 'Y',
-  link_owner int(11) NOT NULL default '1',
+  link_owner bigint(20) unsigned NOT NULL default '1',
   link_rating int(11) NOT NULL default '0',
   link_updated datetime NOT NULL default '0000-00-00 00:00:00',
   link_rel varchar(255) NOT NULL default '',
   link_notes mediumtext NOT NULL,
   link_rss varchar(255) NOT NULL default '',
   PRIMARY KEY  (link_id),
-  KEY link_category (link_category),
   KEY link_visible (link_visible)
 ) $charset_collate;
 CREATE TABLE $wpdb->options (
-  option_id bigint(20) NOT NULL auto_increment,
+  option_id bigint(20) unsigned NOT NULL auto_increment,
   blog_id int(11) NOT NULL default '0',
   option_name varchar(64) NOT NULL default '',
   option_value longtext NOT NULL,
@@ -105,8 +103,8 @@ CREATE TABLE $wpdb->options (
   KEY option_name (option_name)
 ) $charset_collate;
 CREATE TABLE $wpdb->postmeta (
-  meta_id bigint(20) NOT NULL auto_increment,
-  post_id bigint(20) NOT NULL default '0',
+  meta_id bigint(20) unsigned NOT NULL auto_increment,
+  post_id bigint(20) unsigned NOT NULL default '0',
   meta_key varchar(255) default NULL,
   meta_value longtext,
   PRIMARY KEY  (meta_id),
@@ -115,12 +113,11 @@ CREATE TABLE $wpdb->postmeta (
 ) $charset_collate;
 CREATE TABLE $wpdb->posts (
   ID bigint(20) unsigned NOT NULL auto_increment,
-  post_author bigint(20) NOT NULL default '0',
+  post_author bigint(20) unsigned NOT NULL default '0',
   post_date datetime NOT NULL default '0000-00-00 00:00:00',
   post_date_gmt datetime NOT NULL default '0000-00-00 00:00:00',
   post_content longtext NOT NULL,
   post_title text NOT NULL,
-  post_category int(4) NOT NULL default '0',
   post_excerpt text NOT NULL,
   post_status varchar(20) NOT NULL default 'publish',
   comment_status varchar(20) NOT NULL default 'open',
@@ -132,7 +129,7 @@ CREATE TABLE $wpdb->posts (
   post_modified datetime NOT NULL default '0000-00-00 00:00:00',
   post_modified_gmt datetime NOT NULL default '0000-00-00 00:00:00',
   post_content_filtered text NOT NULL,
-  post_parent bigint(20) NOT NULL default '0',
+  post_parent bigint(20) unsigned NOT NULL default '0',
   guid varchar(255) NOT NULL default '',
   menu_order int(11) NOT NULL default '0',
   post_type varchar(20) NOT NULL default 'post',
@@ -159,8 +156,8 @@ CREATE TABLE $wpdb->users (
   KEY user_nicename (user_nicename)
 ) $charset_collate;
 CREATE TABLE $wpdb->usermeta (
-  umeta_id bigint(20) NOT NULL auto_increment,
-  user_id bigint(20) NOT NULL default '0',
+  umeta_id bigint(20) unsigned NOT NULL auto_increment,
+  user_id bigint(20) unsigned NOT NULL default '0',
   meta_key varchar(255) default NULL,
   meta_value longtext,
   PRIMARY KEY  (umeta_id),
@@ -215,7 +212,6 @@ function populate_options() {
 	'default_pingback_flag' => 1,
 	'default_post_edit_rows' => 10,
 	'posts_per_page' => 10,
-	'what_to_show' => 'posts',
 	/* translators: default date format, see http://php.net/date */
 	'date_format' => __('F j, Y'),
 	/* translators: default time format, see http://php.net/date */
@@ -247,7 +243,6 @@ function populate_options() {
 	'template' => 'default',
 	'stylesheet' => 'default',
 	'comment_whitelist' => 1,
-	'page_uris' => '',
 	'blacklist_keys' => '',
 	'comment_registration' => 0,
 	'rss_language' => 'en',
@@ -304,11 +299,13 @@ function populate_options() {
 	'comments_per_page' => 50,
 	'default_comments_page' => 'newest',
 	'comment_order' => 'asc',
-	'use_ssl' => 0,
 	'sticky_posts' => array(),
 	'widget_categories' => array(),
 	'widget_text' => array(),
-	'widget_rss' => array()
+	'widget_rss' => array(),
+
+	// 2.8
+	'timezone_string' => ''
 	);
 
 	// Set autoload to no for these options
@@ -326,9 +323,11 @@ function populate_options() {
 			$autoload = 'yes';
 
 		$option = $wpdb->escape($option);
+		if ( is_array($value) )
+			$value = serialize($value);
 		$value = $wpdb->escape($value);
 		if ( !empty($insert) )
-			$insert .= ', '; 
+			$insert .= ', ';
 		$insert .= "('$option', '$value', '$autoload')";
 	}
 
@@ -339,7 +338,8 @@ function populate_options() {
 	if ( !__get_option('home') ) update_option('home', $guessurl);
 
 	// Delete unused options
-	$unusedoptions = array ('blodotgsping_url', 'bodyterminator', 'emailtestonly', 'phoneemail_separator', 'smilies_directory', 'subjectprefix', 'use_bbcode', 'use_blodotgsping', 'use_phoneemail', 'use_quicktags', 'use_weblogsping', 'weblogs_cache_file', 'use_preview', 'use_htmltrans', 'smilies_directory', 'fileupload_allowedusers', 'use_phoneemail', 'default_post_status', 'default_post_category', 'archive_mode', 'time_difference', 'links_minadminlevel', 'links_use_adminlevels', 'links_rating_type', 'links_rating_char', 'links_rating_ignore_zero', 'links_rating_single_image', 'links_rating_image0', 'links_rating_image1', 'links_rating_image2', 'links_rating_image3', 'links_rating_image4', 'links_rating_image5', 'links_rating_image6', 'links_rating_image7', 'links_rating_image8', 'links_rating_image9', 'weblogs_cacheminutes', 'comment_allowed_tags', 'search_engine_friendly_urls', 'default_geourl_lat', 'default_geourl_lon', 'use_default_geourl', 'weblogs_xml_url', 'new_users_can_blog', '_wpnonce', '_wp_http_referer', 'Update', 'action', 'rich_editing', 'autosave_interval', 'deactivated_plugins', 'can_compress_scripts');
+	$unusedoptions = array ('blodotgsping_url', 'bodyterminator', 'emailtestonly', 'phoneemail_separator', 'smilies_directory', 'subjectprefix', 'use_bbcode', 'use_blodotgsping', 'use_phoneemail', 'use_quicktags', 'use_weblogsping', 'weblogs_cache_file', 'use_preview', 'use_htmltrans', 'smilies_directory', 'fileupload_allowedusers', 'use_phoneemail', 'default_post_status', 'default_post_category', 'archive_mode', 'time_difference', 'links_minadminlevel', 'links_use_adminlevels', 'links_rating_type', 'links_rating_char', 'links_rating_ignore_zero', 'links_rating_single_image', 'links_rating_image0', 'links_rating_image1', 'links_rating_image2', 'links_rating_image3', 'links_rating_image4', 'links_rating_image5', 'links_rating_image6', 'links_rating_image7', 'links_rating_image8', 'links_rating_image9', 'weblogs_cacheminutes', 'comment_allowed_tags', 'search_engine_friendly_urls', 'default_geourl_lat', 'default_geourl_lon', 'use_default_geourl', 'weblogs_xml_url', 'new_users_can_blog', '_wpnonce', '_wp_http_referer', 'Update', 'action', 'rich_editing', 'autosave_interval', 'deactivated_plugins', 'can_compress_scripts',
+		'page_uris', 'rewrite_rules', 'update_core', 'update_plugins', 'update_themes', 'doing_cron', 'random_seed');
 	foreach ($unusedoptions as $option)
 		delete_option($option);
 }

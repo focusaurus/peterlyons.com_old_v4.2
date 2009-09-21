@@ -170,7 +170,7 @@ class MagpieRSS {
 		{
 			// if tags are inlined, then flatten
 			$attrs_str = join(' ',
-					array_map('map_attrs',
+					array_map(array('MagpieRSS', 'map_attrs'),
 					array_keys($attrs),
 					array_values($attrs) ) );
 
@@ -872,8 +872,8 @@ function wp_rss( $url, $num_items = -1 ) {
 		foreach ( (array) $rss->items as $item ) {
 			printf(
 				'<li><a href="%1$s" title="%2$s">%3$s</a></li>',
-				clean_url( $item['link'] ),
-				attribute_escape( strip_tags( $item['description'] ) ),
+				esc_url( $item['link'] ),
+				esc_attr( strip_tags( $item['description'] ) ),
 				htmlentities( $item['title'] )
 			);
 		}

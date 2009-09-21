@@ -168,6 +168,8 @@ function &get_comment(&$comment, $output = OBJECT) {
 /**
  * Retrieve a list of comments.
  *
+ * The comment list can be for the blog as a whole or for an individual post.
+ *
  * The list of comment arguments are 'status', 'orderby', 'comment_date_gmt',
  * 'order', 'number', 'offset', and 'post_id'.
  *
@@ -369,14 +371,14 @@ function sanitize_comment_cookies() {
 	if ( isset($_COOKIE['comment_author_'.COOKIEHASH]) ) {
 		$comment_author = apply_filters('pre_comment_author_name', $_COOKIE['comment_author_'.COOKIEHASH]);
 		$comment_author = stripslashes($comment_author);
-		$comment_author = attribute_escape($comment_author);
+		$comment_author = esc_attr($comment_author);
 		$_COOKIE['comment_author_'.COOKIEHASH] = $comment_author;
 	}
 
 	if ( isset($_COOKIE['comment_author_email_'.COOKIEHASH]) ) {
 		$comment_author_email = apply_filters('pre_comment_author_email', $_COOKIE['comment_author_email_'.COOKIEHASH]);
 		$comment_author_email = stripslashes($comment_author_email);
-		$comment_author_email = attribute_escape($comment_author_email);
+		$comment_author_email = esc_attr($comment_author_email);
 		$_COOKIE['comment_author_email_'.COOKIEHASH] = $comment_author_email;
 	}
 
@@ -410,9 +412,9 @@ function wp_allow_comment($commentdata) {
 	$dupe .= ") AND comment_content = '$comment_content' LIMIT 1";
 	if ( $wpdb->get_var($dupe) ) {
 		if ( defined('DOING_AJAX') )
-			die( __('Duplicate comment detected; it looks as though you\'ve already said that!') );
+			die( __('Duplicate comment detected; it looks as though you&#8217;ve already said that!') );
 
-		wp_die( __('Duplicate comment detected; it looks as though you\'ve already said that!') );
+		wp_die( __('Duplicate comment detected; it looks as though you&#8217;ve already said that!') );
 	}
 
 	do_action( 'check_comment_flood', $comment_author_IP, $comment_author_email, $comment_date_gmt );
@@ -462,8 +464,8 @@ function check_comment_flood_db( $ip, $email, $date ) {
 	if ( current_user_can( 'manage_options' ) )
 		return; // don't throttle admins
 	if ( $lasttime = $wpdb->get_var( $wpdb->prepare("SELECT comment_date_gmt FROM $wpdb->comments WHERE comment_author_IP = %s OR comment_author_email = %s ORDER BY comment_date DESC LIMIT 1", $ip, $email) ) ) {
-		$time_lastcomment = mysql2date('U', $lasttime);
-		$time_newcomment  = mysql2date('U', $date);
+		$time_lastcomment = mysql2date('U', $lasttime, false);
+		$time_newcomment  = mysql2date('U', $date, false);
 		$flood_die = apply_filters('comment_flood_filter', false, $time_lastcomment, $time_newcomment);
 		if ( $flood_die ) {
 			do_action('comment_flood_trigger', $time_lastcomment, $time_newcomment);
@@ -1089,6 +1091,8 @@ function wp_update_comment($commentarr) {
 	// Escape data pulled from DB.
 	$comment = $wpdb->escape($comment);
 
+	$old_status = $comment['comment_approved'];
+
 	// Merge old and new fields with new fields overwriting old ones.
 	$commentarr = array_merge($comment, $commentarr);
 
@@ -1117,7 +1121,7 @@ function wp_update_comment($commentarr) {
 	wp_update_comment_count($comment_post_ID);
 	do_action('edit_comment', $comment_ID);
 	$comment = get_comment($comment_ID);
-	wp_transition_comment_status($comment_approved, $comment->comment_approved, $comment);
+	wp_transition_comment_status($comment->comment_approved, $old_status, $comment);
 	return $rval;
 }
 
@@ -1340,7 +1344,7 @@ function do_trackbacks($post_id) {
 	$to_ping = get_to_ping($post_id);
 	$pinged  = get_pung($post_id);
 	if ( empty($to_ping) ) {
-		$wpdb->update($wpdb->posts, array('to_ping' => ''), array('ID' => $post_id) ); 
+		$wpdb->update($wpdb->posts, array('to_ping' => ''), array('ID' => $post_id) );
 		return;
 	}
 

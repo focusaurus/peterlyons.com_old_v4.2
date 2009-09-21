@@ -10,8 +10,9 @@
 if (!isset($_GET["page"])) require_once('admin.php');
 
 get_admin_page_title();
-$title = wp_specialchars( strip_tags( $title ) );
+$title = esc_html( strip_tags( $title ) );
 wp_user_settings();
+wp_menu_unfold();
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" <?php do_action('admin_xml_ns'); ?> <?php language_attributes(); ?>>
@@ -26,13 +27,21 @@ wp_admin_css( 'css/colors' );
 wp_admin_css( 'css/ie' );
 wp_enqueue_script('utils');
 
+$hook_suffix = '';
+if ( isset($page_hook) )
+	$hook_suffix = "$page_hook";
+else if ( isset($plugin_page) )
+	$hook_suffix = "$plugin_page";
+else if ( isset($pagenow) )
+	$hook_suffix = "$pagenow";
+
+$admin_body_class = preg_replace('/[^a-z0-9_-]+/i', '-', $hook_suffix);
 ?>
 <script type="text/javascript">
 //<![CDATA[
 addLoadEvent = function(func){if(typeof jQuery!="undefined")jQuery(document).ready(func);else if(typeof wpOnload!='function'){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}};
 var userSettings = {'url':'<?php echo SITECOOKIEPATH; ?>','uid':'<?php if ( ! isset($current_user) ) $current_user = wp_get_current_user(); echo $current_user->ID; ?>','time':'<?php echo time() ?>'};
-var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
-var pagenow = '<?php echo substr($pagenow, 0, -4); ?>';
+var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>', pagenow = '<?php echo substr($pagenow, 0, -4); ?>', adminpage = '<?php echo $admin_body_class; ?>';
 //]]>
 </script>
 <?php
@@ -42,14 +51,6 @@ if ( in_array( $pagenow, array('post.php', 'post-new.php', 'page.php', 'page-new
 	wp_enqueue_script('quicktags');
 }
 
-$hook_suffix = '';
-if ( isset($page_hook) )
-	$hook_suffix = "$page_hook";
-else if ( isset($plugin_page) )
-	$hook_suffix = "$plugin_page";
-else if ( isset($pagenow) )
-	$hook_suffix = "$pagenow";
-
 do_action('admin_enqueue_scripts', $hook_suffix);
 do_action("admin_print_styles-$hook_suffix");
 do_action('admin_print_styles');
@@ -57,26 +58,25 @@ do_action("admin_print_scripts-$hook_suffix");
 do_action('admin_print_scripts');
 do_action("admin_head-$hook_suffix");
 do_action('admin_head');
-?>
 
-<noscript>
-<style type="text/css">
-.hide-if-no-js{display:none}
-.hide-if-js,.closed .inside{display:block}
-</style>
-</noscript>
-<script type="text/javascript">
-(function(){
-	var ns = document.getElementsByTagName('noscript');
-	if ( ns && (ns = ns[0]) ) ns.parentNode.removeChild(ns);
-})();
-</script>
+if ( get_user_setting('mfold') == 'f' ) {
+	$admin_body_class .= ' folded';
+}
 
-<?php if ( $is_iphone ) { ?>
+if ( $is_iphone ) { ?>
 <style type="text/css">.row-actions{visibility:visible;}</style>
 <?php } ?>
 </head>
-<body class="wp-admin <?php echo apply_filters( 'admin_body_class', '' ); ?>">
+<body class="wp-admin no-js <?php echo apply_filters( 'admin_body_class', '' ) . " $admin_body_class"; ?>">
+<script type="text/javascript">
+//<![CDATA[
+(function(){
+var c = document.body.className;
+c = c.replace(/no-js/, 'js');
+document.body.className = c;
+})();
+//]]>
+</script>
 
 <div id="wpwrap">
 <div id="wpcontent">
@@ -101,7 +101,7 @@ if ( function_exists('mb_strlen') ) {
 }
 ?>
 
-<img id="header-logo" src="../wp-includes/images/blank.gif" alt="" width="32" height="32" /> <h1 <?php echo $title_class ?>><a href="<?php echo trailingslashit( get_bloginfo('url') ); ?>" title="<?php _e('Visit site') ?>"><?php echo $blog_name ?> <span>&larr; <?php _e('Visit site') ?></span></a></h1>
+<img id="header-logo" src="../wp-includes/images/blank.gif" alt="" width="32" height="32" /> <h1 id="site-heading" <?php echo $title_class ?>><a href="<?php echo trailingslashit( get_bloginfo('url') ); ?>" title="<?php _e('Visit Site') ?>"><span id="site-title"><?php echo $blog_name ?></span> <em id="site-visit-button"><?php _e('Visit Site') ?></em></a></h1>
 
 <div id="wphead-info">
 <div id="user_info">
@@ -110,13 +110,9 @@ if ( function_exists('mb_strlen') ) {
 <a href="<?php echo wp_logout_url() ?>" title="<?php _e('Log Out') ?>"><?php _e('Log Out'); ?></a></p>
 </div>
 
-<?php favorite_actions(); ?>
+<?php favorite_actions($hook_suffix); ?>
 </div>
 </div>
-
-<?php if ( get_user_setting('mfold') == 'f' ) { ?>
-<script type="text/javascript">jQuery('#wpcontent').addClass('folded');</script>
-<?php } ?>
 
 <div id="wpbody">
 <?php require(ABSPATH . 'wp-admin/menu-header.php'); ?>

@@ -1,4 +1,16 @@
 
+jQuery(document).ready(function($){
+	var h = wpCookies.getHash('TinyMCE_content_size');
+
+	if ( getUserSetting( 'editor' ) == 'html' ) {
+		if ( h )
+			$('#content').css('height', h.ch - 15 + 'px');
+	} else {
+		$('#content').css('color', 'white');
+		$('#quicktags').hide();
+	}
+});
+
 var switchEditors = {
 
 	mode : '',
@@ -8,18 +20,6 @@ var switchEditors = {
 	},
 
 	edInit : function() {
-		var h = tinymce.util.Cookie.getHash("TinyMCE_content_size");
-
-		// Activate TinyMCE if it's the user's default editor
-		if ( getUserSetting( 'editor' ) == 'html' ) {
-			if ( h )
-				try { this.I('content').style.height = h.ch - 30 + 'px'; } catch(e){};
-		} else {
-			try {
-				this.I("quicktags").style.display = "none";
-			} catch(e){};
-			tinyMCE.execCommand("mceAddControl", false, "content");
-		}
 	},
 
 	saveCallback : function(el, content, body) {
@@ -70,8 +70,9 @@ var switchEditors = {
 		content = content.replace(new RegExp('<li([^>]*)>', 'g'), '\t<li$1>');
 
 		if ( content.indexOf('<object') != -1 ) {
-			content = content.replace(new RegExp('\\s*<param([^>]*)>\\s*', 'mg'), "<param$1>");
-			content = content.replace(new RegExp('\\s*</embed>\\s*', 'mg'), '</embed>');
+			content = content.replace(/<object[\s\S]+?<\/object>/g, function(a){
+				return a.replace(/[\r\n]+/g, '');
+			});
 		}
 
 		// Unmark special paragraph closing tags
@@ -93,49 +94,60 @@ var switchEditors = {
 		id = id || 'content';
 		mode = mode || this.mode || '';
 
-		var ed = tinyMCE.get(id) || false, qt = this.I('quicktags'), H = this.I('edButtonHTML'), P = this.I('edButtonPreview'), ta = this.I(id);
+		var ed, qt = this.I('quicktags'), H = this.I('edButtonHTML'), P = this.I('edButtonPreview'), ta = this.I(id);
+
+		try { ed = tinyMCE.get(id); }
+		catch(e) { ed = false; }
 
 		if ( 'tinymce' == mode ) {
-
 			if ( ed && ! ed.isHidden() )
 				return false;
 
+			setUserSetting( 'editor', 'tinymce' );
 			this.mode = 'html';
-			ta.style.color = '#fff';
 
 			P.className = 'active';
 			H.className = '';
 			edCloseAllTags(); // :-(
-
 			qt.style.display = 'none';
 
 			ta.value = this.wpautop(ta.value);
 
-			if ( ed ) ed.show();
-			else tinyMCE.execCommand("mceAddControl", false, id);
-
-			setUserSetting( 'editor', 'tinymce' );
+			if ( ed ) {
+				ed.show();
+			} else {
+				try{tinyMCE.execCommand("mceAddControl", false, id);}
+				catch(e){}
+			}
 		} else {
-			if ( ! ed || ed.isHidden() )
-				return false;
-
+			setUserSetting( 'editor', 'html' );
+			ta.style.color = '#000';
 			this.mode = 'tinymce';
 			H.className = 'active';
 			P.className = '';
 
-			ta.style.height = ed.getContentAreaContainer().offsetHeight + 6 + 'px';
+			if ( ed && !ed.isHidden() ) {
+				ta.style.height = ed.getContentAreaContainer().offsetHeight + 24 + 'px';
+				ed.hide();
+			}
 
-			ed.hide();
 			qt.style.display = 'block';
-
-			ta.style.color = '';
-			setUserSetting( 'editor', 'html' );
 		}
 		return false;
 	},
 
 	wpautop : function(pee) {
-		var blocklist = 'table|thead|tfoot|caption|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|address|math|p|h[1-6]';
+		var blocklist = 'table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|address|math|p|h[1-6]';
+
+		if ( pee.indexOf('<object') != -1 ) {
+			pee = pee.replace(/<object[\s\S]+?<\/object>/g, function(a){
+				return a.replace(/[\r\n]+/g, '');
+			});
+		}
+
+		pee = pee.replace(/<[^<>]+>/g, function(a){
+			return a.replace(/[\r\n]+/g, ' ');
+		});
 
 		pee = pee + "\n\n";
 		pee = pee.replace(new RegExp('<br />\\s*<br />', 'gi'), "\n\n");
@@ -155,7 +167,6 @@ var switchEditors = {
 		pee = pee.replace(new RegExp('(</?(?:'+blocklist+')[^>]*>)\\s*<br />', 'gi'), "$1");
 		pee = pee.replace(new RegExp('<br />(\\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)>)', 'gi'), '$1');
 		pee = pee.replace(new RegExp('(?:<p>|<br ?/?>)*\\s*\\[caption([^\\[]+)\\[/caption\\]\\s*(?:</p>|<br ?/?>)*', 'gi'), '[caption$1[/caption]');
-		// pee = pee.replace(new RegExp('^((?:&nbsp;)*)\\s', 'mg'), '$1&nbsp;');
 
 		// Fix the pre|script tags
 		pee = pee.replace(/<(pre|script)[^>]*>[\s\S]+?<\/\1>/g, function(a) {

@@ -36,7 +36,7 @@ class WP {
 	 * @since 2.0.0
 	 * @var array
 	 */
-	var $private_query_vars = array('offset', 'posts_per_page', 'posts_per_archive_page', 'what_to_show', 'showposts', 'nopaging', 'post_type', 'post_status', 'category__in', 'category__not_in', 'category__and', 'tag__in', 'tag__not_in', 'tag__and', 'tag_slug__in', 'tag_slug__and', 'tag_id', 'post_mime_type', 'perm', 'comments_per_page');
+	var $private_query_vars = array('offset', 'posts_per_page', 'posts_per_archive_page', 'showposts', 'nopaging', 'post_type', 'post_status', 'category__in', 'category__not_in', 'category__and', 'tag__in', 'tag__not_in', 'tag__and', 'tag_slug__in', 'tag_slug__and', 'tag_id', 'post_mime_type', 'perm', 'comments_per_page');
 
 	/**
 	 * Extra query variables set by the user.
@@ -253,7 +253,7 @@ class WP {
 		$this->public_query_vars = apply_filters('query_vars', $this->public_query_vars);
 
 		foreach ( $GLOBALS['wp_taxonomies'] as $taxonomy => $t )
-			if ( isset($t->query_var) )
+			if ( $t->query_var )
 				$taxonomy_query_vars[$t->query_var] = $taxonomy;
 
 		for ($i=0; $i<count($this->public_query_vars); $i += 1) {
@@ -355,9 +355,9 @@ class WP {
 			}
 		}
 
-		$headers = apply_filters('wp_headers', $headers, $this); 
+		$headers = apply_filters('wp_headers', $headers, $this);
 
-		if ( ! empty( $status ) ) 
+		if ( ! empty( $status ) )
 			status_header( $status );
 		foreach( (array) $headers as $name => $field_value )
 			@header("{$name}: {$field_value}");
@@ -414,10 +414,10 @@ class WP {
 			$GLOBALS[$key] = $value;
 		}
 
-		$GLOBALS['query_string'] = & $this->query_string;
+		$GLOBALS['query_string'] = $this->query_string;
 		$GLOBALS['posts'] = & $wp_query->posts;
-		$GLOBALS['post'] = & $wp_query->post;
-		$GLOBALS['request'] = & $wp_query->request;
+		$GLOBALS['post'] = $wp_query->post;
+		$GLOBALS['request'] = $wp_query->request;
 
 		if ( is_single() || is_page() ) {
 			$GLOBALS['more'] = 1;
@@ -1172,20 +1172,22 @@ class Walker_Page extends Walker {
 			$indent = '';
 
 		extract($args, EXTR_SKIP);
-		$css_class = 'page_item page-item-'.$page->ID;
+		$css_class = array('page_item', 'page-item-'.$page->ID);
 		if ( !empty($current_page) ) {
 			$_current_page = get_page( $current_page );
 			if ( isset($_current_page->ancestors) && in_array($page->ID, (array) $_current_page->ancestors) )
-				$css_class .= ' current_page_ancestor';
+				$css_class[] = 'current_page_ancestor';
 			if ( $page->ID == $current_page )
-				$css_class .= ' current_page_item';
+				$css_class[] = 'current_page_item';
 			elseif ( $_current_page && $page->ID == $_current_page->post_parent )
-				$css_class .= ' current_page_parent';
+				$css_class[] = 'current_page_parent';
 		} elseif ( $page->ID == get_option('page_for_posts') ) {
-			$css_class .= ' current_page_parent';
+			$css_class[] = 'current_page_parent';
 		}
 
-		$output .= $indent . '<li class="' . $css_class . '"><a href="' . get_page_link($page->ID) . '" title="' . attribute_escape(apply_filters('the_title', $page->post_title)) . '">' . $link_before . apply_filters('the_title', $page->post_title) . $link_after . '</a>';
+		$css_class = implode(' ', apply_filters('page_css_class', $css_class, $page));
+
+		$output .= $indent . '<li class="' . $css_class . '"><a href="' . get_page_link($page->ID) . '" title="' . esc_attr(apply_filters('the_title', $page->post_title)) . '">' . $link_before . apply_filters('the_title', $page->post_title) . $link_after . '</a>';
 
 		if ( !empty($show_date) ) {
 			if ( 'modified' == $show_date )
@@ -1250,7 +1252,7 @@ class Walker_PageDropdown extends Walker {
 		if ( $page->ID == $args['selected'] )
 			$output .= ' selected="selected"';
 		$output .= '>';
-		$title = wp_specialchars($page->post_title);
+		$title = esc_html($page->post_title);
 		$output .= "$pad$title";
 		$output .= "</option>\n";
 	}
@@ -1323,13 +1325,13 @@ class Walker_Category extends Walker {
 	function start_el(&$output, $category, $depth, $args) {
 		extract($args);
 
-		$cat_name = attribute_escape( $category->name);
+		$cat_name = esc_attr( $category->name);
 		$cat_name = apply_filters( 'list_cats', $cat_name, $category );
 		$link = '<a href="' . get_category_link( $category->term_id ) . '" ';
 		if ( $use_desc_for_title == 0 || empty($category->description) )
 			$link .= 'title="' . sprintf(__( 'View all posts filed under %s' ), $cat_name) . '"';
 		else
-			$link .= 'title="' . attribute_escape( apply_filters( 'category_description', $category->description, $category )) . '"';
+			$link .= 'title="' . esc_attr( strip_tags( apply_filters( 'category_description', $category->description, $category ) ) ) . '"';
 		$link .= '>';
 		$link .= $cat_name . '</a>';
 
@@ -1587,226 +1589,6 @@ class WP_Ajax_Response {
 			echo $response;
 		echo '</wp_ajax>';
 		die();
-	}
-}
-
-/**
- * This class must be extended for each widget and WP_Widgets::widget(), WP_Widgets::update()
- * and WP_Widgets::form() need to be over-ridden.
- * 
- * @package WordPress
- * @since 2.8
- */
-class WP_Widgets {
-
-	var $id_base;         	// Root id for all widgets of this type.
-	var $name;				// Name for this widget type.
-	var $widget_options;	// Option array passed to wp_register_sidebar_widget()
-	var $control_options;	// Option array passed to wp_register_widget_control()
-
-	var $number = false;	// Unique ID number of the current instance.
-	var $id = false;		// Unique ID string of the current instance (id_base-number)
-	var $updated = false;	// Set true when we update the data after a POST submit - makes sure we don't do it twice.
-
-	// Member functions that you must over-ride.
-
-	/** Echo the actual widget content. Subclasses should over-ride this function
-	 *	to generate their widget code. */
-	function widget($args, $instance) {
-		die('function WP_Widgets::widget() must be over-ridden in a sub-class.');
-	}
-
-	/** Update a particular instance.
-	 *	This function should check that $new_instance is set correctly.
-	 *	The newly calculated value of $instance should be returned. */
-	function update($new_instance, $old_instance) {
-		die('function WP_Widgets::update() must be over-ridden in a sub-class.');
-	}
-
-	/** Echo a control form for the current instance. */
-	function form($instance) {
-		die('function WP_Widgets::form() must be over-ridden in a sub-class.');
-	}
-
-	// Functions you'll need to call.
-
-	/**
-	 * PHP4 constructor
-	 */
-	function WP_Widgets( $id_base, $name, $widget_options = array(), $control_options = array() ) {
-		$this->__construct( $id_base, $name, $widget_options, $control_options );
-	}
-
-	/**
-	 * PHP5 constructor
-	 *	 widget_options: passed to wp_register_sidebar_widget()
-	 *	 - description
-	 *	 - classname
-	 *	 control_options: passed to wp_register_widget_control()
-	 *	 - width
-	 *	 - height
-	 */
-	function __construct( $id_base, $name, $widget_options = array(), $control_options = array() ) {
-		$this->id_base = $id_base;
-		$this->name = $name;
-		$this->option_name = 'widget_' . $id_base;
-		$this->widget_options = wp_parse_args( $widget_options, array('classname' => $this->option_name) );
-		$this->control_options = wp_parse_args( $control_options, array('id_base' => $this->id_base) );
-
-		add_action( 'widgets_init', array( &$this, 'register' ) );
-	}
-
-	/** Helper function to be called by form().
-	 *	Returns an HTML name for the field. */
-	function get_field_name($field_name) {
-		return 'widget-' . $this->id_base . '[' . $this->number . '][' . $field_name . ']';
-	}
-
-	/** Helper function to be called by form().
-	 *	Returns an HTML id for the field. */
-	function get_field_id($field_name) {
-		return 'widget-' . $this->id_base . '-' . $this->number . '-' . $field_name;
-	}
-
-	/** Registers this widget-type.
-	 *	Called during the 'widgets_init' action. */
-	function register() {
-		$settings = $this->get_settings();
-
-		if ( empty($settings) ) {
-			// If there are none, we register the widget's existance with a
-			// generic template
-			$this->_set(1);
-			$this->_register_one();
-		} elseif ( is_array($settings) ) {
-			foreach ( array_keys($settings) as $number ) {
-				if ( is_numeric($number) ) {
-					$this->_set($number);
-					$this->_register_one($number);
-				}
-			}
-		}
-	}
-
-	// Private Functions. Don't worry about these.
-
-	function _set($number) {
-		$this->number = $number;
-		$this->id = $this->id_base . '-' . $number;
-	}
-
-	function _get_display_callback() {
-		return array(&$this, 'display_callback');
-	}
-
-	function _get_control_callback() {
-		return array(&$this, 'control_callback');
-	}
-
-	/** Generate the actual widget content.
-	 *	Just finds the instance and calls widget().
-	 *	Do NOT over-ride this function. */
-	function display_callback( $args, $widget_args = 1 ) {
-		if ( is_numeric($widget_args) )
-			$widget_args = array( 'number' => $widget_args );
-
-		$widget_args = wp_parse_args( $widget_args, array( 'number' => -1 ) );
-		$this->_set( $widget_args['number'] );
-		$settings = $this->get_settings();
-
-		if ( array_key_exists( $this->number, $settings ) )
-			$this->widget($args, $settings[$this->number]);
-	}
-
-	/** Deal with changed settings and generate the control form.
-	 *	Do NOT over-ride this function. */
-	function control_callback( $widget_args = 1 ) {
-		global $wp_registered_widgets;
-
-		if ( is_numeric($widget_args) )
-			$widget_args = array( 'number' => $widget_args );
-
-		$widget_args = wp_parse_args( $widget_args, array( 'number' => -1 ) );
-		$all_instances = $this->get_settings();
-
-		// We need to update the data
-		if ( !$this->updated && !empty($_POST['sidebar']) ) {
-
-			// Tells us what sidebar to put the data in
-			$sidebar = (string) $_POST['sidebar'];
-
-			$sidebars_widgets = wp_get_sidebars_widgets();
-			if ( isset($sidebars_widgets[$sidebar]) )
-				$this_sidebar =& $sidebars_widgets[$sidebar];
-			else
-				$this_sidebar = array();
-
-			foreach ( $this_sidebar as $_widget_id )	{
-				// Remove all widgets of this type from the sidebar. We'll add the
-				// new data in a second. This makes sure we don't get any duplicate
-				// data since widget ids aren't necessarily persistent across multiple
-				// updates
-				if ( $this->_get_display_callback() == $wp_registered_widgets[$_widget_id]['callback'] && isset($wp_registered_widgets[$_widget_id]['params'][0]['number']) ) {
-					$number = $wp_registered_widgets[$_widget_id]['params'][0]['number'];
-					if( !in_array( $this->id_base . '-' . $number, (array)$_POST['widget-id'] ) ) {
-						// the widget has been removed.
-						unset($all_instances[$number]);
-					}
-				}
-			}
-
-			foreach( (array) $_POST['widget-' . $this->id_base] as $number => $new_instance ) {
-				$this->_set($number);
-				if ( isset($all_instances[$number]) )
-					$instance = $this->update($new_instance, $all_instances[$number]);
-				else
-					$instance = $this->update($new_instance, array());
-
-				if ( !empty($instance) )
-					$all_instances[$number] = $instance;
-			}
-
-			$this->save_settings($all_instances);
-			$this->updated = true;
-		}
-
-		// Here we echo out the form
-		if ( -1 == $widget_args['number'] ) {
-			// We echo out a form where 'number' can be set later via JS
-			$this->_set('%i%');
-			$instance = array();
-		} else {
-			$this->_set($widget_args['number']);
-			$instance = $all_instances[ $widget_args['number'] ];
-		}
-
-		$this->form($instance);
-	}
-
-	/** Helper function: Registers a single instance. */
-	function _register_one($number = -1) {
-		wp_register_sidebar_widget(	$this->id, $this->name,	$this->_get_display_callback(), $this->widget_options, array( 'number' => $number ) );
-		wp_register_widget_control(	$this->id, $this->name,	$this->_get_control_callback(),	$this->control_options,	array( 'number' => $number ) );
-	}
-	
-	function save_settings($settings) {
-		$settings['_multiwidget'] = 1;
-		update_option( $this->option_name, $settings );
-	}
-
-	function get_settings() {
-		$settings = get_option($this->option_name);	
-
-		if ( !is_array($settings) )
-			return array();
-
-		if ( !array_key_exists('_multiwidget', $settings) ) {
-			// old format, conver if single widget
-			$settings = wp_convert_widget_settings($this->id_base, $this->option_name, $settings);
-		}
-
-		unset($settings['_multiwidget']);
-		return $settings;
 	}
 }
 

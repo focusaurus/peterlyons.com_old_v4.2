@@ -12,6 +12,7 @@ find "${WORK}" -type d -print0 | xargs -0 chmod 775
 chmod 775 "${WORK}"/overlay/etc/init.d/*
 chmod 775 "${WORK}"/overlay${APP}/AppServer
 chmod 775 "${WORK}"/bin/*.sh
+chmod 777 "${WORK}"/overlay/var/www/peterlyons.com/*blog/wp-content/cache
 echo overlaying flat files into the filesystem
 #NOTA BENE the trailing slashes in the rsync commands below are important
 rsync -aiE --delete --exclude-from="${WORK}/bin/exclude_static.txt" "${WORK}/overlay${STATIC}/" "${STATIC}"

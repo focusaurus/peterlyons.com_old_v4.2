@@ -118,7 +118,7 @@ class WP_Http {
 			}
 		}
 
-		if( has_filter('http_transport_get_debug') )
+		if ( has_filter('http_transport_get_debug') )
 			do_action('http_transport_get_debug', $working_transport, $blocking_transport, $nonblocking_transport);
 
 		if ( isset($args['blocking']) && !$args['blocking'] )
@@ -166,7 +166,7 @@ class WP_Http {
 			}
 		}
 
-		if( has_filter('http_transport_post_debug') )
+		if ( has_filter('http_transport_post_debug') )
 			do_action('http_transport_post_debug', $working_transport, $blocking_transport, $nonblocking_transport);
 
 		if ( isset($args['blocking']) && !$args['blocking'] )
@@ -239,20 +239,16 @@ class WP_Http {
 		$arrURL = parse_url($url);
 
 		if ( $this->block_request( $url ) )
-			return new WP_Error('http_request_failed', 'User has blocked requests through HTTP.');
+			return new WP_Error('http_request_failed', __('User has blocked requests through HTTP.'));
 
 		// Determine if this is a https call and pass that on to the transport functions
 		// so that we can blacklist the transports that do not support ssl verification
-		if ( $arrURL['scheme'] == 'https' || $arrURL['scheme'] == 'ssl' )
-			$r['ssl'] = true;
-		else
-			$r['ssl'] = false;
+		$r['ssl'] = $arrURL['scheme'] == 'https' || $arrURL['scheme'] == 'ssl';
 
-                // Determine if this request is to OUR install of WordPress
-                if ( stristr(get_bloginfo('url'), $arrURL['host']) )
-                        $r['local'] = true;
-                else
-                        $r['local'] = false;
+		// Determine if this request is to OUR install of WordPress
+		$homeURL = parse_url(get_bloginfo('url'));
+		$r['local'] = $homeURL['host'] == $arrURL['host'] || 'localhost' == $arrURL['host'];
+		unset($homeURL);
 
 		if ( is_null( $r['headers'] ) )
 			$r['headers'] = array();
@@ -275,7 +271,7 @@ class WP_Http {
 		// Construct Cookie: header if any cookies are set
 		WP_Http::buildCookieHeader( $r );
 
-		if( WP_Http_Encoding::is_available() )
+		if ( WP_Http_Encoding::is_available() )
 			$r['headers']['Accept-Encoding'] = WP_Http_Encoding::accept_encoding();
 
 		if ( is_null($r['body']) ) {
@@ -285,7 +281,10 @@ class WP_Http {
 			$transports = WP_Http::_getTransport($r);
 		} else {
 			if ( is_array( $r['body'] ) || is_object( $r['body'] ) ) {
-				$r['body'] = http_build_query($r['body'], null, '&');
+				if ( ! version_compare(phpversion(), '5.1.2', '>=') )
+					$r['body'] = _http_build_query($r['body'], null, '&');
+				else
+					$r['body'] = http_build_query($r['body'], null, '&');
 				$r['headers']['Content-Type'] = 'application/x-www-form-urlencoded; charset=' . get_option('blog_charset');
 				$r['headers']['Content-Length'] = strlen($r['body']);
 			}
@@ -296,17 +295,17 @@ class WP_Http {
 			$transports = WP_Http::_postTransport($r);
 		}
 
-		if( has_action('http_api_debug') )
+		if ( has_action('http_api_debug') )
 			do_action('http_api_debug', $transports, 'transports_list');
 
 		$response = array( 'headers' => array(), 'body' => '', 'response' => array('code' => false, 'message' => false), 'cookies' => array() );
-		foreach( (array) $transports as $transport ) {
+		foreach ( (array) $transports as $transport ) {
 			$response = $transport->request($url, $r);
-			
-			if( has_action('http_api_debug') )
+
+			if ( has_action('http_api_debug') )
 				do_action( 'http_api_debug', $response, 'response', get_class($transport) );
 
-			if( ! is_wp_error($response) )
+			if ( ! is_wp_error($response) )
 				return $response;
 		}
 
@@ -397,8 +396,15 @@ class WP_Http {
 	 * 					Then a numbered array is returned as the value of that header-key.
 	 */
 	function processHeaders($headers) {
-		if ( is_string($headers) )
-			$headers = explode("\n", str_replace(array("\r\n", "\r"), "\n", $headers) );
+		// split headers, one per array element
+		if ( is_string($headers) ) {
+			// tolerate line terminator: CRLF = LF (RFC 2616 19.3)
+			$headers = str_replace("\r\n", "\n", $headers);
+			// unfold folded header fields. LWS = [CRLF] 1*( SP | HT ) <US-ASCII SP, space (32)>, <US-ASCII HT, horizontal-tab (9)> (RFC 2616 2.2)
+			$headers = preg_replace('/\n[ \t]/', ' ', $headers);
+			// create the headers array
+			$headers = explode("\n", $headers);
+		}
 
 		$response = array('code' => 0, 'message' => '');
 
@@ -494,7 +500,7 @@ class WP_Http {
 
 				$body = ltrim(str_replace(array($match[0], $strBody), '', $body), "\n");
 
-				if( "0" == trim($body) )
+				if ( "0" == trim($body) )
 					return $parsedBody; // Ignore footer headers.
 			} else {
 				return $body;
@@ -510,7 +516,8 @@ class WP_Http {
 	 *
 	 * You block external URL requests by defining WP_HTTP_BLOCK_EXTERNAL in your wp-config.php file
 	 * and this will only allow localhost and your blog to make requests. The constant
-	 * WP_ACCESSABLE_HOSTS will allow additional hosts to go through for requests.
+	 * WP_ACCESSIBLE_HOSTS will allow additional hosts to go through for requests. The format of the
+	 * WP_ACCESSIBLE_HOSTS constant is a comma separated list of hostnames to allow.
 	 *
 	 * @since 2.8.0
 	 * @link http://core.trac.wordpress.org/ticket/8927 Allow preventing external requests.
@@ -537,17 +544,20 @@ class WP_Http {
 		if ( $check === false )
 			return false;
 
-		$home = parse_url( get_bloginfo('site_url') );
-		
+		$home = parse_url( get_option('siteurl') );
+
 		// Don't block requests back to ourselves by default
-		if ( $uri == 'localhost' || $uri == $home['host'] )
+		if ( $check['host'] == 'localhost' || $check['host'] == $home['host'] )
 			return apply_filters('block_local_requests', false);
 
-		if ( defined('WP_ACCESSABLE_HOSTS') && is_array( WP_ACCESSABLE_HOSTS ) && in_array( $check['host'], WP_ACCESSABLE_HOSTS ) ) {
-				return false;
-		}
+		if ( !defined('WP_ACCESSIBLE_HOSTS') )
+			return true;
 
-		return true;
+		static $accessible_hosts;
+		if ( null == $accessible_hosts )
+			$accessible_hosts = preg_split('|,\s*|', WP_ACCESSIBLE_HOSTS);
+
+		return !in_array( $check['host'], $accessible_hosts ); //Inverse logic, If its in the array, then we can't access it.
 	}
 }
 
@@ -601,18 +611,18 @@ class WP_Http_Fsockopen {
 
 		$arrURL = parse_url($url);
 
+		$fsockopen_host = $arrURL['host'];
+
 		$secure_transport = false;
 
-		if ( ! isset($arrURL['port']) ) {
-			if ( ($arrURL['scheme'] == 'ssl' || $arrURL['scheme'] == 'https') && extension_loaded('openssl') ) {
-				$arrURL['host'] = 'ssl://' . $arrURL['host'];
-				$arrURL['port'] = apply_filters('http_request_port', 443);
+		if ( ! isset( $arrURL['port'] ) ) {
+			if ( ( $arrURL['scheme'] == 'ssl' || $arrURL['scheme'] == 'https' ) && extension_loaded('openssl') ) {
+				$fsockopen_host = "ssl://$fsockopen_host";
+				$arrURL['port'] = 443;
 				$secure_transport = true;
 			} else {
-				$arrURL['port'] = apply_filters('http_request_default_port', 80);
+				$arrURL['port'] = 80;
 			}
-		} else {
-			$arrURL['port'] = apply_filters('http_request_port', $arrURL['port'], $arrURL['host']);
 		}
 
 		// There are issues with the HTTPS and SSL protocols that cause errors that can be safely
@@ -625,16 +635,15 @@ class WP_Http_Fsockopen {
 		$proxy = new WP_HTTP_Proxy();
 
 		if ( !defined('WP_DEBUG') || ( defined('WP_DEBUG') && false === WP_DEBUG ) ) {
-			if( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) )
-				$handle = @fsockopen($proxy->host(), $proxy->port(), $iError, $strError, $r['timeout'] );
+			if ( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) )
+				$handle = @fsockopen( $proxy->host(), $proxy->port(), $iError, $strError, $r['timeout'] );
 			else
-				$handle = @fsockopen($arrURL['host'], $arrURL['port'], $iError, $strError, $r['timeout'] );
-		}
-		else {
-			if( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) )
-				$handle = fsockopen($proxy->host(), $proxy->port(), $iError, $strError, $r['timeout'] );
+				$handle = @fsockopen( $fsockopen_host, $arrURL['port'], $iError, $strError, $r['timeout'] );
+		} else {
+			if ( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) )
+				$handle = fsockopen( $proxy->host(), $proxy->port(), $iError, $strError, $r['timeout'] );
 			else
-				$handle = fsockopen($arrURL['host'], $arrURL['port'], $iError, $strError, $r['timeout'] );
+				$handle = fsockopen( $fsockopen_host, $arrURL['port'], $iError, $strError, $r['timeout'] );
 		}
 
 		$endDelay = time();
@@ -648,22 +657,24 @@ class WP_Http_Fsockopen {
 		if ( false === $handle )
 			return new WP_Error('http_request_failed', $iError . ': ' . $strError);
 
-		// WordPress supports PHP 4.3, which has this function. Removed sanity checking for
-		// performance reasons.
 		stream_set_timeout($handle, $r['timeout'] );
 
-		$requestPath = $arrURL['path'] . ( isset($arrURL['query']) ? '?' . $arrURL['query'] : '' );
-		$requestPath = empty($requestPath) ? '/' : $requestPath;
+		if ( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) ) //Some proxies require full URL in this field.
+			$requestPath = $url;
+		else
+			$requestPath = $arrURL['path'] . ( isset($arrURL['query']) ? '?' . $arrURL['query'] : '' );
 
-		$strHeaders = '';
-		$strHeaders .= strtoupper($r['method']) . ' ' . $requestPath . ' HTTP/' . $r['httpversion'] . "\r\n";
+		if ( empty($requestPath) )
+			$requestPath .= '/';
 
-		if( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) )
-			$strHeaders .= 'Host: ' . $arrURL['host'] .':'. $arrURL['port'] . "\r\n";
+		$strHeaders = strtoupper($r['method']) . ' ' . $requestPath . ' HTTP/' . $r['httpversion'] . "\r\n";
+
+		if ( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) )
+			$strHeaders .= 'Host: ' . $arrURL['host'] . ':' . $arrURL['port'] . "\r\n";
 		else
 			$strHeaders .= 'Host: ' . $arrURL['host'] . "\r\n";
 
-		if( isset($r['user-agent']) )
+		if ( isset($r['user-agent']) )
 			$strHeaders .= 'User-agent: ' . $r['user-agent'] . "\r\n";
 
 		if ( is_array($r['headers']) ) {
@@ -673,9 +684,8 @@ class WP_Http_Fsockopen {
 			$strHeaders .= $r['headers'];
 		}
 
-		if ( $proxy->use_authentication() ) {
+		if ( $proxy->use_authentication() )
 			$strHeaders .= $proxy->authentication_header() . "\r\n";
-		}
 
 		$strHeaders .= "\r\n";
 
@@ -718,7 +728,7 @@ class WP_Http_Fsockopen {
 		if ( ! empty( $process['body'] ) && isset( $arrHeaders['headers']['transfer-encoding'] ) && 'chunked' == $arrHeaders['headers']['transfer-encoding'] )
 			$process['body'] = WP_Http::chunkTransferDecode($process['body']);
 
-		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($arrHeaders) )
+		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($arrHeaders['headers']) )
 			$process['body'] = WP_Http_Encoding::decompress( $process['body'] );
 
 		return array('headers' => $arrHeaders['headers'], 'body' => $process['body'], 'response' => $arrHeaders['response'], 'cookies' => $arrHeaders['cookies']);
@@ -731,14 +741,20 @@ class WP_Http_Fsockopen {
 	 * @static
 	 * @return boolean False means this class can not be used, true means it can.
 	 */
-	function test($args = array()) {
+	function test( $args = array() ) {
 		if ( false !== ($option = get_option( 'disable_fsockopen' )) && time()-$option < 43200 ) // 12 hours
 			return false;
 
-		if ( function_exists( 'fsockopen' ) && ( isset($args['ssl']) && !$args['ssl'] ) )
-			return apply_filters('use_fsockopen_transport', true);
+		$is_ssl = isset($args['ssl']) && $args['ssl'];
 
-		return false;
+		if ( ! $is_ssl && function_exists( 'fsockopen' ) )
+			$use = true;
+		elseif ( $is_ssl && extension_loaded('openssl') && function_exists( 'fsockopen' ) )
+			$use = true;
+		else
+			$use = false;
+
+		return apply_filters('use_fsockopen_transport', $use, $args);
 	}
 }
 
@@ -772,8 +788,6 @@ class WP_Http_Fopen {
 	 * @return array 'headers', 'body', 'cookies' and 'response' keys.
 	 */
 	function request($url, $args = array()) {
-		global $http_response_header;
-
 		$defaults = array(
 			'method' => 'GET', 'timeout' => 5,
 			'redirection' => 5, 'httpversion' => '1.0',
@@ -799,8 +813,6 @@ class WP_Http_Fopen {
 		if (! $handle)
 			return new WP_Error('http_request_failed', sprintf(__('Could not open handle for fopen() to %s'), $url));
 
-		// WordPress supports PHP 4.3, which has this function. Removed sanity
-		// checking for performance reasons.
 		stream_set_timeout($handle, $r['timeout'] );
 
 		if ( ! $r['blocking'] ) {
@@ -812,15 +824,14 @@ class WP_Http_Fopen {
 		while ( ! feof($handle) )
 			$strResponse .= fread($handle, 4096);
 
-		$theHeaders = '';
 		if ( function_exists('stream_get_meta_data') ) {
 			$meta = stream_get_meta_data($handle);
 			$theHeaders = $meta['wrapper_data'];
-			if( isset( $meta['wrapper_data']['headers'] ) )
+			if ( isset( $meta['wrapper_data']['headers'] ) )
 				$theHeaders = $meta['wrapper_data']['headers'];
 		} else {
-			if( ! isset( $http_response_header ) )
-				global $http_response_header;
+			//$http_response_header is a PHP reserved variable which is set in the current-scope when using the HTTP Wrapper
+			//see http://php.oregonstate.edu/manual/en/reserved.variables.httpresponseheader.php
 			$theHeaders = $http_response_header;
 		}
 
@@ -831,7 +842,7 @@ class WP_Http_Fopen {
 		if ( ! empty( $strResponse ) && isset( $processedHeaders['headers']['transfer-encoding'] ) && 'chunked' == $processedHeaders['headers']['transfer-encoding'] )
 			$strResponse = WP_Http::chunkTransferDecode($strResponse);
 
-		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($processedHeaders) )
+		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($processedHeaders['headers']) )
 			$strResponse = WP_Http_Encoding::decompress( $strResponse );
 
 		return array('headers' => $processedHeaders['headers'], 'body' => $strResponse, 'response' => $processedHeaders['response'], 'cookies' => $processedHeaders['cookies']);
@@ -844,19 +855,28 @@ class WP_Http_Fopen {
 	 * @static
 	 * @return boolean False means this class can not be used, true means it can.
 	 */
-	function test() {
+	function test($args = array()) {
 		if ( ! function_exists('fopen') || (function_exists('ini_get') && true != ini_get('allow_url_fopen')) )
 			return false;
 
-		        if (
-                                ( isset($args['ssl']) && !$args['ssl'] ) ||
-                                ( isset($args['local']) && $args['local'] == true && apply_filters('https_local_ssl_verify', true) != true ) ||
-                                ( isset($args['local']) && $args['local'] == false && apply_filters('https_ssl_verify', true) != true ) ||
-                                ( isset($args['sslverify']) && !$args['sslverify'] )
-                        )
-				return apply_filters('use_fopen_transport', true);
+		$use = true;
 
-		return false;
+		//PHP does not verify SSL certs, We can only make a request via this transports if SSL Verification is turned off.
+		$is_ssl = isset($args['ssl']) && $args['ssl'];
+		if ( $is_ssl ) {
+			$is_local = isset($args['local']) && $args['local'];
+			$ssl_verify = isset($args['sslverify']) && $args['sslverify'];
+			if ( $is_local && true != apply_filters('https_local_ssl_verify', true) )
+				$use = true;
+			elseif ( !$is_local && true != apply_filters('https_ssl_verify', true) )
+				$use = true;
+			elseif ( !$ssl_verify )
+				$use = true;
+			else
+				$use = false;
+		}
+
+		return apply_filters('use_fopen_transport', $use, $args);
 	}
 }
 
@@ -910,15 +930,22 @@ class WP_Http_Streams {
 			return new WP_Error('http_request_failed', sprintf(__('Malformed URL: %s'), $url));
 
 		if ( 'http' != $arrURL['scheme'] && 'https' != $arrURL['scheme'] )
-			$url = str_replace($arrURL['scheme'], 'http', $url);
+			$url = preg_replace('|^' . preg_quote($arrURL['scheme'], '|') . '|', 'http', $url);
 
 		// Convert Header array to string.
 		$strHeaders = '';
 		if ( is_array( $r['headers'] ) )
-			foreach( $r['headers'] as $name => $value )
+			foreach ( $r['headers'] as $name => $value )
 				$strHeaders .= "{$name}: $value\r\n";
 		else if ( is_string( $r['headers'] ) )
 			$strHeaders = $r['headers'];
+
+		$is_local = isset($args['local']) && $args['local'];
+		$ssl_verify = isset($args['sslverify']) && $args['sslverify'];
+		if ( $is_local )
+			$ssl_verify = apply_filters('https_local_ssl_verify', $ssl_verify);
+		elseif ( ! $is_local )
+			$ssl_verify = apply_filters('https_ssl_verify', $ssl_verify);
 
 		$arrContext = array('http' =>
 			array(
@@ -929,21 +956,21 @@ class WP_Http_Streams {
 				'header' => $strHeaders,
 				'timeout' => $r['timeout'],
 				'ssl' => array(
-						'verify_peer' => apply_filters('https_ssl_verify', $r['sslverify']),
-						'verify_host' => apply_filters('https_ssl_verify', $r['sslverify'])
+						'verify_peer' => $ssl_verify,
+						'verify_host' => $ssl_verify
 				)
 			)
 		);
 
 		$proxy = new WP_HTTP_Proxy();
 
-		if ( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) ) { 
-			$arrContext['http']['proxy'] = 'tcp://'.$proxy->host().':'.$proxy->port();
+		if ( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) ) {
+			$arrContext['http']['proxy'] = 'tcp://' . $proxy->host() . ':' . $proxy->port();
+			$arrContext['http']['request_fulluri'] = true;
 
 			// We only support Basic authentication so this will only work if that is what your proxy supports.
-			if ( $proxy->use_authentication() ) {
+			if ( $proxy->use_authentication() )
 				$arrContext['http']['header'] .= $proxy->authentication_header() . "\r\n";
-			}
 		}
 
 		if ( ! is_null($r['body']) && ! empty($r['body'] ) )
@@ -975,7 +1002,7 @@ class WP_Http_Streams {
 		fclose($handle);
 
 		$processedHeaders = array();
-		if( isset( $meta['wrapper_data']['headers'] ) )
+		if ( isset( $meta['wrapper_data']['headers'] ) )
 			$processedHeaders = WP_Http::processHeaders($meta['wrapper_data']['headers']);
 		else
 			$processedHeaders = WP_Http::processHeaders($meta['wrapper_data']);
@@ -983,7 +1010,7 @@ class WP_Http_Streams {
 		if ( ! empty( $strResponse ) && isset( $processedHeaders['headers']['transfer-encoding'] ) && 'chunked' == $processedHeaders['headers']['transfer-encoding'] )
 			$strResponse = WP_Http::chunkTransferDecode($strResponse);
 
-		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($processedHeaders) )
+		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($processedHeaders['headers']) )
 			$strResponse = WP_Http_Encoding::decompress( $strResponse );
 
 		return array('headers' => $processedHeaders['headers'], 'body' => $strResponse, 'response' => $processedHeaders['response'], 'cookies' => $processedHeaders['cookies']);
@@ -1005,7 +1032,19 @@ class WP_Http_Streams {
 		if ( version_compare(PHP_VERSION, '5.0', '<') )
 			return false;
 
-		return apply_filters('use_streams_transport', true);
+		//HTTPS via Proxy was added in 5.1.0
+		$is_ssl = isset($args['ssl']) && $args['ssl'];
+		if ( $is_ssl && version_compare(PHP_VERSION, '5.1.0', '<') ) {
+			$proxy = new WP_HTTP_Proxy();
+			/**
+			 * No URL check, as its not currently passed to the ::test() function
+			 * In the case where a Proxy is in use, Just bypass this transport for HTTPS.
+			 */
+			if ( $proxy->is_enabled() )
+				return false;
+		}
+
+		return apply_filters('use_streams_transport', true, $args);
 	}
 }
 
@@ -1069,7 +1108,14 @@ class WP_Http_ExtHTTP {
 		$arrURL = parse_url($url);
 
 		if ( 'http' != $arrURL['scheme'] || 'https' != $arrURL['scheme'] )
-			$url = str_replace($arrURL['scheme'], 'http', $url);
+			$url = preg_replace('|^' . preg_quote($arrURL['scheme'], '|') . '|', 'http', $url);
+
+		$is_local = isset($args['local']) && $args['local'];
+		$ssl_verify = isset($args['sslverify']) && $args['sslverify'];
+		if ( $is_local )
+			$ssl_verify = apply_filters('https_local_ssl_verify', $ssl_verify);
+		elseif ( ! $is_local )
+			$ssl_verify = apply_filters('https_ssl_verify', $ssl_verify);
 
 		$options = array(
 			'timeout' => $r['timeout'],
@@ -1077,9 +1123,9 @@ class WP_Http_ExtHTTP {
 			'redirect' => $r['redirection'],
 			'useragent' => $r['user-agent'],
 			'headers' => $r['headers'],
-			'ssl' => array( 
-				'verifypeer' => apply_filters('https_ssl_verify', $r['sslverify']),
-				'verifyhost' => apply_filters('https_ssl_verify', $r['sslverify'])
+			'ssl' => array(
+				'verifypeer' => $ssl_verify,
+				'verifyhost' => $ssl_verify
 			)
 		);
 
@@ -1120,7 +1166,7 @@ class WP_Http_ExtHTTP {
 				$theBody = http_chunked_decode($theBody);
 		}
 
-		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($theHeaders) )
+		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($theHeaders['headers']) )
 			$theBody = http_inflate( $theBody );
 
 		$theResponse = array();
@@ -1139,10 +1185,7 @@ class WP_Http_ExtHTTP {
 	 * @return boolean False means this class can not be used, true means it can.
 	 */
 	function test($args = array()) {
-		if ( function_exists('http_request') )
-			return apply_filters('use_http_extension_transport', true);
-
-		return false;
+		return apply_filters('use_http_extension_transport', function_exists('http_request'), $args );
 	}
 }
 
@@ -1199,7 +1242,6 @@ class WP_Http_Curl {
 		$proxy = new WP_HTTP_Proxy();
 
 		if ( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) ) {
-			curl_setopt( $handle, CURLOPT_HTTPPROXYTUNNEL, true );
 
 			$isPHP5 = version_compare(PHP_VERSION, '5.0.0', '>=');
 
@@ -1219,10 +1261,17 @@ class WP_Http_Curl {
 			}
 		}
 
+		$is_local = isset($args['local']) && $args['local'];
+		$ssl_verify = isset($args['sslverify']) && $args['sslverify'];
+		if ( $is_local )
+			$ssl_verify = apply_filters('https_local_ssl_verify', $ssl_verify);
+		elseif ( ! $is_local )
+			$ssl_verify = apply_filters('https_ssl_verify', $ssl_verify);
+
 		curl_setopt( $handle, CURLOPT_URL, $url);
 		curl_setopt( $handle, CURLOPT_RETURNTRANSFER, true );
-		curl_setopt( $handle, CURLOPT_SSL_VERIFYHOST, apply_filters('https_ssl_verify', $r['sslverify']) );
-		curl_setopt( $handle, CURLOPT_SSL_VERIFYPEER, apply_filters('https_ssl_verify', $r['sslverify']) );
+		curl_setopt( $handle, CURLOPT_SSL_VERIFYHOST, $ssl_verify );
+		curl_setopt( $handle, CURLOPT_SSL_VERIFYPEER, $ssl_verify );
 		curl_setopt( $handle, CURLOPT_USERAGENT, $r['user-agent'] );
 		curl_setopt( $handle, CURLOPT_CONNECTTIMEOUT, $r['timeout'] );
 		curl_setopt( $handle, CURLOPT_TIMEOUT, $r['timeout'] );
@@ -1276,7 +1325,7 @@ class WP_Http_Curl {
 
 		if ( !empty($theResponse) ) {
 			$parts = explode("\r\n\r\n", $theResponse);
-			
+
 			$headerLength = curl_getinfo($handle, CURLINFO_HEADER_SIZE);
 			$theHeaders = trim( substr($theResponse, 0, $headerLength) );
 			$theBody = substr( $theResponse, $headerLength );
@@ -1301,7 +1350,7 @@ class WP_Http_Curl {
 
 		curl_close( $handle );
 
-		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($theHeaders) )
+		if ( true === $r['decompress'] && true === WP_Http_Encoding::should_decode($theHeaders['headers']) )
 			$theBody = WP_Http_Encoding::decompress( $theBody );
 
 		return array('headers' => $theHeaders['headers'], 'body' => $theBody, 'response' => $response, 'cookies' => $theHeaders['cookies']);
@@ -1317,7 +1366,7 @@ class WP_Http_Curl {
 	 */
 	function test($args = array()) {
 		if ( function_exists('curl_init') && function_exists('curl_exec') )
-			return  apply_filters('use_curl_transport', true);
+			return apply_filters('use_curl_transport', true, $args);
 
 		return false;
 	}
@@ -1338,28 +1387,20 @@ class WP_Http_Curl {
  * <li>WP_PROXY_PASSWORD - Proxy password, if it requires authentication.</li>
  * <li>WP_PROXY_BYPASS_HOSTS - Will prevent the hosts in this list from going through the proxy.
  * You do not need to have localhost and the blog host in this list, because they will not be passed
- * through the proxy.</li>
+ * through the proxy. The list should be presented in a comma separated list</li>
  * </ol>
  *
  * An example can be as seen below.
  * <code>
  * define('WP_PROXY_HOST', '192.168.84.101');
  * define('WP_PROXY_PORT', '8080');
- * define('WP_PROXY_BYPASS_HOSTS', array('localhost', 'www.example.com'));
+ * define('WP_PROXY_BYPASS_HOSTS', 'localhost, www.example.com');
  * </code>
  *
  * @link http://core.trac.wordpress.org/ticket/4011 Proxy support ticket in WordPress.
  * @since 2.8
  */
 class WP_HTTP_Proxy {
-
-	function WP_HTTP_Proxy() {
-		$this->__construct();
-	}
-
-	function __construct() {
-		
-	}
 
 	/**
 	 * Whether proxy connection should be used.
@@ -1371,7 +1412,7 @@ class WP_HTTP_Proxy {
 	 * @return bool
 	 */
 	function is_enabled() {
-		return ( defined('WP_PROXY_HOST') && defined('WP_PROXY_PORT') );
+		return defined('WP_PROXY_HOST') && defined('WP_PROXY_PORT');
 	}
 
 	/**
@@ -1384,7 +1425,7 @@ class WP_HTTP_Proxy {
 	 * @return bool
 	 */
 	function use_authentication() {
-		return ( defined('WP_PROXY_USERNAME') && defined('WP_PROXY_PASSWORD') );
+		return defined('WP_PROXY_USERNAME') && defined('WP_PROXY_PASSWORD');
 	}
 
 	/**
@@ -1395,7 +1436,7 @@ class WP_HTTP_Proxy {
 	 * @return string
 	 */
 	function host() {
-		if( defined('WP_PROXY_HOST') )
+		if ( defined('WP_PROXY_HOST') )
 			return WP_PROXY_HOST;
 
 		return '';
@@ -1409,7 +1450,7 @@ class WP_HTTP_Proxy {
 	 * @return string
 	 */
 	function port() {
-		if( defined('WP_PROXY_PORT') )
+		if ( defined('WP_PROXY_PORT') )
 			return WP_PROXY_PORT;
 
 		return '';
@@ -1423,7 +1464,7 @@ class WP_HTTP_Proxy {
 	 * @return string
 	 */
 	function username() {
-		if( defined('WP_PROXY_USERNAME') )
+		if ( defined('WP_PROXY_USERNAME') )
 			return WP_PROXY_USERNAME;
 
 		return '';
@@ -1437,7 +1478,7 @@ class WP_HTTP_Proxy {
 	 * @return string
 	 */
 	function password() {
-		if( defined('WP_PROXY_PASSWORD') )
+		if ( defined('WP_PROXY_PASSWORD') )
 			return WP_PROXY_PASSWORD;
 
 		return '';
@@ -1451,7 +1492,7 @@ class WP_HTTP_Proxy {
 	 * @return string
 	 */
 	function authentication() {
-		return $this->username() .':'. $this->password();
+		return $this->username() . ':' . $this->password();
 	}
 
 	/**
@@ -1462,7 +1503,7 @@ class WP_HTTP_Proxy {
 	 * @return string
 	 */
 	function authentication_header() {
-		return 'Proxy-Authentication: Basic '. base64_encode( $this->authentication() );
+		return 'Proxy-Authentication: Basic ' . base64_encode( $this->authentication() );
 	}
 
 	/**
@@ -1484,23 +1525,24 @@ class WP_HTTP_Proxy {
 		$check = @parse_url($uri);
 
 		// Malformed URL, can not process, but this could mean ssl, so let through anyway.
-		if( $check === false )
+		if ( $check === false )
 			return true;
 
-		$home = parse_url( get_bloginfo('site_url') );
+		$home = parse_url( get_option('siteurl') );
 
-		if ( $uri == 'localhost' || $uri == $home['host'] )
+		if ( $check['host'] == 'localhost' || $check['host'] == $home['host'] )
 			return false;
 
-		if ( defined('WP_PROXY_BYPASS_HOSTS') && is_array( WP_PROXY_BYPASS_HOSTS ) && in_array( $check['host'], WP_PROXY_BYPASS_HOSTS ) ) {
-			return false;
-		}
+		if ( !defined('WP_PROXY_BYPASS_HOSTS') )
+			return true;
 
-		return true;
+		static $bypass_hosts;
+		if ( null == $bypass_hosts )
+			$bypass_hosts = preg_split('|,\s*|', WP_PROXY_BYPASS_HOSTS);
+
+		return !in_array( $check['host'], $bypass_hosts );
 	}
 }
-
-
 /**
  * Internal representation of a single cookie.
  *
@@ -1630,7 +1672,7 @@ class WP_Http_Cookie {
 
 	/**
 	 * Confirms that it's OK to send this cookie to the URL checked against.
-	 * 
+	 *
 	 * Decision is based on RFC 2109/2965, so look there for details on validity.
 	 *
 	 * @access public
@@ -1683,7 +1725,7 @@ class WP_Http_Cookie {
 	function getHeaderValue() {
 		if ( empty( $this->name ) || empty( $this->value ) )
 			return '';
-		
+
 		return $this->name . '=' . urlencode( $this->value );
 	}
 
@@ -1744,18 +1786,20 @@ class WP_Http_Encoding {
 	function decompress( $compressed, $length = null ) {
 		$decompressed = gzinflate( $compressed );
 
-		if( false !== $decompressed )
+		if ( false !== $decompressed )
 			return $decompressed;
 
 		$decompressed = gzuncompress( $compressed );
 
-		if( false !== $decompressed )
+		if ( false !== $decompressed )
 			return $decompressed;
 
-		$decompressed = gzdecode( $compressed );
+		if ( function_exists('gzdecode') ) {
+			$decompressed = gzdecode( $compressed );
 
-		if( false !== $decompressed )
-			return $decompressed;
+			if ( false !== $decompressed )
+				return $decompressed;
+		}
 
 		return $compressed;
 	}
@@ -1769,13 +1813,13 @@ class WP_Http_Encoding {
 	 */
 	function accept_encoding() {
 		$type = array();
-		if( function_exists( 'gzinflate' ) )
+		if ( function_exists( 'gzinflate' ) )
 			$type[] = 'deflate;q=1.0';
 
-		if( function_exists( 'gzuncompress' ) )
+		if ( function_exists( 'gzuncompress' ) )
 			$type[] = 'compress;q=0.5';
 
-		if( function_exists( 'gzdecode' ) )
+		if ( function_exists( 'gzdecode' ) )
 			$type[] = 'gzip;q=0.5';
 
 		return implode(', ', $type);
@@ -1801,8 +1845,8 @@ class WP_Http_Encoding {
 	 * @return bool
 	 */
 	function should_decode($headers) {
-		if( is_array( $headers ) ) {
-			if( array_key_exists('content-encoding', $headers) && ! empty( $headers['content-encoding'] ) )
+		if ( is_array( $headers ) ) {
+			if ( array_key_exists('content-encoding', $headers) && ! empty( $headers['content-encoding'] ) )
 				return true;
 		} else if( is_string( $headers ) ) {
 			return ( stripos($headers, 'content-encoding:') !== false );
@@ -1823,8 +1867,7 @@ class WP_Http_Encoding {
 	 * @return bool
 	 */
 	function is_available() {
-		return ( function_exists('gzuncompress') || function_exists('gzdeflate') ||
-				 function_exists('gzinflate') );
+		return ( function_exists('gzuncompress') || function_exists('gzdeflate') || function_exists('gzinflate') );
 	}
 }
 
@@ -1870,7 +1913,7 @@ function &_wp_http_get_object() {
  *
  * @param string $url Site URL to retrieve.
  * @param array $args Optional. Override the defaults.
- * @return WP_Error|string The body of the response or WP_Error on failure.
+ * @return WP_Error|array The response or WP_Error on failure.
  */
 function wp_remote_request($url, $args = array()) {
 	$objFetchSite = _wp_http_get_object();
@@ -1886,11 +1929,10 @@ function wp_remote_request($url, $args = array()) {
  *
  * @param string $url Site URL to retrieve.
  * @param array $args Optional. Override the defaults.
- * @return WP_Error|string The body of the response or WP_Error on failure.
+ * @return WP_Error|array The response or WP_Error on failure.
  */
 function wp_remote_get($url, $args = array()) {
 	$objFetchSite = _wp_http_get_object();
-
 	return $objFetchSite->get($url, $args);
 }
 
@@ -1903,7 +1945,7 @@ function wp_remote_get($url, $args = array()) {
  *
  * @param string $url Site URL to retrieve.
  * @param array $args Optional. Override the defaults.
- * @return WP_Error|string The body of the response or WP_Error on failure.
+ * @return WP_Error|array The response or WP_Error on failure.
  */
 function wp_remote_post($url, $args = array()) {
 	$objFetchSite = _wp_http_get_object();
@@ -1919,7 +1961,7 @@ function wp_remote_post($url, $args = array()) {
  *
  * @param string $url Site URL to retrieve.
  * @param array $args Optional. Override the defaults.
- * @return WP_Error|string The body of the response or WP_Error on failure.
+ * @return WP_Error|array The response or WP_Error on failure.
  */
 function wp_remote_head($url, $args = array()) {
 	$objFetchSite = _wp_http_get_object();
@@ -1935,7 +1977,7 @@ function wp_remote_head($url, $args = array()) {
  * @return array The headers of the response. Empty array if incorrect parameter given.
  */
 function wp_remote_retrieve_headers(&$response) {
-	if ( ! isset($response['headers']) || ! is_array($response['headers']))
+	if ( is_wp_error($response) || ! isset($response['headers']) || ! is_array($response['headers']))
 		return array();
 
 	return $response['headers'];
@@ -1948,10 +1990,10 @@ function wp_remote_retrieve_headers(&$response) {
  *
  * @param array $response
  * @param string $header Header name to retrieve value from.
- * @return array The header value. Empty string on if incorrect parameter given.
+ * @return string The header value. Empty string on if incorrect parameter given, or if the header doesnt exist.
  */
 function wp_remote_retrieve_header(&$response, $header) {
-	if ( ! isset($response['headers']) || ! is_array($response['headers']))
+	if ( is_wp_error($response) || ! isset($response['headers']) || ! is_array($response['headers']))
 		return '';
 
 	if ( array_key_exists($header, $response['headers']) )
@@ -1968,10 +2010,10 @@ function wp_remote_retrieve_header(&$response, $header) {
  * @since 2.7.0
  *
  * @param array $response HTTP response.
- * @return array The keys 'code' and 'message' give information on the response.
+ * @return string the response code. Empty string on incorrect parameter given.
  */
 function wp_remote_retrieve_response_code(&$response) {
-	if ( ! isset($response['response']) || ! is_array($response['response']))
+	if ( is_wp_error($response) || ! isset($response['response']) || ! is_array($response['response']))
 		return '';
 
 	return $response['response']['code'];
@@ -1985,10 +2027,10 @@ function wp_remote_retrieve_response_code(&$response) {
  * @since 2.7.0
  *
  * @param array $response HTTP response.
- * @return array The keys 'code' and 'message' give information on the response.
+ * @return string The response message. Empty string on incorrect parameter given.
  */
 function wp_remote_retrieve_response_message(&$response) {
-	if ( ! isset($response['response']) || ! is_array($response['response']))
+	if ( is_wp_error($response) || ! isset($response['response']) || ! is_array($response['response']))
 		return '';
 
 	return $response['response']['message'];
@@ -2003,7 +2045,7 @@ function wp_remote_retrieve_response_message(&$response) {
  * @return string The body of the response. Empty string if no body or incorrect parameter given.
  */
 function wp_remote_retrieve_body(&$response) {
-	if ( ! isset($response['body']) )
+	if ( is_wp_error($response) || ! isset($response['body']) )
 		return '';
 
 	return $response['body'];
