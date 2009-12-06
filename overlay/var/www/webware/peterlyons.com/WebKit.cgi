@@ -2,7 +2,7 @@
 
 # If the Webware installation is located somewhere else,
 # then set the webwareDir variable to point to it here:
-webwareDir = '/usr/local/Webware-1.0.1'
+webwareDir = '/usr/local/webware'
 
 # If you used the MakeAppWorkDir.py script to make a separate
 # application working directory, specify it here:

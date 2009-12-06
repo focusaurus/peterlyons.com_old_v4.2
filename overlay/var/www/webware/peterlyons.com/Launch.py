@@ -6,7 +6,7 @@
 # (more info in WebKit.Launch):
 
 workDir = None
-webwareDir = '/usr/local/Webware-1.0.1'
+webwareDir = '/usr/local/webware'
 libraryDirs = []
 runProfile = 0
 logFile = None

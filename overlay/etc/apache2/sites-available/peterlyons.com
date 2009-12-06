@@ -12,7 +12,7 @@
         Options Indexes
     </Location>
     <Location /app>
-        WKServer localhost 9000
+        WKServer 127.0.0.1 9000
         SetHandler webkit-handler
     </Location>
     CustomLog /var/log/apache2/www.peterlyons.com.access.log combined
