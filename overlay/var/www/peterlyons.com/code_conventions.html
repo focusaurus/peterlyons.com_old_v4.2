@@ -29,6 +29,9 @@
 <p>
 This page will document conventions I use when writing computer code.  Hopefully folks will find them helpful.  I will try to explain the reasoning behind each convention clearly. I have found the rationale omitted from many coding convention guidelines and found that to be frustrating.
 </p>
+<p>
+See also <a href="http://google-styleguide.googlecode.com/svn/trunk/pyguide.html">Google's Python Style Guide</a>.  Overall it is spot on and goes into good detail and examples.  There are a few points I disagree with, but they are not super important.  My main gripe is there are some points they assert without explaining the underlying reasoning.
+</p>
 <h1>Guiding Principles</h1>
 <p>
 All these conventions reinforce certain core tenets.
@@ -56,6 +59,9 @@ All these conventions reinforce certain core tenets.
 <h1>Thoughts on naming</h1>
 
 <p>Clear naming is absolutely critical, in my opinion.  This applies very broadly: names of products, projects, directories, files, classes, methods, functions, variables, modules, packages, etc.  Clear names make all the difference.  I often will spend ten minutes thinking about the best name for a key class or method.  The fact is, naming is something you can't avoid.  You can get away without writing comments or documentation, but every file needs a name and so does every variable.  Therefore, the absolute minimum you can do is make the names clear.  And it goes a long, long way.  Conversely, naming that is confusing or unclear from the beginning, or that becomes confusing through a refactoring without the accompanying renaming, is wasteful.  The maintainer is going to waste time (and therefore money) acting on confused assumptions based on your bad or broken names. If you have a variable called <code>serverIP</code>, which initially contains just a string IP address in dotted quad notation, and then later you refactor the code so this variable contains <code>ip:port</code>, you need to rename the variable to <code>serverIPPort</code>.  It's worth the effort to keep the code straightforward and not full of nasty surprises and tricks.
+</p>
+<p>
+<em>See also</em> <a href="http://www.oreillynet.com/onlamp/blog/2004/03/the_worlds_two_worst_variable.html">Andy Lester's article on the two worst variable names</a>.
 </p>
 
 <h1>General Guidelines</h1>
