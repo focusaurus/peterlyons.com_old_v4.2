@@ -166,7 +166,7 @@ function wp_loginout($redirect = '') {
 function wp_logout_url($redirect = '') {
 	$args = array( 'action' => 'logout' );
 	if ( !empty($redirect) ) {
-		$args['redirect_to'] = $redirect;
+		$args['redirect_to'] = urlencode( $redirect );
 	}
 
 	$logout_url = add_query_arg($args, site_url('wp-login.php', 'login'));
@@ -817,6 +817,7 @@ function wp_get_archives($args = '') {
 			$afterafter = $after;
 			foreach ( (array) $arcresults as $arcresult ) {
 				$url = get_month_link( $arcresult->year, $arcresult->month );
+				/* translators: 1: month name, 2: 4-digit year */
 				$text = sprintf(__('%1$s %2$d'), $wp_locale->get_month($arcresult->month), $arcresult->year);
 				if ( $show_post_count )
 					$after = '&nbsp;('.$arcresult->posts.')' . $afterafter;
@@ -1023,7 +1024,7 @@ function get_calendar($initial = true) {
 
 	/* translators: Calendar caption: 1: month name, 2: 4-digit year */
 	$calendar_caption = _x('%1$s %2$s', 'calendar caption');
-	echo '<table id="wp-calendar" summary="' . __('Calendar') . '">
+	echo '<table id="wp-calendar" summary="' . esc_attr__('Calendar') . '">
 	<caption>' . sprintf($calendar_caption, $wp_locale->get_month($thismonth), date('Y', $unixmonth)) . '</caption>
 	<thead>
 	<tr>';
@@ -1036,6 +1037,7 @@ function get_calendar($initial = true) {
 
 	foreach ( $myweek as $wd ) {
 		$day_name = (true == $initial) ? $wp_locale->get_weekday_initial($wd) : $wp_locale->get_weekday_abbrev($wd);
+		$wd = esc_attr($wd);
 		echo "\n\t\t<th abbr=\"$wd\" scope=\"col\" title=\"$wd\">$day_name</th>";
 	}
 
@@ -1058,8 +1060,8 @@ function get_calendar($initial = true) {
 
 	if ( $next ) {
 		echo "\n\t\t".'<td abbr="' . $wp_locale->get_month($next->month) . '" colspan="3" id="next"><a href="' .
-		get_month_link($next->year, $next->month) . '" title="' . sprintf(__('View posts for %1$s %2$s'), $wp_locale->get_month($next->month),
-			date('Y', mktime(0, 0 , 0, $next->month, 1, $next->year))) . '">' . $wp_locale->get_month_abbrev($wp_locale->get_month($next->month)) . ' &raquo;</a></td>';
+		get_month_link($next->year, $next->month) . '" title="' . esc_attr( sprintf(__('View posts for %1$s %2$s'), $wp_locale->get_month($next->month) ,
+			date('Y', mktime(0, 0 , 0, $next->month, 1, $next->year))) ) . '">' . $wp_locale->get_month_abbrev($wp_locale->get_month($next->month)) . ' &raquo;</a></td>';
 	} else {
 		echo "\n\t\t".'<td colspan="3" id="next" class="pad">&nbsp;</td>';
 	}
@@ -1116,7 +1118,7 @@ function get_calendar($initial = true) {
 	// See how much we should pad in the beginning
 	$pad = calendar_week_mod(date('w', $unixmonth)-$week_begins);
 	if ( 0 != $pad )
-		echo "\n\t\t".'<td colspan="'.$pad.'" class="pad">&nbsp;</td>';
+		echo "\n\t\t".'<td colspan="'. esc_attr($pad) .'" class="pad">&nbsp;</td>';
 
 	$daysinmonth = intval(date('t', $unixmonth));
 	for ( $day = 1; $day <= $daysinmonth; ++$day ) {
@@ -1130,7 +1132,7 @@ function get_calendar($initial = true) {
 			echo '<td>';
 
 		if ( in_array($day, $daywithpost) ) // any posts today?
-				echo '<a href="' . get_day_link($thisyear, $thismonth, $day) . "\" title=\"$ak_titles_for_day[$day]\">$day</a>";
+				echo '<a href="' . get_day_link($thisyear, $thismonth, $day) . "\" title=\"" . esc_attr($ak_titles_for_day[$day]) . "\">$day</a>";
 		else
 			echo $day;
 		echo '</td>';
@@ -1141,7 +1143,7 @@ function get_calendar($initial = true) {
 
 	$pad = 7 - calendar_week_mod(date('w', mktime(0, 0 , 0, $thismonth, $day, $thisyear))-$week_begins);
 	if ( $pad != 0 && $pad != 7 )
-		echo "\n\t\t".'<td class="pad" colspan="'.$pad.'">&nbsp;</td>';
+		echo "\n\t\t".'<td class="pad" colspan="'. esc_attr($pad) .'">&nbsp;</td>';
 
 	echo "\n\t</tr>\n\t</tbody>\n\t</table>";
 
@@ -1165,7 +1167,6 @@ add_action( 'save_post', 'delete_get_calendar_cache' );
 add_action( 'delete_post', 'delete_get_calendar_cache' );
 add_action( 'update_option_start_of_week', 'delete_get_calendar_cache' );
 add_action( 'update_option_gmt_offset', 'delete_get_calendar_cache' );
-add_action( 'update_option_start_of_week', 'delete_get_calendar_cache' );
 
 /**
  * Display all of the allowed tags in HTML format with attributes.
@@ -1704,7 +1705,7 @@ function the_editor($content, $id = 'content', $prev_id = 'title', $media_button
  * @return string
  */
 function get_search_query() {
-	return apply_filters( 'get_search_query', stripslashes( get_query_var( 's' ) ) );
+	return apply_filters( 'get_search_query', get_query_var( 's' ) );
 }
 
 /**

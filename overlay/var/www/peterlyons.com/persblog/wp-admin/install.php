@@ -49,6 +49,12 @@ header( 'Content-Type: text/html; charset=utf-8' );
 }//end function display_header();
 
 function display_setup_form( $error = null ) {
+	// Ensure that Blogs appear in search engines by default
+	$blog_public = 1;
+	if ( isset($_POST) && !empty($_POST) ) {
+		$blog_public = isset($_POST['blog_public']);
+	}
+
 	if ( ! is_null( $error ) ) {
 ?>
 <p><?php printf( __('<strong>ERROR</strong>: %s'), $error); ?></p>
@@ -62,10 +68,10 @@ function display_setup_form( $error = null ) {
 		<tr>
 			<th scope="row"><label for="admin_email"><?php _e('Your E-mail'); ?></label></th>
 			<td><input name="admin_email" type="text" id="admin_email" size="25" value="<?php echo ( isset($_POST['admin_email']) ? esc_attr($_POST['admin_email']) : '' ); ?>" /><br />
-			<?php _e('Double-check your email address before continuing.'); ?>
+			<?php _e('Double-check your email address before continuing.'); ?></td>
 		</tr>
 		<tr>
-			<td colspan="2"><label><input type="checkbox" name="blog_public" value="1"<?php if( isset($_POST) && ! empty($_POST) && isset( $_POST['blog_public'] ) ) : ?> checked="checked"<?php endif; ?> /> <?php _e('Allow my blog to appear in search engines like Google and Technorati.'); ?></label></td>
+			<td colspan="2"><label><input type="checkbox" name="blog_public" value="1" <?php checked($blog_public); ?> /> <?php _e('Allow my blog to appear in search engines like Google and Technorati.'); ?></label></td>
 		</tr>
 	</table>
 	<p class="step"><input type="submit" name="Submit" value="<?php esc_attr_e('Install WordPress'); ?>" class="button" /></p>
@@ -75,6 +81,23 @@ function display_setup_form( $error = null ) {
 
 // Let's check to make sure WP isn't already installed.
 if ( is_blog_installed() ) {display_header(); die('<h1>'.__('Already Installed').'</h1><p>'.__('You appear to have already installed WordPress. To reinstall please clear your old database tables first.').'</p></body></html>');}
+
+$php_version    = phpversion();
+$mysql_version  = $wpdb->db_version();
+$php_compat     = version_compare( $php_version, $required_php_version, '>=' );
+$mysql_compat   = version_compare( $mysql_version, $required_mysql_version, '>=' ) || file_exists( WP_CONTENT_DIR . '/db.php' );
+
+if ( !$mysql_compat && !$php_compat )
+	$compat = sprintf( __('You cannot install because WordPress %1$s requires PHP version %2$s or higher and MySQL version %3$s or higher. You are running PHP version %4$s and MySQL version %5$s.'), $wp_version, $required_php_version, $required_mysql_version, $php_version, $mysql_version );
+elseif ( !$php_compat )
+	$compat = sprintf( __('You cannot install because WordPress %1$s requires PHP version %2$s or higher. You are running version %3$s.'), $wp_version, $required_php_version, $php_version );
+elseif ( !$mysql_compat )
+	$compat = sprintf( __('You cannot install because WordPress %1$s requires MySQL version %2$s or higher. You are running version %3$s.'), $wp_version, $required_mysql_version, $mysql_version );
+
+if ( !$mysql_compat || !$php_compat ) {
+	display_header();
+	die('<h1>' . __('Insufficient Requirements') . '</h1><p>' . $compat . '</p></body></html>');
+}
 
 switch($step) {
 	case 0:

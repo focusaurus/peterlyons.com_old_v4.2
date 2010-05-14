@@ -22,7 +22,7 @@
  */
 function get_the_author($deprecated = '') {
 	global $authordata;
-	return apply_filters('the_author', $authordata->display_name);
+	return apply_filters('the_author', is_object($authordata) ? $authordata->display_name : null);
 }
 
 /**
@@ -104,7 +104,7 @@ function get_the_author_meta($field = '', $user_id = false) {
 	else
 		$value = isset($authordata->$field) ? $authordata->$field : '';
 
-	return apply_filters('get_the_author_' . $field, $value);
+	return apply_filters('get_the_author_' . $field, $value, $user_id);
 }
 
 /**
@@ -116,7 +116,7 @@ function get_the_author_meta($field = '', $user_id = false) {
  * @echo string The author's field from the current author's DB object.
  */
 function the_author_meta($field = '', $user_id = false) {
-	echo apply_filters('the_author_' . $field, get_the_author_meta($field, $user_id));
+	echo apply_filters('the_author_' . $field, get_the_author_meta($field, $user_id), $user_id);
 }
 
 /**
@@ -132,7 +132,7 @@ function the_author_meta($field = '', $user_id = false) {
  */
 function the_author_link() {
 	if ( get_the_author_meta('url') ) {
-		echo '<a href="' . get_the_author_meta('url') . '" title="' . sprintf(__("Visit %s&#8217;s website"), get_the_author()) . '" rel="external">' . get_the_author() . '</a>';
+		echo '<a href="' . get_the_author_meta('url') . '" title="' . esc_attr( sprintf(__("Visit %s&#8217;s website"), get_the_author()) ) . '" rel="external">' . get_the_author() . '</a>';
 	} else {
 		the_author();
 	}
@@ -178,12 +178,13 @@ function the_author_posts() {
  */
 function the_author_posts_link($deprecated = '') {
 	global $authordata;
-	printf(
+	$link = sprintf(
 		'<a href="%1$s" title="%2$s">%3$s</a>',
 		get_author_posts_url( $authordata->ID, $authordata->user_nicename ),
-		sprintf( __( 'Posts by %s' ), esc_attr( get_the_author() ) ),
+		esc_attr( sprintf( __( 'Posts by %s' ), get_the_author() ) ),
 		get_the_author()
 	);
+	echo apply_filters( 'the_author_posts_link', $link );
 }
 
 /**
@@ -292,7 +293,7 @@ function wp_list_authors($args = '') {
 			if ( ! $hide_empty )
 				$link = $name;
 		} else {
-			$link = '<a href="' . get_author_posts_url($author->ID, $author->user_nicename) . '" title="' . sprintf(__("Posts by %s"), esc_attr($author->display_name)) . '">' . $name . '</a>';
+			$link = '<a href="' . get_author_posts_url($author->ID, $author->user_nicename) . '" title="' . esc_attr( sprintf(__("Posts by %s"), $author->display_name) ) . '">' . $name . '</a>';
 
 			if ( (! empty($feed_image)) || (! empty($feed)) ) {
 				$link .= ' ';
@@ -301,8 +302,8 @@ function wp_list_authors($args = '') {
 				$link .= '<a href="' . get_author_feed_link($author->ID) . '"';
 
 				if ( !empty($feed) ) {
-					$title = ' title="' . $feed . '"';
-					$alt = ' alt="' . $feed . '"';
+					$title = ' title="' . esc_attr($feed) . '"';
+					$alt = ' alt="' . esc_attr($feed) . '"';
 					$name = $feed;
 					$link .= $title;
 				}
@@ -310,7 +311,7 @@ function wp_list_authors($args = '') {
 				$link .= '>';
 
 				if ( !empty($feed_image) )
-					$link .= "<img src=\"$feed_image\" style=\"border: none;\"$alt$title" . ' />';
+					$link .= "<img src=\"" . esc_url($feed_image) . "\" style=\"border: none;\"$alt$title" . ' />';
 				else
 					$link .= $name;
 

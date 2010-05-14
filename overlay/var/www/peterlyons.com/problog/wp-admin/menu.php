@@ -91,7 +91,7 @@ else
 if ( current_user_can('edit_users') ) {
 	$_wp_real_parent_file['profile.php'] = 'users.php'; // Back-compat for plugins adding submenus to profile.php.
 	$submenu['users.php'][5] = array(__('Authors &amp; Users'), 'edit_users', 'users.php');
-	$submenu['users.php'][10] = array(__('Add New'), 'create_users', 'user-new.php');
+	$submenu['users.php'][10] = array(_x('Add New', 'user'), 'create_users', 'user-new.php');
 	$submenu['users.php'][15] = array(__('Your Profile'), 'read', 'profile.php');
 } else {
 	$_wp_real_parent_file['users.php'] = 'profile.php';
@@ -198,11 +198,13 @@ do_action('admin_menu', '');
 // Remove menus that have no accessible submenus and require privs that the user does not have.
 // Run re-parent loop again.
 foreach ( $menu as $id => $data ) {
+	if ( ! current_user_can($data[1]) )
+		$_wp_menu_nopriv[$data[2]] = true;
+
 	// If submenu is empty...
 	if ( empty($submenu[$data[2]]) ) {
 		// And user doesn't have privs, remove menu.
-		if ( ! current_user_can($data[1]) ) {
-			$_wp_menu_nopriv[$data[2]] = true;
+		if ( isset( $_wp_menu_nopriv[$data[2]] ) ) {
 			unset($menu[$id]);
 		}
 	}

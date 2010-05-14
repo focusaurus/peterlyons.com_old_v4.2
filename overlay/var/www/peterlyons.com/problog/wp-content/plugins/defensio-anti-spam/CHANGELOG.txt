@@ -1,0 +1,11 @@
+2.5.0 (01-12-2010)
+  - Initial release supporting Defensio 2.0
+
+2.5.1 (01-13-2010)
+  - Fixed bug that prevented plugin from working on MU
+
+2.5.2 (01-14-2010)
+  - Fixed comment deletion bug
+
+2.5.3 (01-14-2010)
+  - Fixed bug causing admins to sometimes being notified of spam by email
