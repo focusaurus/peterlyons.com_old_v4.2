@@ -13,6 +13,7 @@ chmod 775 "${WORK}"/overlay/etc/init.d/*
 chmod 775 "${WORK}"/overlay${APP}/AppServer
 chmod 775 "${WORK}"/overlay/var/www/${SITE}/*.cgi
 chmod 775 "${WORK}"/bin/*.sh
+chmod 775 "${WORK}"/bin/*.py
 chmod 777 "${WORK}"/overlay/var/www/${SITE}/*blog/wp-content/cache
 echo overlaying flat files into the filesystem
 #NOTA BENE the trailing slashes in the rsync commands below are important

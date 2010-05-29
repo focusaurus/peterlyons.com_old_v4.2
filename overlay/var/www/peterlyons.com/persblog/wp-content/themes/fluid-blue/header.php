@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
 
 <head>
+<link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'/>
 <meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" />
 <meta name="keywords" content="peter lyons, pete lyons, computer, computers, java, software engineer, programmer, programming, Sun Certified Programmer for the Java 2 Platform, music, musician, sax, saxophone, saxophonist, sunny daze, confunktion junction, jazz, oberlin, classical" />
 <meta name="author" content="Peter Lyons" />
