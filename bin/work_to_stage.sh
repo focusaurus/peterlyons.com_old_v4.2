@@ -11,18 +11,20 @@ find "${WORK}" -type f -print0 | xargs -0 chmod 664
 find "${WORK}" -type d -print0 | xargs -0 chmod 775
 chmod 775 "${WORK}"/overlay/etc/init.d/*
 chmod 775 "${WORK}"/overlay${APP}/AppServer
-chmod 775 "${WORK}"/overlay/var/www/${SITE}/*.cgi
+#chmod 775 "${WORK}"/overlay/var/www/${SITE}/*.cgi
 chmod 775 "${WORK}"/bin/*.sh
 chmod 775 "${WORK}"/bin/*.py
-chmod 777 "${WORK}"/overlay/var/www/${SITE}/*blog/wp-content/cache
+#chmod 777 "${WORK}"/overlay/var/www/${SITE}/*blog/wp-content/cache
 echo overlaying flat files into the filesystem
 #NOTA BENE the trailing slashes in the rsync commands below are important
 rsync -aiE --delete --exclude-from="${WORK}/bin/exclude_static.txt" "${WORK}/overlay${STATIC}/" "${STATIC}"
 rsync -aiE --delete --exclude-from="${WORK}/bin/exclude_app.txt" "--exclude=*.pyc" "${WORK}/overlay${APP}/" "${APP}"
-rsync -rliE "${WORK}/overlay/etc/" /etc
+rsync -rliE --exclude-from="${WORK}/bin/exclude_etc.txt" "${WORK}/overlay/etc/" /etc
 perl -pi -e "s/ServerName.*/ServerName stage.${SITE}/" "/etc/apache2/sites-available/${SITE}"
+perl -pi -e "s/server_name.*/server_name stage.${SITE};/" "/etc/nginx/sites-available/${SITE}"
 echo saving html for quasi-dynamic pages
 "/etc/init.d/webware_${SITE}" restart
+sleep 1
 for URI in `ls ${WORK}/templates/*.tmpl | xargs -n 1 basename | sed -e s/_tmpl.tmpl// | sed -e /photos/d -e /main/d`
 do
     URL="${STAGEURL}/app/${URI}"
