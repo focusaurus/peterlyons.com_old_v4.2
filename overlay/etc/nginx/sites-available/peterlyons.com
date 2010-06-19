@@ -62,7 +62,7 @@ server {
         fastcgi_param REMOTE_PORT $remote_port;
         fastcgi_param SERVER_ADDR $server_addr;
         fastcgi_param SERVER_PORT $server_port;
-        fastcgi_param SERVER_NAME $server_name;
+        #fastcgi_param SERVER_NAME $server_name;
 
         # required if PHP was built with --enable-force-cgi-redirect
         fastcgi_param REDIRECT_STATUS 200;
