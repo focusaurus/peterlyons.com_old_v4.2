@@ -11,10 +11,10 @@
     <Location /misc/>
         Options Indexes
     </Location>
-    <Location /app>
-        WKServer 127.0.0.1 9000
-        SetHandler webkit-handler
-    </Location>
+    #<Location /app>
+    #    WKServer 127.0.0.1 9000
+    #    SetHandler webkit-handler
+    #</Location>
     CustomLog /var/log/apache2/www.peterlyons.com.access.log combined
     Errorlog /var/log/apache2/www.peterlyons.com.error.log
 
