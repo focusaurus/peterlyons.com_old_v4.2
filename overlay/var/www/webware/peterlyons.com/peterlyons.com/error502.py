@@ -1,3 +1,3 @@
 from baseservlet import baseservlet
-class oberlin(baseservlet):
+class error502(baseservlet):
     pass
