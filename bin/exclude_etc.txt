@@ -1,1 +1,3 @@
 *~
+nginx/sites-available/peterlyons.com.crt
+nginx/sites-available/peterlyons.com.key.secure
