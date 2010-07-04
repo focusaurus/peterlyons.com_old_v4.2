@@ -30,8 +30,9 @@ server {
         proxy_pass http://localhost:9100;
     }
     
-    #error_page 404 /404.html;
+    error_page 404 /error404.html;
 
+    error_page 502 /error502.html;
     # redirect server error pages to the static page /50x.html
     #
     #error_page 500 502 503 504 /50x.html;
@@ -41,30 +42,28 @@ server {
 
     # pass the PHP scripts to FastCGI server
     location ~ \.php$ {
+        include /etc/nginx/fastcgi_params;
         fastcgi_pass 127.0.0.1:9200;
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME /var/www/peterlyons.com$fastcgi_script_name;  # same path as above
-        fastcgi_param QUERY_STRING $query_string;
-        fastcgi_param REQUEST_METHOD $request_method;
-        fastcgi_param CONTENT_TYPE $content_type;
-        fastcgi_param CONTENT_LENGTH $content_length;
-
-        fastcgi_param SCRIPT_NAME $fastcgi_script_name;
-        fastcgi_param REQUEST_URI $request_uri;
-        fastcgi_param DOCUMENT_URI $document_uri;
-        fastcgi_param DOCUMENT_ROOT $document_root;
-        fastcgi_param SERVER_PROTOCOL $server_protocol;
-
-        fastcgi_param GATEWAY_INTERFACE CGI/1.1;
-        fastcgi_param SERVER_SOFTWARE nginx/$nginx_version;
-
-        fastcgi_param REMOTE_ADDR $remote_addr;
-        fastcgi_param REMOTE_PORT $remote_port;
-        fastcgi_param SERVER_ADDR $server_addr;
-        fastcgi_param SERVER_PORT $server_port;
-        #fastcgi_param SERVER_NAME $server_name;
 
         # required if PHP was built with --enable-force-cgi-redirect
         fastcgi_param REDIRECT_STATUS 200;
+    }
+}
+
+server {
+    listen 443;
+    access_log /var/log/nginx/ssl.peterlyons.com.access.log;
+    error_log /var/log/nginx/ssl.peterlyons.com.error.log;
+    ssl on;
+    ssl_certificate /etc/nginx/sites-available/peterlyons.com.crt;
+    ssl_certificate_key /etc/nginx/sites-available/peterlyons.com.key;
+    keepalive_timeout 70;
+
+    location / {
+        auth_basic "Restricted";
+        auth_basic_user_file htpasswd;
+        proxy_pass http://127.0.0.1:9300;
     }
 }

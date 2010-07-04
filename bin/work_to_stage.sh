@@ -28,6 +28,11 @@ sleep 1
 for URI in `ls ${WORK}/templates/*.tmpl | xargs -n 1 basename | sed -e s/_tmpl.tmpl// | sed -e /photos/d -e /main/d`
 do
     URL="${STAGEURL}/app/${URI}"
+    cat << EOF > "${WORK}/overlay${APP}/${SITE}/${URI}.py"
+from baseservlet import baseservlet
+class ${URI}(baseservlet):
+    pass
+EOF
     echo retrieving HTML for "${URL}"
     wget -q "${URL}" -O "${WORK}/overlay${STATIC}/${URI}.html"
     if [ "${?}" -eq "0" ]; then
