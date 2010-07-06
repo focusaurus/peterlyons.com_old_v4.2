@@ -71,7 +71,7 @@ foreach ($posts_columns as $column_name => $column_display_name ) {
 				if ( $is_trash ) echo $thumb;
 				else {
 ?>
-				<a href="media.php?action=edit&amp;attachment_id=<?php the_ID(); ?>" title="<?php echo esc_attr(sprintf(__('Edit &#8220;%s&#8221;'), $att_title)); ?>">
+				<a href="<?php echo get_edit_post_link( $post->ID, true ); ?>" title="<?php echo esc_attr(sprintf(__('Edit &#8220;%s&#8221;'), $att_title)); ?>">
 					<?php echo $thumb; ?>
 				</a>
 
@@ -84,25 +84,33 @@ foreach ($posts_columns as $column_name => $column_display_name ) {
 
 	case 'media':
 		?>
-		<td <?php echo $attributes ?>><strong><?php if ( $is_trash ) echo $att_title; else { ?><a href="<?php echo get_edit_post_link( $post->ID ); ?>" title="<?php echo esc_attr(sprintf(__('Edit &#8220;%s&#8221;'), $att_title)); ?>"><?php echo $att_title; ?></a><?php } ?></strong><br />
-		<?php echo strtoupper(preg_replace('/^.*?\.(\w+)$/', '$1', get_attached_file($post->ID))); ?>
+		<td <?php echo $attributes ?>><strong><?php if ( $is_trash ) echo $att_title; else { ?><a href="<?php echo get_edit_post_link( $post->ID, true ); ?>" title="<?php echo esc_attr(sprintf(__('Edit &#8220;%s&#8221;'), $att_title)); ?>"><?php echo $att_title; ?></a><?php } ?></strong>
 		<p>
+		<?php
+		if ( preg_match( '/^.*?\.(\w+)$/', get_attached_file( $post->ID ), $matches ) )
+			echo esc_html( strtoupper( $matches[1] ) );
+		else
+			echo strtoupper( str_replace( 'image/', '', get_post_mime_type() ) );
+		?>
+		</p>
 		<?php
 		$actions = array();
 		if ( current_user_can('edit_post', $post->ID) && !$is_trash )
 			$actions['edit'] = '<a href="' . get_edit_post_link($post->ID, true) . '">' . __('Edit') . '</a>';
 		if ( current_user_can('delete_post', $post->ID) ) {
 			if ( $is_trash )
-				$actions['untrash'] = "<a class='submitdelete' href='" . wp_nonce_url("post.php?action=untrash&amp;post=$post->ID", 'untrash-post_' . $post->ID) . "'>" . __('Restore') . "</a>";
+				$actions['untrash'] = "<a class='submitdelete' href='" . wp_nonce_url("post.php?action=untrash&amp;post=$post->ID", 'untrash-attachment_' . $post->ID) . "'>" . __('Restore') . "</a>";
 			elseif ( EMPTY_TRASH_DAYS && MEDIA_TRASH )
-				$actions['trash'] = "<a class='submitdelete' href='" . wp_nonce_url("post.php?action=trash&amp;post=$post->ID", 'trash-post_' . $post->ID) . "'>" . __('Trash') . "</a>";
+				$actions['trash'] = "<a class='submitdelete' href='" . wp_nonce_url("post.php?action=trash&amp;post=$post->ID", 'trash-attachment_' . $post->ID) . "'>" . __('Trash') . "</a>";
 			if ( $is_trash || !EMPTY_TRASH_DAYS || !MEDIA_TRASH ) {
 				$delete_ays = (!$is_trash && !MEDIA_TRASH) ? " onclick='return showNotice.warn();'" : '';
-				$actions['delete'] = "<a class='submitdelete'$delete_ays href='" . wp_nonce_url("post.php?action=delete&amp;post=$post->ID", 'delete-post_' . $post->ID) . "'>" . __('Delete Permanently') . "</a>";
+				$actions['delete'] = "<a class='submitdelete'$delete_ays href='" . wp_nonce_url("post.php?action=delete&amp;post=$post->ID", 'delete-attachment_' . $post->ID) . "'>" . __('Delete Permanently') . "</a>";
 			}
 		}
-		if ( !$is_trash )
+		if ( !$is_trash ) {
+			$title =_draft_or_post_title($post->post_parent);
 			$actions['view'] = '<a href="' . get_permalink($post->ID) . '" title="' . esc_attr(sprintf(__('View &#8220;%s&#8221;'), $title)) . '" rel="permalink">' . __('View') . '</a>';
+		}
 		$actions = apply_filters( 'media_row_actions', $actions, $post );
 		$action_count = count($actions);
 		$i = 0;
@@ -113,7 +121,7 @@ foreach ($posts_columns as $column_name => $column_display_name ) {
 			echo "<span class='$action'>$link$sep</span>";
 		}
 		echo '</div>';
-		?></p></td>
+		?></td>
 		<?php
 		break;
 

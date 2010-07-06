@@ -6,6 +6,11 @@ div.star-holder {
 	font-size: 19px;
 }
 
+div.action-links {
+	font-weight: normal;
+	margin: 6px 0 0;
+}
+
 div.star {
 	height: 100%;
 	position: absolute;
@@ -37,7 +42,11 @@ div.star img {
 	border-right: 1px solid #fff;
 }
 
-/* Start custom CSS */
+/* Table layout CSS */
+table#install-plugins th.num {
+	white-space: nowrap; /* Prevents long plugin titles from causing the version column to wrap */
+}
+
 /* Header on thickbox */
 #plugin-information-header {
 	margin: 0;

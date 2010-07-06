@@ -1,4 +1,5 @@
 <?php
+if ( !class_exists( 'SimplePie' ) ) :
 /**
  * SimplePie
  *
@@ -4066,16 +4067,16 @@ class SimplePie_Item
 					$temp = explode(':', $this->sanitize($duration_parent[0]['data'], SIMPLEPIE_CONSTRUCT_TEXT));
 					if (sizeof($temp) > 0)
 					{
-						(int) $seconds = array_pop($temp);
+						$seconds = (int) array_pop($temp);
 					}
 					if (sizeof($temp) > 0)
 					{
-						(int) $minutes = array_pop($temp);
+						$minutes = (int) array_pop($temp);
 						$seconds += $minutes * 60;
 					}
 					if (sizeof($temp) > 0)
 					{
-						(int) $hours = array_pop($temp);
+						$hours = (int) array_pop($temp);
 						$seconds += $hours * 3600;
 					}
 					unset($temp);
@@ -14997,5 +14998,5 @@ class SimplePie_Sanitize
 		}
 	}
 }
-
+endif;
 ?>

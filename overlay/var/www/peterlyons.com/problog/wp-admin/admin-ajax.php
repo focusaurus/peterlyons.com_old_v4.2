@@ -15,29 +15,34 @@ define('DOING_AJAX', true);
 define('WP_ADMIN', true);
 
 require_once('../wp-load.php');
-require_once('includes/admin.php');
+
+if ( ! isset( $_REQUEST['action'] ) )
+	die('-1');
+
+require_once('./includes/admin.php');
 @header('Content-Type: text/html; charset=' . get_option('blog_charset'));
+send_nosniff_header();
 
 do_action('admin_init');
 
 if ( ! is_user_logged_in() ) {
 
-	if ( $_POST['action'] == 'autosave' ) {
+	if ( isset( $_POST['action'] ) && $_POST['action'] == 'autosave' ) {
 		$id = isset($_POST['post_ID'])? (int) $_POST['post_ID'] : 0;
 
 		if ( ! $id )
 			die('-1');
 
-		$message = sprintf( __('<strong>ALERT: You are logged out!</strong> Could not save draft. <a href="%s" target="blank">Please log in again.</a>'), wp_login_url() );
-			$x = new WP_Ajax_Response( array(
-				'what' => 'autosave',
-				'id' => $id,
-				'data' => $message
-			) );
-			$x->send();
+		$message = sprintf( __('<strong>ALERT: You are logged out!</strong> Could not save draft. <a href="%s" target="_blank">Please log in again.</a>'), wp_login_url() );
+		$x = new WP_Ajax_Response( array(
+			'what' => 'autosave',
+			'id' => $id,
+			'data' => $message
+		) );
+		$x->send();
 	}
 
-	if ( !empty( $_REQUEST['action']) )
+	if ( !empty( $_REQUEST['action'] ) )
 		do_action( 'wp_ajax_nopriv_' . $_REQUEST['action'] );
 
 	die('-1');
@@ -93,10 +98,10 @@ case 'wp-compression-test' :
 		 } elseif ( 2 == $_GET['test'] ) {
 			if ( !isset($_SERVER['HTTP_ACCEPT_ENCODING']) )
 				die('-1');
-			if ( false !== strpos( strtolower($_SERVER['HTTP_ACCEPT_ENCODING']), 'deflate') && function_exists('gzdeflate') && ! $force_gzip ) {
+			if ( false !== stripos( $_SERVER['HTTP_ACCEPT_ENCODING'], 'deflate') && function_exists('gzdeflate') && ! $force_gzip ) {
 				header('Content-Encoding: deflate');
 				$out = gzdeflate( $test_str, 1 );
-			} elseif ( false !== strpos( strtolower($_SERVER['HTTP_ACCEPT_ENCODING']), 'gzip') && function_exists('gzencode') ) {
+			} elseif ( false !== stripos( $_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') && function_exists('gzencode') ) {
 				header('Content-Encoding: gzip');
 				$out = gzencode( $test_str, 1 );
 			} else {
@@ -121,10 +126,20 @@ case 'imgedit-preview' :
 	check_ajax_referer( "image_editor-$post_id" );
 
 	include_once( ABSPATH . 'wp-admin/includes/image-edit.php' );
-	if ( !stream_preview_image($post_id) )
+	if ( ! stream_preview_image($post_id) )
 		die('-1');
 
 	die();
+	break;
+case 'menu-quick-search':
+	if ( ! current_user_can( 'edit_theme_options' ) )
+		die('-1');
+
+	require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
+
+	_wp_ajax_menu_quick_search( $_REQUEST );
+
+	exit;
 	break;
 case 'oembed-cache' :
 	$return = ( $wp_embed->cache_oembed( $_GET['post'] ) ) ? '1' : '0';
@@ -200,6 +215,84 @@ function _wp_ajax_delete_comment_response( $comment_id ) {
 	$x->send();
 }
 
+function _wp_ajax_add_hierarchical_term() {
+	$action = $_POST['action'];
+	$taxonomy = get_taxonomy(substr($action, 4));
+	check_ajax_referer( $action, '_ajax_nonce-add-' . $taxonomy->name );
+	if ( !current_user_can( $taxonomy->cap->edit_terms ) )
+		die('-1');
+	$names = explode(',', $_POST['new'.$taxonomy->name]);
+	$parent = isset($_POST['new'.$taxonomy->name.'_parent']) ? (int) $_POST['new'.$taxonomy->name.'_parent'] : 0;
+	if ( 0 > $parent )
+		$parent = 0;
+	if ( $taxonomy->name == 'category' )
+		$post_category = isset($_POST['post_category']) ? (array) $_POST['post_category'] : array();
+	else
+		$post_category = ( isset($_POST['tax_input']) && isset($_POST['tax_input'][$taxonomy->name]) ) ? (array) $_POST['tax_input'][$taxonomy->name] : array();
+	$checked_categories = array_map( 'absint', (array) $post_category );
+	$popular_ids = wp_popular_terms_checklist($taxonomy->name, 0, 10, false);
+
+	foreach ( $names as $cat_name ) {
+		$cat_name = trim($cat_name);
+		$category_nicename = sanitize_title($cat_name);
+		if ( '' === $category_nicename )
+			continue;
+		if ( !($cat_id = term_exists($cat_name, $taxonomy->name, $parent)) ) {
+			$new_term = wp_insert_term($cat_name, $taxonomy->name, array('parent' => $parent));
+			$cat_id = $new_term['term_id'];
+		}
+		$checked_categories[] = $cat_id;
+		if ( $parent ) // Do these all at once in a second
+			continue;
+		$category = get_term( $cat_id, $taxonomy->name );
+		ob_start();
+			wp_terms_checklist( 0, array( 'taxonomy' => $taxonomy->name, 'descendants_and_self' => $cat_id, 'selected_cats' => $checked_categories, 'popular_cats' => $popular_ids ));
+		$data = ob_get_contents();
+		ob_end_clean();
+		$add = array(
+			'what' => $taxonomy->name,
+			'id' => $cat_id,
+			'data' => str_replace( array("\n", "\t"), '', $data),
+			'position' => -1
+		);
+	}
+
+	if ( $parent ) { // Foncy - replace the parent and all its children
+		$parent = get_term( $parent, $taxonomy->name );
+		$term_id = $parent->term_id;
+
+		while ( $parent->parent ) { // get the top parent
+			$parent = &get_term( $parent->parent, $taxonomy->name );
+			if ( is_wp_error( $parent ) )
+				break;
+			$term_id = $parent->term_id;
+		}
+
+		ob_start();
+			wp_terms_checklist( 0, array('taxonomy' => $taxonomy->name, 'descendants_and_self' => $term_id, 'selected_cats' => $checked_categories, 'popular_cats' => $popular_ids));
+		$data = ob_get_contents();
+		ob_end_clean();
+		$add = array(
+			'what' => $taxonomy->name,
+			'id' => $term_id,
+			'data' => str_replace( array("\n", "\t"), '', $data),
+			'position' => -1
+		);
+	}
+
+	ob_start();
+		wp_dropdown_categories( array(
+			'taxonomy' => $taxonomy->name, 'hide_empty' => 0, 'name' => 'new'.$taxonomy->name.'_parent', 'orderby' => 'name',
+			'hierarchical' => 1, 'show_option_none' => '&mdash; '.$taxonomy->labels->parent_item.' &mdash;'
+		) );
+	$sup = ob_get_contents();
+	ob_end_clean();
+	$add['supplemental'] = array( 'newcat_parent' => $sup );
+
+	$x = new WP_Ajax_Response( $add );
+	$x->send();
+}
+
 $id = isset($_POST['id'])? (int) $_POST['id'] : 0;
 switch ( $action = $_POST['action'] ) :
 case 'delete-comment' : // On success, die with time() instead of 1
@@ -237,27 +330,15 @@ case 'delete-comment' : // On success, die with time() instead of 1
 		_wp_ajax_delete_comment_response( $comment->comment_ID );
 	die( '0' );
 	break;
-case 'delete-cat' :
-	check_ajax_referer( "delete-category_$id" );
-	if ( !current_user_can( 'manage_categories' ) )
-		die('-1');
-
-	$cat = get_category( $id );
-	if ( !$cat || is_wp_error( $cat ) )
-		die('1');
-
-	if ( wp_delete_category( $id ) )
-		die('1');
-	else
-		die('0');
-	break;
 case 'delete-tag' :
 	$tag_id = (int) $_POST['tag_ID'];
 	check_ajax_referer( "delete-tag_$tag_id" );
-	if ( !current_user_can( 'manage_categories' ) )
-		die('-1');
 
 	$taxonomy = !empty($_POST['taxonomy']) ? $_POST['taxonomy'] : 'post_tag';
+	$tax = get_taxonomy($taxonomy);
+
+	if ( !current_user_can( $tax->cap->delete_terms ) )
+		die('-1');
 
 	$tag = get_term( $tag_id, $taxonomy );
 	if ( !$tag || is_wp_error( $tag ) )
@@ -409,70 +490,6 @@ case 'dim-comment' : // On success, die with time() instead of 1
 	_wp_ajax_delete_comment_response( $comment->comment_ID );
 	die( '0' );
 	break;
-case 'add-category' : // On the Fly
-	check_ajax_referer( $action );
-	if ( !current_user_can( 'manage_categories' ) )
-		die('-1');
-	$names = explode(',', $_POST['newcat']);
-	if ( 0 > $parent = (int) $_POST['newcat_parent'] )
-		$parent = 0;
-	$post_category = isset($_POST['post_category'])? (array) $_POST['post_category'] : array();
-	$checked_categories = array_map( 'absint', (array) $post_category );
-	$popular_ids = wp_popular_terms_checklist('category', 0, 10, false);
-
-	foreach ( $names as $cat_name ) {
-		$cat_name = trim($cat_name);
-		$category_nicename = sanitize_title($cat_name);
-		if ( '' === $category_nicename )
-			continue;
-		$cat_id = wp_create_category( $cat_name, $parent );
-		$checked_categories[] = $cat_id;
-		if ( $parent ) // Do these all at once in a second
-			continue;
-		$category = get_category( $cat_id );
-		ob_start();
-			wp_category_checklist( 0, $cat_id, $checked_categories, $popular_ids );
-		$data = ob_get_contents();
-		ob_end_clean();
-		$add = array(
-			'what' => 'category',
-			'id' => $cat_id,
-			'data' => str_replace( array("\n", "\t"), '', $data),
-			'position' => -1
-		);
-	}
-	if ( $parent ) { // Foncy - replace the parent and all its children
-		$parent = get_category( $parent );
-		$term_id = $parent->term_id;
-
-		while ( $parent->parent ) { // get the top parent
-			$parent = &get_category( $parent->parent );
-			if ( is_wp_error( $parent ) )
-				break;
-			$term_id = $parent->term_id;
-		}
-
-		ob_start();
-			wp_category_checklist( 0, $term_id, $checked_categories, $popular_ids, null, false );
-		$data = ob_get_contents();
-		ob_end_clean();
-		$add = array(
-			'what' => 'category',
-			'id' => $term_id,
-			'data' => str_replace( array("\n", "\t"), '', $data),
-			'position' => -1
-		);
-	}
-
-	ob_start();
-		wp_dropdown_categories( array( 'hide_empty' => 0, 'name' => 'newcat_parent', 'orderby' => 'name', 'hierarchical' => 1, 'show_option_none' => __('Parent category') ) );
-	$sup = ob_get_contents();
-	ob_end_clean();
-	$add['supplemental'] = array( 'newcat_parent' => $sup );
-
-	$x = new WP_Ajax_Response( $add );
-	$x->send();
-	break;
 case 'add-link-category' : // On the Fly
 	check_ajax_referer( $action );
 	if ( !current_user_can( 'manage_categories' ) )
@@ -484,7 +501,7 @@ case 'add-link-category' : // On the Fly
 		$slug = sanitize_title($cat_name);
 		if ( '' === $slug )
 			continue;
-		if ( !$cat_id = is_term( $cat_name, 'link_category' ) ) {
+		if ( !$cat_id = term_exists( $cat_name, 'link_category' ) ) {
 			$cat_id = wp_insert_term( $cat_name, 'link_category' );
 		}
 		$cat_id = $cat_id['term_id'];
@@ -496,59 +513,6 @@ case 'add-link-category' : // On the Fly
 			'position' => -1
 		) );
 	}
-	$x->send();
-	break;
-case 'add-cat' : // From Manage->Categories
-	check_ajax_referer( 'add-category' );
-	if ( !current_user_can( 'manage_categories' ) )
-		die('-1');
-
-	if ( '' === trim($_POST['cat_name']) ) {
-		$x = new WP_Ajax_Response( array(
-			'what' => 'cat',
-			'id' => new WP_Error( 'cat_name', __('You did not enter a category name.') )
-		) );
-		$x->send();
-	}
-
-	if ( category_exists( trim( $_POST['cat_name'] ), $_POST['category_parent'] ) ) {
-		$x = new WP_Ajax_Response( array(
-			'what' => 'cat',
-			'id' => new WP_Error( 'cat_exists', __('The category you are trying to create already exists.'), array( 'form-field' => 'cat_name' ) ),
-		) );
-		$x->send();
-	}
-
-	$cat = wp_insert_category( $_POST, true );
-
-	if ( is_wp_error($cat) ) {
-		$x = new WP_Ajax_Response( array(
-			'what' => 'cat',
-			'id' => $cat
-		) );
-		$x->send();
-	}
-
-	if ( !$cat || (!$cat = get_category( $cat )) )
-		die('0');
-
-	$level = 0;
-	$cat_full_name = $cat->name;
-	$_cat = $cat;
-	while ( $_cat->parent ) {
-		$_cat = get_category( $_cat->parent );
-		$cat_full_name = $_cat->name . ' &#8212; ' . $cat_full_name;
-		$level++;
-	}
-	$cat_full_name = esc_attr($cat_full_name);
-
-	$x = new WP_Ajax_Response( array(
-		'what' => 'cat',
-		'id' => $cat->term_id,
-		'position' => -1,
-		'data' => _cat_row( $cat, $level, $cat_full_name ),
-		'supplemental' => array('name' => $cat_full_name, 'show-link' => sprintf(__( 'Category <a href="#%s">%s</a> added' ), "cat-$cat->term_id", $cat_full_name))
-	) );
 	$x->send();
 	break;
 case 'add-link-cat' : // From Blogroll -> Categories
@@ -588,19 +552,57 @@ case 'add-link-cat' : // From Blogroll -> Categories
 	break;
 case 'add-tag' : // From Manage->Tags
 	check_ajax_referer( 'add-tag' );
-	if ( !current_user_can( 'manage_categories' ) )
-		die('-1');
 
 	$taxonomy = !empty($_POST['taxonomy']) ? $_POST['taxonomy'] : 'post_tag';
+	$tax = get_taxonomy($taxonomy);
+
+	$x = new WP_Ajax_Response();
+
+	if ( !current_user_can( $tax->cap->edit_terms ) )
+		die('-1');
+
 	$tag = wp_insert_term($_POST['tag-name'], $taxonomy, $_POST );
 
 	if ( !$tag || is_wp_error($tag) || (!$tag = get_term( $tag['term_id'], $taxonomy )) ) {
-		echo '<div class="error"><p>' . __('An error has occured. Please reload the page and try again.') . '</p></div>';
-		exit;
+		$message = __('An error has occured. Please reload the page and try again.');
+		if ( is_wp_error($tag) && $tag->get_error_message() )
+			$message = $tag->get_error_message();
+
+		$x->add( array(
+			'what' => 'taxonomy',
+			'data' => new WP_Error('error', $message )
+		) );
+		$x->send();
 	}
 
-	echo _tag_row( $tag, '', $taxonomy );
-	exit;
+	if ( isset($_POST['screen']) )
+		set_current_screen($_POST['screen']);
+
+	$level = 0;
+	$tag_full_name = false;
+	$tag_full_name = $tag->name;
+	if ( is_taxonomy_hierarchical($taxonomy) ) {
+		$_tag = $tag;
+		while ( $_tag->parent  ) {
+			$_tag = get_term( $_tag->parent, $taxonomy );
+			$tag_full_name = $_tag->name . ' &#8212; ' . $tag_full_name;
+			$level++;
+		}
+		$noparents = _tag_row( $tag, $level, $taxonomy );
+	}
+	$tag->name = $tag_full_name;
+	$parents = _tag_row( $tag, 0, $taxonomy);
+
+	$x->add( array(
+		'what' => 'taxonomy',
+		'supplemental' => compact('parents', 'noparents')
+		) );
+	$x->add( array(
+		'what' => 'term',
+		'position' => $level,
+		'supplemental' => get_term( $tag->term_id, $taxonomy, ARRAY_A ) //Refetch as $tag has been contaminated by the full name.
+		) );
+	$x->send();
 	break;
 case 'get-tagcloud' :
 	if ( !current_user_can( 'edit_posts' ) )
@@ -613,8 +615,10 @@ case 'get-tagcloud' :
 
 	$tags = get_terms( $taxonomy, array( 'number' => 45, 'orderby' => 'count', 'order' => 'DESC' ) );
 
-	if ( empty( $tags ) )
-		die( __('No tags found!') );
+	if ( empty( $tags ) ) {
+		$tax = get_taxonomy( $taxonomy );
+		die( isset( $tax->no_tagcloud ) ? $tax->no_tagcloud : __('No tags found!') );
+	}
 
 	if ( is_wp_error($tags) )
 		die($tags->get_error_message());
@@ -701,7 +705,7 @@ case 'get-comments' :
 	$x->send();
 	break;
 case 'replyto-comment' :
-	check_ajax_referer( $action );
+	check_ajax_referer( $action, '_ajax_nonce-replyto-comment' );
 
 	$comment_post_ID = (int) $_POST['comment_post_ID'];
 	if ( !current_user_can( 'edit_post', $comment_post_ID ) )
@@ -770,7 +774,7 @@ case 'replyto-comment' :
 	$x->send();
 	break;
 case 'edit-comment' :
-	check_ajax_referer( 'replyto-comment' );
+	check_ajax_referer( 'replyto-comment', '_ajax_nonce-replyto-comment' );
 
 	$comment_post_ID = (int) $_POST['comment_post_ID'];
 	if ( ! current_user_can( 'edit_post', $comment_post_ID ) )
@@ -807,20 +811,60 @@ case 'edit-comment' :
 
 	$x->send();
 	break;
+case 'add-menu-item' :
+	if ( ! current_user_can( 'edit_theme_options' ) )
+		die('-1');
+
+	check_ajax_referer( 'add-menu_item', 'menu-settings-column-nonce' );
+
+	require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
+
+	$item_ids = wp_save_nav_menu_items( 0, $_POST['menu-item'] );
+	if ( is_wp_error( $item_ids ) )
+		die('-1');
+
+	foreach ( (array) $item_ids as $menu_item_id ) {
+		$menu_obj = get_post( $menu_item_id );
+		if ( ! empty( $menu_obj->ID ) ) {
+			$menu_obj = wp_setup_nav_menu_item( $menu_obj );
+			$menu_obj->label = $menu_obj->title; // don't show "(pending)" in ajax-added items
+			$menu_items[] = $menu_obj;
+		}
+	}
+
+	if ( ! empty( $menu_items ) ) {
+		$args = array(
+			'after' => '',
+			'before' => '',
+			'link_after' => '',
+			'link_before' => '',
+			'walker' => new Walker_Nav_Menu_Edit,
+		);
+		echo walk_nav_menu_tree( $menu_items, 0, (object) $args );
+	}
+	break;
 case 'add-meta' :
-	check_ajax_referer( 'add-meta' );
+	check_ajax_referer( 'add-meta', '_ajax_nonce-add-meta' );
 	$c = 0;
 	$pid = (int) $_POST['post_id'];
+	$post = get_post( $pid );
+
 	if ( isset($_POST['metakeyselect']) || isset($_POST['metakeyinput']) ) {
 		if ( !current_user_can( 'edit_post', $pid ) )
 			die('-1');
 		if ( isset($_POST['metakeyselect']) && '#NONE#' == $_POST['metakeyselect'] && empty($_POST['metakeyinput']) )
 			die('1');
-		if ( $pid < 0 ) {
+		if ( $post->post_status == 'auto-draft' ) {
+			$save_POST = $_POST; // Backup $_POST
+			$_POST = array(); // Make it empty for edit_post()
+			$_POST['action'] = 'draft'; // Warning fix
+			$_POST['post_ID'] = $pid;
+			$_POST['post_type'] = $post->post_type;
+			$_POST['post_status'] = 'draft';
 			$now = current_time('timestamp', 1);
-			if ( $pid = wp_insert_post( array(
-				'post_title' => sprintf('Draft created on %s at %s', date(get_option('date_format'), $now), date(get_option('time_format'), $now))
-			) ) ) {
+			$_POST['post_title'] = sprintf('Draft created on %s at %s', date(get_option('date_format'), $now), date(get_option('time_format'), $now));
+
+			if ( $pid = edit_post() ) {
 				if ( is_wp_error( $pid ) ) {
 					$x = new WP_Ajax_Response( array(
 						'what' => 'meta',
@@ -828,6 +872,7 @@ case 'add-meta' :
 					) );
 					$x->send();
 				}
+				$_POST = $save_POST; // Now we can restore original $_POST again
 				if ( !$mid = add_meta( $pid ) )
 					die(__('Please provide a custom field value.'));
 			} else {
@@ -847,15 +892,19 @@ case 'add-meta' :
 			'position' => 1,
 			'supplemental' => array('postid' => $pid)
 		) );
-	} else {
+	} else { // Update?
 		$mid = (int) array_pop(array_keys($_POST['meta']));
 		$key = $_POST['meta'][$mid]['key'];
 		$value = $_POST['meta'][$mid]['value'];
+		if ( '' == trim($key) )
+			die(__('Please provide a custom field name.'));
+		if ( '' == trim($value) )
+			die(__('Please provide a custom field value.'));
 		if ( !$meta = get_post_meta_by_id( $mid ) )
 			die('0'); // if meta doesn't exist
 		if ( !current_user_can( 'edit_post', $meta->post_id ) )
 			die('-1');
-		if ( $meta->meta_value != stripslashes($value) ) {
+		if ( $meta->meta_value != stripslashes($value) || $meta->meta_key != stripslashes($key) ) {
 			if ( !$u = update_meta( $mid, $key, $value ) )
 				die('0'); // We know meta exists; we also know it's unchanged (or DB error, in which case there are bigger problems).
 		}
@@ -910,7 +959,7 @@ case 'autosave' : // The name of this action is hardcoded in edit_post()
 	global $current_user;
 
 	$_POST['post_category'] = explode(",", $_POST['catslist']);
-	if($_POST['post_type'] == 'page' || empty($_POST['post_category']))
+	if ( $_POST['post_type'] == 'page' || empty($_POST['post_category']) )
 		unset($_POST['post_category']);
 
 	$do_autosave = (bool) $_POST['autosave'];
@@ -919,64 +968,62 @@ case 'autosave' : // The name of this action is hardcoded in edit_post()
 	$data = '';
 	/* translators: draft saved date format, see http://php.net/date */
 	$draft_saved_date_format = __('g:i:s a');
-	$message = sprintf( __('Draft Saved at %s.'), date_i18n( $draft_saved_date_format ) );
+	/* translators: %s: date and time */
+	$message = sprintf( __('Draft saved at %s.'), date_i18n( $draft_saved_date_format ) );
 
 	$supplemental = array();
 	if ( isset($login_grace_period) )
 		$supplemental['session_expired'] = add_query_arg( 'interim-login', 1, wp_login_url() );
 
 	$id = $revision_id = 0;
-	if($_POST['post_ID'] < 0) {
+
+	$post_ID = (int) $_POST['post_ID'];
+	$_POST['ID'] = $post_ID;
+	$post = get_post($post_ID);
+	if ( 'auto-draft' == $post->post_status )
 		$_POST['post_status'] = 'draft';
-		$_POST['temp_ID'] = $_POST['post_ID'];
-		if ( $do_autosave ) {
-			$id = wp_write_post();
-			$data = $message;
-		}
-	} else {
-		$post_ID = (int) $_POST['post_ID'];
-		$_POST['ID'] = $post_ID;
-		$post = get_post($post_ID);
 
-		if ( $last = wp_check_post_lock( $post->ID ) ) {
-			$do_autosave = $do_lock = false;
+	if ( $last = wp_check_post_lock( $post->ID ) ) {
+		$do_autosave = $do_lock = false;
 
-			$last_user = get_userdata( $last );
-			$last_user_name = $last_user ? $last_user->display_name : __( 'Someone' );
-			$data = new WP_Error( 'locked', sprintf(
-				$_POST['post_type'] == 'page' ? __( 'Autosave disabled: %s is currently editing this page.' ) : __( 'Autosave disabled: %s is currently editing this post.' ),
-				esc_html( $last_user_name )
-			) );
+		$last_user = get_userdata( $last );
+		$last_user_name = $last_user ? $last_user->display_name : __( 'Someone' );
+		$data = new WP_Error( 'locked', sprintf(
+			$_POST['post_type'] == 'page' ? __( 'Autosave disabled: %s is currently editing this page.' ) : __( 'Autosave disabled: %s is currently editing this post.' ),
+			esc_html( $last_user_name )
+		) );
 
-			$supplemental['disable_autosave'] = 'disable';
-		}
-
-		if ( 'page' == $post->post_type ) {
-			if ( !current_user_can('edit_page', $post_ID) )
-				die(__('You are not allowed to edit this page.'));
-		} else {
-			if ( !current_user_can('edit_post', $post_ID) )
-				die(__('You are not allowed to edit this post.'));
-		}
-
-		if ( $do_autosave ) {
-			// Drafts are just overwritten by autosave
-			if ( 'draft' == $post->post_status ) {
-				$id = edit_post();
-			} else { // Non drafts are not overwritten.  The autosave is stored in a special post revision.
-				$revision_id = wp_create_post_autosave( $post->ID );
-				if ( is_wp_error($revision_id) )
-					$id = $revision_id;
-				else
-					$id = $post->ID;
-			}
-			$data = $message;
-		} else {
-			$id = $post->ID;
-		}
+		$supplemental['disable_autosave'] = 'disable';
 	}
 
-	if ( $do_lock && $id && is_numeric($id) )
+	if ( 'page' == $post->post_type ) {
+		if ( !current_user_can('edit_page', $post_ID) )
+			die(__('You are not allowed to edit this page.'));
+	} else {
+		if ( !current_user_can('edit_post', $post_ID) )
+			die(__('You are not allowed to edit this post.'));
+	}
+
+	if ( $do_autosave ) {
+		// Drafts and auto-drafts are just overwritten by autosave
+		if ( 'auto-draft' == $post->post_status || 'draft' == $post->post_status ) {
+			$id = edit_post();
+		} else { // Non drafts are not overwritten.  The autosave is stored in a special post revision.
+			$revision_id = wp_create_post_autosave( $post->ID );
+			if ( is_wp_error($revision_id) )
+				$id = $revision_id;
+			else
+				$id = $post->ID;
+		}
+		$data = $message;
+	} else {
+		if ( isset( $_POST['auto_draft'] ) && '1' == $_POST['auto_draft'] )
+			$id = 0; // This tells us it didn't actually save
+		else
+			$id = $post->ID;
+	}
+
+	if ( $do_lock && ( isset( $_POST['auto_draft'] ) && ( $_POST['auto_draft'] != '1' ) ) && $id && is_numeric($id) )
 		wp_set_post_lock( $id );
 
 	if ( $nonce_age == 2 ) {
@@ -1000,21 +1047,14 @@ case 'autosave' : // The name of this action is hardcoded in edit_post()
 	) );
 	$x->send();
 	break;
-case 'autosave-generate-nonces' :
-	check_ajax_referer( 'autosave', 'autosavenonce' );
-	$ID = (int) $_POST['post_ID'];
-	$post_type = ( 'page' == $_POST['post_type'] ) ? 'page' : 'post';
-	if ( current_user_can( "edit_{$post_type}", $ID ) )
-		die( json_encode( array( 'updateNonce' => wp_create_nonce( "update-{$post_type}_{$ID}" ), 'deleteURL' => str_replace( '&amp;', '&', wp_nonce_url( admin_url( $post_type . '.php?action=trash&post=' . $ID ), "trash-{$post_type}_{$ID}" ) ) ) ) );
-	do_action('autosave_generate_nonces');
-	die('0');
-break;
 case 'closed-postboxes' :
 	check_ajax_referer( 'closedpostboxes', 'closedpostboxesnonce' );
-	$closed = isset( $_POST['closed'] ) ? $_POST['closed'] : '';
-	$closed = explode( ',', $_POST['closed'] );
-	$hidden = isset( $_POST['hidden'] ) ? $_POST['hidden'] : '';
-	$hidden = explode( ',', $_POST['hidden'] );
+	$closed = isset( $_POST['closed'] ) ? explode( ',', $_POST['closed']) : array();
+	$closed = array_filter($closed);
+
+	$hidden = isset( $_POST['hidden'] ) ? explode( ',', $_POST['hidden']) : array();
+	$hidden = array_filter($hidden);
+
 	$page = isset( $_POST['page'] ) ? $_POST['page'] : '';
 
 	if ( !preg_match( '/^[a-z_-]+$/', $page ) )
@@ -1024,11 +1064,11 @@ case 'closed-postboxes' :
 		die('-1');
 
 	if ( is_array($closed) )
-		update_usermeta($user->ID, 'closedpostboxes_'.$page, $closed);
+		update_user_option($user->ID, "closedpostboxes_$page", $closed, true);
 
 	if ( is_array($hidden) ) {
-		$hidden = array_diff( $hidden, array('submitdiv', 'linksubmitdiv') ); // postboxes that are always shown
-		update_usermeta($user->ID, 'meta-box-hidden_'.$page, $hidden);
+		$hidden = array_diff( $hidden, array('submitdiv', 'linksubmitdiv', 'manage-menu', 'create-menu') ); // postboxes that are always shown
+		update_user_option($user->ID, "metaboxhidden_$page", $hidden, true);
 	}
 
 	die('1');
@@ -1046,8 +1086,66 @@ case 'hidden-columns' :
 		die('-1');
 
 	if ( is_array($hidden) )
-		update_usermeta($user->ID, "manage-$page-columns-hidden", $hidden);
+		update_user_option($user->ID, "manage{$page}columnshidden", $hidden, true);
 
+	die('1');
+	break;
+case 'menu-get-metabox' :
+	if ( ! current_user_can( 'edit_theme_options' ) )
+		die('-1');
+
+	require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
+
+	if ( isset( $_POST['item-type'] ) && 'post_type' == $_POST['item-type'] ) {
+		$type = 'posttype';
+		$callback = 'wp_nav_menu_item_post_type_meta_box';
+		$items = (array) get_post_types( array( 'show_in_nav_menus' => true ), 'object' );
+	} elseif ( isset( $_POST['item-type'] ) && 'taxonomy' == $_POST['item-type'] ) {
+		$type = 'taxonomy';
+		$callback = 'wp_nav_menu_item_taxonomy_meta_box';
+		$items = (array) get_taxonomies( array( 'show_ui' => true ), 'object' );
+	}
+
+	if ( ! empty( $_POST['item-object'] ) && isset( $items[$_POST['item-object']] ) ) {
+		$item = apply_filters( 'nav_menu_meta_box_object', $items[ $_POST['item-object'] ] );
+		ob_start();
+		call_user_func_array($callback, array(
+			null,
+			array(
+				'id' => 'add-' . $item->name,
+				'title' => $item->labels->name,
+				'callback' => $callback,
+				'args' => $item,
+			)
+		));
+
+		$markup = ob_get_clean();
+
+		echo json_encode(array(
+			'replace-id' => $type . '-' . $item->name,
+			'markup' => $markup,
+		));
+	}
+
+	exit;
+	break;
+case 'menu-quick-search':
+	if ( ! current_user_can( 'edit_theme_options' ) )
+		die('-1');
+
+	require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
+
+	_wp_ajax_menu_quick_search( $_REQUEST );
+
+	exit;
+	break;
+case 'menu-locations-save':
+	if ( ! current_user_can( 'edit_theme_options' ) )
+		die('-1');
+	check_ajax_referer( 'add-menu_item', 'menu-settings-column-nonce' );
+	if ( ! isset( $_POST['menu-locations'] ) )
+		die('0');
+	set_theme_mod( 'nav_menu_locations', $_POST['menu-locations'] );
 	die('1');
 	break;
 case 'meta-box-order':
@@ -1063,10 +1161,10 @@ case 'meta-box-order':
 		die('-1');
 
 	if ( $order )
-		update_user_option($user->ID, "meta-box-order_$page", $order);
+		update_user_option($user->ID, "meta-box-order_$page", $order, true);
 
 	if ( $page_columns )
-		update_usermeta($user->ID, "screen_layout_$page", $page_columns);
+		update_user_option($user->ID, "screen_layout_$page", $page_columns, true);
 
 	die('1');
 	break;
@@ -1079,7 +1177,7 @@ case 'sample-permalink':
 	check_ajax_referer( 'samplepermalink', 'samplepermalinknonce' );
 	$post_id = isset($_POST['post_id'])? intval($_POST['post_id']) : 0;
 	$title = isset($_POST['new_title'])? $_POST['new_title'] : '';
-	$slug = isset($_POST['new_slug'])? $_POST['new_slug'] : '';
+	$slug = isset($_POST['new_slug'])? $_POST['new_slug'] : null;
 	die(get_sample_permalink_html($post_id, $title, $slug));
 break;
 case 'inline-save':
@@ -1095,6 +1193,9 @@ case 'inline-save':
 		if ( ! current_user_can( 'edit_post', $post_ID ) )
 			die( __('You are not allowed to edit this post.') );
 	}
+
+	if ( isset($_POST['screen']) )
+		set_current_screen($_POST['screen']);
 
 	if ( $last = wp_check_post_lock( $post_ID ) ) {
 		$last_user = get_userdata( $last );
@@ -1135,7 +1236,7 @@ case 'inline-save':
 	if ( 'page' == $_POST['post_type'] ) {
 		$post[] = get_post($_POST['post_ID']);
 		page_rows($post);
-	} elseif ( 'post' == $_POST['post_type'] ) {
+	} elseif ( 'post' == $_POST['post_type'] || in_array($_POST['post_type'], get_post_types( array('public' => true) ) ) ) {
 		$mode = $_POST['post_view'];
 		$post[] = get_post($_POST['post_ID']);
 		post_rows($post);
@@ -1146,32 +1247,18 @@ case 'inline-save':
 case 'inline-save-tax':
 	check_ajax_referer( 'taxinlineeditnonce', '_inline_edit' );
 
-	if ( ! current_user_can('manage_categories') )
+	$taxonomy = !empty($_POST['taxonomy']) ? $_POST['taxonomy'] : false;
+	if ( ! $taxonomy )
+		die( __('Cheatin&#8217; uh?') );
+	$tax = get_taxonomy($taxonomy);
+
+	if ( ! current_user_can( $tax->cap->edit_terms ) )
 		die( __('Cheatin&#8217; uh?') );
 
 	if ( ! isset($_POST['tax_ID']) || ! ( $id = (int) $_POST['tax_ID'] ) )
 		die(-1);
 
 	switch ($_POST['tax_type']) {
-		case 'cat' :
-			$data = array();
-			$data['cat_ID'] = $id;
-			$data['cat_name'] = $_POST['name'];
-			$data['category_nicename'] = $_POST['slug'];
-			if ( isset($_POST['parent']) && (int) $_POST['parent'] > 0 )
-				$data['category_parent'] = $_POST['parent'];
-
-			$cat = get_category($id, ARRAY_A);
-			$data['category_description'] = $cat['category_description'];
-
-			$updated = wp_update_category($data);
-
-			if ( $updated && !is_wp_error($updated) )
-				echo _cat_row( $updated, 0 );
-			else
-				die( __('Category not updated.') );
-
-			break;
 		case 'link-cat' :
 			$updated = wp_update_term($id, 'link_category', $_POST);
 
@@ -1190,12 +1277,19 @@ case 'inline-save-tax':
 			$updated = wp_update_term($id, $taxonomy, $_POST);
 			if ( $updated && !is_wp_error($updated) ) {
 				$tag = get_term( $updated['term_id'], $taxonomy );
-				if ( !$tag || is_wp_error( $tag ) )
-					die( __('Tag not updated.') );
+				if ( !$tag || is_wp_error( $tag ) ) {
+					if ( is_wp_error($tag) && $tag->get_error_message() )
+						die( $tag->get_error_message() );
+					die( __('Item not updated.') );
+				}
 
-				echo _tag_row($tag, '', $taxonomy);
+				set_current_screen( 'edit-' . $taxonomy );
+
+				echo _tag_row($tag, 0, $taxonomy);
 			} else {
-				die( __('Tag not updated.') );
+				if ( is_wp_error($updated) && $updated->get_error_message() )
+					die( $updated->get_error_message() );
+				die( __('Item not updated.') );
 			}
 
 			break;
@@ -1209,7 +1303,11 @@ case 'find_posts':
 	if ( empty($_POST['ps']) )
 		exit;
 
-	$what = isset($_POST['pages']) ? 'page' : 'post';
+	if ( !empty($_POST['post_type']) && in_array( $_POST['post_type'], get_post_types() ) )
+		$what = $_POST['post_type'];
+	else
+		$what = 'post';
+
 	$s = stripslashes($_POST['ps']);
 	preg_match_all('/".*?("|$)|((?<=[\\s",+])|^)[^\\s",+]+/', $s, $matches);
 	$search_terms = array_map('_search_terms_tidy', $matches[0]);
@@ -1226,8 +1324,10 @@ case 'find_posts':
 
 	$posts = $wpdb->get_results( "SELECT ID, post_title, post_status, post_date FROM $wpdb->posts WHERE post_type = '$what' AND post_status IN ('draft', 'publish') AND ($search) ORDER BY post_date_gmt DESC LIMIT 50" );
 
-	if ( ! $posts )
-		exit( __('No posts found.') );
+	if ( ! $posts ) {
+		$posttype = get_post_type_object($what);
+		exit($posttype->labels->not_found);
+	}
 
 	$html = '<table class="widefat" cellspacing="0"><thead><tr><th class="found-radio"><br /></th><th>'.__('Title').'</th><th>'.__('Date').'</th><th>'.__('Status').'</th></tr></thead><tbody>';
 	foreach ( $posts as $post ) {
@@ -1284,7 +1384,7 @@ case 'lj-importer' :
 case 'widgets-order' :
 	check_ajax_referer( 'save-sidebar-widgets', 'savewidgets' );
 
-	if ( !current_user_can('switch_themes') )
+	if ( !current_user_can('edit_theme_options') )
 		die('-1');
 
 	unset( $_POST['savewidgets'], $_POST['action'] );
@@ -1314,7 +1414,7 @@ case 'widgets-order' :
 case 'save-widget' :
 	check_ajax_referer( 'save-sidebar-widgets', 'savewidgets' );
 
-	if ( !current_user_can('switch_themes') || !isset($_POST['id_base']) )
+	if ( !current_user_can('edit_theme_options') || !isset($_POST['id_base']) )
 		die('-1');
 
 	unset( $_POST['savewidgets'], $_POST['action'] );
@@ -1406,24 +1506,27 @@ case 'image-editor':
 	die();
 	break;
 case 'set-post-thumbnail':
-	$post_id = intval( $_POST['post_id'] );
-	if ( !current_user_can( 'edit_post', $post_id ) )
+	$post_ID = intval( $_POST['post_id'] );
+	if ( !current_user_can( 'edit_post', $post_ID ) )
 		die( '-1' );
 	$thumbnail_id = intval( $_POST['thumbnail_id'] );
 
+	check_ajax_referer( "set_post_thumbnail-$post_ID" );
+
 	if ( $thumbnail_id == '-1' ) {
-		delete_post_meta( $post_id, '_thumbnail_id' );
+		delete_post_meta( $post_ID, '_thumbnail_id' );
 		die( _wp_post_thumbnail_html() );
 	}
 
 	if ( $thumbnail_id && get_post( $thumbnail_id ) ) {
 		$thumbnail_html = wp_get_attachment_image( $thumbnail_id, 'thumbnail' );
 		if ( !empty( $thumbnail_html ) ) {
-			update_post_meta( $post_id, '_thumbnail_id', $thumbnail_id );
+			update_post_meta( $post_ID, '_thumbnail_id', $thumbnail_id );
 			die( _wp_post_thumbnail_html( $thumbnail_id ) );
 		}
 	}
 	die( '0' );
+	break;
 default :
 	do_action( 'wp_ajax_' . $_POST['action'] );
 	die('0');

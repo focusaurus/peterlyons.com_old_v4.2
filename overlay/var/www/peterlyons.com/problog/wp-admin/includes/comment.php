@@ -96,36 +96,45 @@ function get_comment_to_edit( $id ) {
 }
 
 /**
- * {@internal Missing Short Description}}
+ * Get the number of pending comments on a post or posts
  *
  * @since unknown
  * @uses $wpdb
  *
- * @param int $post_id Post ID
- * @return unknown
+ * @param int|array $post_id Either a single Post ID or an array of Post IDs
+ * @return int|array Either a single Posts pending comments as an int or an array of ints keyed on the Post IDs
  */
 function get_pending_comments_num( $post_id ) {
 	global $wpdb;
 
 	$single = false;
 	if ( !is_array($post_id) ) {
-		$post_id = (array) $post_id;
+		$post_id_array = (array) $post_id;
 		$single = true;
+	} else {
+		$post_id_array = $post_id;
 	}
-	$post_id = array_map('intval', $post_id);
-	$post_id = "'" . implode("', '", $post_id) . "'";
+	$post_id_array = array_map('intval', $post_id_array);
+	$post_id_in = "'" . implode("', '", $post_id_array) . "'";
 
-	$pending = $wpdb->get_results( "SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM $wpdb->comments WHERE comment_post_ID IN ( $post_id ) AND comment_approved = '0' GROUP BY comment_post_ID", ARRAY_N );
+	$pending = $wpdb->get_results( "SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM $wpdb->comments WHERE comment_post_ID IN ( $post_id_in ) AND comment_approved = '0' GROUP BY comment_post_ID", ARRAY_A );
 
-	if ( empty($pending) )
-		return 0;
-
-	if ( $single )
-		return $pending[0][1];
+	if ( $single ) {
+		if ( empty($pending) )
+			return 0;
+		else
+			return absint($pending[0]['num_comments']);
+	}
 
 	$pending_keyed = array();
-	foreach ( $pending as $pend )
-		$pending_keyed[$pend[0]] = $pend[1];
+
+	// Default to zero pending for all posts in request
+	foreach ( $post_id_array as $id )
+		$pending_keyed[$id] = 0;
+
+	if ( !empty($pending) )
+		foreach ( $pending as $pend )
+			$pending_keyed[$pend['comment_post_ID']] = absint($pend['num_comments']);
 
 	return $pending_keyed;
 }
@@ -133,7 +142,7 @@ function get_pending_comments_num( $post_id ) {
 /**
  * Add avatars to relevant places in admin, or try to.
  *
- * @since unknown
+ * @since 2.5.0
  * @uses $comment
  *
  * @param string $name User name.
@@ -141,16 +150,7 @@ function get_pending_comments_num( $post_id ) {
  */
 function floated_admin_avatar( $name ) {
 	global $comment;
-
-	$id = $avatar = false;
-	if ( $comment->comment_author_email )
-		$id = $comment->comment_author_email;
-	if ( $comment->user_id )
-		$id = $comment->user_id;
-
-	if ( $id )
-		$avatar = get_avatar( $id, 32 );
-
+	$avatar = get_avatar( $comment, 32 );
 	return "$avatar $name";
 }
 

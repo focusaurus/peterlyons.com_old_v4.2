@@ -12,6 +12,11 @@
  * @subpackage MagpieRSS
  */
 
+/**
+ * Deprecated. Use SimplePie (class-simplepie.php) instead.
+ */
+_deprecated_file( basename( __FILE__ ), '3.0', WPINC . '/class-simplepie.php' );
+
 /*
  * Hook to use another RSS object instead of MagpieRSS
  */
@@ -62,7 +67,7 @@ class MagpieRSS {
 		$this->parser = $parser;
 
 		# pass in parser, and a reference to this object
-		# setup handlers
+		# set up handlers
 		#
 		xml_set_object( $this->parser, $this );
 		xml_set_element_handler($this->parser,
@@ -456,7 +461,7 @@ function fetch_rss ($url) {
 
 		// else attempt a conditional get
 
-		// setup headers
+		// set up headers
 		if ( $cache_status == 'STALE' ) {
 			$rss = $cache->get( $url );
 			if ( isset($rss->etag) and $rss->last_modified ) {
@@ -535,7 +540,7 @@ endif;
  * @param array $headers Optional. Headers to send to the URL.
  * @return Snoopy style response
  */
-function _fetch_remote_file ($url, $headers = "" ) {
+function _fetch_remote_file($url, $headers = "" ) {
 	$resp = wp_remote_request($url, array('headers' => $headers, 'timeout' => MAGPIE_FETCH_TIME_OUT));
 	if ( is_wp_error($resp) ) {
 		$error = array_shift($resp->errors);
@@ -546,10 +551,23 @@ function _fetch_remote_file ($url, $headers = "" ) {
 		$resp->error = $error[0] . "\n"; //\n = Snoopy compatibility
 		return $resp;
 	}
+
+	// Snoopy returns headers unprocessed.
+	// Also note, WP_HTTP lowercases all keys, Snoopy did not.
+	$return_headers = array();
+	foreach ( $resp['headers'] as $key => $value ) {
+		if ( !is_array($value) ) {
+			$return_headers[] = "$key: $value";
+		} else {
+			foreach ( $value as $v )
+				$return_headers[] = "$key: $v";
+		}
+	}
+
 	$response = new stdClass;
 	$response->status = $resp['response']['code'];
 	$response->response_code = $resp['response']['code'];
-	$response->headers = $resp['headers'];
+	$response->headers = $return_headers;
 	$response->results = $resp['body'];
 
 	return $response;
@@ -582,11 +600,11 @@ function _response_to_rss ($resp) {
 				$val = "";
 			}
 
-			if ( $field == 'ETag' ) {
+			if ( $field == 'etag' ) {
 				$rss->etag = $val;
 			}
 
-			if ( $field == 'Last-Modified' ) {
+			if ( $field == 'last-modified' ) {
 				$rss->last_modified = $val;
 			}
 		}
@@ -606,7 +624,7 @@ function _response_to_rss ($resp) {
 }
 
 /**
- * Setup constants with default values, unless user overrides.
+ * Set up constants with default values, unless user overrides.
  *
  * @since unknown
  * @package External
@@ -710,7 +728,6 @@ class RSSCache {
 	Output:		true on sucess
 \*=======================================================================*/
 	function set ($url, $rss) {
-		global $wpdb;
 		$cache_option = 'rss_' . $this->file_name( $url );
 
 		set_transient($cache_option, $rss, $this->MAX_AGE);

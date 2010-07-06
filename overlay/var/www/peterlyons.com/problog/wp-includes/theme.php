@@ -7,6 +7,17 @@
  */
 
 /**
+ * Whether a child theme is in use.
+ *
+ * @since 3.0.0
+ *
+ * @return bool true if a child theme is in use, false otherwise.
+ **/
+function is_child_theme() {
+	return ( TEMPLATEPATH !== STYLESHEETPATH );
+}
+
+/**
  * Retrieve name of the current stylesheet.
  *
  * The theme name that the administrator has currently set the front end theme
@@ -170,15 +181,15 @@ function get_template_directory_uri() {
  * @return array Theme data.
  */
 function get_theme_data( $theme_file ) {
-	$default_headers = array( 
-		'Name' => 'Theme Name', 
-		'URI' => 'Theme URI', 
-		'Description' => 'Description', 
-		'Author' => 'Author', 
+	$default_headers = array(
+		'Name' => 'Theme Name',
+		'URI' => 'Theme URI',
+		'Description' => 'Description',
+		'Author' => 'Author',
 		'AuthorURI' => 'Author URI',
-		'Version' => 'Version', 
-		'Template' => 'Template', 
-		'Status' => 'Status', 
+		'Version' => 'Version',
+		'Template' => 'Template',
+		'Status' => 'Status',
 		'Tags' => 'Tags'
 		);
 
@@ -222,12 +233,13 @@ function get_theme_data( $theme_file ) {
 		$theme_data['Tags'] = array_map( 'trim', explode( ',', wp_kses( $theme_data['Tags'], array() ) ) );
 
 	if ( $theme_data['Author'] == '' ) {
-		$theme_data['Author'] = __('Anonymous');
+		$theme_data['Author'] = $theme_data['AuthorName'] = __('Anonymous');
 	} else {
+		$theme_data['AuthorName'] = wp_kses( $theme_data['Author'], $themes_allowed_tags );
 		if ( empty( $theme_data['AuthorURI'] ) ) {
-			$theme_data['Author'] = wp_kses( $theme_data['Author'], $themes_allowed_tags );
+			$theme_data['Author'] = $theme_data['AuthorName'];
 		} else {
-			$theme_data['Author'] = sprintf( '<a href="%1$s" title="%2$s">%3$s</a>', $theme_data['AuthorURI'], __( 'Visit author homepage' ), wp_kses( $theme_data['Author'], $themes_allowed_tags ) );
+			$theme_data['Author'] = sprintf( '<a href="%1$s" title="%2$s">%3$s</a>', $theme_data['AuthorURI'], __( 'Visit author homepage' ), $theme_data['AuthorName'] );
 		}
 	}
 
@@ -297,6 +309,8 @@ function get_themes() {
 			$title = $name;
 		}
 
+		$parent_template = $template;
+
 		if ( empty($template) ) {
 			if ( file_exists("$theme_root/$stylesheet/index.php") )
 				$template = $stylesheet;
@@ -319,7 +333,10 @@ function get_themes() {
 				if ( isset($theme_files[$template]) && file_exists( $theme_files[$template]['theme_root'] . "/$template/index.php" ) ) {
 					$template_directory = $theme_files[$template]['theme_root'] . "/$template";
 				} else {
-					$wp_broken_themes[$name] = array('Name' => $name, 'Title' => $title, 'Description' => __('Template is missing.'));
+					if ( empty( $parent_template) )
+						$wp_broken_themes[$name] = array('Name' => $name, 'Title' => $title, 'Description' => __('Template is missing.'), 'error' => 'no_template');
+					else
+						$wp_broken_themes[$name] = array('Name' => $name, 'Title' => $title, 'Description' => sprintf( __('The parent theme is missing. Please install the "%s" parent theme.'),  $parent_template ), 'error' => 'no_parent', 'parent' => $parent_template );
 					continue;
 				}
 
@@ -370,7 +387,7 @@ function get_themes() {
 		//Make unique and remove duplicates when stylesheet and template are the same i.e. most themes
 		$template_files = array_unique($template_files);
 		$stylesheet_files = array_unique($stylesheet_files);
-			
+
 		$template_dir = dirname($template_files[0]);
 		$stylesheet_dir = dirname($stylesheet_files[0]);
 
@@ -398,7 +415,26 @@ function get_themes() {
 		}
 
 		$theme_roots[$stylesheet] = str_replace( WP_CONTENT_DIR, '', $theme_root );
-		$wp_themes[$name] = array( 'Name' => $name, 'Title' => $title, 'Description' => $description, 'Author' => $author, 'Version' => $version, 'Template' => $template, 'Stylesheet' => $stylesheet, 'Template Files' => $template_files, 'Stylesheet Files' => $stylesheet_files, 'Template Dir' => $template_dir, 'Stylesheet Dir' => $stylesheet_dir, 'Status' => $theme_data['Status'], 'Screenshot' => $screenshot, 'Tags' => $theme_data['Tags'], 'Theme Root' => $theme_root, 'Theme Root URI' => str_replace( WP_CONTENT_DIR, content_url(), $theme_root ) );
+		$wp_themes[$name] = array(
+			'Name' => $name,
+			'Title' => $title,
+			'Description' => $description,
+			'Author' => $author,
+			'Author Name' => $theme_data['AuthorName'],
+			'Author URI' => $theme_data['AuthorURI'],
+			'Version' => $version,
+			'Template' => $template,
+			'Stylesheet' => $stylesheet,
+			'Template Files' => $template_files,
+			'Stylesheet Files' => $stylesheet_files,
+			'Template Dir' => $template_dir,
+			'Stylesheet Dir' => $stylesheet_dir,
+			'Status' => $theme_data['Status'],
+			'Screenshot' => $screenshot,
+			'Tags' => $theme_data['Tags'],
+			'Theme Root' => $theme_root,
+			'Theme Root URI' => str_replace( WP_CONTENT_DIR, content_url(), $theme_root ),
+		);
 	}
 
 	unset($theme_files);
@@ -592,14 +628,13 @@ function search_theme_directories() {
 							@closedir($stylish_dir);
 						}
 					}
-					@closedir($theme_subdir);
+					@closedir($theme_subdirs);
 					if ( !$found_subdir_themes )
 						$wp_broken_themes[$theme_dir] = array('Name' => $theme_dir, 'Title' => $theme_dir, 'Description' => __('Stylesheet is missing.'));
 				}
 			}
 		}
-		if ( is_dir( $theme_dir ) )
-			@closedir( $theme_dir );
+		@closedir( $themes_dir );
 	}
 	return $theme_files;
 }
@@ -619,7 +654,7 @@ function get_theme_root( $stylesheet_or_template = false ) {
 	if ($stylesheet_or_template) {
 		$theme_roots = get_theme_roots();
 
-		if ( $theme_roots[$stylesheet_or_template] )
+		if ( ! empty( $theme_roots[$stylesheet_or_template] ) )
 			$theme_root = WP_CONTENT_DIR . $theme_roots[$stylesheet_or_template];
 		else
 			$theme_root = WP_CONTENT_DIR . '/themes';
@@ -643,7 +678,7 @@ function get_theme_root( $stylesheet_or_template = false ) {
 function get_theme_root_uri( $stylesheet_or_template = false ) {
 	$theme_roots = get_theme_roots();
 
-	if ( $theme_roots[$stylesheet_or_template] )
+	if ( isset( $theme_roots[$stylesheet_or_template] ) && $theme_roots[$stylesheet_or_template] )
 		$theme_root_uri = content_url( $theme_roots[$stylesheet_or_template] );
 	else
 		$theme_root_uri = content_url( 'themes' );
@@ -681,6 +716,17 @@ function get_query_template($type) {
 }
 
 /**
+ * Retrieve path of index template in current or parent template.
+ *
+ * @since 3.0.0
+ *
+ * @return string
+ */
+function get_index_template() {
+	return get_query_template('index');
+}
+
+/**
  * Retrieve path of 404 template in current or parent template.
  *
  * @since 1.5.0
@@ -710,7 +756,20 @@ function get_archive_template() {
  * @return string
  */
 function get_author_template() {
-	return get_query_template('author');
+	$author_id = absint( get_query_var( 'author' ) );
+	$author = get_user_by( 'id', $author_id );
+	$author = $author->user_nicename;
+
+	$templates = array();
+
+	if ( $author )
+		$templates[] = "author-{$author}.php";
+	if ( $author_id )
+		$templates[] = "author-{$author_id}.php";
+	$templates[] = 'author.php';
+
+	$template = locate_template( $templates );
+	return apply_filters( 'author_template', $template );
 }
 
 /**
@@ -816,6 +875,8 @@ function get_date_template() {
 /**
  * Retrieve path of home template in current or parent template.
  *
+ * This is the template used for the page containing the blog posts
+ *
  * Attempts to locate 'home.php' first before falling back to 'index.php'.
  *
  * @since 1.5.0
@@ -826,6 +887,20 @@ function get_date_template() {
 function get_home_template() {
 	$template = locate_template(array('home.php', 'index.php'));
 	return apply_filters('home_template', $template);
+}
+
+/**
+ * Retrieve path of front-page template in current or parent template.
+ *
+ * Looks for 'front-page.php'.
+ *
+ * @since 3.0.0
+ * @uses apply_filters() Calls 'front_page_template' on file path of template.
+ *
+ * @return string
+ */
+function get_front_page_template() {
+	return apply_filters( 'front_page_template', locate_template( array('front-page.php') ) );
 }
 
 /**
@@ -842,9 +917,15 @@ function get_home_template() {
 function get_page_template() {
 	global $wp_query;
 
-	$id = (int) $wp_query->post->ID;
+	$id = (int) $wp_query->get_queried_object_id();
 	$template = get_post_meta($id, '_wp_page_template', true);
 	$pagename = get_query_var('pagename');
+
+	if ( !$pagename && $id > 0 ) {
+		// If a static page is set as the front page, $pagename will not be set. Retrieve it from the queried object
+		$post = $wp_query->get_queried_object();
+		$pagename = $post->post_name;
+	}
 
 	if ( 'default' == $template )
 		$template = '';
@@ -891,7 +972,11 @@ function get_search_template() {
  * @return string
  */
 function get_single_template() {
-	return get_query_template('single');
+	global $wp_query;
+
+	$object = $wp_query->get_queried_object();
+	$templates = array('single-' . $object->post_type . '.php', 'single.php');
+	return apply_filters('single_template', locate_template($templates));
 }
 
 /**
@@ -926,9 +1011,7 @@ function get_attachment_template() {
  * Retrieve path of comment popup template in current or parent template.
  *
  * Checks for comment popup template in current template, if it exists or in the
- * parent template. If it doesn't exist, then it retrieves the comment-popup.php
- * file from the default theme. The default theme must then exist for it to
- * work.
+ * parent template.
  *
  * @since 1.5.0
  * @uses apply_filters() Calls 'comments_popup_template' filter on path.
@@ -937,8 +1020,10 @@ function get_attachment_template() {
  */
 function get_comments_popup_template() {
 	$template = locate_template(array("comments-popup.php"));
+
+	// Backward compat code will be removed in a future release
 	if ('' == $template)
-		$template = get_theme_root() . '/default/comments-popup.php';
+		$template = WPINC . '/theme-compat/comments-popup.php';
 
 	return apply_filters('comments_popup_template', $template);
 }
@@ -953,14 +1038,17 @@ function get_comments_popup_template() {
  *
  * @param array $template_names Array of template files to search for in priority order.
  * @param bool $load If true the template file will be loaded if it is found.
+ * @param bool $require_once Whether to require_once or require. Default true. Has no effect if $load is false.
  * @return string The template filename if one is located.
  */
-function locate_template($template_names, $load = false) {
-	if (!is_array($template_names))
+function locate_template($template_names, $load = false, $require_once = true ) {
+	if ( !is_array($template_names) )
 		return '';
 
 	$located = '';
-	foreach($template_names as $template_name) {
+	foreach ( $template_names as $template_name ) {
+		if ( !$template_name )
+			continue;
 		if ( file_exists(STYLESHEETPATH . '/' . $template_name)) {
 			$located = STYLESHEETPATH . '/' . $template_name;
 			break;
@@ -970,14 +1058,14 @@ function locate_template($template_names, $load = false) {
 		}
 	}
 
-	if ($load && '' != $located)
-		load_template($located);
+	if ( $load && '' != $located )
+		load_template( $located, $require_once );
 
 	return $located;
 }
 
 /**
- * Require once the template file with WordPress environment.
+ * Require the template file with WordPress environment.
  *
  * The globals are set up for the template file to ensure that the WordPress
  * environment is available from within the function. The query variables are
@@ -986,14 +1074,18 @@ function locate_template($template_names, $load = false) {
  * @since 1.5.0
  *
  * @param string $_template_file Path to template file.
+ * @param bool $require_once Whether to require_once or require. Default true.
  */
-function load_template($_template_file) {
+function load_template( $_template_file, $require_once = true ) {
 	global $posts, $post, $wp_did_header, $wp_did_template_redirect, $wp_query, $wp_rewrite, $wpdb, $wp_version, $wp, $id, $comment, $user_ID;
 
-	if ( is_array($wp_query->query_vars) )
-		extract($wp_query->query_vars, EXTR_SKIP);
+	if ( is_array( $wp_query->query_vars ) )
+		extract( $wp_query->query_vars, EXTR_SKIP );
 
-	require_once($_template_file);
+	if ( $require_once )
+		require_once( $_template_file );
+	else
+		require( $_template_file );
 }
 
 /**
@@ -1038,7 +1130,7 @@ function preview_theme() {
 	}
 
 	// Prevent theme mods to current theme being used on theme being previewed
-	add_filter( 'pre_option_mods_' . get_current_theme(), create_function( '', "return array();" ) );
+	add_filter( 'pre_option_mods_' . get_current_theme(), '__return_empty_array' );
 
 	ob_start( 'preview_theme_ob_filter' );
 }
@@ -1098,7 +1190,7 @@ function preview_theme_ob_filter_callback( $matches ) {
 	if (
 		( false !== strpos($matches[3], '/wp-admin/') )
 	||
-		( false !== strpos($matches[3], '://') && 0 !== strpos($matches[3], get_option('home')) )
+		( false !== strpos( $matches[3], '://' ) && 0 !== strpos( $matches[3], home_url() ) )
 	||
 		( false !== strpos($matches[3], '/feed/') )
 	||
@@ -1132,13 +1224,13 @@ function switch_theme($template, $stylesheet) {
 /**
  * Checks that current theme files 'index.php' and 'style.css' exists.
  *
- * Does not check the 'default' theme. The 'default' theme should always exist
- * or should have another theme renamed to that template name and directory
- * path. Will switch theme to default if current theme does not validate.
+ * Does not check the default theme, which is the fallback and should always exist.
+ * Will switch theme to the fallback theme if current theme does not validate.
  * You can use the 'validate_current_theme' filter to return FALSE to
  * disable this functionality.
  *
  * @since 1.5.0
+ * @see WP_DEFAULT_THEME
  *
  * @return bool
  */
@@ -1147,13 +1239,13 @@ function validate_current_theme() {
 	if ( defined('WP_INSTALLING') || !apply_filters( 'validate_current_theme', true ) )
 		return true;
 
-	if ( get_template() != 'default' && !file_exists(get_template_directory() . '/index.php') ) {
-		switch_theme('default', 'default');
+	if ( get_template() != WP_DEFAULT_THEME && !file_exists(get_template_directory() . '/index.php') ) {
+		switch_theme( WP_DEFAULT_THEME, WP_DEFAULT_THEME );
 		return false;
 	}
 
-	if ( get_stylesheet() != 'default' && !file_exists(get_template_directory() . '/style.css') ) {
-		switch_theme('default', 'default');
+	if ( get_stylesheet() != WP_DEFAULT_THEME && !file_exists(get_template_directory() . '/style.css') ) {
+		switch_theme( WP_DEFAULT_THEME, WP_DEFAULT_THEME );
 		return false;
 	}
 
@@ -1178,7 +1270,7 @@ function validate_current_theme() {
 function get_theme_mod($name, $default = false) {
 	$theme = get_current_theme();
 
-	$mods = get_option("mods_$theme");
+	$mods = get_option( "mods_$theme" );
 
 	if ( isset($mods[$name]) )
 		return apply_filters( "theme_mod_$name", $mods[$name] );
@@ -1253,7 +1345,9 @@ function remove_theme_mods() {
  * @return string
  */
 function get_header_textcolor() {
-	return get_theme_mod('header_textcolor', HEADER_TEXTCOLOR);
+	$default = defined('HEADER_TEXTCOLOR') ? HEADER_TEXTCOLOR : '';
+
+	return get_theme_mod('header_textcolor', $default);
 }
 
 /**
@@ -1274,7 +1368,9 @@ function header_textcolor() {
  * @return string
  */
 function get_header_image() {
-	return get_theme_mod('header_image', HEADER_IMAGE);
+	$default = defined('HEADER_IMAGE') ? HEADER_IMAGE : '';
+
+	return get_theme_mod('header_image', $default);
 }
 
 /**
@@ -1298,26 +1394,217 @@ function header_image() {
  * @uses Custom_Image_Header Sets up for $admin_header_callback for administration panel display.
  *
  * @param callback $header_callback Call on 'wp_head' action.
- * @param callback $admin_header_callback Call on administration panels.
+ * @param callback $admin_header_callback Call on custom header administration screen.
+ * @param callback $admin_image_div_callback Output a custom header image div on the custom header administration screen. Optional.
  */
-function add_custom_image_header($header_callback, $admin_header_callback) {
+function add_custom_image_header($header_callback, $admin_header_callback, $admin_image_div_callback = '') {
 	if ( ! empty($header_callback) )
 		add_action('wp_head', $header_callback);
+
+	add_theme_support( 'custom-header' );
 
 	if ( ! is_admin() )
 		return;
 	require_once(ABSPATH . 'wp-admin/custom-header.php');
-	$GLOBALS['custom_image_header'] =& new Custom_Image_Header($admin_header_callback);
+	$GLOBALS['custom_image_header'] =& new Custom_Image_Header($admin_header_callback, $admin_image_div_callback);
 	add_action('admin_menu', array(&$GLOBALS['custom_image_header'], 'init'));
 }
 
 /**
- * Allows a theme to register its support of a certain feature
- * 
- * Must be called in the themes functions.php file to work.
+ * Register a selection of default headers to be displayed by the custom header admin UI.
  *
- * @author Mark Jaquith
- * @since 2.9
+ * @since 3.0.0
+ *
+ * @param array $headers Array of headers keyed by a string id. The ids point to arrays containing 'url', 'thumbnail_url', and 'description' keys.
+ */
+function register_default_headers( $headers ) {
+	global $_wp_default_headers;
+
+	$_wp_default_headers = array_merge( (array) $_wp_default_headers, (array) $headers );
+}
+
+/**
+ * Unregister default headers.
+ *
+ * This function must be called after register_default_headers() has already added the
+ * header you want to remove.
+ *
+ * @see register_default_headers()
+ * @since 3.0.0
+ *
+ * @param string|array The header string id (key of array) to remove, or an array thereof.
+ * @return True on success, false on failure.
+ */
+function unregister_default_headers( $header ) {
+	global $_wp_default_headers;
+	if ( is_array( $header ) ) {
+		array_map( 'unregister_default_headers', $header );
+	} elseif ( isset( $_wp_default_headers[ $header ] ) ) {
+		unset( $_wp_default_headers[ $header ] );
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Retrieve background image for custom background.
+ *
+ * @since 3.0.0
+ *
+ * @return string
+ */
+function get_background_image() {
+	$default = defined('BACKGROUND_IMAGE') ? BACKGROUND_IMAGE : '';
+
+	return get_theme_mod('background_image', $default);
+}
+
+/**
+ * Display background image path.
+ *
+ * @since 3.0.0
+ */
+function background_image() {
+	echo get_background_image();
+}
+
+/**
+ * Retrieve value for custom background color.
+ *
+ * @since 3.0.0
+ * @uses BACKGROUND_COLOR
+ *
+ * @return string
+ */
+function get_background_color() {
+	$default = defined('BACKGROUND_COLOR') ? BACKGROUND_COLOR : '';
+
+	return get_theme_mod('background_color', $default);
+}
+
+/**
+ * Display background color value.
+ *
+ * @since 3.0.0
+ */
+function background_color() {
+	echo get_background_color();
+}
+
+/**
+ * Add callbacks for background image display.
+ *
+ * The parameter $header_callback callback will be required to display the
+ * content for the 'wp_head' action. The parameter $admin_header_callback
+ * callback will be added to Custom_Background class and that will be added
+ * to the 'admin_menu' action.
+ *
+ * @since 3.0.0
+ * @uses Custom_Background Sets up for $admin_header_callback for administration panel display.
+ *
+ * @param callback $header_callback Call on 'wp_head' action.
+ * @param callback $admin_header_callback Call on custom background administration screen.
+ * @param callback $admin_image_div_callback Output a custom background image div on the custom background administration screen. Optional.
+ */
+function add_custom_background($header_callback = '', $admin_header_callback = '', $admin_image_div_callback = '') {
+	if ( isset($GLOBALS['custom_background']) )
+		return;
+
+	if ( empty($header_callback) )
+		$header_callback = '_custom_background_cb';
+
+	add_action('wp_head', $header_callback);
+
+	add_theme_support( 'custom-background' );
+
+	if ( ! is_admin() )
+		return;
+	require_once(ABSPATH . 'wp-admin/custom-background.php');
+	$GLOBALS['custom_background'] =& new Custom_Background($admin_header_callback, $admin_image_div_callback);
+	add_action('admin_menu', array(&$GLOBALS['custom_background'], 'init'));
+}
+
+/**
+ * Default custom background callback.
+ *
+ * @since 3.0.0
+ * @see add_custom_background()
+ * @access protected
+ */
+function _custom_background_cb() {
+	$background = get_background_image();
+	$color = get_background_color();
+	if ( ! $background && ! $color )
+		return;
+
+	$style = $color ? "background-color: #$color;" : '';
+
+	if ( $background ) {
+		$image = " background-image: url('$background');";
+
+		$repeat = get_theme_mod( 'background_repeat', 'repeat' );
+		if ( ! in_array( $repeat, array( 'no-repeat', 'repeat-x', 'repeat-y', 'repeat' ) ) )
+			$repeat = 'repeat';
+		$repeat = " background-repeat: $repeat;";
+
+		$position = get_theme_mod( 'background_position_x', 'left' );
+		if ( ! in_array( $position, array( 'center', 'right', 'left' ) ) )
+			$position = 'left';
+		$position = " background-position: top $position;";
+
+		$attachment = get_theme_mod( 'background_attachment', 'scroll' );
+		if ( ! in_array( $attachment, array( 'fixed', 'scroll' ) ) )
+			$attachment = 'scroll';
+		$attachment = " background-attachment: $attachment;";
+
+		$style .= $image . $repeat . $position . $attachment;
+	}
+?>
+<style type="text/css">
+body { <?php echo trim( $style ); ?> }
+</style>
+<?php
+}
+
+/**
+ * Add callback for custom TinyMCE editor stylesheets.
+ *
+ * The parameter $stylesheet is the name of the stylesheet, relative to
+ * the theme root. It also accepts an array of stylesheets.
+ * It is optional and defaults to 'editor-style.css'.
+ *
+ * @since 3.0.0
+ *
+ * @param mixed $stylesheet Optional. Stylesheet name or array thereof, relative to theme root.
+ * 	Defaults to 'editor-style.css'
+ */
+function add_editor_style( $stylesheet = 'editor-style.css' ) {
+
+	add_theme_support( 'editor-style' );
+
+	if ( ! is_admin() )
+		return;
+
+	global $editor_styles;
+	$editor_styles = (array) $editor_styles;
+	$stylesheet    = (array) $stylesheet;
+	if ( is_rtl() ) {
+		$rtl_stylesheet = str_replace('.css', '-rtl.css', $stylesheet[0]);
+		$stylesheet[] = $rtl_stylesheet;
+	}
+
+	$editor_styles = array_merge( $editor_styles, $stylesheet );
+}
+
+/**
+ * Allows a theme to register its support of a certain feature
+ *
+ * Must be called in the theme's functions.php file to work.
+ * If attached to a hook, it must be after_setup_theme.
+ * The init hook may be too late for some features.
+ *
+ * @since 2.9.0
  * @param string $feature the feature being added
  */
 function add_theme_support( $feature ) {
@@ -1330,14 +1617,36 @@ function add_theme_support( $feature ) {
 }
 
 /**
+ * Allows a theme to de-register its support of a certain feature
+ *
+ * Should be called in the theme's functions.php file. Generally would
+ * be used for child themes to override support from the parent theme.
+ *
+ * @since 3.0.0
+ * @see add_theme_support()
+ * @param string $feature the feature being added
+ * @return bool Whether feature was removed.
+ */
+function remove_theme_support( $feature ) {
+	// Blacklist: for internal registrations not used directly by themes.
+	if ( in_array( $feature, array( 'custom-background', 'custom-header', 'editor-style', 'widgets' ) ) )
+		return false;
+
+	global $_wp_theme_features;
+
+	if ( ! isset( $_wp_theme_features[$feature] ) )
+		return false;
+	unset( $_wp_theme_features[$feature] );
+	return true;
+}
+
+/**
  * Checks a theme's support for a given feature
  *
- * @author Mark Jaquith
- * @since 2.9
+ * @since 2.9.0
  * @param string $feature the feature being checked
  * @return boolean
  */
-
 function current_theme_supports( $feature ) {
 	global $_wp_theme_features;
 
@@ -1372,8 +1681,7 @@ function current_theme_supports( $feature ) {
 /**
  * Checks a theme's support for a given feature before loading the functions which implement it.
  *
- * @author Peter Westwood
- * @since 2.9
+ * @since 2.9.0
  * @param string $feature the feature being checked
  * @param string $include the file containing the functions that implement the feature
  */
@@ -1381,5 +1689,29 @@ function require_if_theme_supports( $feature, $include) {
 	if ( current_theme_supports( $feature ) )
 		require ( $include );
 }
+
+/**
+ * Checks an attachment being deleted to see if it's a header or background image.
+ *
+ * If true it removes the theme modification which would be pointing at the deleted
+ * attachment
+ *
+ * @access private
+ * @since 3.0.0
+ * @param int $id the attachment id
+ */
+function _delete_attachment_theme_mod( $id ) {
+	$attachment_image = wp_get_attachment_url( $id );
+	$header_image = get_header_image();
+	$background_image = get_background_image();
+
+	if ( $header_image && $header_image == $attachment_image )
+		remove_theme_mod( 'header_image' );
+
+	if ( $background_image && $background_image == $attachment_image )
+		remove_theme_mod( 'background_image' );
+}
+
+add_action( 'delete_attachment', '_delete_attachment_theme_mod' );
 
 ?>

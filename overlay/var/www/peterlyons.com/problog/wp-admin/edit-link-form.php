@@ -22,7 +22,7 @@ if ( ! empty($link_id) ) {
 	$nonce_action = 'add-bookmark';
 }
 
-require_once('includes/meta-boxes.php');
+require_once('./includes/meta-boxes.php');
 
 add_meta_box('linksubmitdiv', __('Save'), 'link_submit_meta_box', 'link', 'side', 'core');
 add_meta_box('linkcategorydiv', __('Categories'), 'link_categories_meta_box', 'link', 'normal', 'core');
@@ -30,9 +30,21 @@ add_meta_box('linktargetdiv', __('Target'), 'link_target_meta_box', 'link', 'nor
 add_meta_box('linkxfndiv', __('Link Relationship (XFN)'), 'link_xfn_meta_box', 'link', 'normal', 'core');
 add_meta_box('linkadvanceddiv', __('Advanced'), 'link_advanced_meta_box', 'link', 'normal', 'core');
 
+do_action('add_meta_boxes', 'link', $link);
+do_action('add_meta_boxes_link', $link);
+
 do_action('do_meta_boxes', 'link', 'normal', $link);
 do_action('do_meta_boxes', 'link', 'advanced', $link);
 do_action('do_meta_boxes', 'link', 'side', $link);
+
+add_contextual_help($current_screen,
+	'<p>' . __( 'You can add or edit links on this screen by entering information in each of the boxes. Only the link&#8217;s web address and name (the text you want to display on your site as the link) are required fields.' ) . '</p>' .
+	'<p>' . __( 'The boxes for link name, web address, and description have fixed positions, while the others may be repositioned using drag and drop. You can also hide boxes you don&#8217;t use in the Screen Options tab, or minimize boxes by clicking on the title bar of the box.' ) . '</p>' .
+	'<p>' . __( 'XFN stands for <a href="http://gmpg.org/xfn/" target="_blank">XHTML Friends Network</a>, which is optional. WordPress allows the generation of XFN attributes to show how you are related to the authors/owners of the site to which you are linking.' ) . '</p>' .
+	'<p><strong>' . __( 'For more information:' ) . '</strong></p>' .
+	'<p>' . __( '<a href="http://codex.wordpress.org/Links_Add_New_SubPanel" target="_blank">Documentation on Creating Links</a>' ) . '</p>' .
+	'<p>' . __( '<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>' ) . '</p>'
+);
 
 require_once ('admin-header.php');
 
@@ -42,7 +54,7 @@ require_once ('admin-header.php');
 <h2><?php echo esc_html( $title ); ?></h2>
 
 <?php if ( isset( $_GET['added'] ) ) : ?>
-<div id="message" class="updated fade"><p><?php _e('Link added.'); ?></p></div>
+<div id="message" class="updated"><p><?php _e('Link added.'); ?></p></div>
 <?php endif; ?>
 
 <?php

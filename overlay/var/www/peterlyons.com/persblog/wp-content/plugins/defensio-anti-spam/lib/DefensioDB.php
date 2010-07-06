@@ -33,7 +33,7 @@ class DefensioDB
 
             /* From WP docs:
              *
-             * dbDelta function is rather picky, however. For instance:
+             * ... dbDelta function is rather picky, however. For instance:
              *
              * You have to put each field on its own line in your SQL statement.
              * You have to have two spaces between the words PRIMARY KEY and the definition of your primary key.
@@ -74,7 +74,7 @@ class DefensioDB
         $this->table_version = DefensioDB::TABLE_VERSION;
     }
 
-    /* 
+    /** 
      * @param integer $limit 
      * @return array All the comments with status unprocessed
      */
@@ -83,13 +83,14 @@ class DefensioDB
         return $this->getCommentsByStatus('unprocessed', $limit);
     }
 
-    /* @return array All the comments with status pending */
+    /** @return array All the comments with status pending */
     public function getPendingComments($limit=20)
     {
         return $this->getCommentsByStatus('pending', $limit);
     }
 
-    /* @param string Get all the comments with status $status, status can be ok, peding and unprocessed
+    /** 
+     * @param string Get all the comments with status $status, status can be ok, peding and unprocessed
      * @return array All the comments with status defined by $status */
     public function getCommentsByStatus($status, $limit = NULL)
     {
@@ -104,7 +105,8 @@ class DefensioDB
         return $out;
     }
 
-    /* Get a defensio row of metadata  by its comment_ID
+    /** 
+     * Get a defensio row of metadata  by its comment_ID
      * @param integer $comment_ID the id of the comment 
      * @return a one element array with the defensio data for that commet's id
      */
@@ -115,7 +117,8 @@ class DefensioDB
             $comment_ID));
     }
 
-    /* Get a defensio row of metadata  by its comment_ID
+    /** 
+     * Get a defensio row of metadata  by its comment_ID
      * @param string $signature the signature of the comment 
      * @return a one element array with the defensio data for that commet's signature
      */
@@ -125,7 +128,7 @@ class DefensioDB
         return $wpdb->get_results($wpdb->prepare("SELECT * FROM $this->table_name WHERE signature = %s LIMIT 1", $signature));
     }
 
-    /*
+    /**
      * @params integer $comment_ID the id of the comment for which Defensio data will be update
      * @params array $new_values associative array with the new parameters
      */
@@ -135,7 +138,7 @@ class DefensioDB
         $wpdb->update($this->table_name, $new_values, array('comment_ID' => $comment_ID));
     }
 
-    /* 
+    /** 
      * Shorthand for wpdb->insert
      *
      * @param array $values
@@ -147,7 +150,7 @@ class DefensioDB
         $wpdb->insert($this->table_name, $values, $types);
     }
 
-    /* Deletes a comment along with its Defensio metadata */
+    /** Deletes a comment along with its Defensio metadata */
     public function deleteCommentAndDefensioRow($comment_ID)
     {
         global $wpdb;
@@ -155,7 +158,7 @@ class DefensioDB
         $wpdb->query($wpdb->prepare("DELETE FROM $wpdb->comments   WHERE comment_ID = %d", $comment_ID));
     }
 
-    /* Deletes all comments marked as spam and their Defensio metadata*/
+    /** Deletes all comments marked as spam and their Defensio metadata*/
     public function deleteAllSpam()
     {
         global $wpdb;
@@ -186,7 +189,8 @@ class DefensioDB
         return $count;
     }
 
-    /* Fetches the data to build Defensio's spam quarantine
+    /** 
+     * Fetches the data to build Defensio's spam quarantine
      *
      * @param integer $page page number
      * @param integer $items_per_page number of items per page

@@ -10,20 +10,25 @@
 if ( !defined('ABSPATH') )
 	die('-1');
 ?>
-<table class="widefat post fixed" cellspacing="0">
+<table class="widefat <?php echo $post_type_object->hierarchical ? 'page' : 'post'; ?> fixed" cellspacing="0">
 	<thead>
 	<tr>
-<?php print_column_headers('edit'); ?>
+<?php print_column_headers( $current_screen ); ?>
 	</tr>
 	</thead>
 
 	<tfoot>
 	<tr>
-<?php print_column_headers('edit', false); ?>
+<?php print_column_headers($current_screen, false); ?>
 	</tr>
 	</tfoot>
 
 	<tbody>
-<?php post_rows(); ?>
+<?php
+if ( $post_type_object->hierarchical )
+	page_rows($posts, $pagenum, $per_page);
+else
+	post_rows();
+?>
 	</tbody>
 </table>

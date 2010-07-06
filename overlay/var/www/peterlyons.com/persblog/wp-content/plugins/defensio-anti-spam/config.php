@@ -15,7 +15,7 @@ function defensio_set_key()
     } else {
         $defensio_conf['key'] = trim(get_option('defensio_key'));
     }
-
 }
+
 
 ?>

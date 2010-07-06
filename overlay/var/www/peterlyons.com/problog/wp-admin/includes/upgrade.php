@@ -31,10 +31,14 @@ if ( !function_exists('wp_install') ) :
  * @param string $user_email User's email.
  * @param bool $public Whether blog is public.
  * @param null $deprecated Optional. Not used.
+ * @param string $user_password Optional. User's chosen password. Will default to a random password.
  * @return array Array keys 'url', 'user_id', 'password', 'password_message'.
  */
-function wp_install($blog_title, $user_name, $user_email, $public, $deprecated='') {
+function wp_install( $blog_title, $user_name, $user_email, $public, $deprecated = '', $user_password = '' ) {
 	global $wp_rewrite;
+
+	if ( !empty( $deprecated ) )
+		_deprecated_argument( __FUNCTION__, '2.6' );
 
 	wp_check_mysql_version();
 	wp_cache_flush();
@@ -57,14 +61,20 @@ function wp_install($blog_title, $user_name, $user_email, $public, $deprecated='
 	// Create default user.  If the user already exists, the user tables are
 	// being shared among blogs.  Just set the role in that case.
 	$user_id = username_exists($user_name);
-	if ( !$user_id ) {
-		$random_password = wp_generate_password();
+	$user_password = trim($user_password);
+	$email_password = false;
+	if ( !$user_id && empty($user_password) ) {
+		$user_password = wp_generate_password();
 		$message = __('<strong><em>Note that password</em></strong> carefully! It is a <em>random</em> password that was generated just for you.');
-		$user_id = wp_create_user($user_name, $random_password, $user_email);
-		update_usermeta($user_id, 'default_password_nag', true);
+		$user_id = wp_create_user($user_name, $user_password, $user_email);
+		update_user_option($user_id, 'default_password_nag', true, true);
+		$email_password = true;
+	} else if ( !$user_id ) {
+		// Password has been provided
+		$message = '<em>'.__('Your chosen password.').'</em>';
+		$user_id = wp_create_user($user_name, $user_password, $user_email);
 	} else {
-		$random_password = '';
-		$message =  __('User already exists.  Password inherited.');
+		$message =  __('User already exists. Password inherited.');
 	}
 
 	$user = new WP_User($user_id);
@@ -74,11 +84,11 @@ function wp_install($blog_title, $user_name, $user_email, $public, $deprecated='
 
 	$wp_rewrite->flush_rules();
 
-	wp_new_blog_notification($blog_title, $guessurl, $user_id, $random_password);
+	wp_new_blog_notification($blog_title, $guessurl, $user_id, ($email_password ? $user_password : __('The password you chose during the install.') ) );
 
 	wp_cache_flush();
 
-	return array('url' => $guessurl, 'user_id' => $user_id, 'password' => $random_password, 'password_message' => $message);
+	return array('url' => $guessurl, 'user_id' => $user_id, 'password' => $user_password, 'password_message' => $message);
 }
 endif;
 
@@ -93,23 +103,47 @@ if ( !function_exists('wp_install_defaults') ) :
  * @param int $user_id User ID.
  */
 function wp_install_defaults($user_id) {
-	global $wpdb;
+	global $wpdb, $wp_rewrite, $current_site, $table_prefix;
 
 	// Default category
 	$cat_name = __('Uncategorized');
 	/* translators: Default category slug */
 	$cat_slug = sanitize_title(_x('Uncategorized', 'Default category slug'));
 
-	$wpdb->insert( $wpdb->terms, array('name' => $cat_name, 'slug' => $cat_slug, 'term_group' => 0) );
-	$wpdb->insert( $wpdb->term_taxonomy, array('term_id' => '1', 'taxonomy' => 'category', 'description' => '', 'parent' => 0, 'count' => 1));
+	if ( global_terms_enabled() ) {
+		$cat_id = $wpdb->get_var( $wpdb->prepare( "SELECT cat_ID FROM {$wpdb->sitecategories} WHERE category_nicename = %s", $cat_slug ) );
+		if ( $cat_id == null ) {
+			$wpdb->insert( $wpdb->sitecategories, array('cat_ID' => 0, 'cat_name' => $cat_name, 'category_nicename' => $cat_slug, 'last_updated' => current_time('mysql', true)) );
+			$cat_id = $wpdb->insert_id;
+		}
+		update_option('default_category', $cat_id);
+	} else {
+		$cat_id = 1;
+	}
+
+	$wpdb->insert( $wpdb->terms, array('term_id' => $cat_id, 'name' => $cat_name, 'slug' => $cat_slug, 'term_group' => 0) );
+	$wpdb->insert( $wpdb->term_taxonomy, array('term_id' => $cat_id, 'taxonomy' => 'category', 'description' => '', 'parent' => 0, 'count' => 1));
+	$cat_tt_id = $wpdb->insert_id;
 
 	// Default link category
 	$cat_name = __('Blogroll');
 	/* translators: Default link category slug */
 	$cat_slug = sanitize_title(_x('Blogroll', 'Default link category slug'));
 
-	$wpdb->insert( $wpdb->terms, array('name' => $cat_name, 'slug' => $cat_slug, 'term_group' => 0) );
-	$wpdb->insert( $wpdb->term_taxonomy, array('term_id' => '2', 'taxonomy' => 'link_category', 'description' => '', 'parent' => 0, 'count' => 7));
+	if ( global_terms_enabled() ) {
+		$blogroll_id = $wpdb->get_var( $wpdb->prepare( "SELECT cat_ID FROM {$wpdb->sitecategories} WHERE category_nicename = %s", $cat_slug ) );
+		if ( $blogroll_id == null ) {
+			$wpdb->insert( $wpdb->sitecategories, array('cat_ID' => 0, 'cat_name' => $cat_name, 'category_nicename' => $cat_slug, 'last_updated' => current_time('mysql', true)) );
+			$blogroll_id = $wpdb->insert_id;
+		}
+		update_option('default_link_category', $blogroll_id);
+	} else {
+		$blogroll_id = 2;
+	}
+
+	$wpdb->insert( $wpdb->terms, array('term_id' => $blogroll_id, 'name' => $cat_name, 'slug' => $cat_slug, 'term_group' => 0) );
+	$wpdb->insert( $wpdb->term_taxonomy, array('term_id' => $blogroll_id, 'taxonomy' => 'link_category', 'description' => '', 'parent' => 0, 'count' => 7));
+	$blogroll_tt_id = $wpdb->insert_id;
 
 	// Now drop in some default links
 	$default_links = array();
@@ -119,7 +153,7 @@ function wp_install_defaults($user_id) {
 								'link_notes' => '');
 
 	$default_links[] = array(	'link_url' => 'http://wordpress.org/development/',
-								'link_name' => 'Development Blog',
+								'link_name' => 'WordPress Blog',
 								'link_rss' => 'http://wordpress.org/development/feed/',
 								'link_notes' => '');
 
@@ -150,7 +184,7 @@ function wp_install_defaults($user_id) {
 
 	foreach ( $default_links as $link ) {
 		$wpdb->insert( $wpdb->links, $link);
-		$wpdb->insert( $wpdb->term_relationships, array('term_taxonomy_id' => 2, 'object_id' => $wpdb->insert_id) );
+		$wpdb->insert( $wpdb->term_relationships, array('term_taxonomy_id' => $blogroll_tt_id, 'object_id' => $wpdb->insert_id) );
 	}
 
 	// First post
@@ -158,15 +192,27 @@ function wp_install_defaults($user_id) {
 	$now_gmt = gmdate('Y-m-d H:i:s');
 	$first_post_guid = get_option('home') . '/?p=1';
 
+	if ( is_multisite() ) {
+		$first_post = get_site_option( 'first_post' );
+
+		if ( empty($first_post) )
+			$first_post = stripslashes( __( 'Welcome to <a href="SITE_URL">SITE_NAME</a>. This is your first post. Edit or delete it, then start blogging!' ) );
+
+		$first_post = str_replace( "SITE_URL", esc_url( network_home_url() ), $first_post );
+		$first_post = str_replace( "SITE_NAME", $current_site->site_name, $first_post );
+	} else {
+		$first_post = __('Welcome to WordPress. This is your first post. Edit or delete it, then start blogging!');
+	}
+
 	$wpdb->insert( $wpdb->posts, array(
 								'post_author' => $user_id,
 								'post_date' => $now,
 								'post_date_gmt' => $now_gmt,
-								'post_content' => __('Welcome to WordPress. This is your first post. Edit or delete it, then start blogging!'),
+								'post_content' => $first_post,
 								'post_excerpt' => '',
 								'post_title' => __('Hello world!'),
 								/* translators: Default post slug */
-								'post_name' => _x('hello-world', 'Default post slug'),
+								'post_name' => sanitize_title( _x('hello-world', 'Default post slug') ),
 								'post_modified' => $now,
 								'post_modified_gmt' => $now_gmt,
 								'guid' => $first_post_guid,
@@ -175,25 +221,37 @@ function wp_install_defaults($user_id) {
 								'pinged' => '',
 								'post_content_filtered' => ''
 								));
-	$wpdb->insert( $wpdb->term_relationships, array('term_taxonomy_id' => 1, 'object_id' => 1) );
+	$wpdb->insert( $wpdb->term_relationships, array('term_taxonomy_id' => $cat_tt_id, 'object_id' => 1) );
 
 	// Default comment
+	$first_comment_author = __('Mr WordPress');
+	$first_comment_url = 'http://wordpress.org/';
+	$first_comment = __('Hi, this is a comment.<br />To delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them.');
+	if ( is_multisite() ) {
+		$first_comment_author = get_site_option( 'first_comment_author', $first_comment_author );
+		$first_comment_url = get_site_option( 'first_comment_url', network_home_url() );
+		$first_comment = get_site_option( 'first_comment', $first_comment );
+	}
 	$wpdb->insert( $wpdb->comments, array(
 								'comment_post_ID' => 1,
-								'comment_author' => __('Mr WordPress'),
+								'comment_author' => $first_comment_author,
 								'comment_author_email' => '',
-								'comment_author_url' => 'http://wordpress.org/',
+								'comment_author_url' => $first_comment_url,
 								'comment_date' => $now,
 								'comment_date_gmt' => $now_gmt,
-								'comment_content' => __('Hi, this is a comment.<br />To delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them.')
+								'comment_content' => $first_comment
 								));
+
 	// First Page
+	$first_page = __('This is an example of a WordPress page, you could edit this to put information about yourself or your site so readers know where you are coming from. You can create as many pages like this one or sub-pages as you like and manage all of your content inside of WordPress.');
+	if ( is_multisite() )
+		$first_page = get_site_option( 'first_page', $first_page );
 	$first_post_guid = get_option('home') . '/?page_id=2';
 	$wpdb->insert( $wpdb->posts, array(
 								'post_author' => $user_id,
 								'post_date' => $now,
 								'post_date_gmt' => $now_gmt,
-								'post_content' => __('This is an example of a WordPress page, you could edit this to put information about yourself or your site so readers know where you are coming from. You can create as many pages like this one or sub-pages as you like and manage all of your content inside of WordPress.'),
+								'post_content' => $first_page,
 								'post_excerpt' => '',
 								'post_title' => __('About'),
 								/* translators: Default page slug */
@@ -206,6 +264,33 @@ function wp_install_defaults($user_id) {
 								'pinged' => '',
 								'post_content_filtered' => ''
 								));
+	$wpdb->insert( $wpdb->postmeta, array( 'post_id' => 2, 'meta_key' => '_wp_page_template', 'meta_value' => 'default' ) );
+
+	// Setup default widgets for default theme.
+	update_option( 'widget_search', array ( 2 => array ( 'title' => '' ), '_multiwidget' => 1 ) );
+	update_option( 'widget_recent-posts', array ( 2 => array ( 'title' => '', 'number' => 5 ), '_multiwidget' => 1 ) );
+	update_option( 'widget_recent-comments', array ( 2 => array ( 'title' => '', 'number' => 5 ), '_multiwidget' => 1 ) );
+	update_option( 'widget_archives', array ( 2 => array ( 'title' => '', 'count' => 0, 'dropdown' => 0 ), '_multiwidget' => 1 ) );
+	update_option( 'widget_categories', array ( 2 => array ( 'title' => '', 'count' => 0, 'hierarchical' => 0, 'dropdown' => 0 ), '_multiwidget' => 1 ) );
+	update_option( 'widget_meta', array ( 2 => array ( 'title' => '' ), '_multiwidget' => 1 ) );
+	update_option( 'sidebars_widgets', array ( 'wp_inactive_widgets' => array ( ), 'primary-widget-area' => array ( 0 => 'search-2', 1 => 'recent-posts-2', 2 => 'recent-comments-2', 3 => 'archives-2', 4 => 'categories-2', 5 => 'meta-2', ), 'secondary-widget-area' => array ( ), 'first-footer-widget-area' => array ( ), 'second-footer-widget-area' => array ( ), 'third-footer-widget-area' => array ( ), 'fourth-footer-widget-area' => array ( ), 'array_version' => 3 ) );
+
+	if ( is_multisite() ) {
+		// Flush rules to pick up the new page.
+		$wp_rewrite->init();
+		$wp_rewrite->flush_rules();
+
+		$user = new WP_User($user_id);
+		$wpdb->update( $wpdb->options, array('option_value' => $user->user_email), array('option_name' => 'admin_email') );
+
+		// Remove all perms except for the login user.
+		$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->usermeta WHERE user_id != %d AND meta_key = %s", $user_id, $table_prefix.'user_level') );
+		$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->usermeta WHERE user_id != %d AND meta_key = %s", $user_id, $table_prefix.'capabilities') );
+
+		// Delete any caps that snuck into the previously active blog. (Hardcoded to blog 1 for now.) TODO: Get previous_blog_id.
+		if ( !is_super_admin( $user_id ) && $user_id != 1 )
+			$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->usermeta WHERE user_id = %d AND meta_key = %s", $user_id, $wpdb->base_prefix.'1_capabilities') );
+	}
 }
 endif;
 
@@ -226,7 +311,7 @@ function wp_new_blog_notification($blog_title, $blog_url, $user_id, $password) {
 	$user = new WP_User($user_id);
 	$email = $user->user_email;
 	$name = $user->user_login;
-	$message = sprintf(__("Your new WordPress blog has been successfully set up at:
+	$message = sprintf(__("Your new WordPress site has been successfully set up at:
 
 %1\$s
 
@@ -235,13 +320,13 @@ You can log in to the administrator account with the following information:
 Username: %2\$s
 Password: %3\$s
 
-We hope you enjoy your new blog. Thanks!
+We hope you enjoy your new site. Thanks!
 
 --The WordPress Team
 http://wordpress.org/
 "), $blog_url, $name, $password);
 
-	@wp_mail($email, __('New WordPress Blog'), $message);
+	@wp_mail($email, __('New WordPress Site'), $message);
 }
 endif;
 
@@ -256,7 +341,7 @@ if ( !function_exists('wp_upgrade') ) :
  * @return null
  */
 function wp_upgrade() {
-	global $wp_current_db_version, $wp_db_version;
+	global $wp_current_db_version, $wp_db_version, $wpdb;
 
 	$wp_current_db_version = __get_option('db_version');
 
@@ -264,7 +349,7 @@ function wp_upgrade() {
 	if ( $wp_db_version == $wp_current_db_version )
 		return;
 
-	if( ! is_blog_installed() )
+	if ( ! is_blog_installed() )
 		return;
 
 	wp_check_mysql_version();
@@ -272,7 +357,16 @@ function wp_upgrade() {
 	pre_schema_upgrade();
 	make_db_current_silent();
 	upgrade_all();
+	if ( is_multisite() && is_main_site() )
+		upgrade_network();
 	wp_cache_flush();
+
+	if ( is_multisite() ) {
+		if ( $wpdb->get_row( "SELECT blog_id FROM {$wpdb->blog_versions} WHERE blog_id = '{$wpdb->blogid}'" ) )
+			$wpdb->query( "UPDATE {$wpdb->blog_versions} SET db_version = '{$wp_db_version}' WHERE blog_id = '{$wpdb->blogid}'" );
+		else
+			$wpdb->query( "INSERT INTO {$wpdb->blog_versions} ( `blog_id` , `db_version` , `last_updated` ) VALUES ( '{$wpdb->blogid}', '{$wp_db_version}', NOW());" );
+	}
 }
 endif;
 
@@ -331,9 +425,6 @@ function upgrade_all() {
 	if ( $wp_current_db_version < 7499 )
 		upgrade_250();
 
-	if ( $wp_current_db_version < 7796 )
-		upgrade_251();
-
 	if ( $wp_current_db_version < 7935 )
 		upgrade_252();
 
@@ -348,6 +439,9 @@ function upgrade_all() {
 
 	if ( $wp_current_db_version < 11958 )
 		upgrade_290();
+
+	if ( $wp_current_db_version < 15260 )
+		upgrade_300();
 
 	maybe_disable_automattic_widgets();
 
@@ -470,7 +564,7 @@ function upgrade_110() {
 	// Check if we already set the GMT fields (if we did, then
 	// MAX(post_date_gmt) can't be '0000-00-00 00:00:00'
 	// <michel_v> I just slapped myself silly for not thinking about it earlier
-	$got_gmt_fields = ($wpdb->get_var("SELECT MAX(post_date_gmt) FROM $wpdb->posts") == '0000-00-00 00:00:00') ? false : true;
+	$got_gmt_fields = ! ($wpdb->get_var("SELECT MAX(post_date_gmt) FROM $wpdb->posts") == '0000-00-00 00:00:00');
 
 	if (!$got_gmt_fields) {
 
@@ -581,23 +675,23 @@ function upgrade_160() {
 	$users = $wpdb->get_results("SELECT * FROM $wpdb->users");
 	foreach ( $users as $user ) :
 		if ( !empty( $user->user_firstname ) )
-			update_usermeta( $user->ID, 'first_name', $wpdb->escape($user->user_firstname) );
+			update_user_meta( $user->ID, 'first_name', $wpdb->escape($user->user_firstname) );
 		if ( !empty( $user->user_lastname ) )
-			update_usermeta( $user->ID, 'last_name', $wpdb->escape($user->user_lastname) );
+			update_user_meta( $user->ID, 'last_name', $wpdb->escape($user->user_lastname) );
 		if ( !empty( $user->user_nickname ) )
-			update_usermeta( $user->ID, 'nickname', $wpdb->escape($user->user_nickname) );
+			update_user_meta( $user->ID, 'nickname', $wpdb->escape($user->user_nickname) );
 		if ( !empty( $user->user_level ) )
-			update_usermeta( $user->ID, $wpdb->prefix . 'user_level', $user->user_level );
+			update_user_meta( $user->ID, $wpdb->prefix . 'user_level', $user->user_level );
 		if ( !empty( $user->user_icq ) )
-			update_usermeta( $user->ID, 'icq', $wpdb->escape($user->user_icq) );
+			update_user_meta( $user->ID, 'icq', $wpdb->escape($user->user_icq) );
 		if ( !empty( $user->user_aim ) )
-			update_usermeta( $user->ID, 'aim', $wpdb->escape($user->user_aim) );
+			update_user_meta( $user->ID, 'aim', $wpdb->escape($user->user_aim) );
 		if ( !empty( $user->user_msn ) )
-			update_usermeta( $user->ID, 'msn', $wpdb->escape($user->user_msn) );
+			update_user_meta( $user->ID, 'msn', $wpdb->escape($user->user_msn) );
 		if ( !empty( $user->user_yim ) )
-			update_usermeta( $user->ID, 'yim', $wpdb->escape($user->user_icq) );
+			update_user_meta( $user->ID, 'yim', $wpdb->escape($user->user_icq) );
 		if ( !empty( $user->user_description ) )
-			update_usermeta( $user->ID, 'description', $wpdb->escape($user->user_description) );
+			update_user_meta( $user->ID, 'description', $wpdb->escape($user->user_description) );
 
 		if ( isset( $user->user_idmode ) ):
 			$idmode = $user->user_idmode;
@@ -612,11 +706,11 @@ function upgrade_160() {
 		endif;
 
 		// FIXME: RESET_CAPS is temporary code to reset roles and caps if flag is set.
-		$caps = get_usermeta( $user->ID, $wpdb->prefix . 'capabilities');
+		$caps = get_user_meta( $user->ID, $wpdb->prefix . 'capabilities');
 		if ( empty($caps) || defined('RESET_CAPS') ) {
-			$level = get_usermeta($user->ID, $wpdb->prefix . 'user_level');
+			$level = get_user_meta($user->ID, $wpdb->prefix . 'user_level', true);
 			$role = translate_level_to_role($level);
-			update_usermeta( $user->ID, $wpdb->prefix . 'capabilities', array($role => true) );
+			update_user_meta( $user->ID, $wpdb->prefix . 'capabilities', array($role => true) );
 		}
 
 	endforeach;
@@ -628,7 +722,7 @@ function upgrade_160() {
 
 	// populate comment_count field of posts table
 	$comments = $wpdb->get_results( "SELECT comment_post_ID, COUNT(*) as c FROM $wpdb->comments WHERE comment_approved = '1' GROUP BY comment_post_ID" );
-	if( is_array( $comments ) )
+	if ( is_array( $comments ) )
 		foreach ($comments as $comment)
 			$wpdb->update( $wpdb->posts, array('comment_count' => $comment->c), array('ID' => $comment->comment_post_ID) );
 
@@ -919,18 +1013,6 @@ function upgrade_250() {
 }
 
 /**
- * Execute changes made in WordPress 2.5.1.
- *
- * @since 2.5.1
- */
-function upgrade_251() {
-	global $wp_current_db_version;
-
-	// Make the secret longer
-	update_option('secret', wp_generate_password(64));
-}
-
-/**
  * Execute changes made in WordPress 2.5.2.
  *
  * @since 2.5.2
@@ -980,10 +1062,25 @@ function upgrade_270() {
  * @since 2.8.0
  */
 function upgrade_280() {
-	global $wp_current_db_version;
+	global $wp_current_db_version, $wpdb;
 
 	if ( $wp_current_db_version < 10360 )
 		populate_roles_280();
+	if ( is_multisite() ) {
+		$start = 0;
+		while( $rows = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options ORDER BY option_id LIMIT $start, 20" ) ) {
+			foreach( $rows as $row ) {
+				$value = $row->option_value;
+				if ( !@unserialize( $value ) )
+					$value = stripslashes( $value );
+				if ( $value !== $row->option_value ) {
+					update_option( $row->option_name, $value );
+				}
+			}
+			$start += 20;
+		}
+		refresh_blog_details( $wpdb->blogid );
+	}
 }
 
 /**
@@ -1003,6 +1100,83 @@ function upgrade_290() {
 	}
 }
 
+/**
+ * Execute changes made in WordPress 3.0.
+ *
+ * @since 3.0.0
+ */
+function upgrade_300() {
+	global $wp_current_db_version, $wpdb;
+
+	if ( $wp_current_db_version < 15093 )
+		populate_roles_300();
+
+	if ( $wp_current_db_version < 14139 && is_multisite() && is_main_site() && ! defined( 'MULTISITE' ) && get_site_option( 'siteurl' ) === false )
+		add_site_option( 'siteurl', '' );
+
+	// 3.0-alpha nav menu postmeta changes. can be removed before release. // r13802
+	if ( $wp_current_db_version >= 13226 && $wp_current_db_version < 13974 )
+		$wpdb->query( "DELETE FROM $wpdb->postmeta WHERE meta_key IN( 'menu_type', 'object_id', 'menu_new_window', 'menu_link', '_menu_item_append', 'menu_item_append', 'menu_item_type', 'menu_item_object_id', 'menu_item_target', 'menu_item_classes', 'menu_item_xfn', 'menu_item_url' )" );
+
+	// 3.0-beta1 remove_user primitive->meta cap. can be removed before release. r13956
+	if ( $wp_current_db_version >= 12751 && $wp_current_db_version < 13974 ) {
+		$role =& get_role( 'administrator' );
+		if ( ! empty( $role ) )
+			$role->remove_cap( 'remove_user' );
+	}
+
+	// 3.0-beta1 nav menu postmeta changes. can be removed before release. r13974
+	if ( $wp_current_db_version >= 13802 && $wp_current_db_version < 13974 )
+		$wpdb->update( $wpdb->postmeta, array( 'meta_value' => '' ), array( 'meta_key' => '_menu_item_target', 'meta_value' => '_self' ) );
+
+	// 3.0 screen options key name changes.
+	if ( !is_multisite() || is_main_site() ) {
+		$prefix = like_escape($wpdb->base_prefix);
+		$wpdb->query( "DELETE FROM $wpdb->usermeta WHERE meta_key LIKE '{$prefix}%meta-box-hidden%' OR meta_key LIKE '{$prefix}%closedpostboxes%' OR meta_key LIKE '{$prefix}%manage-%-columns-hidden%' OR meta_key LIKE '{$prefix}%meta-box-order%' OR meta_key LIKE '{$prefix}%metaboxorder%' OR meta_key LIKE '{$prefix}%screen_layout%'
+					 OR meta_key = 'manageedittagscolumnshidden' OR meta_key='managecategoriescolumnshidden' OR meta_key = 'manageedit-tagscolumnshidden' OR meta_key = 'manageeditcolumnshidden' OR meta_key = 'categories_per_page' OR meta_key = 'edit_tags_per_page'" );
+	}
+
+}
+
+/**
+ * Execute network level changes
+ *
+ * @since 3.0.0
+ */
+function upgrade_network() {
+	global $wp_current_db_version, $wpdb;
+	// 2.8
+	if ( $wp_current_db_version < 11549 ) {
+		$wpmu_sitewide_plugins = get_site_option( 'wpmu_sitewide_plugins' );
+		$active_sitewide_plugins = get_site_option( 'active_sitewide_plugins' );
+		if ( $wpmu_sitewide_plugins ) {
+			if ( !$active_sitewide_plugins )
+				$sitewide_plugins = (array) $wpmu_sitewide_plugins;
+			else
+				$sitewide_plugins = array_merge( (array) $active_sitewide_plugins, (array) $wpmu_sitewide_plugins );
+
+			update_site_option( 'active_sitewide_plugins', $sitewide_plugins );
+		}
+		delete_site_option( 'wpmu_sitewide_plugins' );
+		delete_site_option( 'deactivated_sitewide_plugins' );
+
+		$start = 0;
+		while( $rows = $wpdb->get_results( "SELECT meta_key, meta_value FROM {$wpdb->sitemeta} ORDER BY meta_id LIMIT $start, 20" ) ) {
+			foreach( $rows as $row ) {
+				$value = $row->meta_value;
+				if ( !@unserialize( $value ) )
+					$value = stripslashes( $value );
+				if ( $value !== $row->meta_value ) {
+					update_site_option( $row->meta_key, $value );
+				}
+			}
+			$start += 20;
+		}
+	}
+	// 3.0
+	if ( $wp_current_db_version < 13576 )
+		update_site_option( 'global_terms_enabled', '1' );
+}
 
 // The functions we use to actually do stuff
 
@@ -1132,11 +1306,11 @@ function __get_option($setting) {
 	global $wpdb;
 
 	if ( $setting == 'home' && defined( 'WP_HOME' ) ) {
-		return preg_replace( '|/+$|', '', constant( 'WP_HOME' ) );
+		return preg_replace( '|/+$|', '', WP_HOME );
 	}
 
 	if ( $setting == 'siteurl' && defined( 'WP_SITEURL' ) ) {
-		return preg_replace( '|/+$|', '', constant( 'WP_SITEURL' ) );
+		return preg_replace( '|/+$|', '', WP_SITEURL );
 	}
 
 	$option = $wpdb->get_var( $wpdb->prepare("SELECT option_value FROM $wpdb->options WHERE option_name = %s", $setting) );
@@ -1196,9 +1370,9 @@ function dbDelta($queries, $execute = true) {
 	global $wpdb;
 
 	// Separate individual queries into an array
-	if( !is_array($queries) ) {
+	if ( !is_array($queries) ) {
 		$queries = explode( ';', $queries );
-		if('' == $queries[count($queries) - 1]) array_pop($queries);
+		if ('' == $queries[count($queries) - 1]) array_pop($queries);
 	}
 
 	$cqueries = array(); // Creation Queries
@@ -1207,33 +1381,28 @@ function dbDelta($queries, $execute = true) {
 
 	// Create a tablename index for an array ($cqueries) of queries
 	foreach($queries as $qry) {
-		if(preg_match("|CREATE TABLE ([^ ]*)|", $qry, $matches)) {
+		if (preg_match("|CREATE TABLE ([^ ]*)|", $qry, $matches)) {
 			$cqueries[trim( strtolower($matches[1]), '`' )] = $qry;
 			$for_update[$matches[1]] = 'Created table '.$matches[1];
-		}
-		else if(preg_match("|CREATE DATABASE ([^ ]*)|", $qry, $matches)) {
+		} else if (preg_match("|CREATE DATABASE ([^ ]*)|", $qry, $matches)) {
 			array_unshift($cqueries, $qry);
-		}
-		else if(preg_match("|INSERT INTO ([^ ]*)|", $qry, $matches)) {
+		} else if (preg_match("|INSERT INTO ([^ ]*)|", $qry, $matches)) {
 			$iqueries[] = $qry;
-		}
-		else if(preg_match("|UPDATE ([^ ]*)|", $qry, $matches)) {
+		} else if (preg_match("|UPDATE ([^ ]*)|", $qry, $matches)) {
 			$iqueries[] = $qry;
-		}
-		else {
+		} else {
 			// Unrecognized query type
 		}
 	}
 
 	// Check to see which tables and fields exist
-	if($tables = $wpdb->get_col('SHOW TABLES;')) {
+	if ($tables = $wpdb->get_col('SHOW TABLES;')) {
 		// For every table in the database
-		foreach($tables as $table) {
+		foreach ($tables as $table) {
 			// If a table query exists for the database table...
-			if( array_key_exists(strtolower($table), $cqueries) ) {
+			if ( array_key_exists(strtolower($table), $cqueries) ) {
 				// Clear the field and index arrays
-				unset($cfields);
-				unset($indices);
+				$cfields = $indices = array();
 				// Get all of the field names in the query from between the parens
 				preg_match("|\((.*)\)|ms", $cqueries[strtolower($table)], $match2);
 				$qryline = trim($match2[1]);
@@ -1244,15 +1413,14 @@ function dbDelta($queries, $execute = true) {
 				//echo "<hr/><pre>\n".print_r(strtolower($table), true).":\n".print_r($cqueries, true)."</pre><hr/>";
 
 				// For every field line specified in the query
-				foreach($flds as $fld) {
+				foreach ($flds as $fld) {
 					// Extract the field name
 					preg_match("|^([^ ]*)|", trim($fld), $fvals);
 					$fieldname = trim( $fvals[1], '`' );
 
 					// Verify the found field name
 					$validfield = true;
-					switch(strtolower($fieldname))
-					{
+					switch (strtolower($fieldname)) {
 					case '':
 					case 'primary':
 					case 'index':
@@ -1266,7 +1434,7 @@ function dbDelta($queries, $execute = true) {
 					$fld = trim($fld);
 
 					// If it's a valid field, add it to the field array
-					if($validfield) {
+					if ($validfield) {
 						$cfields[strtolower($fieldname)] = trim($fld, ", \n");
 					}
 				}
@@ -1275,15 +1443,15 @@ function dbDelta($queries, $execute = true) {
 				$tablefields = $wpdb->get_results("DESCRIBE {$table};");
 
 				// For every field in the table
-				foreach($tablefields as $tablefield) {
+				foreach ($tablefields as $tablefield) {
 					// If the table field exists in the field array...
-					if(array_key_exists(strtolower($tablefield->Field), $cfields)) {
+					if (array_key_exists(strtolower($tablefield->Field), $cfields)) {
 						// Get the field type from the query
 						preg_match("|".$tablefield->Field." ([^ ]*( unsigned)?)|i", $cfields[strtolower($tablefield->Field)], $matches);
 						$fieldtype = $matches[1];
 
 						// Is actual field type different from the field type in query?
-						if($tablefield->Type != $fieldtype) {
+						if ($tablefield->Type != $fieldtype) {
 							// Add a query to change the column type
 							$cqueries[] = "ALTER TABLE {$table} CHANGE COLUMN {$tablefield->Field} " . $cfields[strtolower($tablefield->Field)];
 							$for_update[$table.'.'.$tablefield->Field] = "Changed type of {$table}.{$tablefield->Field} from {$tablefield->Type} to {$fieldtype}";
@@ -1291,10 +1459,9 @@ function dbDelta($queries, $execute = true) {
 
 						// Get the default value from the array
 							//echo "{$cfields[strtolower($tablefield->Field)]}<br>";
-						if(preg_match("| DEFAULT '(.*)'|i", $cfields[strtolower($tablefield->Field)], $matches)) {
+						if (preg_match("| DEFAULT '(.*)'|i", $cfields[strtolower($tablefield->Field)], $matches)) {
 							$default_value = $matches[1];
-							if($tablefield->Default != $default_value)
-							{
+							if ($tablefield->Default != $default_value) {
 								// Add a query to change the column's default value
 								$cqueries[] = "ALTER TABLE {$table} ALTER COLUMN {$tablefield->Field} SET DEFAULT '{$default_value}'";
 								$for_update[$table.'.'.$tablefield->Field] = "Changed default value of {$table}.{$tablefield->Field} from {$tablefield->Default} to {$default_value}";
@@ -1303,14 +1470,13 @@ function dbDelta($queries, $execute = true) {
 
 						// Remove the field from the array (so it's not added)
 						unset($cfields[strtolower($tablefield->Field)]);
-					}
-					else {
+					} else {
 						// This field exists in the table, but not in the creation queries?
 					}
 				}
 
 				// For every remaining field specified for the table
-				foreach($cfields as $fieldname => $fielddef) {
+				foreach ($cfields as $fieldname => $fielddef) {
 					// Push a query line into $cqueries that adds the field to that table
 					$cqueries[] = "ALTER TABLE {$table} ADD COLUMN $fielddef";
 					$for_update[$table.'.'.$fieldname] = 'Added column '.$table.'.'.$fieldname;
@@ -1320,12 +1486,12 @@ function dbDelta($queries, $execute = true) {
 				// Fetch the table index structure from the database
 				$tableindices = $wpdb->get_results("SHOW INDEX FROM {$table};");
 
-				if($tableindices) {
+				if ($tableindices) {
 					// Clear the index array
 					unset($index_ary);
 
 					// For every index in the table
-					foreach($tableindices as $tableindex) {
+					foreach ($tableindices as $tableindex) {
 						// Add the index to the index data array
 						$keyname = $tableindex->Key_name;
 						$index_ary[$keyname]['columns'][] = array('fieldname' => $tableindex->Column_name, 'subpart' => $tableindex->Sub_part);
@@ -1333,32 +1499,31 @@ function dbDelta($queries, $execute = true) {
 					}
 
 					// For each actual index in the index array
-					foreach($index_ary as $index_name => $index_data) {
+					foreach ($index_ary as $index_name => $index_data) {
 						// Build a create string to compare to the query
 						$index_string = '';
-						if($index_name == 'PRIMARY') {
+						if ($index_name == 'PRIMARY') {
 							$index_string .= 'PRIMARY ';
-						}
-						else if($index_data['unique']) {
+						} else if($index_data['unique']) {
 							$index_string .= 'UNIQUE ';
 						}
 						$index_string .= 'KEY ';
-						if($index_name != 'PRIMARY') {
+						if ($index_name != 'PRIMARY') {
 							$index_string .= $index_name;
 						}
 						$index_columns = '';
 						// For each column in the index
-						foreach($index_data['columns'] as $column_data) {
-							if($index_columns != '') $index_columns .= ',';
+						foreach ($index_data['columns'] as $column_data) {
+							if ($index_columns != '') $index_columns .= ',';
 							// Add the field to the column list string
 							$index_columns .= $column_data['fieldname'];
-							if($column_data['subpart'] != '') {
+							if ($column_data['subpart'] != '') {
 								$index_columns .= '('.$column_data['subpart'].')';
 							}
 						}
 						// Add the column list to the index create string
 						$index_string .= ' ('.$index_columns.')';
-						if(!(($aindex = array_search($index_string, $indices)) === false)) {
+						if (!(($aindex = array_search($index_string, $indices)) === false)) {
 							unset($indices[$aindex]);
 							//echo "<pre style=\"border:1px solid #ccc;margin-top:5px;\">{$table}:<br />Found index:".$index_string."</pre>\n";
 						}
@@ -1383,8 +1548,8 @@ function dbDelta($queries, $execute = true) {
 	}
 
 	$allqueries = array_merge($cqueries, $iqueries);
-	if($execute) {
-		foreach($allqueries as $query) {
+	if ($execute) {
+		foreach ($allqueries as $query) {
 			//echo "<pre style=\"border:1px solid #ccc;margin-top:5px;\">".print_r($query, true)."</pre>\n";
 			$wpdb->query($query);
 		}
@@ -1454,7 +1619,7 @@ function make_site_theme_from_oldschool($theme_name, $template) {
 		if ($oldfile == 'index.php') { // Check to make sure it's not a new index
 			$index = implode('', file("$oldpath/$oldfile"));
 			if (strpos($index, 'WP_USE_THEMES') !== false) {
-				if (! @copy(WP_CONTENT_DIR . '/themes/default/index.php', "$site_dir/$newfile"))
+				if (! @copy(WP_CONTENT_DIR . '/themes/' . WP_DEFAULT_THEME . '/index.php', "$site_dir/$newfile"))
 					return false;
 				continue; // Don't copy anything
 				}
@@ -1514,12 +1679,12 @@ function make_site_theme_from_oldschool($theme_name, $template) {
  */
 function make_site_theme_from_default($theme_name, $template) {
 	$site_dir = WP_CONTENT_DIR . "/themes/$template";
-	$default_dir = WP_CONTENT_DIR . '/themes/default';
+	$default_dir = WP_CONTENT_DIR . '/themes/' . WP_DEFAULT_THEME;
 
 	// Copy files from the default theme to the site theme.
 	//$files = array('index.php', 'comments.php', 'comments-popup.php', 'footer.php', 'header.php', 'sidebar.php', 'style.css');
 
-	$theme_dir = @ opendir("$default_dir");
+	$theme_dir = @ opendir($default_dir);
 	if ($theme_dir) {
 		while(($theme_file = readdir( $theme_dir )) !== false) {
 			if (is_dir("$default_dir/$theme_file"))
@@ -1610,7 +1775,7 @@ function make_site_theme() {
 
 	// Make the new site theme active.
 	$current_template = __get_option('template');
-	if ($current_template == 'default') {
+	if ($current_template == WP_DEFAULT_THEME) {
 		update_option('template', $template);
 		update_option('stylesheet', $template);
 	}
@@ -1699,4 +1864,124 @@ function pre_schema_upgrade() {
 
 }
 
+/**
+ * Install Network.
+ *
+ * @since 3.0.0
+ *
+ */
+if ( !function_exists( 'install_network' ) ) :
+function install_network() {
+	global $wpdb, $charset_collate;
+	$ms_queries = "
+CREATE TABLE $wpdb->users (
+  ID bigint(20) unsigned NOT NULL auto_increment,
+  user_login varchar(60) NOT NULL default '',
+  user_pass varchar(64) NOT NULL default '',
+  user_nicename varchar(50) NOT NULL default '',
+  user_email varchar(100) NOT NULL default '',
+  user_url varchar(100) NOT NULL default '',
+  user_registered datetime NOT NULL default '0000-00-00 00:00:00',
+  user_activation_key varchar(60) NOT NULL default '',
+  user_status int(11) NOT NULL default '0',
+  display_name varchar(250) NOT NULL default '',
+  spam tinyint(2) NOT NULL default '0',
+  deleted tinyint(2) NOT NULL default '0',
+  PRIMARY KEY  (ID),
+  KEY user_login_key (user_login),
+  KEY user_nicename (user_nicename)
+) $charset_collate;
+CREATE TABLE $wpdb->blogs (
+  blog_id bigint(20) NOT NULL auto_increment,
+  site_id bigint(20) NOT NULL default '0',
+  domain varchar(200) NOT NULL default '',
+  path varchar(100) NOT NULL default '',
+  registered datetime NOT NULL default '0000-00-00 00:00:00',
+  last_updated datetime NOT NULL default '0000-00-00 00:00:00',
+  public tinyint(2) NOT NULL default '1',
+  archived enum('0','1') NOT NULL default '0',
+  mature tinyint(2) NOT NULL default '0',
+  spam tinyint(2) NOT NULL default '0',
+  deleted tinyint(2) NOT NULL default '0',
+  lang_id int(11) NOT NULL default '0',
+  PRIMARY KEY  (blog_id),
+  KEY domain (domain(50),path(5)),
+  KEY lang_id (lang_id)
+) $charset_collate;
+CREATE TABLE $wpdb->blog_versions (
+  blog_id bigint(20) NOT NULL default '0',
+  db_version varchar(20) NOT NULL default '',
+  last_updated datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (blog_id),
+  KEY db_version (db_version)
+) $charset_collate;
+CREATE TABLE $wpdb->registration_log (
+  ID bigint(20) NOT NULL auto_increment,
+  email varchar(255) NOT NULL default '',
+  IP varchar(30) NOT NULL default '',
+  blog_id bigint(20) NOT NULL default '0',
+  date_registered datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (ID),
+  KEY IP (IP)
+) $charset_collate;
+CREATE TABLE $wpdb->site (
+  id bigint(20) NOT NULL auto_increment,
+  domain varchar(200) NOT NULL default '',
+  path varchar(100) NOT NULL default '',
+  PRIMARY KEY  (id),
+  KEY domain (domain,path)
+) $charset_collate;
+CREATE TABLE $wpdb->sitemeta (
+  meta_id bigint(20) NOT NULL auto_increment,
+  site_id bigint(20) NOT NULL default '0',
+  meta_key varchar(255) default NULL,
+  meta_value longtext,
+  PRIMARY KEY  (meta_id),
+  KEY meta_key (meta_key),
+  KEY site_id (site_id)
+) $charset_collate;
+CREATE TABLE $wpdb->signups (
+  domain varchar(200) NOT NULL default '',
+  path varchar(100) NOT NULL default '',
+  title longtext NOT NULL,
+  user_login varchar(60) NOT NULL default '',
+  user_email varchar(100) NOT NULL default '',
+  registered datetime NOT NULL default '0000-00-00 00:00:00',
+  activated datetime NOT NULL default '0000-00-00 00:00:00',
+  active tinyint(1) NOT NULL default '0',
+  activation_key varchar(50) NOT NULL default '',
+  meta longtext,
+  KEY activation_key (activation_key),
+  KEY domain (domain)
+) $charset_collate;
+";
+// now create tables
+	dbDelta( $ms_queries );
+}
+endif;
+
+/**
+ * Install global terms.
+ *
+ * @since 3.0.0
+ *
+ */
+if ( !function_exists( 'install_global_terms' ) ) :
+function install_global_terms() {
+	global $wpdb, $charset_collate;
+	$ms_queries = "
+CREATE TABLE $wpdb->sitecategories (
+  cat_ID bigint(20) NOT NULL auto_increment,
+  cat_name varchar(55) NOT NULL default '',
+  category_nicename varchar(200) NOT NULL default '',
+  last_updated timestamp NOT NULL,
+  PRIMARY KEY  (cat_ID),
+  KEY category_nicename (category_nicename),
+  KEY last_updated (last_updated)
+) $charset_collate;
+";
+// now create tables
+	dbDelta( $ms_queries );
+}
+endif;
 ?>

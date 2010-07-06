@@ -171,7 +171,58 @@ $_old_files = array(
 'wp-images/wpminilogo.png',
 'wp.php',
 'wp-includes/gettext.php',
-'wp-includes/streams.php'
+'wp-includes/streams.php',
+// MU
+'wp-admin/wpmu-admin.php',
+'wp-admin/wpmu-blogs.php',
+'wp-admin/wpmu-edit.php',
+'wp-admin/wpmu-options.php',
+'wp-admin/wpmu-themes.php',
+'wp-admin/wpmu-upgrade-site.php',
+'wp-admin/wpmu-users.php',
+'wp-includes/wpmu-default-filters.php',
+'wp-includes/wpmu-functions.php',
+'wpmu-settings.php',
+'index-install.php',
+'README.txt',
+'htaccess.dist',
+'wp-admin/css/mu-rtl.css',
+'wp-admin/css/mu.css',
+'wp-admin/images/site-admin.png',
+'wp-admin/includes/mu.php',
+'wp-includes/images/wordpress-mu.png',
+// 3.0
+'wp-admin/categories.php',
+'wp-admin/edit-category-form.php',
+'wp-admin/edit-page-form.php',
+'wp-admin/edit-pages.php',
+'wp-admin/images/wp-logo.gif',
+'wp-admin/js/wp-gears.dev.js',
+'wp-admin/js/wp-gears.js',
+'wp-admin/options-misc.php',
+'wp-admin/page-new.php',
+'wp-admin/page.php',
+'wp-admin/rtl.css',
+'wp-admin/rtl.dev.css',
+'wp-admin/update-links.php',
+'wp-admin/wp-admin.css',
+'wp-admin/wp-admin.dev.css',
+'wp-includes/js/codepress',
+'wp-includes/js/jquery/autocomplete.dev.js',
+'wp-includes/js/jquery/interface.js',
+'wp-includes/js/jquery/autocomplete.js',
+'wp-includes/js/scriptaculous/prototype.js',
+'wp-includes/js/tinymce/wp-tinymce.js',
+'wp-content/themes/twentyten/searchform.php',
+'wp-admin/import',
+'wp-admin/images/ico-edit.png',
+'wp-admin/images/fav-top.png',
+'wp-admin/images/ico-close.png',
+'wp-admin/images/admin-header-footer.png',
+'wp-admin/images/screen-options-left.gif',
+'wp-admin/images/ico-add.png',
+'wp-admin/images/browse-happy.gif',
+'wp-admin/images/ico-viewpage.png',
 );
 
 /**
@@ -223,7 +274,7 @@ function update_core($from, $to) {
 	$mysql_version  = $wpdb->db_version();
 	$required_php_version = '4.3';
 	$required_mysql_version = '4.1.2';
-	$wp_version = '2.9.2';
+	$wp_version = '3.0';
 	$php_compat     = version_compare( $php_version, $required_php_version, '>=' );
 	$mysql_compat   = version_compare( $mysql_version, $required_mysql_version, '>=' ) || file_exists( WP_CONTENT_DIR . '/db.php' );
 
@@ -238,14 +289,22 @@ function update_core($from, $to) {
 		return new WP_Error( 'mysql_not_compatible', sprintf( __('The update cannot be installed because WordPress %1$s requires MySQL version %2$s or higher. You are running version %3$s.'), $wp_version, $required_mysql_version, $mysql_version ) );
 
 	// Sanity check the unzipped distribution
-	apply_filters('update_feedback', __('Verifying the unpacked files'));
-	if ( !$wp_filesystem->exists($from . '/wordpress/wp-settings.php') || !$wp_filesystem->exists($from . '/wordpress/wp-admin/admin.php') ||
-		!$wp_filesystem->exists($from . '/wordpress/wp-includes/functions.php') ) {
+	apply_filters('update_feedback', __('Verifying the unpacked files&#8230;'));
+	$distro = '';
+	$roots = array( '/wordpress', '/wordpress-mu' );
+	foreach( $roots as $root ) {
+		if ( $wp_filesystem->exists($from . $root . '/wp-settings.php') && $wp_filesystem->exists($from . $root . '/wp-admin/admin.php') &&
+			$wp_filesystem->exists($from . $root . '/wp-includes/functions.php') ) {
+			$distro = $root;
+			break;
+		}
+	}
+	if ( !$distro ) {
 		$wp_filesystem->delete($from, true);
 		return new WP_Error('insane_distro', __('The update could not be unpacked') );
 	}
 
-	apply_filters('update_feedback', __('Installing the latest version'));
+	apply_filters('update_feedback', __('Installing the latest version&#8230;'));
 
 	// Create maintenance file to signal that we are upgrading
 	$maintenance_string = '<?php $upgrading = ' . time() . '; ?>';
@@ -254,7 +313,7 @@ function update_core($from, $to) {
 	$wp_filesystem->put_contents($maintenance_file, $maintenance_string, FS_CHMOD_FILE);
 
 	// Copy new versions of WP files into place.
-	$result = copy_dir($from . '/wordpress', $to);
+	$result = copy_dir($from . $distro, $to);
 	if ( is_wp_error($result) ) {
 		$wp_filesystem->delete($maintenance_file);
 		$wp_filesystem->delete($from, true);
@@ -270,7 +329,7 @@ function update_core($from, $to) {
 	}
 
 	// Upgrade DB with separate request
-	apply_filters('update_feedback', __('Upgrading database'));
+	apply_filters('update_feedback', __('Upgrading database&#8230;'));
 	$db_upgrade_url = admin_url('upgrade.php?step=upgrade_db');
 	wp_remote_post($db_upgrade_url, array('timeout' => 60));
 
@@ -278,8 +337,8 @@ function update_core($from, $to) {
 	$wp_filesystem->delete($from, true);
 
 	// Force refresh of update information
-	if ( function_exists('delete_transient') )
-		delete_transient('update_core');
+	if ( function_exists('delete_site_transient') )
+		delete_site_transient('update_core');
 	else
 		delete_option('update_core');
 

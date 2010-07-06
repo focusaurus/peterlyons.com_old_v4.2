@@ -7,28 +7,11 @@
  */
 
 /** WordPress Administration Bootstrap */
-require_once('admin.php');
+require_once('./admin.php');
 header('Content-Type: ' . get_option('html_type') . '; charset=' . get_option('blog_charset'));
 
 if ( ! current_user_can('edit_posts') )
 	wp_die( __( 'Cheatin&#8217; uh?' ) );
-
-/**
- * Convert characters.
- *
- * @package WordPress
- * @subpackage Press_This
- * @since 2.6.0
- *
- * @param string $text
- * @return string
- */
-function aposfix($text) {
-	$translation_table[chr(34)] = '&quot;';
-	$translation_table[chr(38)] = '&';
-	$translation_table[chr(39)] = '&apos;';
-	return preg_replace("/&(?![A-Za-z]{0,4}\w{2,3};|#[0-9]{2,3};)/","&amp;" , strtr($text, $translation_table));
-}
 
 /**
  * Press It form handler.
@@ -45,7 +28,7 @@ function press_it() {
 	$quick['post_category'] = isset($_POST['post_category']) ? $_POST['post_category'] : null;
 	$quick['tax_input'] = isset($_POST['tax_input']) ? $_POST['tax_input'] : null;
 	$quick['post_title'] = ( trim($_POST['title']) != '' ) ? $_POST['title'] : '  ';
-	$quick['post_content'] = isset($_POST['post_content']) ? $_POST['post_content'] : ''; 
+	$quick['post_content'] = isset($_POST['post_content']) ? $_POST['post_content'] : '';
 
 	// insert the post with nothing in it, to get an ID
 	$post_ID = wp_insert_post($quick, true);
@@ -55,7 +38,7 @@ function press_it() {
 	$content = isset($_POST['content']) ? $_POST['content'] : '';
 
 	$upload = false;
-	if( !empty($_POST['photo_src']) && current_user_can('upload_files') ) {
+	if ( !empty($_POST['photo_src']) && current_user_can('upload_files') ) {
 		foreach( (array) $_POST['photo_src'] as $key => $image) {
 			// see if files exist in content - we don't want to upload non-used selected files.
 			if ( strpos($_POST['content'], htmlspecialchars($image)) !== false ) {
@@ -63,7 +46,7 @@ function press_it() {
 				$upload = media_sideload_image($image, $post_ID, $desc);
 
 				// Replace the POSTED content <img> with correct uploaded ones. Regex contains fix for Magic Quotes
-				if( !is_wp_error($upload) )
+				if ( !is_wp_error($upload) )
 					$content = preg_replace('/<img ([^>]*)src=\\\?(\"|\')'.preg_quote(htmlspecialchars($image), '/').'\\\?(\2)([^>\/]*)\/*>/is', $upload, $content);
 			}
 		}
@@ -92,11 +75,17 @@ if ( isset($_REQUEST['action']) && 'post' == $_REQUEST['action'] ) {
 }
 
 // Set Variables
-$title = isset( $_GET['t'] ) ? trim( strip_tags( aposfix( stripslashes( $_GET['t'] ) ) ) ) : '';
-$selection = isset( $_GET['s'] ) ? trim( htmlspecialchars( html_entity_decode( aposfix( stripslashes( $_GET['s'] ) ) ) ) ) : '';
+$title = isset( $_GET['t'] ) ? trim( strip_tags( html_entity_decode( stripslashes( $_GET['t'] ) , ENT_QUOTES) ) ) : '';
+
+$selection = '';
+if ( !empty($_GET['s']) ) {
+	$selection = str_replace('&apos;', "'", stripslashes($_GET['s']));
+	$selection = trim( htmlspecialchars( html_entity_decode($selection, ENT_QUOTES) ) );
+}
+
 if ( ! empty($selection) ) {
 	$selection = preg_replace('/(\r?\n|\r)/', '</p><p>', $selection);
-	$selection = '<p>'.str_replace('<p></p>', '', $selection).'</p>';
+	$selection = '<p>' . str_replace('<p></p>', '', $selection) . '</p>';
 }
 
 $url = isset($_GET['u']) ? esc_url($_GET['u']) : '';
@@ -195,7 +184,7 @@ if ( !empty($_REQUEST['ajax']) ) {
 		 */
 		function get_images_from_uri($uri) {
 			$uri = preg_replace('/\/#.+?$/','', $uri);
-			if( preg_match('/\.(jpg|jpe|jpeg|png|gif)$/', $uri) && !strpos($uri,'blogger.com') )
+			if ( preg_match('/\.(jpg|jpe|jpeg|png|gif)$/', $uri) && !strpos($uri,'blogger.com') )
 				return "'" . esc_attr( html_entity_decode($uri) ) . "'";
 			$content = wp_remote_fopen($uri);
 			if ( false === $content )
@@ -209,9 +198,9 @@ if ( !empty($_REQUEST['ajax']) ) {
 			$sources = array();
 			foreach ($matches[3] as $src) {
 				// if no http in url
-				if(strpos($src, 'http') === false)
+				if (strpos($src, 'http') === false)
 					// if it doesn't have a relative uri
-					if( strpos($src, '../') === false && strpos($src, './') === false && strpos($src, '/') === 0)
+					if ( strpos($src, '../') === false && strpos($src, './') === false && strpos($src, '/') === 0)
 						$src = 'http://'.str_replace('//','/', $host['host'].'/'.$src);
 					else
 						$src = 'http://'.str_replace('//','/', $host['host'].'/'.dirname($host['path']).'/'.$src);
@@ -410,8 +399,8 @@ var photostorage = false;
 					jQuery('#waiting').hide();
 					jQuery('#extra-fields').show();
 				}
-				jQuery('#extra-fields').before('<div id="waiting"><img src="images/wpspin_light.gif" alt="" /> <?php echo esc_js( __( 'Loading...' ) ); ?></div>');
-				
+				jQuery('#extra-fields').before('<div id="waiting"><img src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" alt="" /> <?php echo esc_js( __( 'Loading...' ) ); ?></div>');
+
 				if(photostorage == false) {
 					jQuery.ajax({
 						type: "GET",
@@ -486,35 +475,59 @@ var photostorage = false;
 						<?php } else { ?>
 							<br /><br /><input class="button-primary" type="submit" name="review" value="<?php esc_attr_e('Submit for Review') ?>" id="review" />
 						<?php } ?>
-						<img src="images/wpspin_light.gif" alt="" id="saving" style="display:none;" />
+						<img src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" alt="" id="saving" style="display:none;" />
 					</p>
 				</div>
 			</div>
 
-			<div id="categorydiv" class="stuffbox">
-				<div class="handlediv" title="<?php _e( 'Click to toggle' ); ?>">
-					<br/>
-				</div>
-				<h3><?php _e('Categories') ?></h3>
+			<?php $tax = get_taxonomy( 'category' ); ?>
+			<div id="categorydiv" class="postbox">
+				<div class="handlediv" title="<?php _e( 'Click to toggle' ); ?>"><br /></div>
+				<h3 class="hndle"><?php _e('Categories') ?></h3>
 				<div class="inside">
+				<div id="taxonomy-category" class="categorydiv">
 
-					<div id="categories-all" class="tabs-panel">
+					<ul id="category-tabs" class="category-tabs">
+						<li class="tabs"><a href="#category-all" tabindex="3"><?php echo $tax->labels->all_items; ?></a></li>
+						<li class="hide-if-no-js"><a href="#category-pop" tabindex="3"><?php _e( 'Most Used' ); ?></a></li>
+					</ul>
 
-						<ul id="categorychecklist" class="list:category categorychecklist form-no-clear">
-							<?php wp_category_checklist($post_ID, false) ?>
+					<div id="category-pop" class="tabs-panel" style="display: none;">
+						<ul id="categorychecklist-pop" class="categorychecklist form-no-clear" >
+							<?php $popular_ids = wp_popular_terms_checklist( 'category' ); ?>
 						</ul>
 					</div>
 
-					<div id="category-adder" class="wp-hidden-children">
-						<a id="category-add-toggle" href="#category-add" class="hide-if-no-js" tabindex="3"><?php _e( '+ Add New Category' ); ?></a>
-						<p id="category-add" class="wp-hidden-child">
-							<label class="screen-reader-text" for="newcat"><?php _e( 'Add New Category' ); ?></label><input type="text" name="newcat" id="newcat" class="form-required form-input-tip" value="<?php esc_attr_e( 'New category name' ); ?>" tabindex="3" aria-required="true"/>
-							<label class="screen-reader-text" for="newcat_parent"><?php _e('Parent category'); ?>:</label><?php wp_dropdown_categories( array( 'hide_empty' => 0, 'name' => 'newcat_parent', 'orderby' => 'name', 'hierarchical' => 1, 'show_option_none' => __('Parent category'), 'tab_index' => 3 ) ); ?>
-							<input type="button" id="category-add-sumbit" class="add:categorychecklist:category-add button" value="<?php esc_attr_e( 'Add' ); ?>" tabindex="3" />
-							<?php wp_nonce_field( 'add-category', '_ajax_nonce', false ); ?>
-							<span id="category-ajax-response"></span>
-						</p>
+					<div id="category-all" class="tabs-panel">
+						<ul id="categorychecklist" class="list:category categorychecklist form-no-clear">
+							<?php wp_terms_checklist($post_ID, array( 'taxonomy' => 'category', 'popular_cats' => $popular_ids ) ) ?>
+						</ul>
 					</div>
+
+					<?php if ( !current_user_can($tax->cap->assign_terms) ) : ?>
+					<p><em><?php _e('You cannot modify this Taxonomy.'); ?></em></p>
+					<?php endif; ?>
+					<?php if ( current_user_can($tax->cap->edit_terms) ) : ?>
+						<div id="category-adder" class="wp-hidden-children">
+							<h4>
+								<a id="category-add-toggle" href="#category-add" class="hide-if-no-js" tabindex="3">
+									<?php printf( __( '+ %s' ), $tax->labels->add_new_item ); ?>
+								</a>
+							</h4>
+							<p id="category-add" class="category-add wp-hidden-child">
+								<label class="screen-reader-text" for="newcategory"><?php echo $tax->labels->add_new_item; ?></label>
+								<input type="text" name="newcategory" id="newcategory" class="form-required form-input-tip" value="<?php echo esc_attr( $tax->labels->new_item_name ); ?>" tabindex="3" aria-required="true"/>
+								<label class="screen-reader-text" for="newcategory_parent">
+									<?php echo $tax->labels->parent_item_colon; ?>
+								</label>
+								<?php wp_dropdown_categories( array( 'taxonomy' => 'category', 'hide_empty' => 0, 'name' => 'newcategory_parent', 'orderby' => 'name', 'hierarchical' => 1, 'show_option_none' => '&mdash; ' . $tax->labels->parent_item . ' &mdash;', 'tab_index' => 3 ) ); ?>
+								<input type="button" id="category-add-submit" class="add:categorychecklist:category-add button category-add-sumbit" value="<?php echo esc_attr( $tax->labels->add_new_item ); ?>" tabindex="3" />
+								<?php wp_nonce_field( 'add-category', '_ajax_nonce', false ); ?>
+								<span id="category-ajax-response"></span>
+							</p>
+						</div>
+					<?php endif; ?>
+				</div>
 				</div>
 			</div>
 
@@ -542,7 +555,7 @@ var photostorage = false;
 	</div>
 	<div class="posting">
 		<?php if ( isset($posted) && intval($posted) ) { $post_ID = intval($posted); ?>
-		<div id="message" class="updated fade"><p><strong><?php _e('Your post has been saved.'); ?></strong> <a onclick="window.opener.location.replace(this.href); window.close();" href="<?php echo get_permalink( $post_ID); ?>"><?php _e('View post'); ?></a> | <a href="<?php echo get_edit_post_link( $post_ID ); ?>" onclick="window.opener.location.replace(this.href); window.close();"><?php _e('Edit post'); ?></a> | <a href="#" onclick="window.close();"><?php _e('Close Window'); ?></a></p></div>
+		<div id="message" class="updated"><p><strong><?php _e('Your post has been saved.'); ?></strong> <a onclick="window.opener.location.replace(this.href); window.close();" href="<?php echo get_permalink( $post_ID); ?>"><?php _e('View post'); ?></a> | <a href="<?php echo get_edit_post_link( $post_ID ); ?>" onclick="window.opener.location.replace(this.href); window.close();"><?php _e('Edit Post'); ?></a> | <a href="#" onclick="window.close();"><?php _e('Close Window'); ?></a></p></div>
 		<?php } ?>
 
 		<div id="titlediv">
@@ -558,13 +571,13 @@ var photostorage = false;
 
 				<li id="photo_button">
 					Add: <?php if ( current_user_can('upload_files') ) { ?><a title="<?php _e('Insert an Image'); ?>" href="#">
-<img alt="<?php _e('Insert an Image'); ?>" src="images/media-button-image.gif"/></a>
+<img alt="<?php _e('Insert an Image'); ?>" src="<?php echo esc_url( admin_url( 'images/media-button-image.gif?ver=20100531' ) ); ?>"/></a>
 					<?php } ?>
 				</li>
 				<li id="video_button">
-					<a title="<?php _e('Embed a Video'); ?>" href="#"><img alt="<?php _e('Embed a Video'); ?>" src="images/media-button-video.gif"/></a>
+					<a title="<?php _e('Embed a Video'); ?>" href="#"><img alt="<?php _e('Embed a Video'); ?>" src="<?php echo esc_url( admin_url( 'images/media-button-video.gif?ver=20100531' ) ); ?>"/></a>
 				</li>
-				<?php if( user_can_richedit() ) { ?>
+				<?php if ( user_can_richedit() ) { ?>
 				<li id="switcher">
 					<?php wp_print_scripts( 'quicktags' ); ?>
 					<?php add_filter('the_editor_content', 'wp_richedit_pre'); ?>

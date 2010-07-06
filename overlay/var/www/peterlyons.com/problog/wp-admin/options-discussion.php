@@ -7,15 +7,23 @@
  */
 
 /** WordPress Administration Bootstrap */
-require_once('admin.php');
+require_once('./admin.php');
 
-if ( ! current_user_can('manage_options') )
-	wp_die(__('You do not have sufficient permissions to manage options for this blog.'));
+if ( ! current_user_can( 'manage_options' ) )
+	wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
 
 $title = __('Discussion Settings');
 $parent_file = 'options-general.php';
 
-include('admin-header.php');
+add_contextual_help($current_screen,
+	'<p>' . __('This screen provides many options for controlling the management and display of comments and links to your posts/pages. So many, in fact, they won&#8217;t all fit here! :) Use the documentation link below to get information on what each discussion setting does.') . '</p>' .
+	'<p>' . __('You must click the Save Changes button at the bottom of the screen for new settings to take effect.') . '</p>' .
+	'<p><strong>' . __('For more information:') . '</strong></p>' .
+	'<p>' . __('<a href="http://codex.wordpress.org/Settings_Discussion_SubPanel" target="_blank">Discussion Settings Documentation</a>') . '</p>' .
+	'<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
+);
+
+include('./admin-header.php');
 ?>
 
 <div class="wrap">
@@ -31,7 +39,7 @@ include('admin-header.php');
 <td><fieldset><legend class="screen-reader-text"><span><?php _e('Default article settings') ?></span></legend>
 <label for="default_pingback_flag">
 <input name="default_pingback_flag" type="checkbox" id="default_pingback_flag" value="1" <?php checked('1', get_option('default_pingback_flag')); ?> />
-<?php _e('Attempt to notify any blogs linked to from the article (slows down posting.)') ?></label>
+<?php _e('Attempt to notify any blogs linked to from the article.') ?></label>
 <br />
 <label for="default_ping_status">
 <input name="default_ping_status" type="checkbox" id="default_ping_status" value="open" <?php checked('open', get_option('default_ping_status')); ?> />
@@ -52,6 +60,7 @@ include('admin-header.php');
 <label for="comment_registration">
 <input name="comment_registration" type="checkbox" id="comment_registration" value="1" <?php checked('1', get_option('comment_registration')); ?> />
 <?php _e('Users must be registered and logged in to comment') ?>
+<?php if ( !get_option( 'users_can_register' ) && is_multisite() ) _e( ' (Signup has been disabled. Only members of this site can comment.)' ); ?>
 </label>
 <br />
 
@@ -150,16 +159,16 @@ printf( __('Comments should be displayed with the %s comments at the top of each
 
 <h3><?php _e('Avatars') ?></h3>
 
-<p><?php _e('An avatar is an image that follows you from weblog to weblog appearing beside your name when you comment on avatar enabled sites.  Here you can enable the display of avatars for people who comment on your blog.'); ?></p>
+<p><?php _e('An avatar is an image that follows you from weblog to weblog appearing beside your name when you comment on avatar enabled sites.  Here you can enable the display of avatars for people who comment on your site.'); ?></p>
 
 <?php // the above would be a good place to link to codex documentation on the gravatar functions, for putting it in themes. anything like that? ?>
 
 <table class="form-table">
 <tr valign="top">
 <th scope="row"><?php _e('Avatar Display') ?></th>
-<td><fieldset><legend class="screen-reader-text"><span><?php _e('Avatar display') ?></span></legend>
+<td><fieldset><legend class="screen-reader-text"><span><?php _e('Avatar Display') ?></span></legend>
 <?php
-	$yesorno = array(0 => __("Don&#8217;t show Avatars"), 1 => __('Show Avatars'));
+	$yesorno = array( 0 => __( 'Don&#8217;t show Avatars' ), 1 => __( 'Show Avatars' ) );
 	foreach ( $yesorno as $key => $value) {
 		$selected = (get_option('show_avatars') == $key) ? 'checked="checked"' : '';
 		echo "\n\t<label><input type='radio' name='show_avatars' value='" . esc_attr($key) . "' $selected/> $value</label><br />";
@@ -172,7 +181,16 @@ printf( __('Comments should be displayed with the %s comments at the top of each
 <td><fieldset><legend class="screen-reader-text"><span><?php _e('Maximum Rating') ?></span></legend>
 
 <?php
-$ratings = array( 'G' => __('G &#8212; Suitable for all audiences'), 'PG' => __('PG &#8212; Possibly offensive, usually for audiences 13 and above'), 'R' => __('R &#8212; Intended for adult audiences above 17'), 'X' => __('X &#8212; Even more mature than above'));
+$ratings = array(
+	/* translators: Content suitability rating: http://bit.ly/89QxZA */
+	'G' => __('G &#8212; Suitable for all audiences'),
+	/* translators: Content suitability rating: http://bit.ly/89QxZA */
+	'PG' => __('PG &#8212; Possibly offensive, usually for audiences 13 and above'),
+	/* translators: Content suitability rating: http://bit.ly/89QxZA */
+	'R' => __('R &#8212; Intended for adult audiences above 17'),
+	/* translators: Content suitability rating: http://bit.ly/89QxZA */
+	'X' => __('X &#8212; Even more mature than above')
+);
 foreach ($ratings as $key => $rating) :
 	$selected = (get_option('avatar_rating') == $key) ? 'checked="checked"' : '';
 	echo "\n\t<label><input type='radio' name='avatar_rating' value='" . esc_attr($key) . "' $selected/> $rating</label><br />";

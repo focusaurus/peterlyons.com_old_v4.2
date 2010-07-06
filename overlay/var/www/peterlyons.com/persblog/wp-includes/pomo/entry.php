@@ -2,7 +2,7 @@
 /**
  * Contains Translation_Entry class
  *
- * @version $Id: entry.php 222 2009-09-07 21:14:23Z nbachiyski $
+ * @version $Id: entry.php 406 2010-02-07 11:10:24Z nbachiyski $
  * @package pomo
  * @subpackage entry
  */
@@ -46,7 +46,6 @@ class Translation_Entry {
 			return;
 		}
 		// get member variable values from args hash
-		$object_varnames = array_keys(get_object_vars($this));
 		foreach ($args as $varname => $value) {
 			$this->$varname = $value;
 		}

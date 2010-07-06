@@ -19,11 +19,6 @@ function __() {}
 /**
  * @ignore
  */
-function _c() {}
-
-/**
- * @ignore
- */
 function _x() {}
 
 
@@ -81,6 +76,11 @@ function site_url() {}
  * @ignore
  */
 function admin_url() {}
+
+/**
+ * @ignore
+ */
+function home_url() {}
 
 /**
  * @ignore

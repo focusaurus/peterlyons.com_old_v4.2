@@ -1,9 +1,9 @@
 <?php
-/*
+/**
  * Plugin Name: Defensio Anti-Spam
  * Plugin URI: http://defensio.com/
  * Description: Defensio is an advanced spam filtering web service that learns and adapts to your behaviors as well to those of your readers and commenters.  To use this plugin, you need to obtain a <a href="http://defensio.com/signup">free API Key</a>.  Tell the world how many spam Defensio caught!  Just put <code>&lt;?php defensio_counter(); ?&gt;</code> in your template.
- * Version: 2.5.3
+ * Version: 2.5.7
  * Author: Websense, Inc.
  * Author URI: http://defensio.com
  *
@@ -12,6 +12,16 @@
 global $defensio_plugin_dir, $defensio_plugin_url, $defensio_conf;
 $defensio_plugin_dir = WP_PLUGIN_DIR .'/'. basename(dirname(__FILE__));
 $defensio_plugin_url = WP_PLUGIN_URL .'/'. basename(dirname(__FILE__));
+
+/** Generates a key name for wp options that is user unique */
+function defensio_user_unique_option_key( $opt_name = NULL ) {
+    global $userdata;
+
+    if($opt_name != NULL){
+        get_currentuserinfo();
+        return "defensio_". $userdata->ID."_$opt_name";
+    }
+}
 
 require_once('lib/defensio-php/Defensio.php');
 require_once('lib/DefensioDB.php');
@@ -34,7 +44,7 @@ if (!function_exists('wp_nonce_field') ) {
 // Initialize arrays for deferred training
 $defensio_retraining  = false;
 
-/* 
+/** 
  * Installation function, creates the Defensio table and populate it with default options
  */
 function defensio_install() {
@@ -47,7 +57,7 @@ function defensio_install() {
 }
 register_activation_hook(__FILE__ , 'defensio_install');
 
-/*
+/**
  * Creates Defensio table in MySQL
  */
 function defensio_create_table() {
@@ -57,13 +67,20 @@ function defensio_create_table() {
         update_option('defensio_db_version', DefensioDB::TABLE_VERSION);
 }
 
-/* 
- * Init hook. Instantiate DefensioDB and DefensioWP to access Defensio's REST service, and make sure the wp_defensio table 
- * is in the database. If not, create it.
+/**
+ * Init hook. Instantiate DefensioDB and DefensioWP to access Defensio's REST service, and make sure the 
+ * wp_defensio table is in the database. If not, create it.
  */
 function defensio_init() {
     global $defensio_conf, $defensio_db, $defensio_manager;
     add_action('admin_menu', 'defensio_config_page');
+
+    // Key should be a global setting, not a user setting. Make the change if required
+    $user_key = trim(get_option(defensio_user_unique_option_key('defensio_key')));
+    if (isset($user_key) && $user_key != "") {
+      update_option('defensio_key', $user_key);
+      delete_option(defensio_user_unique_option_key('defensio_key'));
+    }
 
     defensio_set_key();
     $defensio_db      = new DefensioDB();
@@ -83,9 +100,7 @@ function defensio_styles() {
 add_action('admin_print_styles', 'defensio_styles');
 
 function defensio_key_not_set_warning() {
-    global $defensio_conf;
-
-    if (!isset($defensio_conf['key']) or empty($defensio_conf['key'])) {
+    if (!defensio_is_key_set()) {
         echo "<div id='defensio_warning' class='updated fade'>" .
              "<p><strong>Defensio is not active</strong> because you have not entered your Defensio API key. " .
              " <a href='http://defensio.com/signup' target='_blank'>Get one right here!</a></p></div>";
@@ -213,10 +228,10 @@ function defensio_configuration() {
     ));
 }
 
-function defensio_update_db($opts = null){
+function defensio_update_db($opts = NULL) {
     global $defensio_conf, $defensio_retraining, $defensio_db;
 
-    if($opts == null or !is_array($opts))
+    if($opts == NULL or !is_array($opts))
         return false;
 
     if (function_exists('current_user_can') && !current_user_can('moderate_comments')) {
@@ -256,11 +271,11 @@ function defensio_update_db($opts = null){
 }
 
 // Prepare messages to be displayed in the quarantine
-function defensio_caught( $opts = null ) {
+function defensio_caught( $opts = NULL ) {
     global $defensio_conf, $defensio_retraining, $defensio_manager, $defensio_db, $plugin_uri;
     $page = 1;
 
-    if($opts == null or !is_array($opts))
+    if($opts == NULL or !is_array($opts))
         return false;
 
     if (isset ($opts['page']) or empty ($opts['page'])) {
@@ -272,7 +287,7 @@ function defensio_caught( $opts = null ) {
     } 
 
     // In case further ordering is needed
-    $order = null;
+    $order = NULL;
 
     // A new ordering requested? update ordering creterion
     if ( isset($opts['sort_by']) && !empty ($opts['sort_by'])) {
@@ -291,7 +306,7 @@ function defensio_caught( $opts = null ) {
         // no request? get the ordering from options.
         $order = get_option(defensio_user_unique_option_key('order'));
 
-        if($order == null){
+        if($order == NULL){
             $order = 'spaminess';
             update_option(defensio_user_unique_option_key('order'), $order);
         }
@@ -340,8 +355,7 @@ function defensio_caught( $opts = null ) {
     );
 }
 
-function defensio_dispatch()
-{
+function defensio_dispatch() {
     global $defensio_conf, $defensio_retraining;
 
     if (function_exists('current_user_can') && !current_user_can('moderate_comments')) {
@@ -390,7 +404,7 @@ function defensio_manage_page() {
 }
 add_action('admin_menu', 'defensio_manage_page');
 
-function defensio_admin_head(){
+function defensio_admin_head() {
     global $defensio_plugin_url;
     wp_enqueue_script('prototype');
     wp_enqueue_script('fat',  "$defensio_plugin_url/scripts/fat.js");
@@ -399,7 +413,7 @@ function defensio_admin_head(){
     wp_enqueue_script('admin-forms');
 }
 
-/* 
+/**
  * Posts a comment to Defensio
  *
  * @param id $comment_ID an array representing a WordPress comment
@@ -412,14 +426,14 @@ function defensio_send_comment($comment_ID, $wp_status = NULL ) {
 }
 add_action('comment_post', 'defensio_send_comment');
 
-function defensio_pre_comment_approved($approved){
+function defensio_pre_comment_approved($approved) {
     global $defensio_manager, $user_ID;
     return $defensio_manager->preApproval($approved, $user_ID);
 }
 add_action('pre_comment_approved', 'defensio_pre_comment_approved');
 
 /* To train multiple messages at once, we push them into an array and process them in the shutdown hook. */
-function defensio_defer_training($id, $new_status = null) {
+function defensio_defer_training($id, $new_status = NULL) {
     global $defensio_retraining, $wpdb, $defensio_db, $defensio_manager;
 
     $comment = $wpdb->get_row("SELECT * FROM $wpdb->comments NATURAL JOIN $wpdb->prefix" . "defensio WHERE $wpdb->comments.comment_ID = '$id'");
@@ -457,8 +471,7 @@ function defensio_announce_article($id) {
 }
 add_action('publish_post', 'defensio_announce_article');
 
-
-// To be used with admin-ajax
+/** To be used with admin-ajax */
 function defensio_restore() {
     define('DOING_AJAX', true);
 
@@ -469,11 +482,11 @@ function defensio_restore() {
         }
     } 
 }
+
 add_action('wp_ajax_defensio-restore', 'defensio_restore');
 add_filter('comment_spam_to_approved', create_function('$comment', 'defensio_set_status_approved($comment->comment_ID);'));
 
-function defensio_set_status_approved($id) 
-{
+function defensio_set_status_approved($id) {
     global $defensio_retraining, $defensio_db, $defensio_manager;
 
     // Human checked.. spaminess => 0 
@@ -493,8 +506,7 @@ function defensio_set_status_approved($id)
     $defensio_retraining = false;
 }
 
-function defensio_counter($color='dark', $align='left') 
-{
+function defensio_counter($color='dark', $align='left') {
     global $plugin_uri, $defensio_manager;
 
     // Use Ad-hoc cache instead of wp_cahce, we don't want a requests to defensio per request to the blog's front page 
@@ -523,11 +535,9 @@ function defensio_counter($color='dark', $align='left')
     }
 }
 
-function defensio_widget_register() 
-{
+function defensio_widget_register() {
     if (function_exists('register_sidebar_widget')) {
-        function defensio_widget() 
-        { 
+        function defensio_widget() { 
             $alignment = get_option('defensio_counter_alignment'); 
             $color = get_option('defensio_counter_color');
             if (!isset($alignment) or empty($alignment)){ $alignment = 'left'; }
@@ -536,8 +546,7 @@ function defensio_widget_register()
                 defensio_counter(strtolower($color),strtolower($alignment)); 
         }
 
-        function defensio_widget_control() 
-        {
+        function defensio_widget_control() {
             global $defensio_widget_tones;
             if ($_POST['defensio_counter_alignment']) {
                 update_option('defensio_counter_alignment', $_POST['defensio_counter_alignment']);
@@ -568,13 +577,13 @@ function defensio_widget_register()
       </select>
 <?php
         }
-        register_sidebar_widget('Defensio Counter', 'defensio_widget', null, 'defensio');
+        register_sidebar_widget('Defensio Counter', 'defensio_widget', NULL, 'defensio');
         register_widget_control('Defensio Counter', 'defensio_widget_control', 300, 75, 'defensio');
     }
 }
 add_action('init', 'defensio_widget_register');
 
-/*
+/**
  * Shutdown hook, train comments scheduled to be trained
  */
 function defensio_finalize() {
@@ -589,11 +598,6 @@ function defensio_finalize() {
     }
 }
 add_action('shutdown', 'defensio_finalize');
-
-function defensio_unhidden_spam_count(){
-    global $defensio_db;
-
-}
 
 function defensio_render_activity_box() {
     global $defensio_db;
@@ -642,20 +646,19 @@ function defensio_clean_up_orphan_rows($id, $status) {
 }
 add_action('wp_set_comment_status', 'defensio_clean_up_orphan_rows', 10, 2);
 
-// Generates a key name for wp options that is user unique
-function defensio_user_unique_option_key( $opt_name = null ){
-    global $userdata;
-    if($opt_name != null){
-        get_currentuserinfo();
-        return "defensio_". $userdata->ID."_$opt_name";
-    }
+
+/** Returns true if the Defensio API key has been set and it is valid */
+function defensio_is_key_set() {
+    global $defensio_conf;
+    return isset($defensio_conf['key']) and !empty($defensio_conf['key']);
 }
 
-/* In WP 2.7+, there is a built-in spam quarantine. This filter function
+/** 
+ * In WP 2.7+, there is a built-in spam quarantine. This filter function
  * will take the array of status links in wp-admin/comments and replace the
  * link to spam type by a link to Defensio's quarantine
  */
-function defensio_replace_default_quarantine_link($status_links){
+function defensio_replace_default_quarantine_link($status_links) {
     global $defensio_db;
 
     foreach($status_links as $index => $link){
@@ -669,25 +672,26 @@ function defensio_replace_default_quarantine_link($status_links){
 }
 add_filter('comment_status_links', 'defensio_replace_default_quarantine_link', 99, 1);
 
-// Redirect default quarantine to defensio's. There is no useful hook to change the link in dashboard.php... just redirect 
-function defensio_redirect_to_qurantine($a){
+/** 
+ * Redirect default quarantine to defensio's. There is no useful hook to change the link in 
+ * dashboard.php... just redirect 
+ */
+function defensio_redirect_to_qurantine($a) {
     if($_REQUEST['comment_status'] == 'spam')
         wp_redirect("edit-comments.php?page=defensio-quarantine");
 }
 add_action('load-edit-comments.php', 'defensio_redirect_to_qurantine');
 
-// Scheduling wp-cront task to take care of unprocessed and pending comments if callback was not received sdasd 
+// Scheduling wp-cront task to take care of unprocessed and pending comments if callback was not received 
 
-/* Add a custom wp_cron reccurence */
-function defensio_custom_reccurence()
-{
+/** Add a custom wp_cron reccurence */
+function defensio_custom_reccurence() {
     // Try to add every ten minutes, now warrantied by wp-cron!
     return array('tenminutely' => array('interval' => 600, 'diplay' => 'Every ten minutes' ));
 }
 add_filter('cron_schedules', 'defensio_custom_reccurence');
 
-function defensio_recurrent_actions()
-{
+function defensio_recurrent_actions() {
     global $defensio_manager;
 
     $defensio_manager->getPendingResults();
@@ -783,9 +787,11 @@ if ( !function_exists('wp_notify_postauthor') ):
 
 endif;
 
-/* Using comments_array hook to add defensio_pending comment to what comment posters can see right after they have posted */
-function defensio_add_defensio_pending($comments)
-{
+/** 
+ * Using comments_array hook to add defensio_pending comment to what comment posters can see right 
+ * after they have posted 
+ */
+function defensio_add_defensio_pending($comments) {
     global $user_ID, $post, $wpdb;
 
     $commenter = wp_get_current_commenter();
@@ -803,6 +809,5 @@ function defensio_add_defensio_pending($comments)
     return $comments;
 }
 add_filter('comments_array', 'defensio_add_defensio_pending');
-
 
 ?>

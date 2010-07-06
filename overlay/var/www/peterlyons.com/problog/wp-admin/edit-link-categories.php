@@ -7,7 +7,7 @@
  */
 
 /** WordPress Administration Bootstrap */
-require_once('admin.php');
+require_once('./admin.php');
 
 // Handle bulk actions
 if ( isset($_GET['action']) && isset($_GET['delete']) ) {
@@ -40,7 +40,7 @@ if ( isset($_GET['action']) && isset($_GET['delete']) ) {
 		wp_redirect($location);
 		exit();
 	}
-} elseif ( isset($_GET['_wp_http_referer']) && ! empty($_GET['_wp_http_referer']) ) {
+} elseif ( ! empty($_GET['_wp_http_referer']) ) {
 	 wp_redirect( remove_query_arg( array('_wp_http_referer', '_wpnonce'), stripslashes($_SERVER['REQUEST_URI']) ) );
 	 exit;
 }
@@ -50,6 +50,13 @@ $title = __('Link Categories');
 wp_enqueue_script('admin-categories');
 if ( current_user_can('manage_categories') )
 	wp_enqueue_script('inline-edit-tax');
+
+add_contextual_help($current_screen, '<p>' . __('You can create groups of links by using link categories. Link category names must be unique and link categories are separate from the categories you use for posts.') . '</p>' .
+	'<p>' . __('You can delete link categories, but that action does not delete the links within the category. Instead, it moves them to the default link category.') . '</p>' .
+	'<p><strong>' . __('For more information:') . '</strong></p>' .
+	'<p>' . __('<a href="http://codex.wordpress.org/Links_Link_Categories_SubPanel" target="_blank">Link Categories Documentation</a>') . '</p>' .
+	'<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
+);
 
 require_once ('admin-header.php');
 
@@ -68,7 +75,7 @@ if ( isset($_GET['s']) && $_GET['s'] )
 </h2>
 
 <?php if ( isset($_GET['message']) && ( $msg = (int) $_GET['message'] ) ) : ?>
-<div id="message" class="updated fade"><p><?php echo $messages[$msg]; ?></p></div>
+<div id="message" class="updated"><p><?php echo $messages[$msg]; ?></p></div>
 <?php $_SERVER['REQUEST_URI'] = remove_query_arg(array('message'), $_SERVER['REQUEST_URI']);
 endif; ?>
 
@@ -92,7 +99,7 @@ endif; ?>
 $pagenum = isset( $_GET['pagenum'] ) ? absint( $_GET['pagenum'] ) : 0;
 if ( empty($pagenum) )
 	$pagenum = 1;
-if( ! isset( $catsperpage ) || $catsperpage < 0 )
+if ( ! isset( $catsperpage ) || $catsperpage < 0 )
 	$catsperpage = 20;
 
 $page_links = paginate_links( array(
@@ -198,18 +205,18 @@ if ( $page_links )
 
 <div class="form-field form-required">
 	<label for="name"><?php _e('Link Category name') ?></label>
-	<input name="name" id="name" type="text" value="" size="40" aria-required="true" />
+	<input name="name" id="link-name" type="text" value="" size="40" aria-required="true" />
 </div>
-
+<?php if ( !global_terms_enabled() ) { ?>
 <div class="form-field">
 	<label for="slug"><?php _e('Link Category slug') ?></label>
-	<input name="slug" id="slug" type="text" value="" size="40" />
+	<input name="slug" id="link-slug" type="text" value="" size="40" />
 	<p><?php _e('The &#8220;slug&#8221; is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.'); ?></p>
 </div>
-
+<?php } ?>
 <div class="form-field">
 	<label for="description"><?php _e('Description (optional)') ?></label>
-	<textarea name="description" id="description" rows="5" cols="40"></textarea>
+	<textarea name="description" id="link-description" rows="5" cols="40"></textarea>
 	<p><?php _e('The description is not prominent by default; however, some themes may show it.'); ?></p>
 </div>
 
@@ -226,5 +233,5 @@ if ( $page_links )
 </div><!-- /col-container -->
 </div><!-- /wrap -->
 
-<?php inline_edit_term_row('edit-link-categories'); ?>
-<?php include('admin-footer.php'); ?>
+<?php inline_edit_term_row('edit-link-categories', 'link_category'); ?>
+<?php include('./admin-footer.php'); ?>

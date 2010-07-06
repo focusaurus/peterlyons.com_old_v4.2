@@ -39,7 +39,7 @@ function wp_image_editor($post_id, $msg = false) {
 	<div class="imgedit-menu">
 		<div onclick="imageEdit.crop(<?php echo "$post_id, '$nonce'"; ?>, this)" class="imgedit-crop disabled" title="<?php esc_attr_e( 'Crop' ); ?>"></div><?php
 
-	// On some setups GD library does not provide imagerotate() - Ticket #11536   
+	// On some setups GD library does not provide imagerotate() - Ticket #11536
 	if ( function_exists('imagerotate') ) { ?>
 		<div class="imgedit-rleft"  onclick="imageEdit.rotate( 90, <?php echo "$post_id, '$nonce'"; ?>, this)" title="<?php esc_attr_e( 'Rotate counter-clockwise' ); ?>"></div>
 		<div class="imgedit-rright" onclick="imageEdit.rotate(-90, <?php echo "$post_id, '$nonce'"; ?>, this)" title="<?php esc_attr_e( 'Rotate clockwise' ); ?>"></div>
@@ -96,10 +96,10 @@ function wp_image_editor($post_id, $msg = false) {
 	<div class="imgedit-group-top">
 		<a class="imgedit-help-toggle" onclick="imageEdit.toggleHelp(this);return false;" href="#"><strong><?php _e('Restore Original Image'); ?></strong></a>
 		<div class="imgedit-help">
-		<p><?php _e('Discard any changes and restore the original image.'); 
+		<p><?php _e('Discard any changes and restore the original image.');
 
 		if ( !defined('IMAGE_EDIT_OVERWRITE') || !IMAGE_EDIT_OVERWRITE )
-			_e(' Previously edited copies of the image will not be deleted.');
+			echo ' '.__('Previously edited copies of the image will not be deleted.');
 
 		?></p>
 		<div class="imgedit-submit">
@@ -118,7 +118,7 @@ function wp_image_editor($post_id, $msg = false) {
 		<a class="imgedit-help-toggle" onclick="imageEdit.toggleHelp(this);return false;" href="#"><?php _e('(help)'); ?></a>
 		<div class="imgedit-help">
 		<p><?php _e('The image can be cropped by clicking on it and dragging to select the desired part. While dragging the dimensions of the selection are displayed below.'); ?></p>
-		<strong><?php _e('Keyboard shortcuts'); ?></strong>
+		<strong><?php _e('Keyboard Shortcuts'); ?></strong>
 		<ul>
 		<li><?php _e('Arrow: move by 10px'); ?></li>
 		<li><?php _e('Shift + arrow: move by 1px'); ?></li>
@@ -453,7 +453,7 @@ function wp_restore_image($post_id) {
 		$meta['file'] = _wp_relative_upload_path( $restored_file );
 		$meta['width'] = $data['width'];
 		$meta['height'] = $data['height'];
-		list ( $uwidth, $uheight ) = wp_shrink_dimensions($meta['width'], $meta['height']);
+		list ( $uwidth, $uheight ) = wp_constrain_dimensions($meta['width'], $meta['height'], 128, 96);
 		$meta['hwstring_small'] = "height='$uheight' width='$uwidth'";
 	}
 
@@ -598,7 +598,7 @@ function wp_save_image($post_id) {
 		$meta['width'] = imagesx($img);
 		$meta['height'] = imagesy($img);
 
-		list ( $uwidth, $uheight ) = wp_shrink_dimensions($meta['width'], $meta['height']);
+		list ( $uwidth, $uheight ) = wp_constrain_dimensions($meta['width'], $meta['height'], 128, 96);
 		$meta['hwstring_small'] = "height='$uheight' width='$uwidth'";
 
 		if ( $success && ('nothumb' == $target || 'all' == $target) ) {

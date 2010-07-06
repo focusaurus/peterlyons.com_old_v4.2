@@ -13,7 +13,7 @@
  */
 class WP_Filesystem_Base {
 	/**
-	 * Whether to display debug data for the connection or not.
+	 * Whether to display debug data for the connection.
 	 *
 	 * @since 2.5
 	 * @access public
@@ -142,6 +142,7 @@ class WP_Filesystem_Base {
 				if ( defined($constant) && $folder === $dir )
 					return trailingslashit(constant($constant));
 		} elseif ( 'direct' == $this->method ) {
+			$folder = str_replace('\\', '/', $folder); //Windows path sanitiation
 			return trailingslashit($folder);
 		}
 
@@ -156,7 +157,7 @@ class WP_Filesystem_Base {
 			$this->cache[ $folder ] = $folder;
 			return $folder;
 		}
-		if( $return = $this->search_for_folder($folder) )
+		if ( $return = $this->search_for_folder($folder) )
 			$this->cache[ $folder ] = $return;
 		return $return;
 	}
@@ -288,8 +289,8 @@ class WP_Filesystem_Base {
 		$legal =  array('', 'w', 'r', 'x', '-');
 		$attarray = preg_split('//', $mode);
 
-		for($i=0; $i < count($attarray); $i++)
-		   if($key = array_search($attarray[$i], $legal))
+		for ($i=0; $i < count($attarray); $i++)
+		   if ($key = array_search($attarray[$i], $legal))
 			   $realmode .= $legal[$key];
 
 		$mode = str_pad($realmode, 9, '-');

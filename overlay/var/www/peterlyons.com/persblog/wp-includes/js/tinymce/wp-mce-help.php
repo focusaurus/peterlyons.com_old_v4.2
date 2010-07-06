@@ -128,7 +128,7 @@ wp_admin_css( 'wp-admin', true );
 		border-bottom: 0px;
 	}
 </style>
-<?php if ( ('rtl' == $wp_locale->text_direction) ) : ?>
+<?php if ( is_rtl() ) : ?>
 <style type="text/css">
 	#wphead, #tabs {
 		padding-left: auto;
@@ -210,10 +210,10 @@ wp_admin_css( 'wp-admin', true );
 		<script type="text/javascript">
 		if ( ! tinymce.isWebKit )
 			document.write("<tr><th>b</th><td><?php _e('Bold') ?></td><th>i</th><td><?php _e('Italic') ?></td></tr>"+
-			"<tr><th>u</th><td><?php _e('Underline') ?></td><th>1</th><td><?php _e('Header 1') ?></td></tr>"+
-			"<tr><th>2</th><td><?php _e('Header 2') ?></td><th>3</th><td><?php _e('Header 3') ?></td></tr>"+
-			"<tr><th>4</th><td><?php _e('Header 4') ?></td><th>5</th><td><?php _e('Header 5') ?></td></tr>"+
-			"<tr><th>6</th><td><?php _e('Header 6') ?></td><th>9</th><td><?php _e('Address') ?></td></tr>")
+			"<tr><th>u</th><td><?php _e('Underline') ?></td><th>1</th><td><?php _e('Heading 1') ?></td></tr>"+
+			"<tr><th>2</th><td><?php _e('Heading 2') ?></td><th>3</th><td><?php _e('Heading 3') ?></td></tr>"+
+			"<tr><th>4</th><td><?php _e('Heading 4') ?></td><th>5</th><td><?php _e('Heading 5') ?></td></tr>"+
+			"<tr><th>6</th><td><?php _e('Heading 6') ?></td><th>9</th><td><?php _e('Address') ?></td></tr>")
 		</script>
 	</table>
 
@@ -240,7 +240,7 @@ wp_admin_css( 'wp-admin', true );
 	<h2><?php _e('About TinyMCE'); ?></h2>
 
     <p><?php _e('Version:'); ?> <span id="version"></span> (<span id="date"></span>)</p>
-	<p><?php printf(__('TinyMCE is a platform independent web based Javascript HTML WYSIWYG editor control released as Open Source under %sLGPL</a>	by Moxiecode Systems AB. It has the ability to convert HTML TEXTAREA fields or other HTML elements to editor instances.'), '<a href="'.get_bloginfo('url').'/wp-includes/js/tinymce/license.txt" target="_blank" title="'.__('GNU Library General Public Licence').'">') ?></p>
+	<p><?php printf(__('TinyMCE is a platform independent web based Javascript HTML WYSIWYG editor control released as Open Source under %sLGPL</a>	by Moxiecode Systems AB. It has the ability to convert HTML TEXTAREA fields or other HTML elements to editor instances.'), '<a href="'.home_url('/wp-includes/js/tinymce/license.txt').'" target="_blank" title="'.__('GNU Library General Public Licence').'">') ?></p>
 	<p><?php _e('Copyright &copy; 2003-2007, <a href="http://www.moxiecode.com" target="_blank">Moxiecode Systems AB</a>, All rights reserved.') ?></p>
 	<p><?php _e('For more information about this software visit the <a href="http://tinymce.moxiecode.com" target="_blank">TinyMCE website</a>.') ?></p>
 

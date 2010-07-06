@@ -45,7 +45,7 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 		else
 			$this->options['hostname'] = $opt['hostname'];
 
-		if ( isset($opt['base']) && ! empty($opt['base']) )
+		if ( ! empty($opt['base']) )
 			$this->wp_base = $opt['base'];
 
 		// Check if the options provided are OK.
@@ -92,7 +92,9 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 		if ( empty($type) )
 			$type = FTP_BINARY;
 
-		$temp = tmpfile();
+		$tempfile = wp_tempnam($file);
+		$temp = fopen($tempfile, 'w+');
+
 		if ( ! $temp )
 			return false;
 
@@ -106,25 +108,30 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 			$contents .= fread($temp, 8192);
 
 		fclose($temp);
+		unlink($tempfile);
 		return $contents;
 	}
 	function get_contents_array($file) {
 		return explode("\n", $this->get_contents($file));
 	}
-	function put_contents($file, $contents, $type = '' ) {
-		if ( empty($type) )
-			$type = $this->is_binary($contents) ? FTP_BINARY : FTP_ASCII;
 
-		$temp = tmpfile();
+	function put_contents($file, $contents, $mode = false ) {
+		$tempfile = wp_tempnam($file);
+		$temp = fopen($tempfile, 'w+');
 		if ( ! $temp )
 			return false;
 
 		fwrite($temp, $contents);
 		fseek($temp, 0); //Skip back to the start of the file being written to
 
+		$type = $this->is_binary($contents) ? FTP_BINARY : FTP_ASCII;
 		$ret = @ftp_fput($this->link, $file, $temp, $type);
 
 		fclose($temp);
+		unlink($tempfile);
+
+		$this->chmod($file, $mode);
+
 		return $ret;
 	}
 	function cwd() {
@@ -140,9 +147,6 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 		return false;
 	}
 	function chmod($file, $mode = false, $recursive = false) {
-		if ( ! $this->exists($file) && ! $this->is_dir($file) )
-			return false;
-
 		if ( ! $mode ) {
 			if ( $this->is_file($file) )
 				$mode = FS_CHMOD_FILE;
@@ -152,17 +156,17 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 				return false;
 		}
 
-		if ( ! $recursive || ! $this->is_dir($file) ) {
-			if ( ! function_exists('ftp_chmod') )
-				return @ftp_site($this->link, sprintf('CHMOD %o %s', $mode, $file));
-			return @ftp_chmod($this->link, $mode, $file);
+		// chmod any sub-objects if recursive.
+		if ( $recursive && $this->is_dir($file) ) {
+			$filelist = $this->dirlist($file);
+			foreach ( (array)$filelist as $filename => $filemeta )
+				$this->chmod($file . '/' . $filename, $mode, $recursive);
 		}
-		//Is a directory, and we want recursive
-		$filelist = $this->dirlist($file);
-		foreach ( $filelist as $filename ) {
-			$this->chmod($file . '/' . $filename, $mode, $recursive);
-		}
-		return true;
+
+		// chmod the file or directory
+		if ( ! function_exists('ftp_chmod') )
+			return (bool)@ftp_site($this->link, sprintf('CHMOD %o %s', $mode, $file));
+		return (bool)@ftp_chmod($this->link, $mode, $file);
 	}
 	function chown($file, $owner, $recursive = false ) {
 		return false;
@@ -243,10 +247,8 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 		return false;
 	}
 	function mkdir($path, $chmod = false, $chown = false, $chgrp = false) {
-		if  ( !ftp_mkdir($this->link, $path) )
+		if ( !@ftp_mkdir($this->link, $path) )
 			return false;
-		if ( ! $chmod )
-			$chmod = FS_CHMOD_DIR;
 		$this->chmod($path, $chmod);
 		if ( $chown )
 			$this->chown($path, $chown);
@@ -261,12 +263,15 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 	function parselisting($line) {
 		static $is_windows;
 		if ( is_null($is_windows) )
-			$is_windows = strpos( strtolower(ftp_systype($this->link)), 'win') !== false;
+			$is_windows = stripos( ftp_systype($this->link), 'win') !== false;
 
-		if ( $is_windows && preg_match("/([0-9]{2})-([0-9]{2})-([0-9]{2}) +([0-9]{2}):([0-9]{2})(AM|PM) +([0-9]+|<DIR>) +(.+)/", $line, $lucifer) ) {
+		if ( $is_windows && preg_match('/([0-9]{2})-([0-9]{2})-([0-9]{2}) +([0-9]{2}):([0-9]{2})(AM|PM) +([0-9]+|<DIR>) +(.+)/', $line, $lucifer) ) {
 			$b = array();
-			if ( $lucifer[3] < 70 ) { $lucifer[3] +=2000; } else { $lucifer[3] += 1900; } // 4digit year fix
-			$b['isdir'] = ($lucifer[7]=="<DIR>");
+			if ( $lucifer[3] < 70 )
+				$lucifer[3] +=2000;
+			else
+				$lucifer[3] += 1900; // 4digit year fix
+			$b['isdir'] = ( $lucifer[7] == '<DIR>');
 			if ( $b['isdir'] )
 				$b['type'] = 'd';
 			else
@@ -277,16 +282,17 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 			$b['year'] = $lucifer[3];
 			$b['hour'] = $lucifer[4];
 			$b['minute'] = $lucifer[5];
-			$b['time'] = @mktime($lucifer[4]+(strcasecmp($lucifer[6],"PM")==0?12:0),$lucifer[5],0,$lucifer[1],$lucifer[2],$lucifer[3]);
+			$b['time'] = @mktime($lucifer[4] + (strcasecmp($lucifer[6], "PM") == 0 ? 12 : 0), $lucifer[5], 0, $lucifer[1], $lucifer[2], $lucifer[3]);
 			$b['am/pm'] = $lucifer[6];
 			$b['name'] = $lucifer[8];
-		} else if (!$is_windows && $lucifer=preg_split("/[ ]/",$line,9,PREG_SPLIT_NO_EMPTY)) {
+		} elseif ( !$is_windows && $lucifer = preg_split('/[ ]/', $line, 9, PREG_SPLIT_NO_EMPTY)) {
 			//echo $line."\n";
-			$lcount=count($lucifer);
-			if ($lcount<8) return '';
+			$lcount = count($lucifer);
+			if ( $lcount < 8 )
+				return '';
 			$b = array();
-			$b['isdir'] = $lucifer[0]{0} === "d";
-			$b['islink'] = $lucifer[0]{0} === "l";
+			$b['isdir'] = $lucifer[0]{0} === 'd';
+			$b['islink'] = $lucifer[0]{0} === 'l';
 			if ( $b['isdir'] )
 				$b['type'] = 'd';
 			elseif ( $b['islink'] )
@@ -298,15 +304,15 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 			$b['owner'] = $lucifer[2];
 			$b['group'] = $lucifer[3];
 			$b['size'] = $lucifer[4];
-			if ($lcount==8) {
-				sscanf($lucifer[5],"%d-%d-%d",$b['year'],$b['month'],$b['day']);
-				sscanf($lucifer[6],"%d:%d",$b['hour'],$b['minute']);
-				$b['time'] = @mktime($b['hour'],$b['minute'],0,$b['month'],$b['day'],$b['year']);
+			if ( $lcount == 8 ) {
+				sscanf($lucifer[5], '%d-%d-%d', $b['year'], $b['month'], $b['day']);
+				sscanf($lucifer[6], '%d:%d', $b['hour'], $b['minute']);
+				$b['time'] = @mktime($b['hour'], $b['minute'], 0, $b['month'], $b['day'], $b['year']);
 				$b['name'] = $lucifer[7];
 			} else {
 				$b['month'] = $lucifer[5];
 				$b['day'] = $lucifer[6];
-				if (preg_match("/([0-9]{2}):([0-9]{2})/",$lucifer[7],$l2)) {
+				if ( preg_match('/([0-9]{2}):([0-9]{2})/', $lucifer[7], $l2) ) {
 					$b['year'] = date("Y");
 					$b['hour'] = $l2[1];
 					$b['minute'] = $l2[2];
@@ -315,7 +321,7 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 					$b['hour'] = 0;
 					$b['minute'] = 0;
 				}
-				$b['time'] = strtotime(sprintf("%d %s %d %02d:%02d",$b['day'],$b['month'],$b['year'],$b['hour'],$b['minute']));
+				$b['time'] = strtotime( sprintf('%d %s %d %02d:%02d', $b['day'], $b['month'], $b['year'], $b['hour'], $b['minute']) );
 				$b['name'] = $lucifer[8];
 			}
 		}
@@ -331,9 +337,13 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 			$limit_file = false;
 		}
 
-		$list = @ftp_rawlist($this->link, '-a ' . $path, false);
+		$pwd = @ftp_pwd($this->link);
+		if ( ! @ftp_chdir($this->link, $path) ) // Cant change to folder = folder doesnt exist
+			return false;
+		$list = @ftp_rawlist($this->link, '-a', false);
+		@ftp_chdir($this->link, $pwd);
 
-		if ( $list === false )
+		if ( empty($list) ) // Empty array = non-existent folder (real folder will show . at least)
 			return false;
 
 		$dirlist = array();
@@ -353,9 +363,6 @@ class WP_Filesystem_FTPext extends WP_Filesystem_Base {
 
 			$dirlist[ $entry['name'] ] = $entry;
 		}
-
-		if ( ! $dirlist )
-			return false;
 
 		$ret = array();
 		foreach ( (array)$dirlist as $struc ) {

@@ -11,7 +11,7 @@ if ( !defined('ABSPATH') )
 	die('-1');
 
 if ( !current_user_can('manage_categories') )
-	wp_die(__('You do not have sufficient permissions to edit link categories for this blog.'));
+	wp_die(__('You do not have sufficient permissions to edit link categories for this site.'));
 
 /**
  * @var object
@@ -72,11 +72,13 @@ _fill_empty_link_category($category);
 			<th scope="row" valign="top"><label for="name"><?php _e('Link Category name') ?></label></th>
 			<td><input name="name" id="name" type="text" value="<?php echo esc_attr($category->name); ?>" size="40" aria-required="true" /></td>
 		</tr>
+<?php if ( !is_multisite() ) { ?>
 		<tr class="form-field">
 			<th scope="row" valign="top"><label for="slug"><?php _e('Link Category slug') ?></label></th>
 			<td><input name="slug" id="slug" type="text" value="<?php echo esc_attr(apply_filters('editable_slug', $category->slug)); ?>" size="40" /><br />
             <?php _e('The &#8220;slug&#8221; is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.'); ?></td>
 		</tr>
+<?php } ?>
 		<tr class="form-field">
 			<th scope="row" valign="top"><label for="description"><?php _e('Description (optional)') ?></label></th>
 			<td><textarea name="description" id="description" rows="5" cols="50" style="width: 97%;"><?php echo $category->description; ?></textarea><br />

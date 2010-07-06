@@ -4,7 +4,7 @@ html {
 
 * html input,
 * html .widget {
-    border-color: #dfdfdf;
+	border-color: #dfdfdf;
 }
 
 textarea,
@@ -110,11 +110,13 @@ div.dashboard-widget-submit {
 }
 
 div.tabs-panel,
-ul#category-tabs li.tabs {
+ul.category-tabs li.tabs,
+ul.add-menu-item-tabs li.tabs {
 	border-color: #dfdfdf;
 }
 
-ul#category-tabs li.tabs {
+ul.category-tabs li.tabs,
+ul.add-menu-item-tabs li.tabs {
 	background-color: #f1f1f1;
 }
 
@@ -123,7 +125,6 @@ textarea.disabled {
 	background-color: #ccc;
 }
 /* #upload-menu li a.upload-tab-link, */
-.login #backtoblog a:hover,
 #plugin-information .action-button a,
 #plugin-information .action-button a:hover,
 #plugin-information .action-button a:visited {
@@ -380,7 +381,8 @@ div.dashboard-widget-submit input:hover,
 	border-color: #dfdfdf;
 }
 
-#side-sortables #category-tabs .tabs a {
+#side-sortables .category-tabs .tabs a,
+#side-sortables .add-menu-item-tabs .tabs a {
 	color: #333;
 }
 
@@ -438,7 +440,7 @@ div.dashboard-widget-submit input:hover,
 }
 
 .update-message {
-	color: #000000;
+	color: #000;
 }
 
 a.page-numbers {
@@ -502,38 +504,27 @@ body.press-this .tabs a:hover {
 #adminmenu #awaiting-mod,
 #adminmenu .update-plugins,
 #sidemenu a .update-plugins,
-#rightnow .reallynow,
+#rightnow .reallynow {
+	background-color: #464646;
+	color: #fff;
+	-moz-box-shadow: #fff 0 -1px 0;
+	-khtml-box-shadow: #fff 0 -1px 0;
+	-webkit-box-shadow: #fff 0 -1px 0;
+	box-shadow: #fff 0 -1px 0;
+}
 #plugin-information .action-button {
 	background-color: #d54e21;
 	color: #fff;
 }
 
-#adminmenu li a:hover #awaiting-mod,
-#adminmenu li a:hover .update-plugins,
-#sidemenu li a:hover .update-plugins {
-	background-color: #264761;
-	color: #fff;
-}
-
 #adminmenu li.current a #awaiting-mod,
-#adminmenu li.current a .update-plugins,
-#adminmenu li.wp-has-current-submenu a .update-plugins,
-#adminmenu li.wp-has-current-submenu a .update-plugins {
-	background-color: #ddd;
-	color: #000;
-	text-shadow: none;
-	-moz-box-shadow: rgba(0,0,0,0.2) 0 -1px 0;
-	-khtml-box-shadow: rgba(0,0,0,0.2) 0 -1px 0;
-	-webkit-box-shadow: rgba(0,0,0,0.2) 0 -1px 0;
-	box-shadow: rgba(0,0,0,0.2) 0 -1px 0;
-}
-
-#adminmenu li.current a:hover #awaiting-mod,
-#adminmenu li.current a:hover .update-plugins,
-#adminmenu li.wp-has-current-submenu a:hover #awaiting-mod,
-#adminmenu li.wp-has-current-submenu a:hover .update-plugins {
-	background-color: #264761;
+#adminmenu  li a.wp-has-current-submenu .update-plugins{
+	background-color: #464646;
 	color: #fff;
+	-moz-box-shadow: #fff 0 -1px 0;
+	-khtml-box-shadow: #fff 0 -1px 0;
+	-webkit-box-shadow: #fff 0 -1px 0;
+	box-shadow: #fff 0 -1px 0;
 }
 
 div#media-upload-header,
@@ -577,10 +568,12 @@ input.readonly, textarea.readonly {
 	color: #d54e21 !important;
 }
 
-#footer,
-#footer-upgrade {
-	background: #464646;
-	color: #999;
+#footer {
+	color: #777;
+	border-color: #d1d1d1;
+	background: #d9d9d9; /* fallback color */
+	background:-moz-linear-gradient(bottom,  #d7d7d7,  #e4e4e4);
+	background:-webkit-gradient(linear, left bottom, left top, from(#d7d7d7), to(#e4e4e4));
 }
 
 #media-items,
@@ -692,43 +685,42 @@ table.widefat span.spam a,
 	background: url(../images/xit.gif) no-repeat -10px 0;
 }
 
-#update-nag {
-	background-color: #fffeeb;
-	border-color: #ccc;
+#update-nag, .update-nag {
+	background-color: #FFFBCC;
+	border-color: #E6DB55;
 	color: #555;
 }
 
 .login #backtoblog a {
-	color: #ccc;
+	color: #464646;
 }
 
 #wphead {
-	background-color: #464646;
-}
-
-body.login {
-	border-top-color: #464646;
+	border-bottom:#c6c6c6 1px solid;
+	background: #d9d9d9; /* fallback color */
+	background:-moz-linear-gradient(bottom,  #d7d7d7,  #e4e4e4);
+	background:-webkit-gradient(linear, left bottom, left top, from(#d7d7d7), to(#e4e4e4));
 }
 
 #wphead h1 a {
-	color: #fff;
+	color: #464646;
 }
 
 #user_info {
-	color: #999;
+	color: #777;
 }
 
 #user_info a:link,
 #user_info a:visited,
 #footer a:link,
 #footer a:visited {
-	color: #ccc;
+	color: #222;
 	text-decoration: none;
 }
 
 #user_info a:hover,
 #footer a:hover {
-	color: #fff;
+	color: #000;
 	text-decoration: underline !important;
 }
 
@@ -1048,20 +1040,20 @@ table.widefat .spam a:hover,
 
 #adminmenu li.wp-has-current-submenu.wp-menu-open .wp-menu-toggle,
 #adminmenu li.wp-has-current-submenu:hover .wp-menu-toggle {
-	background: transparent url(../images/menu-bits.gif) no-repeat scroll left -207px;
+	background: transparent url(../images/menu-bits.gif?ver=20100610) no-repeat scroll left -207px;
 }
 
 #adminmenu .wp-has-submenu:hover .wp-menu-toggle,
 #adminmenu .wp-menu-open .wp-menu-toggle {
-	background: transparent url(../images/menu-bits.gif) no-repeat scroll left -109px;
+	background: transparent url(../images/menu-bits.gif?ver=20100610) no-repeat scroll left -109px;
 }
 
 #adminmenu a.menu-top {
-	background: #f1f1f1 url(../images/menu-bits.gif) repeat-x scroll left -379px;
+	background: #f1f1f1 url(../images/menu-bits.gif?ver=20100610) repeat-x scroll left -379px;
 }
 
 #adminmenu .wp-submenu a {
-	background: #FFFFFF url(../images/menu-bits.gif) no-repeat scroll 0 -310px;
+	background: #fff url(../images/menu-bits.gif?ver=20100610) no-repeat scroll 0 -310px;
 }
 
 #adminmenu .wp-has-current-submenu ul li a {
@@ -1072,17 +1064,25 @@ table.widefat .spam a:hover,
 	background: url(../images/menu-dark.gif) top left no-repeat !important;
 }
 
+.wp-has-current-submenu .wp-submenu {
+	border-top: none !important;
+}
+
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu {
+	border-bottom: #aaa 1px solid;
+}
+
 #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
-#adminmenu .menu-top .current {
-	background: #6d6d6d url(../images/menu-bits.gif) top left repeat-x;
-	border-color: #6d6d6d;
-	color: #fff;
-	text-shadow: rgba(0,0,0,0.4) 0px -1px 0px;
+#adminmenu li.current a.menu-top {
+	background: #e0e0e0 url(../images/menu-bits.gif?ver=20100610) top left repeat-x;
+	border: #aaa 1px solid;
+	color: #000;
 }
 
 #adminmenu li.wp-has-current-submenu .wp-submenu,
 #adminmenu li.wp-has-current-submenu ul li a {
-	border-color: #aaa !important;
+	border-right-color: #aaa !important;
+	border-left-color: #aaa !important;
 }
 
 #adminmenu li.wp-has-current-submenu ul li a {
@@ -1093,12 +1093,8 @@ table.widefat .spam a:hover,
 	border-bottom-color: #aaa;
 }
 
-#adminmenu li.menu-top .current:hover {
-	border-color: #B5B5B5;
-}
-
 #adminmenu .wp-submenu .current a.current {
-	background: transparent url(../images/menu-bits.gif) no-repeat scroll  0 -289px;
+	background: transparent url(../images/menu-bits.gif?ver=20100610) no-repeat scroll  0 -289px;
 }
 
 #adminmenu .wp-submenu a:hover {
@@ -1113,7 +1109,6 @@ table.widefat .spam a:hover,
 	background-color: #f5f5f5;
 	background-image: none;
 	border-color: #e3e3e3;
-	text-shadow: rgba(255,255,255,1) 0px 1px 0px;
 }
 
 #adminmenu .wp-submenu ul {
@@ -1140,124 +1135,133 @@ table.widefat .spam a:hover,
 }
 
 /* menu icons */
-#adminmenu #menu-dashboard div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -61px -33px;
+#adminmenu .menu-icon-dashboard div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -61px -33px;
 }
 
-#adminmenu #menu-dashboard:hover div.wp-menu-image,
-#adminmenu  #menu-dashboard.wp-has-current-submenu div.wp-menu-image,
-#adminmenu  #menu-dashboard.current div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -61px -1px;
+#adminmenu .menu-icon-dashboard:hover div.wp-menu-image,
+#adminmenu .menu-icon-dashboard.wp-has-current-submenu div.wp-menu-image,
+#adminmenu .menu-icon-dashboard.current div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -61px -1px;
 }
 
-#adminmenu #menu-posts div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -272px -33px;
+#adminmenu .menu-icon-post div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -272px -33px;
 }
 
-#adminmenu #menu-posts:hover div.wp-menu-image,
-#adminmenu #menu-posts.wp-has-current-submenu div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -272px -1px;
+#adminmenu .menu-icon-post:hover div.wp-menu-image,
+#adminmenu .menu-icon-post.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -272px -1px;
 }
 
-#adminmenu #menu-media div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -121px -33px;
+#adminmenu .menu-icon-media div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -121px -33px;
 }
 
-#adminmenu #menu-media:hover div.wp-menu-image,
-#adminmenu #menu-media.wp-has-current-submenu div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -121px -1px;
+#adminmenu .menu-icon-media:hover div.wp-menu-image,
+#adminmenu .menu-icon-media.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -121px -1px;
 }
 
-#adminmenu #menu-links div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -91px -33px;
+#adminmenu .menu-icon-links div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -91px -33px;
 }
 
-#adminmenu #menu-links:hover div.wp-menu-image,
-#adminmenu #menu-links.wp-has-current-submenu div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -91px -1px;
+#adminmenu .menu-icon-links:hover div.wp-menu-image,
+#adminmenu .menu-icon-links.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -91px -1px;
 }
 
-#adminmenu #menu-pages div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -151px -33px;
+#adminmenu .menu-icon-page div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -151px -33px;
 }
 
-#adminmenu #menu-pages:hover div.wp-menu-image,
-#adminmenu #menu-pages.wp-has-current-submenu div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -151px -1px;
+#adminmenu .menu-icon-page:hover div.wp-menu-image,
+#adminmenu .menu-icon-page.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -151px -1px;
 }
 
-#adminmenu #menu-comments div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -31px -33px;
+#adminmenu .menu-icon-comments div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -31px -33px;
 }
 
-#adminmenu #menu-comments:hover div.wp-menu-image,
-#adminmenu #menu-comments.wp-has-current-submenu div.wp-menu-image,
-#adminmenu #menu-comments.current div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -31px -1px;
+#adminmenu .menu-icon-comments:hover div.wp-menu-image,
+#adminmenu .menu-icon-comments.wp-has-current-submenu div.wp-menu-image,
+#adminmenu .menu-icon-comments.current div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -31px -1px;
 }
 
-#adminmenu #menu-appearance div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -1px -33px;
+#adminmenu .menu-icon-appearance div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -1px -33px;
 }
 
-#adminmenu #menu-appearance:hover div.wp-menu-image,
-#adminmenu #menu-appearance.wp-has-current-submenu div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -1px -1px;
+#adminmenu .menu-icon-appearance:hover div.wp-menu-image,
+#adminmenu .menu-icon-appearance.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -1px -1px;
 }
 
-#adminmenu #menu-plugins div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -181px -33px;
+#adminmenu .menu-icon-plugins div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -181px -33px;
 }
 
-#adminmenu #menu-plugins:hover div.wp-menu-image,
-#adminmenu #menu-plugins.wp-has-current-submenu div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -181px -1px;
+#adminmenu .menu-icon-plugins:hover div.wp-menu-image,
+#adminmenu .menu-icon-plugins.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -181px -1px;
 }
 
-#adminmenu #menu-users div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -301px -33px;
+#adminmenu .menu-icon-users div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -301px -33px;
 }
 
-#adminmenu #menu-users:hover div.wp-menu-image,
-#adminmenu #menu-users.wp-has-current-submenu div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -301px -1px;
+#adminmenu .menu-icon-users:hover div.wp-menu-image,
+#adminmenu .menu-icon-users.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -301px -1px;
 }
 
-#adminmenu #menu-tools div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -211px -33px;
+#adminmenu .menu-icon-tools div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -211px -33px;
 }
 
-#adminmenu #menu-tools:hover div.wp-menu-image,
-#adminmenu #menu-tools.wp-has-current-submenu div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -211px -1px;
+#adminmenu .menu-icon-tools:hover div.wp-menu-image,
+#adminmenu .menu-icon-tools.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -211px -1px;
 }
 
-#adminmenu #menu-settings div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -241px -33px;
+#adminmenu .menu-icon-settings div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -241px -33px;
 }
 
-#adminmenu #menu-settings:hover div.wp-menu-image,
-#adminmenu #menu-settings.wp-has-current-submenu div.wp-menu-image {
-	background: transparent url("../images/menu.png") no-repeat scroll -241px -1px;
+#adminmenu .menu-icon-settings:hover div.wp-menu-image,
+#adminmenu .menu-icon-settings.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -241px -1px;
+}
+
+#adminmenu .menu-icon-site div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -361px -33px;
+}
+
+#adminmenu .menu-icon-site:hover div.wp-menu-image,
+#adminmenu .menu-icon-site.wp-has-current-submenu div.wp-menu-image {
+	background: transparent url('../images/menu.png?ver=20100531') no-repeat scroll -361px -1px;
 }
 /* end menu */
 
 
 /* Diff */
 table.diff .diff-deletedline {
-	background-color: #ffdddd;
+	background-color: #fdd;
 }
 
 table.diff .diff-deletedline del {
-	background-color: #ff9999;
+	background-color: #f99;
 }
 
 table.diff .diff-addedline {
-	background-color: #ddffdd;
+	background-color: #dfd;
 }
 
 table.diff .diff-addedline ins {
-	background-color: #99ff99;
+	background-color: #9f9;
 }
 
 #att-info {
@@ -1357,7 +1361,7 @@ div.star.select:hover {
 }
 
 .inline-editor ul.cat-checklist {
-	background-color: #FFFFFF;
+	background-color: #fff;
 	border-color: #ddd;
 }
 
@@ -1384,7 +1388,7 @@ fieldset.inline-edit-col-right .inline-edit-col {
 }
 
 .meta-box-sortables .postbox:hover .handlediv {
-	background: transparent url(../images/menu-bits.gif) no-repeat scroll left -111px;
+	background: transparent url(../images/menu-bits.gif?ver=20100610) no-repeat scroll left -111px;
 }
 
 #major-publishing-actions {
@@ -1397,7 +1401,7 @@ fieldset.inline-edit-col-right .inline-edit-col {
 
 .tablenav .tablenav-pages a {
 	border-color: #e3e3e3;
-	background: #eee url('../images/menu-bits.gif') repeat-x scroll left -379px;
+	background: #eee url('../images/menu-bits.gif?ver=20100610') repeat-x scroll left -379px;
 }
 
 .tablenav .tablenav-pages a:hover {
@@ -1458,7 +1462,8 @@ fieldset.inline-edit-col-right .inline-edit-col {
 	background-color: #f5f5f5;
 }
 
-#post-body ul#category-tabs li.tabs a {
+#post-body ul.category-tabs li.tabs a,
+#post-body ul.add-menu-item-tabs li.tabs a {
 	color: #333;
 }
 
@@ -1479,34 +1484,31 @@ fieldset.inline-edit-col-right .inline-edit-col {
 }
 
 #favorite-first {
-	background: #797979 url(../images/fav.png) repeat-x left center;
-	border-color: #777 !important;
-	border-bottom-color: #666 !important;
+	border-color: #c0c0c0;
+	background: #f1f1f1; /* fallback color */
+	background:-moz-linear-gradient(bottom,  #e7e7e7,  #fff);
+	background:-webkit-gradient(linear, left bottom, left top, from(#e7e7e7), to(#fff));
 }
 
 #favorite-inside {
-	border-color: #797979;
-	background-color: #797979;
+	border-color: #c0c0c0;
+	background-color: #fff;
 }
 
 #favorite-toggle {
-	background: transparent url(../images/fav-arrow.gif) no-repeat 0 -4px;
+	background: transparent url(../images/fav-arrow.gif?ver=20100531) no-repeat 0 -4px;
 }
 
 #favorite-actions a {
-	color: #ddd;
+	color: #464646;
 }
 
 #favorite-actions a:hover {
-	color: #fff;
+	color: #000;
 }
 
 #favorite-inside a:hover {
 	text-decoration: underline;
-}
-
-#favorite-actions .slide-down {
-	border-bottom-color: #626262;
 }
 
 #screen-meta a.show-settings {
@@ -1516,53 +1518,57 @@ fieldset.inline-edit-col-right .inline-edit-col {
 
 #icon-edit,
 #icon-post {
-	background: transparent url(../images/icons32.png) no-repeat -552px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -552px -5px;
 }
 
 #icon-index {
-	background: transparent url(../images/icons32.png) no-repeat -137px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -137px -5px;
 }
 
 #icon-upload {
-	background: transparent url(../images/icons32.png) no-repeat -251px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -251px -5px;
 }
 
 #icon-link-manager,
 #icon-link,
 #icon-link-category {
-	background: transparent url(../images/icons32.png) no-repeat -190px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -190px -5px;
 }
 
 #icon-edit-pages,
 #icon-page {
-	background: transparent url(../images/icons32.png) no-repeat -312px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -312px -5px;
 }
 
 #icon-edit-comments {
-	background: transparent url(../images/icons32.png) no-repeat -72px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -72px -5px;
 }
 
 #icon-themes {
-	background: transparent url(../images/icons32.png) no-repeat -11px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -11px -5px;
 }
 
 #icon-plugins {
-	background: transparent url(../images/icons32.png) no-repeat -370px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -370px -5px;
 }
 
 #icon-users,
 #icon-profile,
 #icon-user-edit {
-	background: transparent url(../images/icons32.png) no-repeat -600px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -600px -5px;
 }
 
 #icon-tools,
 #icon-admin {
-	background: transparent url(../images/icons32.png) no-repeat -432px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -432px -5px;
 }
 
 #icon-options-general {
-	background: transparent url(../images/icons32.png) no-repeat -492px -5px;
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -492px -5px;
+}
+
+#icon-ms-admin {
+	background: transparent url(../images/icons32.png?ver=20100531) no-repeat -659px -5px;
 }
 
 .view-switch #view-switch-list {
@@ -1582,28 +1588,12 @@ fieldset.inline-edit-col-right .inline-edit-col {
 }
 
 #header-logo {
-	background: transparent url(../images/wp-logo.gif) no-repeat scroll center center;
-}
-
-#wphead #site-visit-button {
-	background-color:#585858;
-	background-image: url(../images/visit-site-button-grad.gif);
-	color:#aaa;
-	text-shadow: #3F3F3F 0 -1px 0;
-}
-
-#wphead a:hover #site-visit-button {
-	color:#fff;
-}
-
-#wphead a:focus #site-visit-button,
-#wphead a:active #site-visit-button {
-	background-position:0 -27px;
+	background: transparent url(../images/wp-logo.png?ver=20100531) no-repeat scroll center center;
 }
 
 .popular-tags,
 .feature-filter {
-	background-color: #FFFFFF;
+	background-color: #fff;
 	border-color: #DFDFDF;
 }
 
@@ -1618,18 +1608,18 @@ fieldset.inline-edit-col-right .inline-edit-col {
 div.widgets-sortables,
 #widgets-left .inactive {
 	background-color: #f1f1f1;
-    border-color: #ddd;
+	border-color: #ddd;
 }
 
 #available-widgets .widget-holder {
-    background-color: #fff;
-    border-color: #ddd;
+	background-color: #fff;
+	border-color: #ddd;
 }
 
 #widgets-left .sidebar-name {
 	background-color: #aaa;
 	background-image: url(../images/ed-bg.gif);
-	text-shadow: #FFFFFF 0 1px 0;
+	text-shadow: #fff 0 1px 0;
 	border-color: #dfdfdf;
 }
 
@@ -1651,11 +1641,11 @@ div.widgets-sortables,
 }
 
 #widgets-left .sidebar-name-arrow {
-	background: transparent url(../images/menu-bits.gif) no-repeat scroll left -109px;
+	background: transparent url(../images/menu-bits.gif?ver=20100610) no-repeat scroll left -109px;
 }
 
 #widgets-right .sidebar-name-arrow {
-	background: transparent url(../images/fav-arrow.gif) no-repeat scroll 0 -1px;
+	background: transparent url(../images/widgets-arrow.gif?ver=20100531) no-repeat scroll 0 -1px;
 }
 
 .in-widget-title {
@@ -1694,4 +1684,13 @@ div.widgets-sortables,
 
 .comment-ays th {
 	background-color: #f1f1f1;
+}
+
+#nav-menu-header, .menu-item-handle {
+	background: url("../images/gray-grad.png") repeat-x scroll left top #dfdfdf;
+}
+
+#menu-management .nav-tab-active {
+	background: #ececec;
+	border-bottom-color: #ececec;
 }

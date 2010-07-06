@@ -156,7 +156,7 @@ function install_theme_search_form() {
 	<select	name="type" id="typeselector">
 	<option value="term" <?php selected('term', $type) ?>><?php _e('Term'); ?></option>
 	<option value="author" <?php selected('author', $type) ?>><?php _e('Author'); ?></option>
-	<option value="tag" <?php selected('tag', $type) ?>><?php echo _x('Tag', 'Theme Installer'); ?></option>
+	<option value="tag" <?php selected('tag', $type) ?>><?php _ex('Tag', 'Theme Installer'); ?></option>
 	</select>
 	<input type="text" name="s" size="30" value="<?php echo esc_attr($term) ?>" />
 	<input type="submit" name="search" value="<?php esc_attr_e('Search'); ?>" class="button" />
@@ -301,7 +301,7 @@ function display_theme($theme, $actions = null, $show_details = true) {
 	if ( !is_array($actions) ) {
 		$actions = array();
 		$actions[] = '<a href="' . admin_url('theme-install.php?tab=theme-information&amp;theme=' . $theme->slug .
-										'&amp;TB_iframe=true&amp;tbWidth=500&amp;tbHeight=350') . '" class="thickbox thickbox-preview onclick" title="' . esc_attr(sprintf(__('Install &#8220;%s&#8221;'), $name)) . '">' . __('Install') . '</a>';
+										'&amp;TB_iframe=true&amp;tbWidth=500&amp;tbHeight=385') . '" class="thickbox thickbox-preview onclick" title="' . esc_attr(sprintf(__('Install &#8220;%s&#8221;'), $name)) . '">' . __('Install') . '</a>';
 		$actions[] = '<a href="' . $preview_link . '" class="thickbox thickbox-preview onclick previewlink" title="' . esc_attr(sprintf(__('Preview &#8220;%s&#8221;'), $name)) . '">' . __('Preview') . '</a>';
 		$actions = apply_filters('theme_install_action_links', $actions, $theme);
 	}
@@ -366,8 +366,6 @@ function display_theme($theme, $actions = null, $show_details = true) {
  * @param int $totalpages Number of pages.
  */
 function display_themes($themes, $page = 1, $totalpages = 1) {
-	global $themes_allowedtags;
-
 	$type = isset($_REQUEST['type']) ? stripslashes( $_REQUEST['type'] ) : '';
 	$term = isset($_REQUEST['s']) ? stripslashes( $_REQUEST['s'] ) : '';
 	?>
@@ -457,8 +455,11 @@ function install_theme_information() {
 	// Sanitize HTML
 	foreach ( (array)$api->sections as $section_name => $content )
 		$api->sections[$section_name] = wp_kses($content, $themes_allowedtags);
-	foreach ( array('version', 'author', 'requires', 'tested', 'homepage', 'downloaded', 'slug') as $key )
-		$api->$key = wp_kses($api->$key, $themes_allowedtags);
+
+	foreach ( array('version', 'author', 'requires', 'tested', 'homepage', 'downloaded', 'slug') as $key ) {
+		if ( isset($api->$key) )
+			$api->$key = wp_kses($api->$key, $themes_allowedtags);
+	}
 
 	iframe_header( __('Theme Install') );
 
@@ -476,7 +477,7 @@ function install_theme_information() {
 	// Default to a "new" theme
 	$type = 'install';
 	// Check to see if this theme is known to be installed, and has an update awaiting it.
-	$update_themes = get_transient('update_themes');
+	$update_themes = get_site_transient('update_themes');
 	if ( is_object($update_themes) && isset($update_themes->response) ) {
 		foreach ( (array)$update_themes->response as $theme_slug => $theme_info ) {
 			if ( $theme_slug === $api->slug ) {

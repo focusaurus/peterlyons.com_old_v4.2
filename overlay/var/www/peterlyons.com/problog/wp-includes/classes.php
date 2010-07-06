@@ -26,7 +26,7 @@ class WP {
 	 * @access public
 	 * @var array
 	 */
-	var $public_query_vars = array('m', 'p', 'posts', 'w', 'cat', 'withcomments', 'withoutcomments', 's', 'search', 'exact', 'sentence', 'debug', 'calendar', 'page', 'paged', 'more', 'tb', 'pb', 'author', 'order', 'orderby', 'year', 'monthnum', 'day', 'hour', 'minute', 'second', 'name', 'category_name', 'tag', 'feed', 'author_name', 'static', 'pagename', 'page_id', 'error', 'comments_popup', 'attachment', 'attachment_id', 'subpost', 'subpost_id', 'preview', 'robots', 'taxonomy', 'term', 'cpage');
+	var $public_query_vars = array('m', 'p', 'posts', 'w', 'cat', 'withcomments', 'withoutcomments', 's', 'search', 'exact', 'sentence', 'debug', 'calendar', 'page', 'paged', 'more', 'tb', 'pb', 'author', 'order', 'orderby', 'year', 'monthnum', 'day', 'hour', 'minute', 'second', 'name', 'category_name', 'tag', 'feed', 'author_name', 'static', 'pagename', 'page_id', 'error', 'comments_popup', 'attachment', 'attachment_id', 'subpost', 'subpost_id', 'preview', 'robots', 'taxonomy', 'term', 'cpage', 'post_type');
 
 	/**
 	 * Private query variables.
@@ -133,6 +133,7 @@ class WP {
 
 		$this->query_vars = array();
 		$taxonomy_query_vars = array();
+		$post_type_query_vars = array();
 
 		if ( is_array($extra_query_vars) )
 			$this->extra_query_vars = & $extra_query_vars;
@@ -144,7 +145,7 @@ class WP {
 		// Fetch the rewrite rules.
 		$rewrite = $wp_rewrite->wp_rewrite_rules();
 
-		if (! empty($rewrite)) {
+		if ( ! empty($rewrite) ) {
 			// If we match a rewrite rule, this will be cleared.
 			$error = '404';
 			$this->did_permalink = true;
@@ -159,7 +160,7 @@ class WP {
 			$req_uri_array = explode('?', $req_uri);
 			$req_uri = $req_uri_array[0];
 			$self = $_SERVER['PHP_SELF'];
-			$home_path = parse_url(get_option('home'));
+			$home_path = parse_url(home_url());
 			if ( isset($home_path['path']) )
 				$home_path = $home_path['path'];
 			else
@@ -203,12 +204,11 @@ class WP {
 
 				// If the requesting file is the anchor of the match, prepend it
 				// to the path info.
-				if ((! empty($req_uri)) && (strpos($match, $req_uri) === 0) && ($req_uri != $request)) {
+				if ( (! empty($req_uri)) && (strpos($match, $req_uri) === 0) && ($req_uri != $request) )
 					$request_match = $req_uri . '/' . $request;
-				}
 
-				if (preg_match("#^$match#", $request_match, $matches) ||
-					preg_match("#^$match#", urldecode($request_match), $matches)) {
+				if ( preg_match("#^$match#", $request_match, $matches) ||
+					preg_match("#^$match#", urldecode($request_match), $matches) ) {
 					// Got a match.
 					$this->matched_rule = $match;
 
@@ -225,10 +225,10 @@ class WP {
 
 					// If we're processing a 404 request, clear the error var
 					// since we found something.
-					if (isset($_GET['error']))
+					if ( isset($_GET['error']) )
 						unset($_GET['error']);
 
-					if (isset($error))
+					if ( isset($error) )
 						unset($error);
 
 					break;
@@ -236,14 +236,14 @@ class WP {
 			}
 
 			// If req_uri is empty or if it is a request for ourself, unset error.
-			if (empty($request) || $req_uri == $self || strpos($_SERVER['PHP_SELF'], 'wp-admin/') !== false) {
-				if (isset($_GET['error']))
+			if ( empty($request) || $req_uri == $self || strpos($_SERVER['PHP_SELF'], 'wp-admin/') !== false ) {
+				if ( isset($_GET['error']) )
 					unset($_GET['error']);
 
-				if (isset($error))
+				if ( isset($error) )
 					unset($error);
 
-				if (isset($perma_query_vars) && strpos($_SERVER['PHP_SELF'], 'wp-admin/') !== false)
+				if ( isset($perma_query_vars) && strpos($_SERVER['PHP_SELF'], 'wp-admin/') !== false )
 					unset($perma_query_vars);
 
 				$this->did_permalink = false;
@@ -256,32 +256,46 @@ class WP {
 			if ( $t->query_var )
 				$taxonomy_query_vars[$t->query_var] = $taxonomy;
 
-		for ($i=0; $i<count($this->public_query_vars); $i += 1) {
+		foreach ( $GLOBALS['wp_post_types'] as $post_type => $t )
+			if ( $t->query_var )
+				$post_type_query_vars[$t->query_var] = $post_type;
+
+		for ( $i = 0; $i < count($this->public_query_vars); $i += 1 ) {
 			$wpvar = $this->public_query_vars[$i];
-			if (isset($this->extra_query_vars[$wpvar]))
+			if ( isset($this->extra_query_vars[$wpvar]) )
 				$this->query_vars[$wpvar] = $this->extra_query_vars[$wpvar];
-			elseif (isset($GLOBALS[$wpvar]))
+			elseif ( isset($GLOBALS[$wpvar]) )
 				$this->query_vars[$wpvar] = $GLOBALS[$wpvar];
-			elseif (!empty($_POST[$wpvar]))
+			elseif ( !empty($_POST[$wpvar]) )
 				$this->query_vars[$wpvar] = $_POST[$wpvar];
-			elseif (!empty($_GET[$wpvar]))
+			elseif ( !empty($_GET[$wpvar]) )
 				$this->query_vars[$wpvar] = $_GET[$wpvar];
-			elseif (!empty($perma_query_vars[$wpvar]))
+			elseif ( !empty($perma_query_vars[$wpvar]) )
 				$this->query_vars[$wpvar] = $perma_query_vars[$wpvar];
 
 			if ( !empty( $this->query_vars[$wpvar] ) ) {
 				$this->query_vars[$wpvar] = (string) $this->query_vars[$wpvar];
-				if ( in_array( $wpvar, $taxonomy_query_vars ) ) {
+				if ( isset( $taxonomy_query_vars[$wpvar] ) ) {
 					$this->query_vars['taxonomy'] = $taxonomy_query_vars[$wpvar];
 					$this->query_vars['term'] = $this->query_vars[$wpvar];
+				} elseif ( isset($post_type_query_vars[$wpvar] ) ) {
+					$this->query_vars['post_type'] = $post_type_query_vars[$wpvar];
+					$this->query_vars['name'] = $this->query_vars[$wpvar];
 				}
 			}
 		}
 
+		// Limit publicly queried post_types to those that are publicly_queryable
+		if ( isset( $this->query_vars['post_type']) ) {
+			$queryable_post_types =  get_post_types( array('publicly_queryable' => true) );
+			if ( ! in_array( $this->query_vars['post_type'], $queryable_post_types ) )
+				unset( $this->query_vars['post_type'] );
+		}
+
 		foreach ( (array) $this->private_query_vars as $var) {
-			if (isset($this->extra_query_vars[$var]))
+			if ( isset($this->extra_query_vars[$var]) )
 				$this->query_vars[$var] = $this->extra_query_vars[$var];
-			elseif (isset($GLOBALS[$var]) && '' != $GLOBALS[$var])
+			elseif ( isset($GLOBALS[$var]) && '' != $GLOBALS[$var] )
 				$this->query_vars[$var] = $GLOBALS[$var];
 		}
 
@@ -395,7 +409,7 @@ class WP {
 	}
 
 	/**
-	 * Setup the WordPress Globals.
+	 * Set up the WordPress Globals.
 	 *
 	 * The query_vars property will be extracted to the GLOBALS. So care should
 	 * be taken when naming global variables that might interfere with the
@@ -426,7 +440,7 @@ class WP {
 	}
 
 	/**
-	 * Setup the current user.
+	 * Set up the current user.
 	 *
 	 * @since 2.0.0
 	 */
@@ -435,7 +449,7 @@ class WP {
 	}
 
 	/**
-	 * Setup the Loop based on the query variables.
+	 * Set up the Loop based on the query variables.
 	 *
 	 * @uses WP::$query_vars
 	 * @since 2.0.0
@@ -447,21 +461,22 @@ class WP {
  	}
 
  	/**
- 	 * Set the Headers for 404, if permalink is not found.
+ 	 * Set the Headers for 404, if nothing is found for requested URL.
 	 *
-	 * Issue a 404 if a permalink request doesn't match any posts.  Don't issue
-	 * a 404 if one was already issued, if the request was a search, or if the
-	 * request was a regular query string request rather than a permalink
-	 * request. Issues a 200, if not 404.
+	 * Issue a 404 if a request doesn't match any posts and doesn't match
+	 * any object (e.g. an existing-but-empty category, tag, author) and a 404 was not already
+	 * issued, and if the request was not a search or the homepage.
+	 *
+	 * Otherwise, issue a 200.
 	 *
 	 * @since 2.0.0
  	 */
 	function handle_404() {
 		global $wp_query;
 
-		if ( (0 == count($wp_query->posts)) && !is_404() && !is_search() && ( $this->did_permalink || (!empty($_SERVER['QUERY_STRING']) && (false === strpos($_SERVER['REQUEST_URI'], '?'))) ) ) {
+		if ( ( 0 == count( $wp_query->posts ) ) && !is_404() && !is_robots() && !is_search() && !is_home() ) {
 			// Don't 404 for these queries if they matched an object.
-			if ( ( is_tag() || is_category() || is_author() ) && $wp_query->get_queried_object() ) {
+			if ( ( is_tag() || is_category() || is_tax() || is_author() ) && $wp_query->get_queried_object() && !is_paged() ) {
 				if ( !is_404() )
 					status_header( 200 );
 				return;
@@ -907,7 +922,7 @@ class Walker {
 
 		/*
 		 * need to display in hierarchical order
-		 * seperate elements into two buckets: top level and children elements
+		 * separate elements into two buckets: top level and children elements
 		 * children_elements is two dimensional array, eg.
 		 * children_elements[10][] contains all sub-elements whose parent is 10.
 		 */
@@ -1021,7 +1036,7 @@ class Walker {
 		}
 
 		/*
-		 * seperate elements into two buckets: top level and children elements
+		 * separate elements into two buckets: top level and children elements
 		 * children_elements is two dimensional array, eg.
 		 * children_elements[10][] contains all sub-elements whose parent is 10.
 		 */
@@ -1140,7 +1155,7 @@ class Walker_Page extends Walker {
 	 */
 	function start_lvl(&$output, $depth) {
 		$indent = str_repeat("\t", $depth);
-		$output .= "\n$indent<ul>\n";
+		$output .= "\n$indent<ul class='children'>\n";
 	}
 
 	/**
@@ -1187,7 +1202,7 @@ class Walker_Page extends Walker {
 
 		$css_class = implode(' ', apply_filters('page_css_class', $css_class, $page));
 
-		$output .= $indent . '<li class="' . $css_class . '"><a href="' . get_page_link($page->ID) . '" title="' . esc_attr(apply_filters('the_title', $page->post_title)) . '">' . $link_before . apply_filters('the_title', $page->post_title) . $link_after . '</a>';
+		$output .= $indent . '<li class="' . $css_class . '"><a href="' . get_page_link($page->ID) . '" title="' . esc_attr( wp_strip_all_tags( apply_filters( 'the_title', $page->post_title, $page->ID ) ) ) . '">' . $link_before . apply_filters( 'the_title', $page->post_title, $page->ID ) . $link_after . '</a>';
 
 		if ( !empty($show_date) ) {
 			if ( 'modified' == $show_date )
@@ -1327,7 +1342,7 @@ class Walker_Category extends Walker {
 
 		$cat_name = esc_attr( $category->name);
 		$cat_name = apply_filters( 'list_cats', $cat_name, $category );
-		$link = '<a href="' . get_category_link( $category->term_id ) . '" ';
+		$link = '<a href="' . get_term_link( $category, $category->taxonomy ) . '" ';
 		if ( $use_desc_for_title == 0 || empty($category->description) )
 			$link .= 'title="' . sprintf(__( 'View all posts filed under %s' ), $cat_name) . '"';
 		else
@@ -1341,7 +1356,7 @@ class Walker_Category extends Walker {
 			if ( empty($feed_image) )
 				$link .= '(';
 
-			$link .= '<a href="' . get_category_feed_link($category->term_id, $feed_type) . '"';
+			$link .= '<a href="' . get_term_feed_link( $category->term_id, $category->taxonomy, $feed_type ) . '"';
 
 			if ( empty($feed) )
 				$alt = ' alt="' . sprintf(__( 'Feed for all posts filed under %s' ), $cat_name ) . '"';
@@ -1677,7 +1692,7 @@ class WP_MatchesMapRegex {
 	 */
 	function callback($matches) {
 		$index = intval(substr($matches[0], 9, -1));
-		return ( isset( $this->_matches[$index] ) ? $this->_matches[$index] : '' );
+		return ( isset( $this->_matches[$index] ) ? urlencode($this->_matches[$index]) : '' );
 	}
 
 }

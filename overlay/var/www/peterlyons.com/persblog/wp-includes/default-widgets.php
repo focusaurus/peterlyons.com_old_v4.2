@@ -15,14 +15,14 @@
 class WP_Widget_Pages extends WP_Widget {
 
 	function WP_Widget_Pages() {
-		$widget_ops = array('classname' => 'widget_pages', 'description' => __( 'Your blog&#8217;s WordPress Pages') );
+		$widget_ops = array('classname' => 'widget_pages', 'description' => __( 'Your site&#8217;s WordPress Pages') );
 		$this->WP_Widget('pages', __('Pages'), $widget_ops);
 	}
 
 	function widget( $args, $instance ) {
 		extract( $args );
 
-		$title = apply_filters('widget_title', empty( $instance['title'] ) ? __( 'Pages' ) : $instance['title']);
+		$title = apply_filters('widget_title', empty( $instance['title'] ) ? __( 'Pages' ) : $instance['title'], $instance, $this->id_base);
 		$sortby = empty( $instance['sortby'] ) ? 'menu_order' : $instance['sortby'];
 		$exclude = empty( $instance['exclude'] ) ? '' : $instance['exclude'];
 
@@ -172,13 +172,13 @@ class WP_Widget_Links extends WP_Widget {
 class WP_Widget_Search extends WP_Widget {
 
 	function WP_Widget_Search() {
-		$widget_ops = array('classname' => 'widget_search', 'description' => __( "A search form for your blog") );
+		$widget_ops = array('classname' => 'widget_search', 'description' => __( "A search form for your site") );
 		$this->WP_Widget('search', __('Search'), $widget_ops);
 	}
 
 	function widget( $args, $instance ) {
 		extract($args);
-		$title = apply_filters('widget_title', $instance['title']);
+		$title = apply_filters('widget_title', $instance['title'], $instance, $this->id_base);
 
 		echo $before_widget;
 		if ( $title )
@@ -215,7 +215,7 @@ class WP_Widget_Search extends WP_Widget {
 class WP_Widget_Archives extends WP_Widget {
 
 	function WP_Widget_Archives() {
-		$widget_ops = array('classname' => 'widget_archive', 'description' => __( 'A monthly archive of your blog&#8217;s posts') );
+		$widget_ops = array('classname' => 'widget_archive', 'description' => __( 'A monthly archive of your site&#8217;s posts') );
 		$this->WP_Widget('archives', __('Archives'), $widget_ops);
 	}
 
@@ -223,7 +223,7 @@ class WP_Widget_Archives extends WP_Widget {
 		extract($args);
 		$c = $instance['count'] ? '1' : '0';
 		$d = $instance['dropdown'] ? '1' : '0';
-		$title = apply_filters('widget_title', empty($instance['title']) ? __('Archives') : $instance['title']);
+		$title = apply_filters('widget_title', empty($instance['title']) ? __('Archives') : $instance['title'], $instance, $this->id_base);
 
 		echo $before_widget;
 		if ( $title )
@@ -286,7 +286,7 @@ class WP_Widget_Meta extends WP_Widget {
 
 	function widget( $args, $instance ) {
 		extract($args);
-		$title = apply_filters('widget_title', empty($instance['title']) ? __('Meta') : $instance['title']);
+		$title = apply_filters('widget_title', empty($instance['title']) ? __('Meta') : $instance['title'], $instance, $this->id_base);
 
 		echo $before_widget;
 		if ( $title )
@@ -328,13 +328,13 @@ class WP_Widget_Meta extends WP_Widget {
 class WP_Widget_Calendar extends WP_Widget {
 
 	function WP_Widget_Calendar() {
-		$widget_ops = array('classname' => 'widget_calendar', 'description' => __( 'A calendar of your blog&#8217;s posts') );
+		$widget_ops = array('classname' => 'widget_calendar', 'description' => __( 'A calendar of your site&#8217;s posts') );
 		$this->WP_Widget('calendar', __('Calendar'), $widget_ops);
 	}
 
 	function widget( $args, $instance ) {
 		extract($args);
-		$title = apply_filters('widget_title', empty($instance['title']) ? '&nbsp;' : $instance['title']);
+		$title = apply_filters('widget_title', empty($instance['title']) ? '&nbsp;' : $instance['title'], $instance, $this->id_base);
 		echo $before_widget;
 		if ( $title )
 			echo $before_title . $title . $after_title;
@@ -376,7 +376,7 @@ class WP_Widget_Text extends WP_Widget {
 
 	function widget( $args, $instance ) {
 		extract($args);
-		$title = apply_filters( 'widget_title', empty($instance['title']) ? '' : $instance['title'], $instance );
+		$title = apply_filters( 'widget_title', empty($instance['title']) ? '' : $instance['title'], $instance, $this->id_base);
 		$text = apply_filters( 'widget_text', $instance['text'], $instance );
 		echo $before_widget;
 		if ( !empty( $title ) ) { echo $before_title . $title . $after_title; } ?>
@@ -406,7 +406,7 @@ class WP_Widget_Text extends WP_Widget {
 
 		<textarea class="widefat" rows="16" cols="20" id="<?php echo $this->get_field_id('text'); ?>" name="<?php echo $this->get_field_name('text'); ?>"><?php echo $text; ?></textarea>
 
-		<p><input id="<?php echo $this->get_field_id('filter'); ?>" name="<?php echo $this->get_field_name('filter'); ?>" type="checkbox" <?php checked(isset($instance['filter']) ? $instance['filter'] : 0); ?> />&nbsp;<label for="<?php echo $this->get_field_id('filter'); ?>"><?php _e('Automatically add paragraphs.'); ?></label></p>
+		<p><input id="<?php echo $this->get_field_id('filter'); ?>" name="<?php echo $this->get_field_name('filter'); ?>" type="checkbox" <?php checked(isset($instance['filter']) ? $instance['filter'] : 0); ?> />&nbsp;<label for="<?php echo $this->get_field_id('filter'); ?>"><?php _e('Automatically add paragraphs'); ?></label></p>
 <?php
 	}
 }
@@ -426,7 +426,7 @@ class WP_Widget_Categories extends WP_Widget {
 	function widget( $args, $instance ) {
 		extract( $args );
 
-		$title = apply_filters('widget_title', empty( $instance['title'] ) ? __( 'Categories' ) : $instance['title']);
+		$title = apply_filters('widget_title', empty( $instance['title'] ) ? __( 'Categories' ) : $instance['title'], $instance, $this->id_base);
 		$c = $instance['count'] ? '1' : '0';
 		$h = $instance['hierarchical'] ? '1' : '0';
 		$d = $instance['dropdown'] ? '1' : '0';
@@ -447,7 +447,7 @@ class WP_Widget_Categories extends WP_Widget {
 	var dropdown = document.getElementById("cat");
 	function onCatChange() {
 		if ( dropdown.options[dropdown.selectedIndex].value > 0 ) {
-			location.href = "<?php echo get_option('home'); ?>/?cat="+dropdown.options[dropdown.selectedIndex].value;
+			location.href = "<?php echo home_url(); ?>/?cat="+dropdown.options[dropdown.selectedIndex].value;
 		}
 	}
 	dropdown.onchange = onCatChange;
@@ -472,9 +472,9 @@ class WP_Widget_Categories extends WP_Widget {
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags($new_instance['title']);
-		$instance['count'] = $new_instance['count'] ? 1 : 0;
-		$instance['hierarchical'] = $new_instance['hierarchical'] ? 1 : 0;
-		$instance['dropdown'] = $new_instance['dropdown'] ? 1 : 0;
+		$instance['count'] = !empty($new_instance['count']) ? 1 : 0;
+		$instance['hierarchical'] = !empty($new_instance['hierarchical']) ? 1 : 0;
+		$instance['dropdown'] = !empty($new_instance['dropdown']) ? 1 : 0;
 
 		return $instance;
 	}
@@ -511,7 +511,7 @@ class WP_Widget_Categories extends WP_Widget {
 class WP_Widget_Recent_Posts extends WP_Widget {
 
 	function WP_Widget_Recent_Posts() {
-		$widget_ops = array('classname' => 'widget_recent_entries', 'description' => __( "The most recent posts on your blog") );
+		$widget_ops = array('classname' => 'widget_recent_entries', 'description' => __( "The most recent posts on your site") );
 		$this->WP_Widget('recent-posts', __('Recent Posts'), $widget_ops);
 		$this->alt_option_name = 'widget_recent_entries';
 
@@ -534,7 +534,7 @@ class WP_Widget_Recent_Posts extends WP_Widget {
 		ob_start();
 		extract($args);
 
-		$title = apply_filters('widget_title', empty($instance['title']) ? __('Recent Posts') : $instance['title']);
+		$title = apply_filters('widget_title', empty($instance['title']) ? __('Recent Posts') : $instance['title'], $instance, $this->id_base);
 		if ( !$number = (int) $instance['number'] )
 			$number = 10;
 		else if ( $number < 1 )
@@ -549,16 +549,18 @@ class WP_Widget_Recent_Posts extends WP_Widget {
 		<?php if ( $title ) echo $before_title . $title . $after_title; ?>
 		<ul>
 		<?php  while ($r->have_posts()) : $r->the_post(); ?>
-		<li><a href="<?php the_permalink() ?>" title="<?php echo esc_attr(get_the_title() ? get_the_title() : get_the_ID()); ?>"><?php if ( get_the_title() ) the_title(); else the_ID(); ?> </a></li>
+		<li><a href="<?php the_permalink() ?>" title="<?php echo esc_attr(get_the_title() ? get_the_title() : get_the_ID()); ?>"><?php if ( get_the_title() ) the_title(); else the_ID(); ?></a></li>
 		<?php endwhile; ?>
 		</ul>
 		<?php echo $after_widget; ?>
 <?php
-			wp_reset_query();  // Restore global post data stomped by the_post().
+		// Reset the global $the_post as this query will have stomped on it
+		wp_reset_postdata();
+
 		endif;
 
 		$cache[$args['widget_id']] = ob_get_flush();
-		wp_cache_add('widget_recent_posts', $cache, 'widget');
+		wp_cache_set('widget_recent_posts', $cache, 'widget');
 	}
 
 	function update( $new_instance, $old_instance ) {
@@ -587,8 +589,7 @@ class WP_Widget_Recent_Posts extends WP_Widget {
 		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></p>
 
 		<p><label for="<?php echo $this->get_field_id('number'); ?>"><?php _e('Number of posts to show:'); ?></label>
-		<input id="<?php echo $this->get_field_id('number'); ?>" name="<?php echo $this->get_field_name('number'); ?>" type="text" value="<?php echo $number; ?>" size="3" /><br />
-		<small><?php _e('(at most 15)'); ?></small></p>
+		<input id="<?php echo $this->get_field_id('number'); ?>" name="<?php echo $this->get_field_name('number'); ?>" type="text" value="<?php echo $number; ?>" size="3" /></p>
 <?php
 	}
 }
@@ -618,36 +619,48 @@ class WP_Widget_Recent_Comments extends WP_Widget {
 	}
 
 	function flush_widget_cache() {
-		wp_cache_delete('recent_comments', 'widget');
+		wp_cache_delete('widget_recent_comments', 'widget');
 	}
 
 	function widget( $args, $instance ) {
-		global $wpdb, $comments, $comment;
+		global $comments, $comment;
 
-		extract($args, EXTR_SKIP);
-		$title = apply_filters('widget_title', empty($instance['title']) ? __('Recent Comments') : $instance['title']);
-		if ( !$number = (int) $instance['number'] )
-			$number = 5;
-		else if ( $number < 1 )
-			$number = 1;
-		else if ( $number > 15 )
-			$number = 15;
+		$cache = wp_cache_get('widget_recent_comments', 'widget');
 
-		if ( !$comments = wp_cache_get( 'recent_comments', 'widget' ) ) {
-			$comments = $wpdb->get_results("SELECT $wpdb->comments.* FROM $wpdb->comments JOIN $wpdb->posts ON $wpdb->posts.ID = $wpdb->comments.comment_post_ID WHERE comment_approved = '1' AND post_status = 'publish' ORDER BY comment_date_gmt DESC LIMIT 15");
-			wp_cache_add( 'recent_comments', $comments, 'widget' );
+		if ( ! is_array( $cache ) )
+			$cache = array();
+
+		if ( isset( $cache[$args['widget_id']] ) ) {
+			echo $cache[$args['widget_id']];
+			return;
 		}
 
-		$comments = array_slice( (array) $comments, 0, $number );
-?>
-		<?php echo $before_widget; ?>
-			<?php if ( $title ) echo $before_title . $title . $after_title; ?>
-			<ul id="recentcomments"><?php
-			if ( $comments ) : foreach ( (array) $comments as $comment) :
-			echo  '<li class="recentcomments">' . /* translators: comments widget: 1: comment author, 2: post link */ sprintf(_x('%1$s on %2$s', 'widgets'), get_comment_author_link(), '<a href="' . esc_url( get_comment_link($comment->comment_ID) ) . '">' . get_the_title($comment->comment_post_ID) . '</a>') . '</li>';
-			endforeach; endif;?></ul>
-		<?php echo $after_widget; ?>
-<?php
+ 		extract($args, EXTR_SKIP);
+ 		$output = '';
+ 		$title = apply_filters('widget_title', empty($instance['title']) ? __('Recent Comments') : $instance['title']);
+
+		if ( ! $number = (int) $instance['number'] )
+ 			$number = 5;
+ 		else if ( $number < 1 )
+ 			$number = 1;
+
+		$comments = get_comments( array( 'number' => $number, 'status' => 'approve' ) );
+		$output .= $before_widget;
+		if ( $title )
+			$output .= $before_title . $title . $after_title;
+
+		$output .= '<ul id="recentcomments">';
+		if ( $comments ) {
+			foreach ( (array) $comments as $comment) {
+				$output .=  '<li class="recentcomments">' . /* translators: comments widget: 1: comment author, 2: post link */ sprintf(_x('%1$s on %2$s', 'widgets'), get_comment_author_link(), '<a href="' . esc_url( get_comment_link($comment->comment_ID) ) . '">' . get_the_title($comment->comment_post_ID) . '</a>') . '</li>';
+			}
+ 		}
+		$output .= '</ul>';
+		$output .= $after_widget;
+
+		echo $output;
+		$cache[$args['widget_id']] = $output;
+		wp_cache_set('widget_recent_comments', $cache, 'widget');
 	}
 
 	function update( $new_instance, $old_instance ) {
@@ -671,8 +684,7 @@ class WP_Widget_Recent_Comments extends WP_Widget {
 		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></p>
 
 		<p><label for="<?php echo $this->get_field_id('number'); ?>"><?php _e('Number of comments to show:'); ?></label>
-		<input id="<?php echo $this->get_field_id('number'); ?>" name="<?php echo $this->get_field_name('number'); ?>" type="text" value="<?php echo $number; ?>" size="3" /><br />
-		<small><?php _e('(at most 15)'); ?></small></p>
+		<input id="<?php echo $this->get_field_id('number'); ?>" name="<?php echo $this->get_field_name('number'); ?>" type="text" value="<?php echo $number; ?>" size="3" /></p>
 <?php
 	}
 }
@@ -721,11 +733,11 @@ class WP_Widget_RSS extends WP_Widget {
 		if ( empty($title) )
 			$title = empty($desc) ? __('Unknown Feed') : $desc;
 
-		$title = apply_filters('widget_title', $title );
+		$title = apply_filters('widget_title', $title, $instance, $this->id_base);
 		$url = esc_url(strip_tags($url));
 		$icon = includes_url('images/rss.png');
 		if ( $title )
-			$title = "<a class='rsswidget' href='$url' title='" . esc_attr(__('Syndicate this content')) ."'><img style='background:orange;color:white;border:none;' width='14' height='14' src='$icon' alt='RSS' /></a> <a class='rsswidget' href='$link' title='$desc'>$title</a>";
+			$title = "<a class='rsswidget' href='$url' title='" . esc_attr__( 'Syndicate this content' ) ."'><img style='border:0' width='14' height='14' src='$icon' alt='RSS' /></a> <a class='rsswidget' href='$link' title='$desc'>$title</a>";
 
 		echo $before_widget;
 		if ( $title )
@@ -739,7 +751,7 @@ class WP_Widget_RSS extends WP_Widget {
 	}
 
 	function update($new_instance, $old_instance) {
-		$testurl = $new_instance['url'] != $old_instance['url'];
+		$testurl = ( isset($new_instance['url']) && ($new_instance['url'] != $old_instance['url']) );
 		return wp_widget_rss_process( $new_instance, $testurl );
 	}
 
@@ -790,7 +802,7 @@ function wp_widget_rss_output( $rss, $args = array() ) {
 
 	if ( !$rss->get_item_quantity() ) {
 		echo '<ul><li>' . __( 'An error has occurred; the feed is probably down. Try again later.' ) . '</li></ul>';
-		$rss->__destruct(); 
+		$rss->__destruct();
 		unset($rss);
 		return;
 	}
@@ -805,8 +817,15 @@ function wp_widget_rss_output( $rss, $args = array() ) {
 		if ( empty($title) )
 			$title = __('Untitled');
 
-		$desc = str_replace(array("\n", "\r"), ' ', esc_attr(strip_tags(@html_entity_decode($item->get_description(), ENT_QUOTES, get_option('blog_charset')))));
-		$desc = wp_html_excerpt( $desc, 360 ) . ' [&hellip;]';
+		$desc = str_replace( array("\n", "\r"), ' ', esc_attr( strip_tags( @html_entity_decode( $item->get_description(), ENT_QUOTES, get_option('blog_charset') ) ) ) );
+		$desc = wp_html_excerpt( $desc, 360 );
+
+		// Append ellipsis. Change existing [...] to [&hellip;].
+		if ( '[...]' == substr( $desc, -5 ) )
+			$desc = substr( $desc, 0, -5 ) . '[&hellip;]';
+		elseif ( '[&hellip;]' != substr( $desc, -10 ) )
+			$desc .= ' [&hellip;]';
+
 		$desc = esc_html( $desc );
 
 		if ( $show_summary ) {
@@ -843,7 +862,7 @@ function wp_widget_rss_output( $rss, $args = array() ) {
 		}
 	}
 	echo '</ul>';
-	$rss->__destruct(); 
+	$rss->__destruct();
 	unset($rss);
 }
 
@@ -939,9 +958,9 @@ function wp_widget_rss_process( $widget_rss, $check_feed = true ) {
 		$items = 10;
 	$url           = esc_url_raw(strip_tags( $widget_rss['url'] ));
 	$title         = trim(strip_tags( $widget_rss['title'] ));
-	$show_summary  = (int) $widget_rss['show_summary'];
-	$show_author   = (int) $widget_rss['show_author'];
-	$show_date     = (int) $widget_rss['show_date'];
+	$show_summary  = isset($widget_rss['show_summary']) ? (int) $widget_rss['show_summary'] : 0;
+	$show_author   = isset($widget_rss['show_author']) ? (int) $widget_rss['show_author'] :0;
+	$show_date     = isset($widget_rss['show_date']) ? (int) $widget_rss['show_date'] : 0;
 
 	if ( $check_feed ) {
 		$rss = fetch_feed($url);
@@ -976,27 +995,123 @@ class WP_Widget_Tag_Cloud extends WP_Widget {
 
 	function widget( $args, $instance ) {
 		extract($args);
-		$title = apply_filters('widget_title', empty($instance['title']) ? __('Tags') : $instance['title']);
+		$current_taxonomy = $this->_get_current_taxonomy($instance);
+		if ( !empty($instance['title']) ) {
+			$title = $instance['title'];
+		} else {
+			if ( 'post_tag' == $current_taxonomy ) {
+				$title = __('Tags');
+			} else {
+				$tax = get_taxonomy($current_taxonomy);
+				$title = $tax->labels->name;
+			}
+		}
+		$title = apply_filters('widget_title', $title, $instance, $this->id_base);
 
 		echo $before_widget;
 		if ( $title )
 			echo $before_title . $title . $after_title;
 		echo '<div>';
-		wp_tag_cloud(apply_filters('widget_tag_cloud_args', array()));
+		wp_tag_cloud( apply_filters('widget_tag_cloud_args', array('taxonomy' => $current_taxonomy) ) );
 		echo "</div>\n";
 		echo $after_widget;
 	}
 
 	function update( $new_instance, $old_instance ) {
 		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
+		$instance['taxonomy'] = stripslashes($new_instance['taxonomy']);
 		return $instance;
 	}
 
 	function form( $instance ) {
+		$current_taxonomy = $this->_get_current_taxonomy($instance);
 ?>
 	<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:') ?></label>
 	<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if (isset ( $instance['title'])) {echo esc_attr( $instance['title'] );} ?>" /></p>
-<?php
+	<p><label for="<?php echo $this->get_field_id('taxonomy'); ?>"><?php _e('Taxonomy:') ?></label>
+	<select class="widefat" id="<?php echo $this->get_field_id('taxonomy'); ?>" name="<?php echo $this->get_field_name('taxonomy'); ?>">
+	<?php foreach ( get_object_taxonomies('post') as $taxonomy ) :
+				$tax = get_taxonomy($taxonomy);
+				if ( !$tax->show_tagcloud || empty($tax->labels->name) )
+					continue;
+	?>
+		<option value="<?php echo esc_attr($taxonomy) ?>" <?php selected($taxonomy, $current_taxonomy) ?>><?php echo $tax->labels->name; ?></option>
+	<?php endforeach; ?>
+	</select></p><?php
+	}
+
+	function _get_current_taxonomy($instance) {
+		if ( !empty($instance['taxonomy']) && taxonomy_exists($instance['taxonomy']) )
+			return $instance['taxonomy'];
+
+		return 'post_tag';
+	}
+}
+
+/**
+ * Navigation Menu widget class
+ *
+ * @since 3.0.0
+ */
+ class WP_Nav_Menu_Widget extends WP_Widget {
+
+	function WP_Nav_Menu_Widget() {
+		$widget_ops = array( 'description' => __('Use this widget to add one of your custom menus as a widget.') );
+		parent::WP_Widget( 'nav_menu', __('Custom Menu'), $widget_ops );
+	}
+
+	function widget($args, $instance) {
+		// Get menu
+		$nav_menu = wp_get_nav_menu_object( $instance['nav_menu'] );
+
+		if ( !$nav_menu )
+			return;
+
+		echo $args['before_widget'];
+
+		if ( !empty($instance['title']) )
+			echo $args['before_title'] . $instance['title'] . $args['after_title'];
+
+		wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu ) );
+
+		echo $args['after_widget'];
+	}
+
+	function update( $new_instance, $old_instance ) {
+		$instance['title'] = strip_tags( stripslashes($new_instance['title']) );
+		$instance['nav_menu'] = (int) $new_instance['nav_menu'];
+		return $instance;
+	}
+
+	function form( $instance ) {
+		$title = isset( $instance['title'] ) ? $instance['title'] : '';
+		$nav_menu = isset( $instance['nav_menu'] ) ? $instance['nav_menu'] : '';
+
+		// Get menus
+		$menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
+
+		// If no menus exists, direct the user to go and create some.
+		if ( !$menus ) {
+			echo '<p>'. sprintf( __('No menus have been created yet. <a href="%s">Create some</a>.'), admin_url('nav-menus.php') ) .'</p>';
+			return;
+		}
+		?>
+		<p>
+			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:') ?></label>
+			<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php echo $title; ?>" />
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id('nav_menu'); ?>"><?php _e('Select Menu:'); ?></label>
+			<select id="<?php echo $this->get_field_id('nav_menu'); ?>" name="<?php echo $this->get_field_name('nav_menu'); ?>">
+		<?php
+			foreach ( $menus as $menu ) {
+				$selected = $nav_menu == $menu->term_id ? ' selected="selected"' : '';
+				echo '<option'. $selected .' value="'. $menu->term_id .'">'. $menu->name .'</option>';
+			}
+		?>
+			</select>
+		</p>
+		<?php
 	}
 }
 
@@ -1035,6 +1150,8 @@ function wp_widgets_init() {
 	register_widget('WP_Widget_RSS');
 
 	register_widget('WP_Widget_Tag_Cloud');
+
+	register_widget('WP_Nav_Menu_Widget');
 
 	do_action('widgets_init');
 }

@@ -24,27 +24,30 @@
  *
  * @param string $action
  * @param array|object $args Optional. Arguments to serialize for the Plugin Info API.
- * @return mixed
+ * @return object plugins_api response object on success, WP_Error on failure.
  */
 function plugins_api($action, $args = null) {
 
-	if( is_array($args) )
+	if ( is_array($args) )
 		$args = (object)$args;
 
 	if ( !isset($args->per_page) )
 		$args->per_page = 24;
 
-	$args = apply_filters('plugins_api_args', $args, $action); //NOTE: Ensure that an object is returned via this filter.
-	$res = apply_filters('plugins_api', false, $action, $args); //NOTE: Allows a plugin to completely override the builtin WordPress.org API.
+	// Allows a plugin to override the WordPress.org API entirely.
+	// Use the filter 'plugins_api_result' to mearly add results.
+	// Please ensure that a object is returned from the following filters.
+	$args = apply_filters('plugins_api_args', $args, $action);
+	$res = apply_filters('plugins_api', false, $action, $args);
 
-	if ( ! $res ) {
-		$request = wp_remote_post('http://api.wordpress.org/plugins/info/1.0/', array( 'body' => array('action' => $action, 'request' => serialize($args))) );
+	if ( false === $res ) {
+		$request = wp_remote_post('http://api.wordpress.org/plugins/info/1.0/', array( 'timeout' => 15, 'body' => array('action' => $action, 'request' => serialize($args))) );
 		if ( is_wp_error($request) ) {
-			$res = new WP_Error('plugins_api_failed', __('An Unexpected HTTP Error occurred during the API request.</p> <p><a href="?" onclick="document.location.reload(); return false;">Try again</a>'), $request->get_error_message() );
+			$res = new WP_Error('plugins_api_failed', __('An Unexpected HTTP Error occurred during the API request.'), $request->get_error_message() );
 		} else {
 			$res = unserialize($request['body']);
-			if ( ! $res )
-				$res = new WP_Error('plugins_api_failed', __('An unknown error occurred'), $request['body']);
+			if ( false === $res )
+				$res = new WP_Error('plugins_api_failed', __('An unknown error occurred.'), $request['body']);
 		}
 	} elseif ( !is_wp_error($res) ) {
 		$res->external = true;
@@ -136,16 +139,20 @@ function install_dashboard() {
 
 	$api_tags = install_popular_tags();
 
-	//Set up the tags in a way which can be interprated by wp_generate_tag_cloud()
-	$tags = array();
-	foreach ( (array)$api_tags as $tag )
-		$tags[ $tag['name'] ] = (object) array(
-								'link' => esc_url( admin_url('plugin-install.php?tab=search&type=tag&s=' . urlencode($tag['name'])) ),
-								'name' => $tag['name'],
-								'id' => sanitize_title_with_dashes($tag['name']),
-								'count' => $tag['count'] );
 	echo '<p class="popular-tags">';
-	echo wp_generate_tag_cloud($tags, array( 'single_text' => __('%d plugin'), 'multiple_text' => __('%d plugins') ) );
+	if ( is_wp_error($api_tags) ) {
+		echo $api_tags->get_error_message();
+	} else {
+		//Set up the tags in a way which can be interprated by wp_generate_tag_cloud()
+		$tags = array();
+		foreach ( (array)$api_tags as $tag )
+			$tags[ $tag['name'] ] = (object) array(
+									'link' => esc_url( admin_url('plugin-install.php?tab=search&type=tag&s=' . urlencode($tag['name'])) ),
+									'name' => $tag['name'],
+									'id' => sanitize_title_with_dashes($tag['name']),
+									'count' => $tag['count'] );
+		echo wp_generate_tag_cloud($tags, array( 'single_text' => __('%d plugin'), 'multiple_text' => __('%d plugins') ) );
+	}
 	echo '</p><br class="clear" />';
 }
 
@@ -162,7 +169,7 @@ function install_search_form(){
 		<select name="type" id="typeselector">
 			<option value="term"<?php selected('term', $type) ?>><?php _e('Term'); ?></option>
 			<option value="author"<?php selected('author', $type) ?>><?php _e('Author'); ?></option>
-			<option value="tag"<?php selected('tag', $type) ?>><?php echo _x('Tag', 'Plugin Installer'); ?></option>
+			<option value="tag"<?php selected('tag', $type) ?>><?php _ex('Tag', 'Plugin Installer'); ?></option>
 		</select>
 		<input type="text" name="s" value="<?php echo esc_attr($term) ?>" />
 		<label class="screen-reader-text" for="plugin-search-input"><?php _e('Search Plugins'); ?></label>
@@ -182,7 +189,7 @@ function install_featured($page = 1) {
 	$args = array('browse' => 'featured', 'page' => $page);
 	$api = plugins_api('query_plugins', $args);
 	if ( is_wp_error($api) )
-		wp_die($api);
+		wp_die($api->get_error_message() . '</p> <p class="hide-if-no-js"><a href="#" onclick="document.location.reload(); return false;">' . __('Try again') . '</a>');
 	display_plugins_table($api->plugins, $api->info['page'], $api->info['pages']);
 }
 
@@ -197,6 +204,8 @@ add_action('install_plugins_popular', 'install_popular', 10, 1);
 function install_popular($page = 1) {
 	$args = array('browse' => 'popular', 'page' => $page);
 	$api = plugins_api('query_plugins', $args);
+	if ( is_wp_error($api) )
+		wp_die($api->get_error_message() . '</p> <p class="hide-if-no-js"><a href="#" onclick="document.location.reload(); return false;">' . __('Try again') . '</a>');
 	display_plugins_table($api->plugins, $api->info['page'], $api->info['pages']);
 }
 
@@ -210,7 +219,7 @@ add_action('install_plugins_upload', 'install_plugins_upload', 10, 1);
 function install_plugins_upload( $page = 1 ) {
 ?>
 	<h4><?php _e('Install a plugin in .zip format') ?></h4>
-	<p class="install-help"><?php _e('If you have a plugin in a .zip format, You may install it by uploading it here.') ?></p>
+	<p class="install-help"><?php _e('If you have a plugin in a .zip format, you may install it by uploading it here.') ?></p>
 	<form method="post" enctype="multipart/form-data" action="<?php echo admin_url('update.php?action=upload-plugin') ?>">
 		<?php wp_nonce_field( 'plugin-upload') ?>
 		<label class="screen-reader-text" for="pluginzip"><?php _e('Plugin zip file'); ?></label>
@@ -232,7 +241,7 @@ function install_new($page = 1) {
 	$args = array('browse' => 'new', 'page' => $page);
 	$api = plugins_api('query_plugins', $args);
 	if ( is_wp_error($api) )
-		wp_die($api);
+		wp_die($api->get_error_message() . '</p> <p class="hide-if-no-js"><a href="#" onclick="document.location.reload(); return false;">' . __('Try again') . '</a>');
 	display_plugins_table($api->plugins, $api->info['page'], $api->info['pages']);
 }
 add_action('install_plugins_updated', 'install_updated', 10, 1);
@@ -248,6 +257,8 @@ add_action('install_plugins_updated', 'install_updated', 10, 1);
 function install_updated($page = 1) {
 	$args = array('browse' => 'updated', 'page' => $page);
 	$api = plugins_api('query_plugins', $args);
+	if ( is_wp_error($api) )
+		wp_die($api->get_error_message() . '</p> <p class="hide-if-no-js"><a href="#" onclick="document.location.reload(); return false;">' . __('Try again') . '</a>');
 	display_plugins_table($api->plugins, $api->info['page'], $api->info['pages']);
 }
 
@@ -302,7 +313,6 @@ function display_plugins_table($plugins, $page = 1, $totalpages = 1){
 				<th scope="col" class="num"><?php _e('Version'); ?></th>
 				<th scope="col" class="num"><?php _e('Rating'); ?></th>
 				<th scope="col" class="desc"><?php _e('Description'); ?></th>
-				<th scope="col" class="action-links"><?php _e('Actions'); ?></th>
 			</tr>
 		</thead>
 
@@ -312,16 +322,15 @@ function display_plugins_table($plugins, $page = 1, $totalpages = 1){
 				<th scope="col" class="num"><?php _e('Version'); ?></th>
 				<th scope="col" class="num"><?php _e('Rating'); ?></th>
 				<th scope="col" class="desc"><?php _e('Description'); ?></th>
-				<th scope="col" class="action-links"><?php _e('Actions'); ?></th>
 			</tr>
 		</tfoot>
 
 		<tbody class="plugins">
 		<?php
-			if( empty($plugins) )
+			if ( empty($plugins) )
 				echo '<tr><td colspan="5">', __('No plugins match your request.'), '</td></tr>';
 
-			foreach( (array) $plugins as $plugin ){
+			foreach ( (array) $plugins as $plugin ){
 				if ( is_object($plugin) )
 					$plugin = (array) $plugin;
 
@@ -342,23 +351,41 @@ function display_plugins_table($plugins, $page = 1, $totalpages = 1){
 				$name = strip_tags($title . ' ' . $version);
 
 				$author = $plugin['author'];
-				if( ! empty($plugin['author']) )
+				if ( ! empty($plugin['author']) )
 					$author = ' <cite>' . sprintf( __('By %s'), $author ) . '.</cite>';
 
 				$author = wp_kses($author, $plugins_allowedtags);
 
-				if( isset($plugin['homepage']) )
-					$title = '<a target="_blank" href="' . esc_attr($plugin['homepage']) . '">' . $title . '</a>';
-
 				$action_links = array();
 				$action_links[] = '<a href="' . admin_url('plugin-install.php?tab=plugin-information&amp;plugin=' . $plugin['slug'] .
-									'&amp;TB_iframe=true&amp;width=600&amp;height=550') . '" class="thickbox onclick" title="' .
-									esc_attr($name) . '">' . __('Install') . '</a>';
+									'&amp;TB_iframe=true&amp;width=600&amp;height=550') . '" class="thickbox" title="' .
+									esc_attr( sprintf( __( 'More information about %s' ), $name ) ) . '">' . __('Details') . '</a>';
 
-				$action_links = apply_filters('plugin_install_action_links', $action_links, $plugin);
+				if ( current_user_can('install_plugins') || current_user_can('update_plugins') ) {
+					$status = install_plugin_install_status($plugin);
+
+					switch ( $status['status'] ) {
+						case 'install':
+							if ( $status['url'] )
+								$action_links[] = '<a class="install-now" href="' . $status['url'] . '" title="' . esc_attr( sprintf( __( 'Install %s' ), $name ) ) . '">' . __('Install Now') . '</a>';
+							break;
+						case 'update_available':
+							if ( $status['url'] )
+								$action_links[] = '<a href="' . $status['url'] . '" title="' . esc_attr( sprintf( __( 'Update to version %s' ), $status['version'] ) ) . '">' . sprintf( __('Update Now'), $status['version'] ) . '</a>';
+							break;
+						case 'latest_installed':
+						case 'newer_installed':
+							$action_links[] = '<span title="' . esc_attr__( 'This plugin is already installed and is up to date' ) . ' ">' . __('Installed') . '</span>';
+							break;
+					}
+				}
+
+				$action_links = apply_filters( 'plugin_install_action_links', $action_links, $plugin );
 			?>
 			<tr>
-				<td class="name"><?php echo $title; ?></td>
+				<td class="name"><strong><?php echo $title; ?></strong>
+					<div class="action-links"><?php if ( !empty($action_links) ) echo implode(' | ', $action_links); ?></div>
+				</td>
 				<td class="vers"><?php echo $version; ?></td>
 				<td class="vers">
 					<div class="star-holder" title="<?php printf(_n('(based on %s rating)', '(based on %s ratings)', $plugin['num_ratings']), number_format_i18n($plugin['num_ratings'])) ?>">
@@ -371,7 +398,6 @@ function display_plugins_table($plugins, $page = 1, $totalpages = 1){
 					</div>
 				</td>
 				<td class="desc"><?php echo $description, $author; ?></td>
-				<td class="action-links"><?php if ( !empty($action_links) )	echo implode(' | ', $action_links); ?></td>
 			</tr>
 			<?php
 			}
@@ -389,6 +415,69 @@ function display_plugins_table($plugins, $page = 1, $totalpages = 1){
 }
 
 add_action('install_plugins_pre_plugin-information', 'install_plugin_information');
+
+/**
+ * Determine the status we can perform on a plugin.
+ *
+ * @since 3.0.0
+ */
+function install_plugin_install_status($api, $loop = false) {
+	// this function is called recursivly, $loop prevents futhur loops.
+	if ( is_array($api) )
+		$api = (object) $api;
+
+	//Default to a "new" plugin
+	$status = 'install';
+	$url = false;
+
+	//Check to see if this plugin is known to be installed, and has an update awaiting it.
+	$update_plugins = get_site_transient('update_plugins');
+	if ( is_object( $update_plugins ) ) {
+		foreach ( (array)$update_plugins->response as $file => $plugin ) {
+			if ( $plugin->slug === $api->slug ) {
+				$status = 'update_available';
+				$update_file = $file;
+				$version = $plugin->new_version;
+				if ( current_user_can('update_plugins') )
+					$url = wp_nonce_url(admin_url('update.php?action=upgrade-plugin&plugin=' . $update_file), 'upgrade-plugin_' . $update_file);
+				break;
+			}
+		}
+	}
+
+	if ( 'install' == $status ) {
+		if ( is_dir( WP_PLUGIN_DIR  . '/' . $api->slug ) ) {
+			$installed_plugin = get_plugins('/' . $api->slug);
+			if ( empty($installed_plugin) ) {
+				if ( current_user_can('install_plugins') )
+					$url = wp_nonce_url(admin_url('update.php?action=install-plugin&plugin=' . $api->slug), 'install-plugin_' . $api->slug);
+			} else {
+				$key = array_shift( $key = array_keys($installed_plugin) ); //Use the first plugin regardless of the name, Could have issues for multiple-plugins in one directory if they share different version numbers
+				if ( version_compare($api->version, $installed_plugin[ $key ]['Version'], '=') ){
+					$status = 'latest_installed';
+				} elseif ( version_compare($api->version, $installed_plugin[ $key ]['Version'], '<') ) {
+					$status = 'newer_installed';
+					$version = $installed_plugin[ $key ]['Version'];
+				} else {
+					//If the above update check failed, Then that probably means that the update checker has out-of-date information, force a refresh
+					if ( ! $loop ) {
+						delete_site_transient('update_plugins');
+						wp_update_plugins();
+						return install_plugin_install_status($api, true);
+					}
+				}
+			}
+		} else {
+			// "install" & no directory with that slug
+			if ( current_user_can('install_plugins') )
+				$url = wp_nonce_url(admin_url('update.php?action=install-plugin&plugin=' . $api->slug), 'install-plugin_' . $api->slug);
+		}
+	}
+	if ( isset($_GET['from']) )
+		$url .= '&amp;from=' . urlencode(stripslashes($_GET['from']));
+
+	return compact('status', 'url', 'version');
+}
 
 /**
  * Display plugin information in dialog box form.
@@ -416,7 +505,7 @@ function install_plugin_information() {
 		$api->$key = wp_kses($api->$key, $plugins_allowedtags);
 
 	$section = isset($_REQUEST['section']) ? stripslashes( $_REQUEST['section'] ) : 'description'; //Default to the Description tab, Do not translate, API returns English.
-	if( empty($section) || ! isset($api->sections[ $section ]) )
+	if ( empty($section) || ! isset($api->sections[ $section ]) )
 		$section = array_shift( $section_titles = array_keys((array)$api->sections) );
 
 	iframe_header( __('Plugin Install') );
@@ -437,66 +526,30 @@ function install_plugin_information() {
 	echo "</div>\n";
 	?>
 	<div class="alignright fyi">
-		<?php if ( ! empty($api->download_link) ) : ?>
+		<?php if ( ! empty($api->download_link) && ( current_user_can('install_plugins') || current_user_can('update_plugins') ) ) : ?>
 		<p class="action-button">
 		<?php
-			//Default to a "new" plugin
-			$type = 'install';
-			//Check to see if this plugin is known to be installed, and has an update awaiting it.
-			$update_plugins = get_transient('update_plugins');
-			if ( is_object( $update_plugins ) ) {
-				foreach ( (array)$update_plugins->response as $file => $plugin ) {
-					if ( $plugin->slug === $api->slug ) {
-						$type = 'update_available';
-						$update_file = $file;
-						break;
-					}
-				}
-			}
-			if ( 'install' == $type && is_dir( WP_PLUGIN_DIR  . '/' . $api->slug ) ) {
-				$installed_plugin = get_plugins('/' . $api->slug);
-				if ( ! empty($installed_plugin) ) {
-					$key = array_shift( $key = array_keys($installed_plugin) ); //Use the first plugin regardless of the name, Could have issues for multiple-plugins in one directory if they share different version numbers
-					if ( version_compare($api->version, $installed_plugin[ $key ]['Version'], '=') ){
-						$type = 'latest_installed';
-					} elseif ( version_compare($api->version, $installed_plugin[ $key ]['Version'], '<') ) {
-						$type = 'newer_installed';
-						$newer_version = $installed_plugin[ $key ]['Version'];
-					} else {
-						//If the above update check failed, Then that probably means that the update checker has out-of-date information, force a refresh
-						delete_transient('update_plugins');
-						$update_file = $api->slug . '/' . $key; //This code branch only deals with a plugin which is in a folder the same name as its slug, Doesnt support plugins which have 'non-standard' names
-						$type = 'update_available';
-					}
-				}
-			}
-
-			switch ( $type ) :
-				default:
-				case 'install':
-					if ( current_user_can('install_plugins') ) :
-				?><a href="<?php echo wp_nonce_url(admin_url('update.php?action=install-plugin&plugin=' . $api->slug), 'install-plugin_' . $api->slug) ?>" target="_parent"><?php _e('Install Now') ?></a><?php
-					endif;
+		$status = install_plugin_install_status($api);
+		switch ( $status['status'] ) {
+			case 'install':
+				if ( $status['url'] )
+					echo '<a href="' . $status['url'] . '" target="_parent">' . __('Install Now') . '</a>';
 				break;
-				case 'update_available':
-					if ( current_user_can('update_plugins') ) :
-						?><a href="<?php echo wp_nonce_url(admin_url('update.php?action=upgrade-plugin&plugin=' . $update_file), 'upgrade-plugin_' . $update_file) ?>" target="_parent"><?php _e('Install Update Now') ?></a><?php
-					endif;
+			case 'update_available':
+				if ( $status['url'] )
+					echo '<a href="' . $status['url'] . '" target="_parent">' . __('Install Update Now') .'</a>';
 				break;
-				case 'newer_installed':
-					if ( current_user_can('install_plugins') || current_user_can('update_plugins') ) :
-					?><a><?php printf(__('Newer Version (%s) Installed'), $newer_version) ?></a><?php
-					endif;
+			case 'newer_installed':
+				echo '<a>' . sprintf(__('Newer Version (%s) Installed'), $status['version']) . '</a>';
 				break;
-				case 'latest_installed':
-					if ( current_user_can('install_plugins') || current_user_can('update_plugins') ) :
-					?><a><?php _e('Latest Version Installed') ?></a><?php
-					endif;
+			case 'latest_installed':
+				echo '<a>' . __('Latest Version Installed') . '</a>';
 				break;
-			endswitch; ?>
+		}
+		?>
 		</p>
 		<?php endif; ?>
-		<h2 class="mainheader"><?php _e('FYI') ?></h2>
+		<h2 class="mainheader"><?php /* translators: For Your Information */ _e('FYI') ?></h2>
 		<ul>
 <?php if ( ! empty($api->version) ) : ?>
 			<li><strong><?php _e('Version:') ?></strong> <?php echo $api->version ?></li>

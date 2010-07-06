@@ -37,23 +37,27 @@ class WP_oEmbed {
 		// The WP_Embed class disables discovery for non-unfiltered_html users, so only providers in this array will be used for them.
 		// Add to this list using the wp_oembed_add_provider() function (see it's PHPDoc for details).
 		$this->providers = apply_filters( 'oembed_providers', array(
-			'#http://(www\.)?youtube.com/watch.*#i' => array( 'http://www.youtube.com/oembed',            true  ),
-			'http://blip.tv/file/*'                 => array( 'http://blip.tv/oembed/',                   false ),
-			'#http://(www\.)?vimeo\.com/.*#i'       => array( 'http://www.vimeo.com/api/oembed.{format}', true  ),
-			'#http://(www\.)?dailymotion\.com/.*#i' => array( 'http://www.dailymotion.com/api/oembed',    true  ),
-			'#http://(www\.)?flickr\.com/.*#i'      => array( 'http://www.flickr.com/services/oembed/',   true  ),
-			'#http://(www\.)?hulu\.com/watch/.*#i'  => array( 'http://www.hulu.com/api/oembed.{format}',  true  ),
-			'#http://(www\.)?viddler\.com/.*#i'     => array( 'http://lab.viddler.com/services/oembed/',  true  ),
-			'http://qik.com/*'                      => array( 'http://qik.com/api/oembed.{format}',       false ),
-			'http://revision3.com/*'                => array( 'http://revision3.com/api/oembed/',         false ),
-			'http://i*.photobucket.com/albums/*'    => array( 'http://photobucket.com/oembed',            false ),
-			'http://gi*.photobucket.com/groups/*'   => array( 'http://photobucket.com/oembed',            false ),
-			'#http://(www\.)?scribd\.com/.*#i'      => array( 'http://www.scribd.com/services/oembed',    true  ),
-			'http://wordpress.tv/*'                 => array( 'http://wordpress.tv/oembed/',              false ),
+			'#http://(www\.)?youtube.com/watch.*#i'         => array( 'http://www.youtube.com/oembed',            true  ),
+			'http://youtu.be/*'                             => array( 'http://www.youtube.com/oembed',            false ),
+			'http://blip.tv/file/*'                         => array( 'http://blip.tv/oembed/',                   false ),
+			'#http://(www\.)?vimeo\.com/.*#i'               => array( 'http://www.vimeo.com/api/oembed.{format}', true  ),
+			'#http://(www\.)?dailymotion\.com/.*#i'         => array( 'http://www.dailymotion.com/api/oembed',    true  ),
+			'#http://(www\.)?flickr\.com/.*#i'              => array( 'http://www.flickr.com/services/oembed/',   true  ),
+			'#http://(.+)?smugmug\.com/.*#i'                => array( 'http://api.smugmug.com/services/oembed/',  true  ),
+			'#http://(www\.)?hulu\.com/watch/.*#i'          => array( 'http://www.hulu.com/api/oembed.{format}',  true  ),
+			'#http://(www\.)?viddler\.com/.*#i'             => array( 'http://lab.viddler.com/services/oembed/',  true  ),
+			'http://qik.com/*'                              => array( 'http://qik.com/api/oembed.{format}',       false ),
+			'http://revision3.com/*'                        => array( 'http://revision3.com/api/oembed/',         false ),
+			'http://i*.photobucket.com/albums/*'            => array( 'http://photobucket.com/oembed',            false ),
+			'http://gi*.photobucket.com/groups/*'           => array( 'http://photobucket.com/oembed',            false ),
+			'#http://(www\.)?scribd\.com/.*#i'              => array( 'http://www.scribd.com/services/oembed',    true  ),
+			'http://wordpress.tv/*'                         => array( 'http://wordpress.tv/oembed/',              false ),
+			'#http://(answers|surveys)\.polldaddy.com/.*#i' => array( 'http://polldaddy.com/oembed/',             true  ),
+			'#http://(www\.)?funnyordie\.com/videos/.*#i'   => array( 'http://www.funnyordie.com/oembed',         true  ),
 		) );
 
-		// Fix Scribd embeds. They contain new lines in the middle of the HTML which breaks wpautop().
-		add_filter( 'oembed_dataparse', array(&$this, 'strip_scribd_newlines'), 10, 3 );
+		// Fix any embeds that contain new lines in the middle of the HTML which breaks wpautop().
+		add_filter( 'oembed_dataparse', array(&$this, '_strip_newlines'), 10, 3 );
 	}
 
 	/**
@@ -161,36 +165,63 @@ class WP_oEmbed {
 	function fetch( $provider, $url, $args = '' ) {
 		$args = wp_parse_args( $args, wp_embed_defaults() );
 
-		$provider = add_query_arg( 'format', 'json', $provider ); // JSON is easier to deal with than XML
-
 		$provider = add_query_arg( 'maxwidth', $args['width'], $provider );
 		$provider = add_query_arg( 'maxheight', $args['height'], $provider );
 		$provider = add_query_arg( 'url', urlencode($url), $provider );
 
-		if ( !$result = wp_remote_retrieve_body( wp_remote_get( $provider ) ) )
-			return false;
-
-		$result = trim( $result );
-
-		// JSON?
-		// Example content: http://vimeo.com/api/oembed.json?url=http%3A%2F%2Fvimeo.com%2F240975
-		if ( $data = json_decode($result) ) {
-			return $data;
+		foreach( array( 'json', 'xml' ) as $format ) {
+			$result = $this->_fetch_with_format( $provider, $format );
+			if ( is_wp_error( $result ) && 'not-implemented' == $result->get_error_code() )
+				continue;
+			return ( $result && ! is_wp_error( $result ) ) ? $result : false;
 		}
+		return false;
+	}
 
-		// Must be XML. Only parse it if PHP5 is installed. (PHP4 isn't worth the trouble.)
-		// Example content: http://vimeo.com/api/oembed.xml?url=http%3A%2F%2Fvimeo.com%2F240975
-		elseif ( function_exists('simplexml_load_string') ) {
+	/**
+	 * Fetches result from an oEmbed provider for a specific format and complete provider URL
+	 *
+	 * @since 3.0.0
+	 * @access private
+	 * @param string $provider_url_with_args URL to the provider with full arguments list (url, maxheight, etc.)
+	 * @param string $format Format to use
+	 * @return bool|object False on failure, otherwise the result in the form of an object.
+	 */
+	function _fetch_with_format( $provider_url_with_args, $format ) {
+		$provider_url_with_args = add_query_arg( 'format', $format, $provider_url_with_args );
+		$response = wp_remote_get( $provider_url_with_args );
+		if ( 501 == wp_remote_retrieve_response_code( $response ) )
+			return new WP_Error( 'not-implemented' );
+		if ( ! $body = wp_remote_retrieve_body( $response ) )
+			return false;
+		$parse_method = "_parse_$format";
+		return $this->$parse_method( $body );
+	}
+
+	/**
+	 * Parses a json response body.
+	 *
+	 * @since 3.0.0
+	 * @access private
+	 */
+	function _parse_json( $response_body ) {
+		return ( ( $data = json_decode( trim( $response_body ) ) ) && is_object( $data ) ) ? $data : false;
+	}
+
+	/**
+	 * Parses an XML response body.
+	 *
+	 * @since 3.0.0
+	 * @access private
+	 */
+	function _parse_xml( $response_body ) {
+		if ( function_exists('simplexml_load_string') ) {
 			$errors = libxml_use_internal_errors( 'true' );
-
-			$data = simplexml_load_string( $result );
-
+			$data = simplexml_load_string( $response_body );
 			libxml_use_internal_errors( $errors );
-
-			if ( is_object($data) )
+			if ( is_object( $data ) )
 				return $data;
 		}
-
 		return false;
 	}
 
@@ -211,7 +242,7 @@ class WP_oEmbed {
 					return false;
 
 				$title = ( !empty($data->title) ) ? $data->title : '';
-				$return = '<img src="' . esc_attr( clean_url( $data->url ) ) . '" alt="' . esc_attr($title) . '" width="' . esc_attr($data->width) . '" height="' . esc_attr($data->height) . '" />';
+				$return = '<img src="' . esc_url( $data->url ) . '" alt="' . esc_attr($title) . '" width="' . esc_attr($data->width) . '" height="' . esc_attr($data->height) . '" />';
 				break;
 
 			case 'video':
@@ -220,7 +251,7 @@ class WP_oEmbed {
 				break;
 
 			case 'link':
-				$return = ( !empty($data->title) ) ? '<a href="' . clean_url($url) . '">' . esc_html($data->title) . '</a>' : false;
+				$return = ( !empty($data->title) ) ? '<a href="' . esc_url($url) . '">' . esc_html($data->title) . '</a>' : false;
 				break;
 
 			default;
@@ -232,15 +263,16 @@ class WP_oEmbed {
 	}
 
 	/**
-	 * Strip new lines from the HTML if it's a Scribd embed.
+	 * Strip any new lines from the HTML.
 	 *
+	 * @access private
 	 * @param string $html Existing HTML.
 	 * @param object $data Data object from WP_oEmbed::data2html()
 	 * @param string $url The original URL passed to oEmbed.
 	 * @return string Possibly modified $html
 	 */
-	function strip_scribd_newlines( $html, $data, $url ) {
-		if ( preg_match( '#http://(www\.)?scribd.com/.*#i', $url ) )
+	function _strip_newlines( $html, $data, $url ) {
+		if ( false !== strpos( $html, "\n" ) )
 			$html = str_replace( array( "\r\n", "\n" ), '', $html );
 
 		return $html;

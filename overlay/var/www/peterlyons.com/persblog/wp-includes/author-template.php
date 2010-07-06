@@ -22,6 +22,10 @@
  */
 function get_the_author($deprecated = '') {
 	global $authordata;
+
+	if ( !empty( $deprecated ) )
+		_deprecated_argument( __FUNCTION__, '2.1' );
+
 	return apply_filters('the_author', is_object($authordata) ? $authordata->display_name : null);
 }
 
@@ -41,10 +45,14 @@ function get_the_author($deprecated = '') {
  * @link http://codex.wordpress.org/Template_Tags/the_author
  *
  * @param string $deprecated Deprecated.
- * @param string $deprecated_echo Echo the string or return it.
+ * @param string $deprecated_echo Deprecated. Use get_the_author(). Echo the string or return it.
  * @return string The author's display name, from get_the_author().
  */
-function the_author($deprecated = '', $deprecated_echo = true) {
+function the_author( $deprecated = '', $deprecated_echo = true ) {
+	if ( !empty( $deprecated ) )
+		_deprecated_argument( __FUNCTION__, '2.1' );
+	if ( $deprecated_echo !== true )
+		_deprecated_argument( __FUNCTION__, '1.5', __('Use <code>get_the_author()</code> instead if you do not want the value echoed.') );
 	if ( $deprecated_echo )
 		echo get_the_author();
 	return get_the_author();
@@ -120,6 +128,23 @@ function the_author_meta($field = '', $user_id = false) {
 }
 
 /**
+ * Retrieve either author's link or author's name.
+ *
+ * If the author has a home page set, return an HTML link, otherwise just return the
+ * author's name.
+ *
+ * @uses get_the_author_meta()
+ * @uses get_the_author()
+ */
+function get_the_author_link() {
+	if ( get_the_author_meta('url') ) {
+		return '<a href="' . get_the_author_meta('url') . '" title="' . esc_attr( sprintf(__("Visit %s&#8217;s website"), get_the_author()) ) . '" rel="external">' . get_the_author() . '</a>';
+	} else {
+		return get_the_author();
+	}
+}
+
+/**
  * Display either author's link or author's name.
  *
  * If the author has a home page set, echo an HTML link, otherwise just echo the
@@ -127,15 +152,10 @@ function the_author_meta($field = '', $user_id = false) {
  *
  * @link http://codex.wordpress.org/Template_Tags/the_author_link
  * @since 2.1
- * @uses get_the_author_meta()
- * @uses the_author()
+ * @uses get_the_author_link()
  */
 function the_author_link() {
-	if ( get_the_author_meta('url') ) {
-		echo '<a href="' . get_the_author_meta('url') . '" title="' . esc_attr( sprintf(__("Visit %s&#8217;s website"), get_the_author()) ) . '" rel="external">' . get_the_author() . '</a>';
-	} else {
-		the_author();
-	}
+	echo get_the_author_link();
 }
 
 /**
@@ -143,12 +163,12 @@ function the_author_link() {
  *
  * @since 1.5
  * @uses $post The current post in the Loop's DB object.
- * @uses get_usernumposts()
+ * @uses count_user_posts()
  * @return int The number of posts by the author.
  */
 function get_the_author_posts() {
 	global $post;
-	return get_usernumposts($post->post_author);
+	return count_user_posts($post->post_author);
 }
 
 /**
@@ -156,7 +176,7 @@ function get_the_author_posts() {
  *
  * @link http://codex.wordpress.org/Template_Tags/the_author_posts
  * @since 0.71
- * @uses get_the_author_posts() Echos returned value from function.
+ * @uses get_the_author_posts() Echoes returned value from function.
  */
 function the_author_posts() {
 	echo get_the_author_posts();
@@ -177,6 +197,9 @@ function the_author_posts() {
  * @param string $deprecated Deprecated.
  */
 function the_author_posts_link($deprecated = '') {
+	if ( !empty( $deprecated ) )
+		_deprecated_argument( __FUNCTION__, '2.1' );
+
 	global $authordata;
 	$link = sprintf(
 		'<a href="%1$s" title="%2$s">%3$s</a>',
@@ -200,7 +223,7 @@ function get_author_posts_url($author_id, $author_nicename = '') {
 	$link = $wp_rewrite->get_author_permastruct();
 
 	if ( empty($link) ) {
-		$file = get_option('home') . '/';
+		$file = home_url() . '/';
 		$link = $file . '?author=' . $auth_ID;
 	} else {
 		if ( '' == $author_nicename ) {
@@ -209,7 +232,7 @@ function get_author_posts_url($author_id, $author_nicename = '') {
 				$author_nicename = $user->user_nicename;
 		}
 		$link = str_replace('%author%', $author_nicename, $link);
-		$link = get_option('home') . trailingslashit($link);
+		$link = home_url() . trailingslashit($link);
 	}
 
 	$link = apply_filters('author_link', $link, $author_id, $author_nicename);
@@ -258,12 +281,20 @@ function wp_list_authors($args = '') {
 	$return = '';
 
 	/** @todo Move select to get_authors(). */
-	$authors = $wpdb->get_results("SELECT ID, user_nicename from $wpdb->users " . ($exclude_admin ? "WHERE user_login <> 'admin' " : '') . "ORDER BY display_name");
+	$users = get_users_of_blog();
+	$author_ids = array();
+	foreach ( (array) $users as $user )
+		$author_ids[] = $user->user_id;
+	if ( count($author_ids) > 0  ) {
+		$author_ids = implode(',', $author_ids );
+		$authors = $wpdb->get_results( "SELECT ID, user_nicename from $wpdb->users WHERE ID IN($author_ids) " . ($exclude_admin ? "AND user_login <> 'admin' " : '') . "ORDER BY display_name" );
+	} else {
+		$authors = array();
+	}
 
 	$author_count = array();
-	foreach ((array) $wpdb->get_results("SELECT DISTINCT post_author, COUNT(ID) AS count FROM $wpdb->posts WHERE post_type = 'post' AND " . get_private_posts_cap_sql( 'post' ) . " GROUP BY post_author") as $row) {
+	foreach ( (array) $wpdb->get_results("SELECT DISTINCT post_author, COUNT(ID) AS count FROM $wpdb->posts WHERE post_type = 'post' AND " . get_private_posts_cap_sql( 'post' ) . " GROUP BY post_author") as $row )
 		$author_count[$row->post_author] = $row->count;
-	}
 
 	foreach ( (array) $authors as $author ) {
 
@@ -326,10 +357,8 @@ function wp_list_authors($args = '') {
 
 		}
 
-		if ( !($posts == 0 && $hide_empty) && 'list' == $style )
-			$return .= $link . '</li>';
-		else if ( ! $hide_empty )
-			$return .= $link . ', ';
+		if ( $posts || ! $hide_empty )
+			$return .= $link . ( ( 'list' == $style ) ? '</li>' : ', ' );
 	}
 
 	$return = trim($return, ', ');

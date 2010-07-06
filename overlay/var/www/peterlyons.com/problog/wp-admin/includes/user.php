@@ -30,7 +30,7 @@ function add_user() {
 			if ( $user_id != $current_user->id || $wp_roles->role_objects[$new_role]->has_cap( 'edit_users' ) ) {
 				// If the new role isn't editable by the logged-in user die with error
 				$editable_roles = get_editable_roles();
-				if ( !$editable_roles[$new_role] )
+				if ( empty( $editable_roles[$new_role] ) )
 					wp_die(__('You can&#8217;t give users that role.'));
 
 				$user = new WP_User( $user_id );
@@ -76,13 +76,15 @@ function edit_user( $user_id = 0 ) {
 
 	if ( isset( $_POST['role'] ) && current_user_can( 'edit_users' ) ) {
 		$new_role = sanitize_text_field( $_POST['role'] );
+		$potential_role = isset($wp_roles->role_objects[$new_role]) ? $wp_roles->role_objects[$new_role] : false;
 		// Don't let anyone with 'edit_users' (admins) edit their own role to something without it.
-		if( $user_id != $current_user->id || $wp_roles->role_objects[$new_role]->has_cap( 'edit_users' ))
+		// Multisite super admins can freely edit their blog roles -- they possess all caps.
+		if ( ( is_multisite() && current_user_can( 'manage_sites' ) ) || $user_id != $current_user->id || ($potential_role && $potential_role->has_cap( 'edit_users' ) ) )
 			$user->role = $new_role;
 
 		// If the new role isn't editable by the logged-in user die with error
 		$editable_roles = get_editable_roles();
-		if ( !$editable_roles[$new_role] )
+		if ( ! empty( $new_role ) && empty( $editable_roles[$new_role] ) )
 			wp_die(__('You can&#8217;t give users that role.'));
 	}
 
@@ -92,7 +94,7 @@ function edit_user( $user_id = 0 ) {
 		if ( empty ( $_POST['url'] ) || $_POST['url'] == 'http://' ) {
 			$user->user_url = '';
 		} else {
-			$user->user_url = sanitize_url( $_POST['url'] );
+			$user->user_url = esc_url_raw( $_POST['url'] );
 			$user->user_url = preg_match('/^(https?|ftps?|mailto|news|irc|gopher|nntp|feed|telnet):/is', $user->user_url) ? $user->user_url : 'http://'.$user->user_url;
 		}
 	}
@@ -156,8 +158,8 @@ function edit_user( $user_id = 0 ) {
 	if ( !empty( $pass1 ) )
 		$user->user_pass = $pass1;
 
-	if ( !$update && !validate_username( $user->user_login ) )
-		$errors->add( 'user_login', __( '<strong>ERROR</strong>: This username is invalid. Please enter a valid username.' ));
+	if ( !$update && isset( $_POST['user_login'] ) && !validate_username( $_POST['user_login'] ) )
+		$errors->add( 'user_login', __( '<strong>ERROR</strong>: This username is invalid because it uses illegal characters. Please enter a valid username.' ));
 
 	if ( !$update && username_exists( $user->user_login ) )
 		$errors->add( 'user_login', __( '<strong>ERROR</strong>: This username is already registered. Please choose another one.' ));
@@ -197,7 +199,11 @@ function edit_user( $user_id = 0 ) {
  */
 function get_author_user_ids() {
 	global $wpdb;
-	$level_key = $wpdb->prefix . 'user_level';
+	if ( !is_multisite() )
+		$level_key = $wpdb->get_blog_prefix() . 'user_level';
+	else
+		$level_key = $wpdb->get_blog_prefix() . 'capabilities'; // wpmu site admins don't have user_levels
+
 	return $wpdb->get_col( $wpdb->prepare("SELECT user_id FROM $wpdb->usermeta WHERE meta_key = %s AND meta_value != '0'", $level_key) );
 }
 
@@ -216,7 +222,7 @@ function get_editable_authors( $user_id ) {
 
 	$editable = get_editable_user_ids( $user_id );
 
-	if( !$editable ) {
+	if ( !$editable ) {
 		return false;
 	} else {
 		$editable = join(',', $editable);
@@ -241,15 +247,19 @@ function get_editable_user_ids( $user_id, $exclude_zeros = true, $post_type = 'p
 	global $wpdb;
 
 	$user = new WP_User( $user_id );
+	$post_type_obj = get_post_type_object($post_type);
 
-	if ( ! $user->has_cap("edit_others_{$post_type}s") ) {
-		if ( $user->has_cap("edit_{$post_type}s") || $exclude_zeros == false )
+	if ( ! $user->has_cap($post_type_obj->cap->edit_others_posts) ) {
+		if ( $user->has_cap($post_type_obj->cap->edit_posts) || ! $exclude_zeros )
 			return array($user->id);
 		else
 			return array();
 	}
 
-	$level_key = $wpdb->prefix . 'user_level';
+	if ( !is_multisite() )
+		$level_key = $wpdb->get_blog_prefix() . 'user_level';
+	else
+		$level_key = $wpdb->get_blog_prefix() . 'capabilities'; // wpmu site admins don't have user_levels
 
 	$query = $wpdb->prepare("SELECT user_id FROM $wpdb->usermeta WHERE meta_key = %s", $level_key);
 	if ( $exclude_zeros )
@@ -294,7 +304,11 @@ function get_editable_roles() {
  */
 function get_nonauthor_user_ids() {
 	global $wpdb;
-	$level_key = $wpdb->prefix . 'user_level';
+
+	if ( !is_multisite() )
+		$level_key = $wpdb->get_blog_prefix() . 'user_level';
+	else
+		$level_key = $wpdb->get_blog_prefix() . 'capabilities'; // wpmu site admins don't have user_levels
 
 	return $wpdb->get_col( $wpdb->prepare("SELECT user_id FROM $wpdb->usermeta WHERE meta_key = %s AND meta_value = '0'", $level_key) );
 }
@@ -320,7 +334,7 @@ function get_others_unpublished_posts($user_id, $type='any') {
 
 	$dir = ( 'pending' == $type ) ? 'ASC' : 'DESC';
 
-	if( !$editable ) {
+	if ( !$editable ) {
 		$other_unpubs = '';
 	} else {
 		$editable = join(',', $editable);
@@ -408,20 +422,19 @@ function get_users_drafts( $user_id ) {
  * @param int $reassign Optional. Reassign posts and links to new User ID.
  * @return bool True when finished.
  */
-function wp_delete_user($id, $reassign = 'novalue') {
+function wp_delete_user( $id, $reassign = 'novalue' ) {
 	global $wpdb;
 
 	$id = (int) $id;
-	$user = new WP_User($id);
 
 	// allow for transaction statement
 	do_action('delete_user', $id);
 
-	if ($reassign == 'novalue') {
+	if ( 'novalue' === $reassign || null === $reassign ) {
 		$post_ids = $wpdb->get_col( $wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_author = %d", $id) );
 
-		if ($post_ids) {
-			foreach ($post_ids as $post_id)
+		if ( $post_ids ) {
+			foreach ( $post_ids as $post_id )
 				wp_delete_post($post_id);
 		}
 
@@ -432,22 +445,22 @@ function wp_delete_user($id, $reassign = 'novalue') {
 			foreach ( $link_ids as $link_id )
 				wp_delete_link($link_id);
 		}
-
 	} else {
 		$reassign = (int) $reassign;
-		$wpdb->query( $wpdb->prepare("UPDATE $wpdb->posts SET post_author = %d WHERE post_author = %d", $reassign, $id) );
-		$wpdb->query( $wpdb->prepare("UPDATE $wpdb->links SET link_owner = %d WHERE link_owner = %d", $reassign, $id) );
+		$wpdb->update( $wpdb->posts, array('post_author' => $reassign), array('post_author' => $id) );
+		$wpdb->update( $wpdb->links, array('link_owner' => $reassign), array('link_owner' => $id) );
 	}
 
+	clean_user_cache($id);
+
 	// FINALLY, delete user
-
-	$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->usermeta WHERE user_id = %d", $id) );
-	$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->users WHERE ID = %d", $id) );
-
-	wp_cache_delete($id, 'users');
-	wp_cache_delete($user->user_login, 'userlogins');
-	wp_cache_delete($user->user_email, 'useremail');
-	wp_cache_delete($user->user_nicename, 'userslugs');
+	if ( !is_multisite() ) {
+		$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->usermeta WHERE user_id = %d", $id) );
+		$wpdb->query( $wpdb->prepare("DELETE FROM $wpdb->users WHERE ID = %d", $id) );
+	} else {
+		$level_key = $wpdb->get_blog_prefix() . 'capabilities'; // wpmu site admins don't have user_levels
+		$wpdb->query("DELETE FROM $wpdb->usermeta WHERE user_id = $id AND meta_key = '{$level_key}'");
+	}
 
 	// allow for commit transaction
 	do_action('deleted_user', $id);
@@ -474,7 +487,6 @@ if ( !class_exists('WP_User_Search') ) :
  * WordPress User Search class.
  *
  * @since unknown
- * @author Mark Jaquith
  */
 class WP_User_Search {
 
@@ -555,27 +567,36 @@ class WP_User_Search {
 	 *
 	 * @since unknown
 	 * @access private
-	 * @var unknown_type
+	 * @var string
 	 */
 	var $query_limit;
 
 	/**
 	 * {@internal Missing Description}}
 	 *
-	 * @since unknown
+	 * @since 3.0.0
 	 * @access private
-	 * @var unknown_type
+	 * @var string
 	 */
-	var $query_sort;
+	var $query_orderby;
 
 	/**
 	 * {@internal Missing Description}}
 	 *
-	 * @since unknown
+	 * @since 3.0.0
 	 * @access private
-	 * @var unknown_type
+	 * @var string
 	 */
-	var $query_from_where;
+	var $query_from;
+
+	/**
+	 * {@internal Missing Description}}
+	 *
+	 * @since 3.0.0
+	 * @access private
+	 * @var string
+	 */
+	var $query_where;
 
 	/**
 	 * {@internal Missing Description}}
@@ -646,8 +667,10 @@ class WP_User_Search {
 	function prepare_query() {
 		global $wpdb;
 		$this->first_user = ($this->page - 1) * $this->users_per_page;
+
 		$this->query_limit = $wpdb->prepare(" LIMIT %d, %d", $this->first_user, $this->users_per_page);
-		$this->query_sort = ' ORDER BY user_login';
+		$this->query_orderby = ' ORDER BY user_login';
+
 		$search_sql = '';
 		if ( $this->search_term ) {
 			$searches = array();
@@ -658,13 +681,19 @@ class WP_User_Search {
 			$search_sql .= ')';
 		}
 
-		$this->query_from_where = "FROM $wpdb->users";
-		if ( $this->role )
-			$this->query_from_where .= $wpdb->prepare(" INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id WHERE $wpdb->usermeta.meta_key = '{$wpdb->prefix}capabilities' AND $wpdb->usermeta.meta_value LIKE %s", '%' . $this->role . '%');
-		else
-			$this->query_from_where .= " WHERE 1=1";
-		$this->query_from_where .= " $search_sql";
+		$this->query_from = " FROM $wpdb->users";
+		$this->query_where = " WHERE 1=1 $search_sql";
 
+		if ( $this->role ) {
+			$this->query_from .= " INNER JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id";
+			$this->query_where .= $wpdb->prepare(" AND $wpdb->usermeta.meta_key = '{$wpdb->prefix}capabilities' AND $wpdb->usermeta.meta_value LIKE %s", '%' . $this->role . '%');
+		} elseif ( is_multisite() ) {
+			$level_key = $wpdb->prefix . 'capabilities'; // wpmu site admins don't have user_levels
+			$this->query_from .= ", $wpdb->usermeta";
+			$this->query_where .= " AND $wpdb->users.ID = $wpdb->usermeta.user_id AND meta_key = '{$level_key}'";
+		}
+
+		do_action_ref_array( 'pre_user_search', array( &$this ) );
 	}
 
 	/**
@@ -677,10 +706,11 @@ class WP_User_Search {
 	 */
 	function query() {
 		global $wpdb;
-		$this->results = $wpdb->get_col('SELECT ID ' . $this->query_from_where . $this->query_sort . $this->query_limit);
+
+		$this->results = $wpdb->get_col("SELECT DISTINCT($wpdb->users.ID)" . $this->query_from . $this->query_where . $this->query_orderby . $this->query_limit);
 
 		if ( $this->results )
-			$this->total_users_for_query = $wpdb->get_var('SELECT COUNT(ID) ' . $this->query_from_where); // no limit
+			$this->total_users_for_query = $wpdb->get_var("SELECT COUNT(DISTINCT($wpdb->users.ID))" . $this->query_from . $this->query_where); // no limit
 		else
 			$this->search_errors = new WP_Error('no_matching_users_found', __('No matching users were found!'));
 	}
@@ -792,39 +822,41 @@ endif;
 add_action('admin_init', 'default_password_nag_handler');
 function default_password_nag_handler($errors = false) {
 	global $user_ID;
-	if ( ! get_usermeta($user_ID, 'default_password_nag') ) //Short circuit it.
+	if ( ! get_user_option('default_password_nag') ) //Short circuit it.
 		return;
 
 	//get_user_setting = JS saved UI setting. else no-js-falback code.
 	if ( 'hide' == get_user_setting('default_password_nag') || isset($_GET['default_password_nag']) && '0' == $_GET['default_password_nag'] ) {
 		delete_user_setting('default_password_nag');
-		update_usermeta($user_ID, 'default_password_nag', false);
+		update_user_option($user_ID, 'default_password_nag', false, true);
 	}
 }
 
 add_action('profile_update', 'default_password_nag_edit_user', 10, 2);
 function default_password_nag_edit_user($user_ID, $old_data) {
-	global $user_ID;
-	if ( ! get_usermeta($user_ID, 'default_password_nag') ) //Short circuit it.
+	if ( ! get_user_option('default_password_nag', $user_ID) ) //Short circuit it.
 		return;
 
 	$new_data = get_userdata($user_ID);
 
 	if ( $new_data->user_pass != $old_data->user_pass ) { //Remove the nag if the password has been changed.
-		delete_user_setting('default_password_nag');
-		update_usermeta($user_ID, 'default_password_nag', false);
+		delete_user_setting('default_password_nag', $user_ID);
+		update_user_option($user_ID, 'default_password_nag', false, true);
 	}
 }
 
 add_action('admin_notices', 'default_password_nag');
 function default_password_nag() {
-	global $user_ID;
-	if ( ! get_usermeta($user_ID, 'default_password_nag') )
+	if ( ! get_user_option('default_password_nag') ) //Short circuit it.
 		return;
 
-	echo '<div class="error default-password-nag"><p>';
-	printf(__("Notice: you're using the auto-generated password for your account. Would you like to change it to something you'll remember easier?<br />
-			  <a href='%s'>Yes, Take me to my profile page</a> | <a href='%s' id='default-password-nag-no'>No Thanks, Do not remind me again.</a>"), admin_url('profile.php') . '#password', '?default_password_nag=0');
+	echo '<div class="error default-password-nag">';
+	echo '<p>';
+	echo '<strong>' . __('Notice:') . '</strong> ';
+	_e('You&rsquo;re using the auto-generated password for your account. Would you like to change it to something you&rsquo;ll remember easier?');
+	echo '</p><p>';
+	printf( '<a href="%s">' . __('Yes, take me to my profile page') . '</a> | ', admin_url('profile.php') . '#password' );
+	printf( '<a href="%s" id="default-password-nag-no">' . __('No thanks, do not remind me again') . '</a>', '?default_password_nag=0' );
 	echo '</p></div>';
 }
 

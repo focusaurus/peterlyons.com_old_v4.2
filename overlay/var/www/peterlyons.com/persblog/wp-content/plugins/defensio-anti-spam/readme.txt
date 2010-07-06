@@ -3,8 +3,8 @@ Contributors: karabunga
 Donate link: http://defensio.com/
 Tags: comments, spam, antispam, defensio
 Requires at least: 2.8
-Tested up to: 2.9.1
-Stable tag: 2.5.3
+Tested up to: 3.0
+Stable tag: 2.5.7
  
 Defensio is an advanced spam filtering web service that learns and adapts to your behaviors and those of your readers.
  
@@ -100,6 +100,8 @@ the images directory.  Be careful to follow the naming convention we already hav
 Defensio does not work with Wordpress 2.9 due to a known Wordpress bug (http://core.trac.wordpress.org/ticket/11505).
 This bug has been fixed in Wordpress 2.9.1, so make sure to update your installation before using Defensio.
 
+PHP 5 is also required. This plugin will NOT work with PHP 4.
+
  
 == Frequently Asked Questions ==
  
@@ -110,3 +112,32 @@ Visit our FAQ at [http://defensio.com/faq](http://defensio.com/faq)
 == Need Help? ==
  
 Visit our user forum at [http://forum.defensio.com](http://forum.defensio.com)
+
+
+== Changelog ==
+
+= 2.5.7 (06-30-2010) =
+* Fixed mysteriously disappearing API keys
+
+= 2.5.6 (06-30-2010) =
+* Fixed an important bug that caused invalid requests to be sent to Defensio under Wordpress 3.0
+
+= 2.5.5 (06-17-2010) =
+* Fixed bug causing a PHP crash on some configurations
+* A few minor fixes
+* Support for Wordpress 3.0
+
+= 2.5.4 (unreleased) =
+* Moved CHANGELOG.txt to readme.txt for better Wordpress.org/extend compatibility
+
+= 2.5.3 (01-14-2010) =
+* Fixed bug causing admins to sometimes being notified of spam by email
+
+= 2.5.2 (01-14-2010) =
+* Fixed comment deletion bug
+
+= 2.5.1 (01-13-2010) =
+* Fixed bug that prevented plugin from working on MU
+
+= 2.5.0 (01-12-2010) =
+* Initial release supporting Defensio 2.0

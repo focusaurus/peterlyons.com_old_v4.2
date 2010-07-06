@@ -15,7 +15,7 @@ if ( isset($_GET['action']) && isset($_GET['linkcheck']) ) {
 	$doaction = $_GET['action'] ? $_GET['action'] : $_GET['action2'];
 
 	if ( ! current_user_can('manage_links') )
-		wp_die( __('You do not have sufficient permissions to edit the links for this blog.') );
+		wp_die( __('You do not have sufficient permissions to edit the links for this site.') );
 
 	if ( 'delete' == $doaction ) {
 		$bulklinks = (array) $_GET['linkcheck'];
@@ -28,7 +28,7 @@ if ( isset($_GET['action']) && isset($_GET['linkcheck']) ) {
 		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
-} elseif ( isset($_GET['_wp_http_referer']) && ! empty($_GET['_wp_http_referer']) ) {
+} elseif ( ! empty($_GET['_wp_http_referer']) ) {
 	 wp_redirect( remove_query_arg( array('_wp_http_referer', '_wpnonce'), stripslashes($_SERVER['REQUEST_URI']) ) );
 	 exit;
 }
@@ -41,12 +41,23 @@ if ( empty($cat_id) )
 if ( empty($order_by) )
 	$order_by = 'order_name';
 
-$title = __('Edit Links');
+$title = __('Links');
 $this_file = $parent_file = 'link-manager.php';
-include_once ("./admin-header.php");
 
-if (!current_user_can('manage_links'))
-	wp_die(__("You do not have sufficient permissions to edit the links for this blog."));
+add_contextual_help( $current_screen,
+	'<p>' . sprintf(__('You can add links here to be displayed on your site, usually using <a href="%s">Widgets</a>. By default, links to several sites in the WordPress community are included as examples.'), 'widgets.php') . '</p>' .
+    '<p>' . __('Links may be separated into categories; these are different than the categories used on your posts.') . '</p>' .
+    '<p>' . __('You can customize the display of this screen using the Screen Options tab and/or the dropdown filters above the links table.') . '</p>' .
+    '<p>' . __('If you delete a link, it will be removed permanently, as Links do not have a Trash function yet.') . '</p>' .
+	'<p><strong>' . __('For more information:') . '</strong></p>' .
+	'<p>' . __('<a href="http://codex.wordpress.org/Links_Edit_SubPanel" target="_blank">Link Management Documentation</a>') . '</p>' .
+	'<p>' . __('<a href="http://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
+);
+
+include_once ('./admin-header.php');
+
+if ( ! current_user_can('manage_links') )
+	wp_die(__("You do not have sufficient permissions to edit the links for this site."));
 
 switch ($order_by) {
 	case 'order_id' :
@@ -72,14 +83,14 @@ switch ($order_by) {
 
 <div class="wrap nosubsub">
 <?php screen_icon(); ?>
-<h2><?php echo esc_html( $title ); ?> <a href="link-add.php" class="button add-new-h2"><?php esc_html_e('Add New'); ?></a> <?php
-if ( isset($_GET['s']) && $_GET['s'] )
+<h2><?php echo esc_html( $title ); ?> <a href="link-add.php" class="button add-new-h2"><?php echo esc_html_x('Add New', 'link'); ?></a> <?php
+if ( !empty($_GET['s']) )
 	printf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', esc_html( stripslashes($_GET['s']) ) ); ?>
 </h2>
 
 <?php
 if ( isset($_GET['deleted']) ) {
-	echo '<div id="message" class="updated fade"><p>';
+	echo '<div id="message" class="updated"><p>';
 	$deleted = (int) $_GET['deleted'];
 	printf(_n('%s link deleted.', '%s links deleted', $deleted), $deleted);
 	echo '</p></div>';
@@ -99,6 +110,16 @@ if ( isset($_GET['deleted']) ) {
 <form id="posts-filter" action="" method="get">
 <div class="tablenav">
 
+<?php
+if ( 'all' == $cat_id )
+	$cat_id = '';
+$args = array( 'category' => $cat_id, 'hide_invisible' => 0, 'orderby' => $sqlorderby, 'hide_empty' => 0 );
+if ( ! empty( $_GET['s'] ) )
+	$args['search'] = $_GET['s'];
+$links = get_bookmarks( $args );
+if ( $links ) {
+?>
+
 <div class="alignleft actions">
 <select name="action">
 <option value="" selected="selected"><?php _e('Bulk Actions'); ?></option>
@@ -107,7 +128,7 @@ if ( isset($_GET['deleted']) ) {
 <input type="submit" value="<?php esc_attr_e('Apply'); ?>" name="doaction" id="doaction" class="button-secondary action" />
 
 <?php
-$categories = get_terms('link_category', "hide_empty=1");
+$categories = get_terms('link_category', array("hide_empty" => 1));
 $select_cat = "<select name=\"cat_id\">\n";
 $select_cat .= '<option value="all"'  . (($cat_id == 'all') ? " selected='selected'" : '') . '>' . __('View all Categories') . "</option>\n";
 foreach ((array) $categories as $cat)
@@ -135,13 +156,6 @@ echo $select_order;
 <div class="clear"></div>
 
 <?php
-if ( 'all' == $cat_id )
-	$cat_id = '';
-$args = array('category' => $cat_id, 'hide_invisible' => 0, 'orderby' => $sqlorderby, 'hide_empty' => 0);
-if ( !empty($_GET['s']) )
-	$args['search'] = $_GET['s'];
-$links = get_bookmarks( $args );
-if ( $links ) {
 	$link_columns = get_column_headers('link-manager');
 	$hidden = get_hidden_columns('link-manager');
 ?>
@@ -239,7 +253,7 @@ if ( $links ) {
 					break;
 				default:
 					?>
-					<td><?php do_action('manage_link_custom_column', $column_name, $link->link_id); ?></td>
+					<td <?php echo $attributes ?>><?php do_action('manage_link_custom_column', $column_name, $link->link_id); ?></td>
 					<?php
 					break;
 
@@ -251,10 +265,6 @@ if ( $links ) {
 	</tbody>
 </table>
 
-<?php } else { ?>
-<p><?php _e('No links found.') ?></p>
-<?php } ?>
-
 <div class="tablenav">
 
 <div class="alignleft actions">
@@ -264,6 +274,10 @@ if ( $links ) {
 </select>
 <input type="submit" value="<?php esc_attr_e('Apply'); ?>" name="doaction2" id="doaction2" class="button-secondary action" />
 </div>
+
+<?php } else { ?>
+<p><?php _e( 'No links found.' ) ?></p>
+<?php } ?>
 
 <br class="clear" />
 </div>
@@ -275,4 +289,4 @@ if ( $links ) {
 </div>
 
 <?php
-include('admin-footer.php');
+include('./admin-footer.php');

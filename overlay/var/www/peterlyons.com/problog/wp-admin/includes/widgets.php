@@ -68,7 +68,7 @@ function wp_list_widget_controls( $sidebar ) {
 
 	if ( !empty( $description ) ) {
 		echo "<div class='sidebar-description'>\n";
-		echo "\t<p class='description'>$description</p>"; 
+		echo "\t<p class='description'>$description</p>";
 		echo "</div>\n";
 	}
 
@@ -202,7 +202,7 @@ function wp_widget_control( $sidebar_args ) {
 		<a class="widget-control-close" href="#close"><?php _e('Close'); ?></a>
 		</div>
 		<div class="alignright<?php if ( 'noform' === $has_form ) echo ' widget-control-noform'; ?>">
-		<img src="images/wpspin_light.gif" class="ajax-feedback " title="" alt="" />
+		<img src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" class="ajax-feedback " title="" alt="" />
 		<input type="submit" name="savewidget" class="button-primary widget-control-save" value="<?php esc_attr_e('Save'); ?>" />
 		</div>
 		<br class="clear" />

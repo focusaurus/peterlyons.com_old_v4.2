@@ -26,7 +26,7 @@ class DefensioWP
     const UNPROCESSED   = 'unprocessed';
     const PENDING       = 'pending';
     const OK            = 'ok';
-    const CLIENT_ID     = 'Defensio for Wordpress | 2.0 | Websense Inc. | info@defensio.com';
+    const CLIENT_ID     = 'Defensio for Wordpress | 2.5.7 | Websense Inc. | info@defensio.com';
 
     /**
      * @param string $api_key A Defensio API key
@@ -45,23 +45,34 @@ class DefensioWP
 
     /** 
      * Get stats for this user, try wp_cache first then load from Defensio server unlike the cache in Defensio's
-     * counter widget this method relies on WordPresse's own object cache
+     * counter widget this method relies on WordPresse's own object cache.
+     * 
+     * Since PHP 5.3.2 serialization of a SimpleXML object will throw an exception, from now on we store only
+     * raw strings in the cache and parse them everytime, should not be a problem since the xml Defensio results
+     * are fairly small.
+     * 
      */
     public function getStats()
     {
-        $stats = wp_cache_get('stats', 'defensio');
+        $stats_str = wp_cache_get('stats', 'defensio');
+        $stats_obj = NULL;
 
-        if (!$stats) { 
-            $stats = $this->refreshStats();
-            wp_cache_set('stats' , $stats, 'defensio', 600);
+        if ($stats_str === FALSE) { 
+            $stats_obj = $this->refreshStats();
+
+            if (is_object($stats_obj))
+                wp_cache_set('stats' , $stats_obj->asXML(), 'defensio', 600);
+
+        } else {
+            $stats_obj = simplexml_load_string($stats_str);
         }
 
-        return $stats;
+        return $stats_obj;
     }
 
     /**
-     *  Will change return true if that key is valid
-     *  @param string $key the candidate key
+     * Will change return true if that key is valid
+     * @param string $key the candidate key
      */
     public function verifyKey($key, &$err_code)
     {
@@ -73,7 +84,7 @@ class DefensioWP
             $out = TRUE;
 
         } else {
-            $this->defensio_client = new Defensio($key);
+            $this->defensio_client = new Defensio($key, self::CLIENT_ID);
 
             try{
                 $out = (200 == array_shift($this->defensio_client->getUser()));
@@ -141,7 +152,7 @@ class DefensioWP
         $out = FALSE;
 
         try{
-            $res =  $this->defensio_client->getBasicStats();
+            $res = $this->defensio_client->getBasicStats();
             $out = $res[1];
         } catch(DefensioError $ex){/*NO OP*/} 
 
@@ -158,21 +169,32 @@ class DefensioWP
 
         $article = get_post($article_id);
         $params = array (
-            'content'      => $article->post_content, 
-            'title'        => $article->post_title, 
-            'permalink'    => get_permalink($article->ID),
-            'author-name'  => $userdata->user_login,
-            'author-email' => $userdata->user_email,
-            'type'         => 'article',
-            'platform'     => self::PLATFORM_NAME
+            'content'        => $article->post_content, 
+            'title'          => $article->post_title, 
+            'permalink'      => get_permalink($article->ID),
+            'author-name'    => $userdata->user_login,
+            'author-email'   => $userdata->user_email,
+            'type'           => 'article',
+            'platform'       => self::PLATFORM_NAME,
+            'author-trusted' => 'true'
         );
 
-        $this->defensio_client->postDocument($params);
+        try{ 
+            $this->defensio_client->postDocument($params);
+        }
+        // Silently rescue connection errors, not much the plugin can do in these cases
+        catch(DefensioConnectionTimeout $ex){ ; }
+        catch(DefensioUnexpectedHTTPStatus $ex){ ; }
+
     }
 
     /**
-     * POSTs a comment to Defensio this will create a document entry, and Defensio will notify callback.php of the result.
-     * In case callback.php is not notified a GET request will be send to Defensio inquiring about the result.
+     * POSTs a comment to Defensio. This will create a document entry, identified by a singature, in Defensio's server,
+     * once the  document entry is processed by Defensio it will contain Defensio's classification and meta data (eg spaminess)
+     * about this comment.
+     *
+     * NOTE: Defensio should notify callback.php of the result. In case callback.php is never 
+     * notified a GET request must be send to Defensio inquiring about the result.
      *
      * @param integer $id value of comment_ID for the comment being posted
      * @param boolean $retrying 
@@ -212,7 +234,7 @@ class DefensioWP
             /* if($data['status'] == self::UNPROCESSED)
                 wp_update_comment(array('comment_approved' => 0, 'comment_ID' => $id));
               else*/
-            // If not approved by comment should not be shown until defensio has seen it.
+            // If not approved by moderator comment should not be shown until defensio has seen it.
             wp_update_comment(array('comment_approved' => self::DEFENSIO_PENDING_STATUS, 'comment_ID' => $id));
 
         }
@@ -227,7 +249,7 @@ class DefensioWP
     }
 
     /** 
-     *   To be called in the pre-approve hook makes anything not automatically approved self::DEFENSIO_PENDING_STATUS
+     * To be called in the pre-approve hook makes anything not automatically approved self::DEFENSIO_PENDING_STATUS
      * @param string $approved_value passed by the pre-comment-approved hook
      */
     public function preApproval($approved_value, $user_ID)
@@ -282,8 +304,8 @@ class DefensioWP
                 if($comment->comment_approved == self::DEFENSIO_PENDING_STATUS || $comment->comment_approved == 'spam')
                     $approval_value = $this->reApplyWPAllow((array)$comment);
 
-                elseif($comment->comment_approved == '1')
-                    $approval_value = '1';
+                elseif($comment->comment_approved == '1' || $comment->comment_approved == '0' )
+                    $approval_value = $comment->comment_approved;
 
 
                 $this->doApply($comment, $result, $approval_value, $profanity_action);
@@ -340,7 +362,7 @@ class DefensioWP
      * @param object $comment the comment
      * @param string $profanity_action a string telling the method what to do or NULL for nothing 'off' analogous to NULL 'mask' call Defensio and
      * mask the profanity with * 'delete' delete the comment and the Defensio meta-data
-    */
+     */
     private function applyProfanityRules($comment, $profanity_action=NULL){
 
         $result = $comment;
@@ -376,9 +398,9 @@ class DefensioWP
     }
 
     /**
-    * Receives a parsed Defensio result, useful when reading a callback from Defensio 
-    * @param object $result a parsed Defensio result
-    */
+     * Receives a parsed Defensio result, useful when reading a callback from Defensio 
+     * @param object $result a parsed Defensio result
+     */
     public function applyCallbackResult($result)
     {
         $comment = $this->defensio_db->getDefensioRowBySignature($result->signature);
@@ -388,9 +410,9 @@ class DefensioWP
     }
 
     /**
-    * Will PUT a new allow value to Defensio and keep the Defensio DB
-    * in sync with the moderators criteria for spam/ham
-    */
+     * Will PUT a new allow value to Defensio and keep the Defensio DB
+     * in sync with the moderators criteria for spam/ham
+     */
     private function retrain($new_value, $signatures)
     {
         if ( !is_array($signatures))
