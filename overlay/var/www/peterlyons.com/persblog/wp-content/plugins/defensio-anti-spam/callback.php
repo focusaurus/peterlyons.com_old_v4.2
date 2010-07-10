@@ -6,7 +6,7 @@ require_once(dirname( __FILE__) . '/../../../wp-load.php');
 require_once(ABSPATH . '/wp-includes/wp-db.php');
 require_once(ABSPATH . '/wp-includes/comment.php');
 require_once(ABSPATH . '/wp-includes/plugin.php');
-require_once('config.php');
+require_once('defensio_config.php');
 
 global $wpdb, $defensio_conf;
 

@@ -1,8 +1,14 @@
 <?php
+/* Include update functions when necessary */
+if(defined('ABSPATH') && ( function_exists('wp_get_current_user') ||  array_shift(split('\.', $wp_version))) == 3 ){
 
-if(defined('ABSPATH') && function_exists('wp_get_current_user')){
-    require_once(ABSPATH . 'wp-admin/upgrade-functions.php');
+    if(file_exists(ABSPATH . 'wp-admin/includes/upgrade.php')) {
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    } else {
+        require_once(ABSPATH . 'wp-admin/upgrade-functions.php');
+    }
 }
+
 /* 
  * Abstract most of the necessary database work for Defensio's plugin
  * @package Defensio
