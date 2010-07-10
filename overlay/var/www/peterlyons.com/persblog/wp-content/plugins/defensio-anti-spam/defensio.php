@@ -3,7 +3,7 @@
  * Plugin Name: Defensio Anti-Spam
  * Plugin URI: http://defensio.com/
  * Description: Defensio is an advanced spam filtering web service that learns and adapts to your behaviors as well to those of your readers and commenters.  To use this plugin, you need to obtain a <a href="http://defensio.com/signup">free API Key</a>.  Tell the world how many spam Defensio caught!  Just put <code>&lt;?php defensio_counter(); ?&gt;</code> in your template.
- * Version: 2.5.7
+ * Version: 2.5.8
  * Author: Websense, Inc.
  * Author URI: http://defensio.com
  *
@@ -27,7 +27,7 @@ require_once('lib/defensio-php/Defensio.php');
 require_once('lib/DefensioDB.php');
 require_once('lib/DefensioWP.php');
 require_once('lib/defensio_utils.php');
-require_once('config.php');
+require_once('defensio_config.php');
 require_once('lib/views/defensio_configuration.php');
 require_once('lib/views/defensio_quarantine.php');
 require_once('lib/views/defensio_head.php');
@@ -536,7 +536,7 @@ function defensio_counter($color='dark', $align='left') {
 }
 
 function defensio_widget_register() {
-    if (function_exists('register_sidebar_widget')) {
+    if (function_exists('register_sidebar_widget') || function_exists('wp_register_sidebar_widget')) {
         function defensio_widget() { 
             $alignment = get_option('defensio_counter_alignment'); 
             $color = get_option('defensio_counter_color');
@@ -577,8 +577,14 @@ function defensio_widget_register() {
       </select>
 <?php
         }
-        register_sidebar_widget('Defensio Counter', 'defensio_widget', NULL, 'defensio');
-        register_widget_control('Defensio Counter', 'defensio_widget_control', 300, 75, 'defensio');
+
+        if( function_exists('wp_register_sidebar_widget')){
+            wp_register_sidebar_widget('Defensio Counter', 'defensio_widget', NULL, 'defensio');
+            wp_register_widget_control('Defensio Counter', 'defensio_widget_control', 300, 75, 'defensio');
+        } else {
+            register_sidebar_widget('Defensio Counter', 'defensio_widget', NULL, 'defensio');
+            register_widget_control('Defensio Counter', 'defensio_widget_control', 300, 75, 'defensio');
+        }
     }
 }
 add_action('init', 'defensio_widget_register');
@@ -603,7 +609,13 @@ function defensio_render_activity_box() {
     global $defensio_db;
 
     $link_base = 'edit-comments.php';
-    $link = clean_url($link_base . "?page=defensio-quarantine.php");
+    $link_query =  "?page=defensio-quarantine.php";
+
+    if(function_exists('esc_url')){
+        $link = esc_url($link_base . $link_query);
+    } else {
+        $link = clean_url($link_base . $link_query);
+    }
 
     $obvious_spam_count = $defensio_db->obviousSpamCount();
     $total_spam_count =   $defensio_db->spamCount();

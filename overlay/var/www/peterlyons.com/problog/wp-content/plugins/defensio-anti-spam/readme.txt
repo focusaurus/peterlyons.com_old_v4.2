@@ -1,10 +1,10 @@
 === Defensio Anti-Spam ===
-Contributors: karabunga
+Contributors: Karabunga
 Donate link: http://defensio.com/
 Tags: comments, spam, antispam, defensio
 Requires at least: 2.8
 Tested up to: 3.0
-Stable tag: 2.5.7
+Stable tag: 2.5.8
  
 Defensio is an advanced spam filtering web service that learns and adapts to your behaviors and those of your readers.
  
@@ -115,6 +115,10 @@ Visit our user forum at [http://forum.defensio.com](http://forum.defensio.com)
 
 
 == Changelog ==
+
+= 2.5.8 (07-07-2010) =
+* Fixed a problem that only affected new users on WP 3.0
+* Fixed name clash with PEAR
 
 = 2.5.7 (06-30-2010) =
 * Fixed mysteriously disappearing API keys
