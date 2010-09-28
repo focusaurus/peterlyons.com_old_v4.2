@@ -8,7 +8,7 @@ import sys
 #edit these values to configure for different environments
 photosURI = "/photos"
 photosDir = "/var/www/peterlyons.com/photos"
-defaultGallery = "fall_2010"
+defaultGallery = "margys_hut_trip_sept_2010"
 
 class photos(baseservlet):
 
@@ -21,6 +21,8 @@ class photos(baseservlet):
         if self.gallery not in self.galleries:
             print "WARNING: invalid gallery in request: '%s'" % self.gallery
             self.gallery = defaultGallery
+            if not os.path.isdir(os.path.join(photosDir, self.gallery)):
+                self.gallery = self.galleries[0]
         self.galleryURI = photosURI + "/" + self.gallery
         self.galleryDir = os.path.join(photosDir, self.gallery)
         #this includes full paths to both full size and thumbnail image files
