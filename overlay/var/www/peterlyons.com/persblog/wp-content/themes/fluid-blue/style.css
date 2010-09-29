@@ -48,6 +48,11 @@ img {
 	border:0;
 }
 
+img.blog {
+    margin: 20px;
+    display: block;
+}
+
 input {
 	font-size:1.2em;
 }
