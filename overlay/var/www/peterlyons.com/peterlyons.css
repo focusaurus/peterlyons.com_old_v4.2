@@ -66,3 +66,12 @@ img {
 li {
     padding: 5px;
 }
+
+table.program {
+    border-spacing: 3px;
+}
+
+td.performers {
+    text-align: center;
+    font-style: italic;
+}
