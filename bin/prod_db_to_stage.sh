@@ -9,3 +9,6 @@ sudo service mysql start
 #Now we must update the site URL
 echo "ENTER THE PROBLOG DB password"
 echo "update wp_options set option_value = '/problog' where option_name in ('siteurl', 'home');" | mysql -u problog -p problog
+
+echo "ENTER THE PERSBLOG DB password"
+echo "update wp_options set option_value = '/persblog' where option_name in ('siteurl', 'home');" | mysql -u persblog -p persblog
