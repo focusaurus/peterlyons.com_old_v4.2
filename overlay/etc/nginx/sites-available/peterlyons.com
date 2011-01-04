@@ -51,19 +51,3 @@ server {
         fastcgi_param REDIRECT_STATUS 200;
     }
 }
-
-server {
-    listen 443;
-    access_log /var/log/nginx/ssl.peterlyons.com.access.log;
-    error_log /var/log/nginx/ssl.peterlyons.com.error.log;
-    ssl on;
-    ssl_certificate /etc/nginx/sites-available/peterlyons.com.crt;
-    ssl_certificate_key /etc/nginx/sites-available/peterlyons.com.key;
-    keepalive_timeout 70;
-
-    location / {
-        auth_basic "Restricted";
-        auth_basic_user_file htpasswd;
-        proxy_pass http://127.0.0.1:9300;
-    }
-}
