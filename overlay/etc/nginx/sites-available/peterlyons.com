@@ -1,6 +1,6 @@
 server {
-    listen 80 default;
-    server_name www.peterlyons.com; 
+    listen 80;
+    server_name peterlyons.com www.peterlyons.com; 
     access_log /var/log/nginx/peterlyons.com.access.log;
     error_log /var/log/nginx/peterlyons.com.error.log;
 
