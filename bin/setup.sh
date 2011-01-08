@@ -7,5 +7,6 @@ link() {
         ln -s "${OVERLAY}${1}" "${1}"
     fi
 }
-link "/etc/monit/conf.d/${SITE}.monitrc"
+link "/etc/monit/conf.d/spawn-fcgi_${SITE}.monitrc"
+link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
 cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc

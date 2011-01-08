@@ -25,7 +25,7 @@ set daemon 120
     with start delay 10
 
 #BUGBUG uncomment these to have shorter pauses for dev/test
-set daemon 10 with start delay 0
+set daemon 5 with start delay 0
 ## Set syslog logging with the 'daemon' facility. If the FACILITY option is
 ## omitted, Monit will use 'user' facility by default. If you want to log to 
 ## a standalone log file instead, specify the full path to the log file

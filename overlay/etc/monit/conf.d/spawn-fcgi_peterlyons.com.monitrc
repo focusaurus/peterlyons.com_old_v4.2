@@ -1,7 +1,7 @@
 #spawn-fcgi for peterlyons.com (Wordpress blogs PHP implementation)
 check process "spawn-fcgi_peterlyons.com"
     with pidfile "/var/run/spawn-fcgi_peterlyons.com.pid"
-    start = "/etc/init.d/spawn-fcgi_peterlyons.com start"
-    stop = "/etc/init.d/spawn-fcgi_peterlyons.com stop"
+    start = "/usr/bin/service spawn-fcgi_peterlyons.com start"
+    stop = "/usr/bin/service spawn-fcgi_peterlyons.com stop"
     if failed host 127.0.0.1 port 9200 then restart
     if 5 restarts within 5 cycles then timeout
