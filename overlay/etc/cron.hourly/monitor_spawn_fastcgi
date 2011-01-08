@@ -1,7 +1,0 @@
-#!/bin/sh
-ps -ef | grep -v grep | grep /usr/bin/php-cgi > /dev/null
-EXIT_CODE=$?
-if [ ${EXIT_CODE} != 0 ]; then
-    echo "spawn-fcgi_peterlyons.com /usr/bin/php-cgi died. Restarting."
-    /etc/init.d/spawn-fcgi_peterlyons.com start
-fi
