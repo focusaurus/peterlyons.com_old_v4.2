@@ -10,7 +10,6 @@ link() {
 link "/etc/monit/conf.d/spawn-fcgi_${SITE}.monitrc"
 link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
 link "/etc/monit/conf.d/webware_${SITE}.monitrc"
-#link "/etc/mysql/my.cnf"
-#link "/etc/mysql/debian-start"
-#link "/etc/init/mysql.conf"
+link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
+cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
 cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
