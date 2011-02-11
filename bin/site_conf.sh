@@ -1,10 +1,11 @@
 #!/bin/bash
 SITE="peterlyons.com"
-WORK="/home/plyons/projects/${SITE}"
-APP="/var/www/webware/${SITE}"
-STATIC="/var/www/${SITE}"
+WORK=~plyons/projects/${SITE}
+STATIC="static"
+APP="app"
 RSYNC_CMD="rsync -caiE"
 HOST="hubb.peterlyons.com"
-STAGEURL="http://stage.peterlyons.com"
-PRODURL="http://peterlyons.com"
+DEVURL="http://localhost:9400"
+STAGEURL="http://staging.${SITE}"
+PRODURL="http://${SITE}"
 
