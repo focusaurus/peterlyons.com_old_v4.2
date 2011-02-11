@@ -57,7 +57,16 @@ users can expect this to work.
 <html lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  #if $servlet.request.field('wordpress', None)
+  <title><?php bloginfo('name'); ?> <?php if ( is_single() ) { ?> &raquo; Blog Archive <?php } ?> <?php wp_title(); ?></title>
+  <link rel="stylesheet" href="<?php bloginfo('template_url'); ?>/print.css" type="text/css" media="print" />
+  <link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS Feed" href="<?php bloginfo('rss2_url'); ?>" />
+  <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
+  <?php if ( is_singular() ) wp_enqueue_script( 'comment-reply' ); ?>
+  <?php wp_head(); ?>
+  #else
   <title>$title$title_suffix</title>
+  #end if
   <link rel="stylesheet" href="/screen.css" type="text/css" />
   <!--[if lt IE 7]>
     <script type="text/javascript" src="/images/unitpngfix.js"></script>
@@ -108,9 +117,13 @@ users can expect this to work.
           <a href="${wkbase}/photos">Photos</a>
         </div>         
     </div>
+      #if $servlet.request.field('wordpress', None)
+      <?php get_sidebar(); ?>
+      #end if
 </div> <!-- site_nav -->
-
 <div id="main_content">
+#if not $servlet.request.field('wordpress', None)
 $body
 </div>
 $footer
+#end if

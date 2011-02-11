@@ -62,6 +62,8 @@ EOF
         echo "FAILED to retrieve ${URL}"
     fi 
 done
+#This creates a version of the main header suitable for embedding the blogs
+wget -q "${STAGEURL}/app/home?wordpress=1" -O "${WORK}/overlay${STATIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
 sudo chgrp webadmin "${STATIC}"/*.html
 echo setting permissions, cleaning up SCM and editor files that are not needed
 #delete source control repository metadata directories

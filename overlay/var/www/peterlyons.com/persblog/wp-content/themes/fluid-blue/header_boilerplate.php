@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>Linkzie: A Simple Bookmark Manager | Peter Lyons</title>
+  <title><?php bloginfo('name'); ?> <?php if ( is_single() ) { ?> &raquo; Blog Archive <?php } ?> <?php wp_title(); ?></title>
+  <link rel="stylesheet" href="<?php bloginfo('template_url'); ?>/print.css" type="text/css" media="print" />
+  <link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS Feed" href="<?php bloginfo('rss2_url'); ?>" />
+  <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
+  <?php if ( is_singular() ) wp_enqueue_script( 'comment-reply' ); ?>
+  <?php wp_head(); ?>
   <link rel="stylesheet" href="/screen.css" type="text/css" />
   <!--[if lt IE 7]>
     <script type="text/javascript" src="/images/unitpngfix.js"></script>
@@ -53,12 +58,7 @@
           <a href="/app/photos">Photos</a>
         </div>         
     </div>
+      <?php get_sidebar(); ?>
 </div> <!-- site_nav -->
 <div id="main_content">
-I built a web application for managing lots of bookmarks. It's up over at <a target="_blank" href="https://linkzie.com">linkzie.com</a>.  The original idea came from a little python script I built way back in 2004 that would generate a page similar to linkzie, albeit a very crude version initially.  All the data was manually edited into the script by hand and then the script could regenerate a new HTML page.  Linkzie has now been made into a modern multi-user web application with easy drag-n-drop organization and a nice single page application AJAX user experience.  There's more information on the Linkzie site, so please go check it out.
-
-</div>
-</body>
-</html>
-
 
