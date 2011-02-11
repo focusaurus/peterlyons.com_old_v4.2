@@ -1,4 +1,3 @@
-	<div id="blog_nav">
 		<ul>
 			
 			<?php if ( !function_exists('dynamic_sidebar')
@@ -41,5 +40,4 @@
 
 			<?php endif; ?>
 		</ul>
-	</div><!-- blog_nav -->
 
