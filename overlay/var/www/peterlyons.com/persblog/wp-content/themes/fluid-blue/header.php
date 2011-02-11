@@ -1,38 +1,64 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
-
-<head>
-<link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'/>
-<meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" />
-<meta name="keywords" content="peter lyons, pete lyons, computer, computers, java, software engineer, programmer, programming, Sun Certified Programmer for the Java 2 Platform, music, musician, sax, saxophone, saxophonist, sunny daze, confunktion junction, jazz, oberlin, classical" />
-<meta name="author" content="Peter Lyons" />
-<meta name="description" content="The blog of for Peter Lyons, Software Engineer and Musician" />
-<meta name="copyright" content="2001, Peter Lyons" />
-<meta name="generator" content="jEdit, Wordpress" />
-
-<title><?php bloginfo('name'); ?> <?php if ( is_single() ) { ?> &raquo; Blog Archive <?php } ?> <?php wp_title(); ?></title>
-
-<link rel="stylesheet" href="<?php bloginfo('stylesheet_url'); ?>" type="text/css" media="screen" />
-<link rel="stylesheet" href="<?php bloginfo('template_url'); ?>/print.css" type="text/css" media="print" />
-<link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS Feed" href="<?php bloginfo('rss2_url'); ?>" />
-<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
-<?php if ( is_singular() ) wp_enqueue_script( 'comment-reply' ); ?>
-<?php wp_head(); ?>
-</head>
-
-<body>
-<div id="page">
-<div id="header">
-	<div id="headertitle">
-		<h1><a href="<?php bloginfo('url') ?>" title="<?php bloginfo('name') ?>: <?php bloginfo('description') ?>"><?php bloginfo('name') ?></a></h1>
-		<p><?php bloginfo('description') ?></p>
-	</div> 
-	<!-- Search box (If you prefer having search form as a sidebar widget, remove this block) -->
-	<div class="search">
-		<?php  include (TEMPLATEPATH . "/searchform.php"); ?>
-	</div> 
-	<!-- Search ends here-->
-		
-</div>
-
-<div id="wrapper">
+<!doctype html> 
+<html lang="en"> 
+<head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+  <meta name="description" content="The personal blog of Peter Lyons" />
+  <meta name="copyright" content="2001, Peter Lyons" />
+  <title><?php bloginfo('name'); ?> <?php if ( is_single() ) { ?> &raquo; Blog Archive <?php } ?> <?php wp_title(); ?></title>
+  <link rel="stylesheet" href="<?php bloginfo('template_url'); ?>/print.css" type="text/css" media="print" />
+  <link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS Feed" href="<?php bloginfo('rss2_url'); ?>" />
+  <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
+  <?php if ( is_singular() ) wp_enqueue_script( 'comment-reply' ); ?>
+  <?php wp_head(); ?>
+  <link rel="stylesheet" href="/screen.css" type="text/css" /> 
+  <!--[if lt IE 7]>
+    <script type="text/javascript" src="/images/unitpngfix.js"></script>
+  <![endif]--> 
+  <link rel="openid.server" href="http://www.livejournal.com/openid/server.bml" /> 
+  <link rel="openid.delegate" href="http://focusaurus.livejournal.com/" /> 
+  <meta name="keywords" content="peter lyons, pete lyons, web development,
+    web applications, startups, music, sax, saxophone,
+    oberlin, jazz, classical"/> 
+  <meta name="description"
+    content="The web site for Peter Lyons, Web Developer and Musician" /> 
+  <meta name="copyright" content="2001, Peter Lyons" /> 
+</head> 
+<body> 
+<div id="wrapper"> 
+  <div id="header"> 
+    <a href="/"><img src="/images/peter_lyons_logo.png" alt="Peter Lyons" class="logo" /></a> 
+  </div> 
+  <div id="site_nav"> 
+    <div class="technology"> 
+      <div class="gray">Technology</div> 
+        <img src="/images/keyboard_icon_alt.png" alt="" class="keyboard_icon" /> 
+        <div class="nav_links"> 
+          <a href="/problog">Blog</a><br /> 
+          <a href="/career.html">Career</a><br /> 
+          Projects<br /> 
+          <span class="indent"><a href="/linkzie.html">Linkzie</a></span><br /> 
+          <span class="indent"><a href="/techstars.html">TechStars</a></span><br /> 
+          <span class="indent"><a href="/smartears.html">SmartEars</a></span><br /> 
+          <span class="indent"><a href="/bigclock.html">BigClock</a></span><br /> 
+          <a href="/code_conventions.html">Code Conventions</a> 
+        </div> 
+      </div> 
+      <div class="music"> 
+        <div class="gray">Music</div> 
+          <img src="/images/sax_icon.png" alt="" class="sax_icon" /> 
+          <div class="nav_links"> 
+            <a href="/bands.html">Bands</a><br /> 
+            <a href="/oberlin.html">Oberlin</a><br /> 
+            Favorites
+          </div>           
+      </div> 
+      <div class="personal"> 
+        <div class="gray">Personal</div> 
+          <img src="/images/peter_icon.png" alt="" class="peter_icon" />   
+          <div class="nav_links"> 
+            <a href="/persblog">Blog</a><br /> 
+            <a href="/app/photos">Photos</a> 
+          </div>         
+      </div> 
+  </div> <!-- site_nav -->
+<div id="main_content">
