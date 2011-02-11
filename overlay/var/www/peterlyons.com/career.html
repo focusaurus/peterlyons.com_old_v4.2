@@ -1,6 +1,61 @@
-#extends main_tmpl
-#attr title = "My Career"
-#def body
+<!doctype html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>My Career | Peter Lyons</title>
+  <link rel="stylesheet" href="/screen.css" type="text/css" />
+  <!--[if lt IE 7]>
+    <script type="text/javascript" src="/images/unitpngfix.js"></script>
+  <![endif]-->
+  <link rel="openid.server" href="http://www.livejournal.com/openid/server.bml" />
+  <link rel="openid.delegate" href="http://focusaurus.livejournal.com/" />
+  <meta name="keywords" content="peter lyons, pete lyons, web development,
+    web applications, startups, music, sax, saxophone,
+    oberlin, jazz, classical"/>
+  <meta name="description"
+    content="The web site for Peter Lyons, Web Developer and Musician" />
+  <meta name="copyright" content="2001, Peter Lyons" />
+</head>
+<body>
+<div id="wrapper">
+  <div id="header">
+    <a href="/"><img src="/images/peter_lyons_logo.png" alt="Peter Lyons" class="logo" /></a>
+  </div>
+  <div id="sidebar">
+    <div class="technology">
+      <div class="gray">Technology</div>
+        <img src="/images/keyboard_icon_alt.png" alt="" class="keyboard_icon" />
+        <div class="nav_links">
+          <a href="/problog">Blog</a><br />
+          <a href="/career.html">Career</a><br />
+          Projects<br />
+          <span class="indent"><a href="/linkzie.html">Linkzie</a></span><br />
+          <span class="indent"><a href="/techstars.html">TechStars</a></span><br />
+          <span class="indent"><a href="/smartears.html">SmartEars</a></span><br />
+          <span class="indent"><a href="/bigclock.html">BigClock</a></span><br />
+          <a href="/code_conventions.html">Code Conventions</a>
+        </div>
+      </div>
+      <div class="music">
+        <div class="gray">Music</div>
+          <img src="/images/sax_icon.png" alt="" class="sax_icon" /> 
+          <div class="nav_links">
+            <a href="/bands.html">Bands</a><br />
+            <a href="/oberlin.html">Oberlin</a><br />
+            Favorites
+          </div>           
+      </div>
+      <div class="personal">
+        <div class="gray">Personal</div>
+          <img src="/images/peter_icon.png" alt="" class="peter_icon" />   
+          <div class="nav_links">
+            <a href="/persblog">Blog</a><br />
+            <a href="/app/photos">Photos</a>
+          </div>         
+      </div>
+  </div>
+
+<div id="main_content">
 <p>
 I have a <b><a href="resume.pdf">traditional resume</b> availabe in PDF format</a> for those looking for the lo-fi version.
 </p>
@@ -26,9 +81,18 @@ HP acquired Opsware for $1.6 Billion in November 2007.  My work and role as tech
 </ul>
 <h2>Technologies Employed</h2>
 <ul>
-#for tech in ["Python", "Java", "Jython", "Bourne Shell", "Linux", "Solaris", "Windows", "DHCP", "NFS", "Samba", "XML", "JSON"]
-<li>$tech</li>
-#end for
+<li>Python</li>
+<li>Java</li>
+<li>Jython</li>
+<li>Bourne Shell</li>
+<li>Linux</li>
+<li>Solaris</li>
+<li>Windows</li>
+<li>DHCP</li>
+<li>NFS</li>
+<li>Samba</li>
+<li>XML</li>
+<li>JSON</li>
 </ul>
 <h2>Key Skills Learned</h2>
 <ul>
@@ -52,9 +116,16 @@ I changed roles and joined the main product engineering team at Opsware, focusin
 </ul>
 <h2>Technologies Employed</h2>
 <ul>
-#for tech in ["Python", "Java", "Jython", "Bourne Shell", "Linux", "Solaris", "Windows", "DHCP", "NFS", "Samba"]
-<li>$tech</li>
-#end for
+<li>Python</li>
+<li>Java</li>
+<li>Jython</li>
+<li>Bourne Shell</li>
+<li>Linux</li>
+<li>Solaris</li>
+<li>Windows</li>
+<li>DHCP</li>
+<li>NFS</li>
+<li>Samba</li>
 </ul>
 <h2>Key Skills Learned</h2>
 <ul>
@@ -84,9 +155,15 @@ This job was a mix of consulting, systems administration, and custom software de
 </ul>
 <h2>Technologies Employed</h2>
 <ul>
-#for tech in ["Linux", "Solaris", "Python", "Java", "JSP", "Struts", "XML-RPC", "Bourne Shell", "DHCP"]
-<li>$tech</li>
-#end for
+<li>Linux</li>
+<li>Solaris</li>
+<li>Python</li>
+<li>Java</li>
+<li>JSP</li>
+<li>Struts</li>
+<li>XML-RPC</li>
+<li>Bourne Shell</li>
+<li>DHCP</li>
 </ul>
 <h2>Key Skills Learned</h2>
 <ul>
@@ -117,9 +194,17 @@ I got exposure to large, complex, high-budget (8-figure) projects and the logist
 </ul>
 <h2>Technologies Employed</h2>
 <ul>
-#for tech in ["Windows Server 2003", "ASP.NET", "MS SQL Server", "MS Exchange Server", "Active Directory", "MS ISA Server", "Cisco IOS", "VBScript", "DNS", "SMTP", "IBM eServers"]
-<li>$tech</li>
-#end for
+<li>Windows Server 2003</li>
+<li>ASP.NET</li>
+<li>MS SQL Server</li>
+<li>MS Exchange Server</li>
+<li>Active Directory</li>
+<li>MS ISA Server</li>
+<li>Cisco IOS</li>
+<li>VBScript</li>
+<li>DNS</li>
+<li>SMTP</li>
+<li>IBM eServers</li>
 </ul>
 <h2>Key Skills Learned</h2>
 <ul>
@@ -152,9 +237,17 @@ I should also note that at this time I started to learn Python on the side, taki
 </ul>
 <h2>Technologies Employed</h2>
 <ul>
-#for tech in ["Java", "Apple WebObjects/EnterpriseObjects", "HTML", "CSS", "SQL", "Mac OS X", "FreeBSD", "Perl", "LDAP", "FrontBase", "XML-RPC"]
-<li>$tech</li>
-#end for
+<li>Java</li>
+<li>Apple WebObjects/EnterpriseObjects</li>
+<li>HTML</li>
+<li>CSS</li>
+<li>SQL</li>
+<li>Mac OS X</li>
+<li>FreeBSD</li>
+<li>Perl</li>
+<li>LDAP</li>
+<li>FrontBase</li>
+<li>XML-RPC</li>
 </ul>
 <h2>Key Skills Learned</h2>
 <ul>
@@ -163,4 +256,10 @@ I should also note that at this time I started to learn Python on the side, taki
   <li>Object-Relational Modeling (ORM)</li>
   <li>Apple Core Foundation APIs</li>
 </ul>
-#end def
+
+</div>
+</div><!--wrapper-->
+</body>
+</html>
+
+

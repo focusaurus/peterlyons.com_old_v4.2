@@ -3,11 +3,18 @@
 body {background: #FFF url(images/bg_gradient.jpg) repeat-x; font-family: Verdana, Arial, Helvetica, sans-serif; font-size:13px; color:#000;}
 
 div#wrapper {width:1010px; margin:0 auto; height:100%;}
+a {
+  color: #6F8599;
+  text-decoration: none;
+  font-weight: bold;
+}
 
-a:link {color:#000; text-decoration:none; border:none;}
-a:visited {color:#000; text-decoration:none; border:none;}
-a:hover {color:#FFF; text-decoration:none; text-shadow:none; border:none;}
-a:active {color:#FFF; text-decoration:none; text-shadow:none; border:none;}
+a:hover {
+  color: #94B6D7;
+  text-decoration: underline;
+  font-weight: bold;
+  font-style: italic;
+}
 
 img {border:none;}
 
@@ -47,6 +54,15 @@ img.peter_icon:hover {position:absolute; top:-15px; left:-25px;}
 div.gray {width:100%; background:#abacae; border-bottom: 1px solid #FFF; text-align:center; font-size:22px; line-height:40px; text-shadow: 0px 1px 0px #CCC;}
 
 div.nav_links {width:200px; margin-left:20px; padding:15px 15px 15px 40px; _width:170px; _padding:15px; font-size:14px; line-height:18px; text-shadow: 0px 1px 0px #999;}
+
+div.nav_links a {
+  color:#000; text-decoration:none; border:none;
+  font-weight: normal;
+  font-style: normal;
+}
+div.nav_links a:hover, div.nav_links a:active {
+  color:#FFF; text-decoration:none; text-shadow:none; border:none;
+}
 
 span.indent {margin-left:15px;}
 
