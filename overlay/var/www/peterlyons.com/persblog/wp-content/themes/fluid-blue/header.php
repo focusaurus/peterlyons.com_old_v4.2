@@ -24,7 +24,6 @@
   <meta name="copyright" content="2001, Peter Lyons" /> 
 </head> 
 <body> 
-<div id="wrapper"> 
   <div id="header"> 
     <a href="/"><img src="/images/peter_lyons_logo.png" alt="Peter Lyons" class="logo" /></a> 
   </div> 
@@ -60,5 +59,6 @@
             <a href="/app/photos">Photos</a> 
           </div>         
       </div> 
-  </div> <!-- site_nav -->
-<div id="main_content">
+      <?php get_sidebar(); ?>
+    </div> <!-- site_nav -->
+    <div id="main_content">
