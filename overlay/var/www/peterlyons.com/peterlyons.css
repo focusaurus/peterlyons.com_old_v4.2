@@ -63,6 +63,12 @@ img {
     border: 0;   
 }
 
+.left {
+    float: left;
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
 li {
     padding: 5px;
 }
