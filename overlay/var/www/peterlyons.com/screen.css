@@ -191,3 +191,8 @@ td.performers {
   text-align: center;
   font-style: italic;
 }
+
+/** FOOTER **/
+#footer {
+  padding-top: 30px; 
+}

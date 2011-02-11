@@ -9,41 +9,41 @@
 #else
 #set nextPhotoName = $servlet.photos[currentIndex + 1].name
 #end if
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript">
 function showPhoto(img, caption, name) {
     if(document.getElementById)   //gecko(NN6) + IE 5+
     {
         document.getElementById("photo").src = img;
         document.getElementById("caption").innerHTML = caption;
-        document.getElementById("photolink").href = '$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&photo=' + name;
+        document.getElementById("photolink").href = '$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&amp;photo=' + name;
     }
     else if(document.layers)       //NN4+
     {
         document.layers["photo"].src = img;
         document.layers["caption"].innerHTML = caption;
-        document.layers["photolink"].href = '$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&photo=' + name;
+        document.layers["photolink"].href = '$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&amp;photo=' + name;
     }
     else if(document.all)       // IE 4
     {
         document.all["photo"].src = img;
         document.all["caption"].innerHTML = caption;
-        document.all["photolink"].href = '$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&photo=' + name;
+        document.all["photolink"].href = '$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&amp;photo=' + name;
     }
     return true;
 }
 </script>
-<a href="$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$prevPhotoName">&lt;&lt;previous</a>
+<a href="$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&amp;photo=$prevPhotoName">&lt;&lt;previous</a>
 &nbsp;
-<a href="$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$nextPhotoName">next&gt;&gt;</a>
+<a href="$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&amp;photo=$nextPhotoName">next&gt;&gt;</a>
 <br/>
 <br/>
-<a href="$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&photo=$nextPhotoName" id="photolink"><img alt="$servlet.photo.caption" id="photo" title="$servlet.photo.caption" src="$servlet.photo.fullSizeURI" border="0"/></a>
+<a href="$wkbase$servlet.request.servletURI()?gallery=$servlet.gallery&amp;photo=$nextPhotoName" id="photolink"><img alt="$servlet.photo.caption" id="photo" title="$servlet.photo.caption" src="$servlet.photo.fullSizeURI" /></a>
 <h1 class="caption" id="caption">$servlet.photo.caption</h1>
 #for $photo in $servlet.photos
 #set jsCaption = $photo.caption.replace("'", "\\'").replace('"', "&quot;").strip()
 #set altCaption = $photo.caption.replace('"', "&quot;").strip()
 <a href="#" onclick="javascript:showPhoto('$photo.fullSizeURI', '$jsCaption', '$photo.name');return true">
-<img border="0" src="$photo.thumbnailURI" alt="$altCaption" title="$altCaption" /></a>
+<img src="$photo.thumbnailURI" alt="$altCaption" title="$altCaption" /></a>
 #end for
 <br/>
 <h1>Other Photo Galleries</h1>
