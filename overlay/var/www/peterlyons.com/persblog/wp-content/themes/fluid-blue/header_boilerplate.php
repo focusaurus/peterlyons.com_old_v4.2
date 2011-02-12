@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
   <meta charset=utf-8" />
-  <title>Peter Lyons: Web apps, startups, music | Peter Lyons</title>
+  <title><?php bloginfo('name'); ?> <?php if ( is_single() ) { ?> &raquo; Blog Archive <?php } ?> <?php wp_title(); ?></title>
+  <link rel="stylesheet" href="<?php bloginfo('template_url'); ?>/print.css" type="text/css" media="print" />
+  <link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS Feed" href="<?php bloginfo('rss2_url'); ?>" />
+  <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
+  <?php if ( is_singular() ) wp_enqueue_script( 'comment-reply' ); ?>
+  <?php wp_head(); ?>
   <link rel="stylesheet" href="/screen.css" type="text/css" />
   <!--[if lt IE 7]>
     <script type="text/javascript" src="/images/unitpngfix.js"></script>
@@ -53,19 +58,7 @@
           <a href="/app/photos">Photos</a>
         </div>         
     </div>
+      <?php get_sidebar(); ?>
 </div> <!-- site_nav -->
 <div id="main_content">
-<h1>4</h1>
-<h1>0</h1>
-<h1>4</h1>
-<p>
-Sorry, the page at this address exists only inside black holes.
-</p>
-<!--Error Code: 404 File Not Found-->
-
-
-</div>
-</body>
-</html>
-
 

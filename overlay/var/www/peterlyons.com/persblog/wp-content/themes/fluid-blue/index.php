@@ -1,6 +1,5 @@
 <?php get_header(); ?>
-
-	<div id="content">
+<div id="content">
 
 	<?php if (have_posts()) : ?>
 		
@@ -38,6 +37,5 @@
 
 	<?php endif; ?>
 
-	</div>
-<?php get_sidebar(); ?>
+	</div><!-- content -->
 <?php get_footer(); ?>
