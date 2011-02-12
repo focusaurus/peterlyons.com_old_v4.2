@@ -155,6 +155,10 @@ span.indent {
   margin-left: 15px;
 }
 
+li.widget {
+  list-style-type: none; 
+}
+
 /**MAIN CONTENT AREA**/
 
 #main_content {
@@ -173,6 +177,7 @@ img.social {
 code, pre {
     background-color: #94b6d7;
     font-family: courier, serif;
+    overflow: auto;
     padding-left: 4px;
     padding-right: 4px;
 }

@@ -1,11 +1,13 @@
 #!/bin/sh
 . `dirname ${0}`/site_conf.sh
+sudo service monit stop
 sudo service mysql stop
 for DIR in persblog problog
 do
     sudo rsync -aiEz --delete root@${HOST}:"/var/lib/mysql/${DIR}/" "/var/lib/mysql/${DIR}"
 done
 sudo service mysql start
+sudo service monit start
 #Now we must update the site URL
 echo "ENTER THE PROBLOG DB password"
 echo "update wp_options set option_value = '/problog' where option_name in ('siteurl', 'home');" | mysql -u problog -p problog
