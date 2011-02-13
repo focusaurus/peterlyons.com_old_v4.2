@@ -14,7 +14,6 @@ doctype 5
 html lang: "en", ->
   head ->
     meta charset: "utf-8"
-    meta "http-equiv": "Content-Type", content: "text/html;charset=utf-8"
     meta name: "keywords", content: "peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears"
     meta name:"author", content: "Peter Lyons"
     meta name: "description", content: "The web site for Peter Lyons, Web Developer and Musician"
