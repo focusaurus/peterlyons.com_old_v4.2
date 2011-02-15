@@ -9,6 +9,8 @@
   <?php if ( is_singular() ) wp_enqueue_script( 'comment-reply' ); ?>
   <?php wp_head(); ?>
   <link rel="stylesheet" href="/screen.css" type="text/css" />
+  <link href="/favicon.ico" type="image/x-icon" rel="icon" />
+  <link href="/favicon.ico" type="image/x-icon" rel="shortcut icon" />
   <!--[if lt IE 7]>
     <script type="text/javascript" src="/images/unitpngfix.js"></script>
   <![endif]-->
