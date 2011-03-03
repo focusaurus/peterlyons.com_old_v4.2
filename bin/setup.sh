@@ -11,5 +11,6 @@ link "/etc/monit/conf.d/php5-cgi_${SITE}.monitrc"
 link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
 link "/etc/monit/conf.d/webware_${SITE}.monitrc"
 link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
+link "/etc/init.d/php5-cgi_${SITE}"
 cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
 cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
