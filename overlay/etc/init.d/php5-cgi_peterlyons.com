@@ -9,20 +9,19 @@
 # Short-Description: starts FastCGI for PHP
 # Description:       starts FastCGI for PHP using start-stop-daemon
 ### END INIT INFO
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
 NAME=php5-cgi_peterlyons.com
 PID=/var/run/php5-cgi_peterlyons.com.pid
-DAEMON=/usr/bin/php5-cgi
-DAEMON_OPTS="-b 127.0.0.1:9200"
+DAEMON_OPTS="PATH=/usr/bin PHP_FCGI_CHILDREN=2 PHP_FCGI_MAX_REQUESTS=1000 /usr/bin/php5-cgi -b 127.0.0.1:9200"
 
-test -x $DAEMON || exit 0
+test -x /usr/bin/env || exit 0
 
 set -e
 
 start() {
     echo "Starting $NAME: "
-    start-stop-daemon --start --pidfile $PID --make-pidfile --user www-data --group www-data \
-        --background --exec $DAEMON -- $DAEMON_OPTS
+    start-stop-daemon --start --pidfile $PID --make-pidfile --user www-data \
+        --group www-data --background --exec /usr/bin/env -- $DAEMON_OPTS
     echo "done."
 }
 
