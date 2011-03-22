@@ -1,13 +1,23 @@
-a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.prev) &lt;&lt;previous&nbsp;
-a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next) &gt;&gt;next
+a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.prev.name) &lt;&lt;previous&nbsp;
+a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next.name) &gt;&gt;next
 br
 br
-a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next, id="photolink")
+a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next.name, id="photolink")
   img#photo(alt=photo.caption, title=photo.caption, src=photo.fullSizeURI)
 
 h1.caption#caption #{photo.caption}
 - each photo in photos
-  img(src=config.photos.photoURI + gallery + '/' + photo + config.photos.thumbExtension)
+  - onClick = "showPhoto('" + photo.fullSizeURI + "', '" + photo.jsCaption + "', '" + photo.name + "');return true"
+  a(href="#", onClick=onClick)
+    img(src=config.photos.photoURI + gallery + '/' + photo.name + config.photos.thumbExtension, alt=photo.caption, title=photo.caption)
+h1 Other Photo Galleries
 - each gallery in galleries
-  p
-    a(href=config.photos.URI + '?gallery=' + gallery) #{gallery})
+  a(href=config.photos.URI + '?gallery=' + gallery) #{gallery})
+  br
+script(type="text/javascript")
+  function showPhoto(img, caption, name) {
+    $("#photo").attr("src", img);
+    $("#caption").html(caption);
+    $("#photolink").attr("href", "#{config.photos.galleryURI}");
+    return true;
+  }

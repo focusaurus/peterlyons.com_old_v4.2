@@ -22,6 +22,7 @@ html lang: "en", ->
     link rel: "openid.server", href: "http://www.livejournal.com/openid/server.bml"
     link rel: "openid.delegate", href: "http://focusaurus.livejournal.com/"
     title "#{@title} | Peter Lyons" if @title?
+    script(type="text/javascript", src="/js/jquery.js")
   body ->
     nav ->
       for l in navLinks

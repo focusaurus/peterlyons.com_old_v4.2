@@ -35,7 +35,6 @@ fs.readdir app.set('views'), (err, names) ->
   for name in names
     if name.match /.partial$/
       key = name.split(".")[0]
-      console.log "Matched #{name} as #{key}"
       fs.readFile app.set('views') + "/" + name, (err, data) ->
         if err
           throw err
@@ -68,17 +67,18 @@ app.get '/app/photos', (req, res)->
       throw err if err
       locals.photos = _.select names, (name)->
         name.indexOf(config.photos.thumbExtension) > 0
-      locals.photos = _.map locals.photos, (name)->
-        name.slice 0, name.length - config.photos.thumbExtension.length
-      locals.photo =
-        name: locals.photos[0]
-        caption: "TO DO"
+      locals.photos = _.map locals.photos, (thumbName)->
+        photoName = thumbName.slice(0, thumbName.length - config.photos.thumbExtension.length)
+        return {
+         name: photoName
+         caption: 'TODO',
+         jsCaption: 'TODO',
+         fullSizeURI: "#{config.photos.photoURI}#{locals.gallery}/#{photoName}#{config.photos.extension}"}
+         
       photoParam = req.param 'photo'
-      index = 0
-      if _.contains locals.photos, photoParam
-        index = locals.photos.indexOf(photoParam)
-        locals.photo.name = photoParam
-      locals.photo.fullSizeURI = "#{config.photos.photoURI}#{locals.gallery}/#{locals.photo.name}#{config.photos.extension}"
+      index = _.pluck(locals.photos, 'name').indexOf(photoParam)
+      index = 0 if index < 0
+      locals.photo = locals.photos[index]
       locals.photo.next = locals.photos[index + 1] or locals.photos[0]
       locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
       res.render 'photos', {locals: locals}
