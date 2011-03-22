@@ -2,7 +2,7 @@ a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.prev
 a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next) &gt;&gt;next
 br
 br
-a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=', id="photolink")
+a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next, id="photolink")
   img#photo(alt=photo.caption, title=photo.caption, src=photo.fullSizeURI)
 
 h1.caption#caption #{photo.caption}

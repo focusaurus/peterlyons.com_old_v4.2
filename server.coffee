@@ -61,7 +61,7 @@ app.get '/app/photos', (req, res)->
     #Stupid Mac OS X polluting the user space filesystem
     locals.galleries = _.without(names, '.DS_Store')
     locals.gallery = config.photos.defaultGallery
-    galleryParam = req.params['gallery']
+    galleryParam = req.param 'gallery'
     if _.contains locals.galleries, galleryParam
       locals.gallery = galleryParam
     fs.readdir config.photos.galleryDir + '/' + locals.gallery, (err, names)->
@@ -70,13 +70,15 @@ app.get '/app/photos', (req, res)->
         name.indexOf(config.photos.thumbExtension) > 0
       locals.photos = _.map locals.photos, (name)->
         name.slice 0, name.length - config.photos.thumbExtension.length
-      locals.photo = {name: locals.photos[0], caption: "TO DO", fullSizeURI: "TO DO"}
-      locals.photo.next = locals.photos.slice(1, 2) or "ONLY 1"
-      photoParam = req.params['photo']
+      locals.photo =
+        name: locals.photos[0]
+        caption: "TO DO"
+      photoParam = req.param 'photo'
       index = 0
       if _.contains locals.photos, photoParam
         index = locals.photos.indexOf(photoParam)
         locals.photo.name = photoParam
+      locals.photo.fullSizeURI = "#{config.photos.photoURI}#{locals.gallery}/#{locals.photo.name}#{config.photos.extension}"
       locals.photo.next = locals.photos[index + 1] or locals.photos[0]
       locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
       res.render 'photos', {locals: locals}
