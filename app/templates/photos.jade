@@ -1,0 +1,5 @@
+- each photo in photos
+  img(src=config.photos.photoURI + gallery + '/' + photo + config.photos.thumbExtension)
+- each gallery in galleries
+  p
+    a(href=config.photos.URI + '?gallery=' + gallery) #{gallery}
