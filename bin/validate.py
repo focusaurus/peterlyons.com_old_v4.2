@@ -31,7 +31,9 @@ def main():
         value = string.Template(value).safe_substitute(conf)
         conf[key] = value
     
-    URIs = ["/", "/persblog", "/problog"]
+    URIs = ["/", "/problog", "/persblog", "/app/photos"]
+    if os.path.isdir("/Users"):
+        conf["WORK"] = conf["WORK"].replace("/home", "/Users")
     for template in glob.glob(os.path.join(conf["WORK"], "templates/*_tmpl.tmpl")):
         template = os.path.basename(template)
         pageName = template.replace("_tmpl.tmpl", "")

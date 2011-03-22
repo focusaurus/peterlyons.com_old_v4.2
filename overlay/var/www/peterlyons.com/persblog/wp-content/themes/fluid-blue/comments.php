@@ -15,19 +15,18 @@
 <?php if ( have_comments() ) : ?>
 
 	<h3><?php comments_number('No Comments', 'One Comment', '% Comments' );?> </h3>
-	<div class="navigation" style="clear:both">
+	<div class="navigation">
 		<div class="alignleft"><?php previous_comments_link() ?></div>
 		<div class="alignright"><?php next_comments_link() ?></div>
 	</div>
-	<div style="clear:both"></div>
 	<ol class="commentlist">
 	<?php wp_list_comments('avatar_size=48&reply_text=Reply to this comment'); ?>
 	</ol>
-	<div class="navigation" style="clear:both">
+	<div class="navigation">
 		<div class="alignleft"><?php previous_comments_link() ?></div>
 		<div class="alignright"><?php next_comments_link() ?></div>
 	</div>
-	<div style="clear:both"></div> <?php else : // this is displayed if there are no comments so far ?>
+<?php else : // this is displayed if there are no comments so far ?>
 
 	<?php if ('open' == $post->comment_status) : ?>
 		<!-- If comments are open, but there are no comments. -->
