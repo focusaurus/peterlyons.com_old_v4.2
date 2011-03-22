@@ -55,6 +55,7 @@ route = (pageURI) ->
 route page for page in pages
 
 app.get '/app/photos', (req, res)->
+  locals.title = "Photo Gallery"
   fs.readdir config.photos.galleryDir, (err, names)->
     throw err if err
     #Stupid Mac OS X polluting the user space filesystem
@@ -73,7 +74,8 @@ app.get '/app/photos', (req, res)->
          name: photoName
          caption: 'TODO',
          jsCaption: 'TODO',
-         fullSizeURI: "#{config.photos.photoURI}#{locals.gallery}/#{photoName}#{config.photos.extension}"}
+         fullSizeURI: "#{config.photos.photoURI}#{locals.gallery}/#{photoName}#{config.photos.extension}",
+         pageURI: "#{config.photos.galleryURI}?gallery=#{locals.gallery}&photo=#{photoName}"}
          
       photoParam = req.param 'photo'
       index = _.pluck(locals.photos, 'name').indexOf(photoParam)
