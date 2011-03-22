@@ -1,5 +1,13 @@
+a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.prev) &lt;&lt;previous&nbsp;
+a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next) &gt;&gt;next
+br
+br
+a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=', id="photolink")
+  img#photo(alt=photo.caption, title=photo.caption, src=photo.fullSizeURI)
+
+h1.caption#caption #{photo.caption}
 - each photo in photos
   img(src=config.photos.photoURI + gallery + '/' + photo + config.photos.thumbExtension)
 - each gallery in galleries
   p
-    a(href=config.photos.URI + '?gallery=' + gallery) #{gallery}
+    a(href=config.photos.URI + '?gallery=' + gallery) #{gallery})

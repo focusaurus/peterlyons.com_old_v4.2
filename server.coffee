@@ -70,6 +70,15 @@ app.get '/app/photos', (req, res)->
         name.indexOf(config.photos.thumbExtension) > 0
       locals.photos = _.map locals.photos, (name)->
         name.slice 0, name.length - config.photos.thumbExtension.length
+      locals.photo = {name: locals.photos[0], caption: "TO DO", fullSizeURI: "TO DO"}
+      locals.photo.next = locals.photos.slice(1, 2) or "ONLY 1"
+      photoParam = req.params['photo']
+      index = 0
+      if _.contains locals.photos, photoParam
+        index = locals.photos.indexOf(photoParam)
+        locals.photo.name = photoParam
+      locals.photo.next = locals.photos[index + 1] or locals.photos[0]
+      locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
       res.render 'photos', {locals: locals}
     
 console.log "#{config.site} server starting on port #{config.port}"
