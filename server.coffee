@@ -1,5 +1,7 @@
 _ = require './public/js/underscore.js'
+async = require 'async'
 express = require 'express'
+child_process = require 'child_process'
 fs = require 'fs'
 
 config = require './server_config'
@@ -69,21 +71,41 @@ app.get '/app/photos', (req, res)->
       locals.photos = _.select names, (name)->
         name.indexOf(config.photos.thumbExtension) > 0
       locals.photos = _.map locals.photos, (thumbName)->
-        photoName = thumbName.slice(0, thumbName.length - config.photos.thumbExtension.length)
+        photoName = thumbName.slice(0, thumbName.length -
+          config.photos.thumbExtension.length)
         caption = '''Jesse's "words"'''
         return {
          name: photoName
          caption: caption,
          fullSizeURI: "#{config.photos.photoURI}#{locals.gallery}/#{photoName}#{config.photos.extension}",
          pageURI: "#{config.photos.galleryURI}?gallery=#{locals.gallery}&photo=#{photoName}"}
-         
       photoParam = req.param 'photo'
       index = _.pluck(locals.photos, 'name').indexOf(photoParam)
       index = 0 if index < 0
       locals.photo = locals.photos[index]
       locals.photo.next = locals.photos[index + 1] or locals.photos[0]
       locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
-      res.render 'photos', {locals: locals}
-    
+      #Read in each photo's caption (Stored in JPEG IPTC metadata)
+      captionTasks = []
+      for photo in locals.photos
+        command = ["python ./bin/iptc_caption.py --image ",
+          "'#{config.photos.galleryDir}/#{locals.gallery}/#{photo.name}",
+          "#{config.photos.extension}'"].join ''
+        captionTasks.push(async.apply(
+          ((command, photo, callback)->
+            child_process.exec(
+              command,
+              (error, stdout, stderr)->
+                photo.caption = (stdout or '').trim()
+                callback(error, photo)
+            )
+          ), command, photo)
+        )
+      async.parallel captionTasks, (error, results)->
+        console.log(error) if error
+        #Once we have completely loaded in all of the IPTC captions,
+        #render the page
+        res.render 'photos', {locals: locals}
+
 console.log "#{config.site} server starting on port #{config.port}"
 app.listen config.port
