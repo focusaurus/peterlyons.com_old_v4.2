@@ -187,6 +187,15 @@ code, pre {
   font-size: 14pt;
 }
 
+#photolink {
+  margin-top: 20px;
+  display: block;
+}
+
+.thumbnail {
+  margin-right: 4px; 
+}
+
 /** Sounds from Oberlin **/
 table.program {
   border-spacing: 3px;

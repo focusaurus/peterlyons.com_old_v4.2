@@ -70,10 +70,10 @@ app.get '/app/photos', (req, res)->
         name.indexOf(config.photos.thumbExtension) > 0
       locals.photos = _.map locals.photos, (thumbName)->
         photoName = thumbName.slice(0, thumbName.length - config.photos.thumbExtension.length)
+        caption = '''Jesse's "words"'''
         return {
          name: photoName
-         caption: 'TODO',
-         jsCaption: 'TODO',
+         caption: caption,
          fullSizeURI: "#{config.photos.photoURI}#{locals.gallery}/#{photoName}#{config.photos.extension}",
          pageURI: "#{config.photos.galleryURI}?gallery=#{locals.gallery}&photo=#{photoName}"}
          
