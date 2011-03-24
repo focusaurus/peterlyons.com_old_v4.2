@@ -1,14 +1,13 @@
 #!/usr/bin/env python
+import json
 import os
 import sys
 from StringIO import StringIO
 from iptcinfo import IPTCInfo
 from optparse import OptionParser
 
-NO_IMAGE_FILE = "Image file '%s' not found. Aborting.\n"
-IMAGE_FILE_REQUIRED = "You must specify the path to your image file with -i or --image.\n"
-CHANGING_CAPTION = "Replacing old caption '%s' with new caption '%s'"
-ADDING_CAPTION = "Adding new caption"
+NO_IMAGE_DIR = "Image directory '%s' not found. Aborting.\n"
+IMAGE_DIR_REQUIRED = "You must specify the path to your image directory with -d or --dir.\n"
 
 def trimNull(caption):
     if caption == None:
@@ -18,56 +17,46 @@ def trimNull(caption):
         caption = caption[:-1]
     return caption
 
-def printCaption(options):
+def writeJSONCaptions(options):
+    captionDict = {}
     #Suppress stupid warning output from IPTCInfo.py on Mac OS X
     realStdout = sys.stdout
     sys.stdout = StringIO() 
-    try:
-        iptcData = IPTCInfo(options.imageFile)
-        sys.stdout = realStdout
-        caption = iptcData.data[120]
-        print trimNull(caption or "")
-    except:
-        #No IPTC data there. Print nothing
-        pass
-    finally:
-        sys.stdout = realStdout
-
-def writeCaption(options):
-    oldCaption = None
-    try:
-        iptcData = IPTCInfo(options.imageFile, force=True)
-        oldCaption = trimNull(iptcData.data[120])
-        iptcData.data[120] = options.caption
-        if oldCaption:
-            print CHANGING_CAPTION % (oldCaption, options.caption)
-        else:
-            print ADDING_CAPTION
-        iptcData.save()
-    except Exception, message:
-        sys.stderr.write(str(message) + "\n")
-        sys.exit(3)
+    for name in os.listdir(options.imageDir):
+        if not name.lower().endswith(".jpg"):
+            continue
+        if name.lower().endswith("-tn.jpg"):
+            continue
+        fullPath = os.path.join(options.imageDir, name)
+        altTxtPath = os.path.join(
+            options.imageDir, os.path.splitext(name)[0] + ".alt.txt")
+        try:
+            iptcData = IPTCInfo(fullPath, force=True)
+            caption = trimNull(iptcData.data[120])
+            if not caption and os.path.isfile(altTxtPath):
+                try:
+                    altFile = file(altTxtPath)
+                    caption = altFile.read().strip()
+                    altFile.close()
+                except IOError:
+                    pass
+            captionDict[name] = caption
+        except Exception, message:
+            sys.stderr.write(str(message) + "\n")
+    sys.stdout = realStdout
+    print json.dumps({"nameToCaption": captionDict})
 
 parser = OptionParser()
-parser.add_option("-i", "--image", dest="imageFile",
-                  help="path to image file with IPTC IIM metadata")
-parser.add_option("-c", "--caption", dest="caption",
-                  help="caption string for the image.  If this option is supplied, the caption will be written (or overwritten) to the image file.  If this option is omitted, the existing caption will be printed if there is one.", default=None)
+parser.add_option("-d", "--dir", dest="imageDir",
+                  help="path to directory of image files with IPTC IIM metadata")
 (options, args) = parser.parse_args()
 
-if options.imageFile is None:
-    sys.stderr.write(IMAGE_FILE_REQUIRED)
+if options.imageDir is None:
+    sys.stderr.write(IMAGE_DIR_REQUIRED)
     parser.print_help()
     sys.exit(1)
-if not os.path.isfile(options.imageFile):
-    sys.stderr.write(NO_IMAGE_FILE % options.imageFile)
+if not os.path.isdir(options.imageDir):
+    sys.stderr.write(NO_IMAGE_DIR % options.imageDir)
     sys.exit(2)
 
-if options.caption == None and len(args) > 0:
-    options.caption = args[0]
-
-if options.caption == None:
-    printCaption(options)
-else:
-    writeCaption(options)
-
+writeJSONCaptions(options)
