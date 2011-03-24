@@ -3,7 +3,6 @@ async = require 'async'
 express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'
-md = require 'markdown-js'
 
 config = require './server_config'
 
@@ -52,7 +51,8 @@ page('bands', 'My Bands')
 page('bigclock', 'BigClock: a full screen desktop clock in java')
 page('career', 'My Career')
 page('hackstars', 'TechStars, pick me!')
-
+page('linkzie', 'Linkzie: A Simple Bookmark Manager')
+page('smartears', 'SmartEars: Ear Training Software')
 route = (page) ->
   app.get '/' + page.URI, (req, res)->
     locals.title = page.title
