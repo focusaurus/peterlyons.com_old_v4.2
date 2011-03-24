@@ -17,6 +17,7 @@
     "jasbin": "~1.0",
     "stylus": "~0.7",
     "zombie": "~0.9",
-    "async": "~1.8"
+    "async": "~1.8",
+    "markdown-js": "*"
   }
 }
