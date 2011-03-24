@@ -16,14 +16,6 @@ app.use express.staticProvider(__dirname + '/public')
 app.use express.staticProvider(__dirname + '/overlay/var/www/' + config.site)
 app.set 'view engine', 'jade'
 app.set 'views', __dirname + '/app/templates'
-app.register('.md', {
-  compile: (str, options)->
-    console.log "BUGBUG .md compile called"
-    html = md.toHTML(str)
-    return (locals)->
-      return html.replace /\{([^}]+)\}/g, (_, name)->
-        return locals[name]
-});
 
 locals =
   config: config
