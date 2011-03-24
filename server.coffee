@@ -3,6 +3,7 @@ async = require 'async'
 express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'
+md = require 'markdown-js'
 
 config = require './server_config'
 
@@ -15,6 +16,14 @@ app.use express.staticProvider(__dirname + '/public')
 app.use express.staticProvider(__dirname + '/overlay/var/www/' + config.site)
 app.set 'view engine', 'jade'
 app.set 'views', __dirname + '/app/templates'
+app.register('.md', {
+  compile: (str, options)->
+    console.log "BUGBUG .md compile called"
+    html = md.toHTML(str)
+    return (locals)->
+      return html.replace /\{([^}]+)\}/g, (_, name)->
+        return locals[name]
+});
 
 locals =
   config: config
@@ -45,14 +54,14 @@ fs.readdir app.set('views'), (err, names) ->
         console.log "Stored data in key #{key}: #{locals[key].slice(0, 20)}..."
 pages = []
 page = (URI, title)->
-  pages.push {URI: URI, title: title}
+  pages.push {URI: URI, title: title, staticURI: URI + ".html"}
 page('home', 'Peter Lyons: Web Development, Startups, Music')
 page('bands', 'My Bands')
 page('bigclock', 'BigClock: a full screen desktop clock in java')
 page('career', 'My Career')
 
 route = (page) ->
-  app.get '/' + page.URI, (req, res) ->
+  app.get '/' + page.URI, (req, res)->
     locals.title = page.title
     res.render page.URI, {locals: locals}
 
