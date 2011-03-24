@@ -43,17 +43,18 @@ fs.readdir app.set('views'), (err, names) ->
           throw err
         locals[key] = data.toString()
         console.log "Stored data in key #{key}: #{locals[key].slice(0, 20)}..."
+pages = []
+page = (URI, title)->
+  pages.push {URI: URI, title: title}
+page('home', 'Peter Lyons: Web Development, Startups, Music')
+page('bands', 'My Bands')
+page('bigclock', 'BigClock: a full screen desktop clock in java')
+page('career', 'My Career')
 
-pages = ['home', 'bands', 'bigclock', 'template']
-titles =
-  home: 'Peter Lyons: Web Development, Startups, Music'
-  bands: "Bands"
-  bigclock: "BigClock: a full screen desktop clock in java"
-  
-route = (pageURI) ->
-  app.get '/' + pageURI, (req, res) ->
-    locals.title = titles[pageURI]
-    res.render pageURI, {locals: locals}
+route = (page) ->
+  app.get '/' + page.URI, (req, res) ->
+    locals.title = page.title
+    res.render page.URI, {locals: locals}
 
 route page for page in pages
 
