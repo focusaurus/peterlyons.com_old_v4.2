@@ -53,6 +53,7 @@ page('career', 'My Career')
 page('hackstars', 'TechStars, pick me!')
 page('linkzie', 'Linkzie: A Simple Bookmark Manager')
 page('smartears', 'SmartEars: Ear Training Software')
+page('oberlin', 'Music from Oberlin')
 route = (page) ->
   app.get '/' + page.URI, (req, res)->
     locals.title = page.title
