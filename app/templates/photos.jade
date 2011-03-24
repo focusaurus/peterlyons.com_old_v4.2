@@ -7,8 +7,8 @@ h1.caption#caption #{photo.caption}
 - each photo in photos
   - jsCaption = photo.caption.replace("'", "\\'").replace('"', "&quot;").trim()
   -  altCaption = photo.caption.replace('"', "&quot;").trim()
-  - onClick = "showPhoto('" + photo.fullSizeURI + "', '" + jsCaption + "', '" + photo.name + "');return true"
-  a(href="#", onClick=onClick)
+  - onClick = "showPhoto('" + photo.fullSizeURI + "', '" + jsCaption + "', '" + photo.name + "');return false"
+  a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.name , onClick=onClick)
     img.thumbnail(src=config.photos.photoURI + gallery + '/' + photo.name + config.photos.thumbExtension, alt=altCaption, title=altCaption)
 h1 Other Photo Galleries
 - each gallery in galleries
@@ -19,5 +19,6 @@ script(type="text/javascript")
     $("#photo").attr("src", img);
     $("#caption").text(caption);
     $("#photolink").attr("href", "#{config.photos.galleryURI}");
+    window.scrollTo(0, 0);
     return true;
   }

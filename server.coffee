@@ -59,54 +59,38 @@ route page for page in pages
 
 app.get '/app/photos', (req, res)->
   locals.title = "Photo Gallery"
-  fs.readdir config.photos.galleryDir, (err, names)->
+  conf = config.photos
+  fs.readdir conf.galleryDir, (err, names)->
     throw err if err
     #Stupid Mac OS X polluting the user space filesystem
     locals.galleries = _.without(names, '.DS_Store')
-    locals.gallery = config.photos.defaultGallery
+    locals.gallery = conf.defaultGallery
     galleryParam = req.param 'gallery'
     if _.contains locals.galleries, galleryParam
       locals.gallery = galleryParam
-    fs.readdir config.photos.galleryDir + '/' + locals.gallery, (err, names)->
-      throw err if err
-      locals.photos = _.select names, (name)->
-        name.indexOf(config.photos.thumbExtension) > 0
-      locals.photos = _.map locals.photos, (thumbName)->
-        photoName = thumbName.slice(0, thumbName.length -
-          config.photos.thumbExtension.length)
-        caption = '''Jesse's "words"'''
-        return {
-         name: photoName
-         caption: caption,
-         fullSizeURI: "#{config.photos.photoURI}#{locals.gallery}/#{photoName}#{config.photos.extension}",
-         pageURI: "#{config.photos.galleryURI}?gallery=#{locals.gallery}&photo=#{photoName}"}
+    #Now we run iptc_caption.py to generate a list of photos with captions
+    #from the filesystem
+    command = ["python ./bin/iptc_caption.py --dir ",
+          "'#{conf.galleryDir}/#{locals.gallery}'"].join ''
+    child_process.exec command, (error, photoJSON, stderr)->
+      if error
+        console.log error
+        locals.photos = []
+        return
+      locals.photos = JSON.parse(photoJSON)
+      for photo in locals.photos
+        photo.fullSizeURI ="#{conf.photoURI}#{locals.gallery}/#{photo.name}#{conf.extension}"
+        photo.pageURI = "#{conf.galleryURI}?gallery=#{locals.gallery}&photo=#{photo.name}"
+
+      #Figure out which photo to display full size.
       photoParam = req.param 'photo'
       index = _.pluck(locals.photos, 'name').indexOf(photoParam)
+      #If it's a bogus photo name, default to the first photo
       index = 0 if index < 0
       locals.photo = locals.photos[index]
       locals.photo.next = locals.photos[index + 1] or locals.photos[0]
       locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
-      #Read in each photo's caption (Stored in JPEG IPTC metadata)
-      captionTasks = []
-      for photo in locals.photos
-        command = ["python ./bin/iptc_caption.py --image ",
-          "'#{config.photos.galleryDir}/#{locals.gallery}/#{photo.name}",
-          "#{config.photos.extension}'"].join ''
-        captionTasks.push(async.apply(
-          ((command, photo, callback)->
-            child_process.exec(
-              command,
-              (error, stdout, stderr)->
-                photo.caption = (stdout or '').trim()
-                callback(error, photo)
-            )
-          ), command, photo)
-        )
-      async.parallel captionTasks, (error, results)->
-        console.log(error) if error
-        #Once we have completely loaded in all of the IPTC captions,
-        #render the page
-        res.render 'photos', {locals: locals}
+      res.render 'photos', {locals: locals}
 
 console.log "#{config.site} server starting on port #{config.port}"
 app.listen config.port

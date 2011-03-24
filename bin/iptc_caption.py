@@ -18,18 +18,20 @@ def trimNull(caption):
     return caption
 
 def writeJSONCaptions(options):
-    captionDict = {}
+    photos = []
     #Suppress stupid warning output from IPTCInfo.py on Mac OS X
     realStdout = sys.stdout
     sys.stdout = StringIO() 
     for name in os.listdir(options.imageDir):
-        if not name.lower().endswith(".jpg"):
+        if not name.lower().endswith("-tn.jpg"):
             continue
-        if name.lower().endswith("-tn.jpg"):
-            continue
+        photo = {}
+        photo["caption"] = ""
+        photo["name"] = os.path.splitext(name)[0][:-3] #Strip off -TN.jpg
         fullPath = os.path.join(options.imageDir, name)
         altTxtPath = os.path.join(
-            options.imageDir, os.path.splitext(name)[0] + ".alt.txt")
+            options.imageDir, photo["name"] + ".alt.txt")
+        photos.append(photo)
         try:
             iptcData = IPTCInfo(fullPath, force=True)
             caption = trimNull(iptcData.data[120])
@@ -40,11 +42,11 @@ def writeJSONCaptions(options):
                     altFile.close()
                 except IOError:
                     pass
-            captionDict[name] = caption
+            photo["caption"] = caption or ""
         except Exception, message:
             sys.stderr.write(str(message) + "\n")
     sys.stdout = realStdout
-    print json.dumps({"nameToCaption": captionDict})
+    print json.dumps(photos)
 
 parser = OptionParser()
 parser.add_option("-d", "--dir", dest="imageDir",
