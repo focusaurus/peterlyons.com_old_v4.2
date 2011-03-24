@@ -29,6 +29,7 @@ locals.navLinks.push({uri: "/oberlin.html", label: "Sounds from Oberlin"})
 locals.navLinks.push({uri: "/code_conventions.html", label: "Code Conventions"})
 locals.navLinks.push({uri: "/smartears.html", label: "SmartEars"})
 locals.navLinks.push({uri: "/bigclock.html", label: "BigClock"})
+locals.wordpress = false
 
 #This pre-loads all included partials
 fs.readdir app.set('views'), (err, names) ->
@@ -45,7 +46,7 @@ fs.readdir app.set('views'), (err, names) ->
 
 pages = ['home', 'bands', 'bigclock', 'template']
 titles =
-  home: "Home"
+  home: 'Peter Lyons: Web Development, Startups, Music'
   bands: "Bands"
   bigclock: "Big Clock"
   
