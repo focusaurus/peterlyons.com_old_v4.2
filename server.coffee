@@ -51,6 +51,7 @@ page('home', 'Peter Lyons: Web Development, Startups, Music')
 page('bands', 'My Bands')
 page('bigclock', 'BigClock: a full screen desktop clock in java')
 page('career', 'My Career')
+page('hackstars', 'TechStars, pick me!')
 
 route = (page) ->
   app.get '/' + page.URI, (req, res)->
