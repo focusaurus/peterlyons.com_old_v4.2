@@ -17,6 +17,8 @@ h1 Other Photo Galleries
 script(type="text/javascript")
   function showPhoto(img, caption, name) {
     $("#photo").attr("src", img);
+    $("#photo").attr("alt", caption);
+    $("#photo").attr("title", caption);
     $("#caption").text(caption);
     $("#photolink").attr("href", "#{config.photos.galleryURI}");
     window.scrollTo(0, 0);
