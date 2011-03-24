@@ -48,7 +48,7 @@ pages = ['home', 'bands', 'bigclock', 'template']
 titles =
   home: 'Peter Lyons: Web Development, Startups, Music'
   bands: "Bands"
-  bigclock: "Big Clock"
+  bigclock: "BigClock: a full screen desktop clock in java"
   
 route = (pageURI) ->
   app.get '/' + pageURI, (req, res) ->
