@@ -46,14 +46,16 @@ fs.readdir app.set('views'), (err, names) ->
 pages = []
 page = (URI, title)->
   pages.push {URI: URI, title: title, staticURI: URI + ".html"}
-page('home', 'Peter Lyons: Web Development, Startups, Music')
-page('bands', 'My Bands')
-page('bigclock', 'BigClock: a full screen desktop clock in java')
-page('career', 'My Career')
-page('hackstars', 'TechStars, pick me!')
-page('linkzie', 'Linkzie: A Simple Bookmark Manager')
-page('smartears', 'SmartEars: Ear Training Software')
-page('oberlin', 'Music from Oberlin')
+page 'home', 'Peter Lyons: Web Development, Startups, Music'
+page 'bands', 'My Bands'
+page 'bigclock', 'BigClock: a full screen desktop clock in java'
+page 'career', 'My Career'
+page 'hackstars', 'TechStars, pick me!'
+page 'linkzie', 'Linkzie: A Simple Bookmark Manager'
+page 'smartears', 'SmartEars: Ear Training Software'
+page 'oberlin', 'Music from Oberlin'
+page 'code_conventions', 'Code Conventions'
+
 route = (page) ->
   app.get '/' + page.URI, (req, res)->
     locals.title = page.title

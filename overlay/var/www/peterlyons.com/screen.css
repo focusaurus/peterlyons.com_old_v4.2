@@ -206,6 +206,13 @@ td.performers {
   font-style: italic;
 }
 
+
+/** Code Conventions **/
+dd {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 /** FOOTER **/
 #footer {
   padding-top: 30px; 
