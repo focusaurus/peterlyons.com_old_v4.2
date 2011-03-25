@@ -1,41 +1,23 @@
 #!/bin/sh
-. $(dirname ${0})/site_conf.sh
+cd "$(dirname ${0})/.."
+DIR=$(pwd)
+source "${DIR}/bin/site_conf.sh"
 
-list_templates() {
-    ls ${WORK}/${APP}/templates/*.coffee | xargs -n 1 basename | sed -e s/\.coffee// \
-        | sed -e /layout/d
-}
-
-echo Compiling CoffeeScript to JavaScript
-coffee --compile --output "${WORK}/${APP}" "${WORK}/app.coffee" || exit 5
-#for URI in $(list_templates)
-#do
-#    coffee --compile --output "${WORK}/${APP}" "${WORK}/templates/${URI}.coffee"
-#done
-cd "${WORK}/${APP}"
-if [ -f app.pid ]; then
-    PID=$(cat app.pid)
-    echo "Checking for already running PID ${PID}"
+PID_FILE="${DIR}/tmp/server.pid"
+PID_DIR="$(dirname ${PID_FILE})"
+if [ ! -d "${PID_DIR}" ]; then
+    mkdir "${PID_DIR}"
+fi
+if [ -f "${PID_FILE}" ]; then
+    PID=$(cat "${PID_FILE}")
     if ps -p "${PID}" > /dev/null; then
-        kill -9 "${PID}"
-        rm app.pid
+        echo "killing old node server process $(cat ${PID_FILE})"
+        kill "${PID}"
+        rm "${PID_FILE}"
     fi
-fi         
-node app.js &
-echo $! > app.pid
+fi
+NODE_ENV=test coffee server.coffee &
+echo "$!" > "${PID_FILE}"
+echo "new node process started with pid $(cat ${PID_FILE})"
 sleep 1
-echo "Generating HTML for static templated pages from ${DEVURL}..."
-for URI in $(list_templates)
-do
-    URL="${DEVURL}/${URI}"
-    echo -n "${URI}, "
-    EXIT_CODE=0
-    curl --silent "${URL}" --output "${WORK}/${STATIC}/${URI}.html" || EXIT_CODE=$?
-    if [ ${EXIT_CODE} -ne 0 ]; then
-        echo "FAILED to retrieve ${URL}"
-        exit ${EXIT_CODE}
-    fi 
-done
-echo
-echo "To stop node, run"
-echo "kill -9 $(cat app.pid)"
+open -a "Google Chrome" "http://localhost:$(coffee bin/get_port.coffee)"
