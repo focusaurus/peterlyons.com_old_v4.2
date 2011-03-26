@@ -3,7 +3,7 @@ html(lang="en")
   head
     meta(charset="utf-8")
     - if (wordpress)
-      :text
+      :markdown
         <title><?php bloginfo('name'); ?> <?php if ( is_single() ) { ?> &raquo; Blog Archive <?php } ?> <?php wp_title(); ?></title>
         <link rel="stylesheet" href="<?php bloginfo('template_url'); ?>/print.css" type="text/css" media="print" />
         <link rel="alternate" type="application/rss+xml" title="<?php bloginfo('name'); ?> RSS Feed" href="<?php bloginfo('rss2_url'); ?>" />
@@ -73,7 +73,7 @@ html(lang="en")
           br
           a(href=config.appURI + "/photos") Photos
       - if (wordpress)
-        :text
+        :markdown
           <?php get_sidebar(); ?>
     #main_content
       !{body}

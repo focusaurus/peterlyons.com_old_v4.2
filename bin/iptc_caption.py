@@ -3,8 +3,10 @@ import json
 import os
 import sys
 from StringIO import StringIO
-from iptcinfo import IPTCInfo
 from optparse import OptionParser
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../overlay/var/www/webware/peterlyons.com/lib"))
+from iptcinfo import IPTCInfo
 
 NO_IMAGE_DIR = "Image directory '%s' not found. Aborting.\n"
 IMAGE_DIR_REQUIRED = "You must specify the path to your image directory with -d or --dir.\n"
@@ -21,8 +23,10 @@ def writeJSONCaptions(options):
     photos = []
     #Suppress stupid warning output from IPTCInfo.py on Mac OS X
     realStdout = sys.stdout
-    sys.stdout = StringIO() 
-    for name in os.listdir(options.imageDir):
+    sys.stdout = StringIO()
+    names = os.listdir(options.imageDir)
+    names.sort()
+    for name in names:
         if not name.lower().endswith("-tn.jpg"):
             continue
         photo = {}

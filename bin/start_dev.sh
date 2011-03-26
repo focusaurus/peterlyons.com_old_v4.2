@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 cd "$(dirname ${0})/.."
 DIR=$(pwd)
 source "${DIR}/bin/site_conf.sh"
@@ -19,5 +19,7 @@ fi
 NODE_ENV=test coffee server.coffee &
 echo "$!" > "${PID_FILE}"
 echo "new node process started with pid $(cat ${PID_FILE})"
-sleep 1
-open -a "Google Chrome" "http://localhost:$(coffee bin/get_port.coffee)"
+if [ $(uname) == "Darwin" ]; then
+    sleep 1
+    open -a "Google Chrome" "http://localhost:$(coffee bin/get_port.coffee)"
+fi

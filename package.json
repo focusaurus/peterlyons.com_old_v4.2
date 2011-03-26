@@ -10,14 +10,12 @@
     "node": "*"
   },
   "depedencies": {
-    "coffeescript": "~1.0",
+    "coffee-script": "~1.0",
     "express": "~1.0",
-    "jade": "~0.6"
+    "jade": "~0.10",
     "jasmine-node": "~1.0",
     "jasbin": "~1.0",
     "stylus": "~0.7",
-    "zombie": "~0.9",
-    "async": "~1.8",
     "markdown-js": "*"
   }
 }

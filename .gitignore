@@ -1,3 +1,4 @@
 *~
+*.pyc
 AppServer.log
 tmp

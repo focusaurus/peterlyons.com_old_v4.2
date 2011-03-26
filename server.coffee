@@ -1,5 +1,4 @@
 _ = require './public/js/underscore.js'
-async = require 'async'
 express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'
@@ -8,11 +7,11 @@ config = require './server_config'
 
 app = express.createServer()
 app.use express.methodOverride()
-app.use express.bodyDecoder()
+app.use express.bodyParser()
 app.use app.router
 app.use(require('stylus').middleware({src: __dirname + '/public'}))
-app.use express.staticProvider(__dirname + '/public')
-app.use express.staticProvider(__dirname + '/overlay/var/www/' + config.site)
+app.use express.static(__dirname + '/public')
+app.use express.static(__dirname + '/overlay/var/www/' + config.site)
 app.set 'view engine', 'jade'
 app.set 'views', __dirname + '/app/templates'
 
@@ -100,4 +99,7 @@ app.get '/app/photos', (req, res)->
       res.render 'photos', {locals: locals}
 
 console.log "#{config.site} server starting on port #{config.port}"
-app.listen config.port
+app.configure 'production', ()->
+  app.listen config.port, '127.0.0.1'
+app.configure 'test', ()->
+  app.listen config.port
