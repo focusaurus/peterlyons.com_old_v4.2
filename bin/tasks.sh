@@ -7,14 +7,18 @@ TASK_SCRIPT="${0}"
 ########## Define Environments ##########
 STAGING_HOSTS="10.11.12.104"
 PRODUCTION_HOSTS="peterlyons.com"
-
+REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com"
+BRANCH="node_express_coffeescript"
+PROJECT_DIR=~/projects/peterlyons.com
+NODE_VERSION="0.4.3"
 ########## No-Op Test Tasks for sudo, root, and normal user ##########
 test:uptime() {
-    uptime   
+    uptime
 }
 
 test:uptime_sudo() { #TASK: sudo
     uptime
+    id
 }
 ########## OS Section ##########
 #Wrapper function for getting everything in the OS bootstrapped
@@ -124,7 +128,7 @@ kill_stale() {
             kill "${PID}"
             rm "${PID_FILE}"
         fi
-    fi 
+    fi
 }
 
 list_templates() {
@@ -132,6 +136,42 @@ list_templates() {
         | sed -e /layout/d | sed -e /photos/d
 }
 
+
+app:initial_setup() {
+    #app:clone
+    app:prereqs
+}
+
+app:clone() {
+    PARENT="$(dirname ${PROJECT_DIR})"
+    [ -d "${PARENT}" ] || mkdir -p "${PARENT}"
+    cd "${PARENT}"
+    git clone "${REPO_URL}"
+    cd "${PROJECT_DIR}"
+    git checkout "${BRANCH}"
+    cd
+}
+
+
+app:prereqs() {
+    cd "${PROJECT_DIR}"
+    [ -d tmp ] || mkdir tmp
+    cd tmp
+    #echo "Installing node.js version ${NODE_VERSION}"
+    #curl --silent --remote-name \
+    #    "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
+    #tar xzf node-v${NODE_VERSION}.tar.gz
+    #cd node-v${NODE_VERSION}
+    #./configure --without-ssl --prefix=~/node && make && make install && make && make install
+    cd ..
+    #rm -rf node-*
+    #echo "Installing npm"
+    #curl http://npmjs.org/install.sh | /usr/bin/env PATH=~/node/bin:$PATH sh || exit 4
+    for DEP in $(python "./bin/get_prereqs.py")
+    do
+        npm install "${DEP}" || exit 5
+    done
+}
 app:start() {
     kill_stale
     NODE_ENV=test coffee server.coffee &
@@ -140,7 +180,7 @@ app:start() {
     if [ $(uname) == "Darwin" ]; then
         sleep 1
         open -a "Google Chrome" "http://localhost:$(coffee bin/get_port.coffee)"
-    fi   
+    fi
 }
 
 app:stop() {
@@ -158,16 +198,7 @@ app:build_static() {
         if [ ${EXIT_CODE} -ne 0 ]; then
             echo "FAILED to retrieve ${URL}"
             exit ${EXIT_CODE}
-        fi 
-    done
-}
-
-app:prereqs() {
-    #TODO node.js install
-    #TODO npm install
-    for DEP in $(python "${DIR}/bin/get_prereqs.py")
-    do
-        npm install "${DEP}" || exit 5
+        fi
     done
 }
 
@@ -181,7 +212,7 @@ if ! expr "${1}" : '.*:' > /dev/null; then
         staging)
             HOSTS="${STAGING_HOSTS}"
         ;;
-            
+
         production)
             HOSTS="${PRODUCTION_HOSTS}"
         ;;
@@ -201,6 +232,11 @@ case "${OP}" in
     ;;
 esac
 
+#figure out sudo
+if egrep "^${OP}\(\).*#TASK:\s*sudo" "${TASK_SCRIPT}" > /dev/null; then
+    SUDO=sudo
+fi
+
 if [ -z "${ENV_NAME}" ]; then
     #local mode
     eval "${OP}" "${@}"
@@ -208,7 +244,8 @@ else
     #remote mode
     for HOST in ${HOSTS}
     do
+        echo "Running task ${OP} on ${HOST} as ${SUDO-$USER}"
         scp "${TASK_SCRIPT}" "${HOST}:/tmp"
-        ssh "${HOST}" bash "/tmp/$(basename ${TASK_SCRIPT})" "${OP}" "${@}"
+        ssh -t "${HOST}" "${SUDO}" bash  "/tmp/$(basename ${TASK_SCRIPT})" "${OP}" "${@}"
     done
 fi
