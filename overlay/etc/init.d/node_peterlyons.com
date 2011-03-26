@@ -12,7 +12,7 @@
 PATH=/home/plyons/node/bin:/sbin:/bin:/usr/sbin:/usr/bin
 NAME=node_peterlyons.com
 PID=/var/run/node_peterlyons.com.pid
-DAEMON_OPTS="PATH=/home/plyons/node/bin:/usr/bin coffee server.coffee"
+DAEMON_OPTS="PATH=/home/plyons/node/bin:/usr/bin NODE_ENV=production /home/plyons/node/bin/coffee server.coffee"
 PROJECT_DIR=/home/plyons/projects/peterlyons.com
 
 test -x /usr/bin/env || exit 0
@@ -20,14 +20,15 @@ test -x /usr/bin/env || exit 0
 set -e
 
 start() {
-    echo "Starting $NAME: "
+    echo -n "Starting $NAME: "
     start-stop-daemon --start --pidfile $PID --make-pidfile --user www-data \
-    --group www-data --chdir ${PROJECT_DIR} --background --exec /usr/bin/env -- $DAEMON_OPTS
+        --group www-data --chdir ${PROJECT_DIR} --background \
+        --exec /usr/bin/env -- $DAEMON_OPTS
     echo "done."
 }
 
 stop() {
-   echo "Stopping $NAME: "
+   echo -n "Stopping $NAME: "
     start-stop-daemon --stop  --pidfile $PID --retry 5
     rm -f $PID
     echo "done."

@@ -1,4 +1,4 @@
-_ = require './public/js/underscore.js'
+_ = require './overlay/var/www/peterlyons.com/js/underscore.js'
 express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'
@@ -10,7 +10,7 @@ app.use express.methodOverride()
 app.use express.bodyParser()
 app.use app.router
 app.use(require('stylus').middleware({src: __dirname + '/public'}))
-app.use express.static(__dirname + '/public')
+#app.use express.static(__dirname + '/public')
 app.use express.static(__dirname + '/overlay/var/www/' + config.site)
 app.set 'view engine', 'jade'
 app.set 'views', __dirname + '/app/templates'
