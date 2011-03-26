@@ -3,7 +3,7 @@
 #DIR=$(pwd)
 #source "${DIR}/bin/site_conf.sh"
 TASK_SCRIPT="${0}"
-
+export PATH=~/node/bin:$PATH
 ########## Define Environments ##########
 STAGING_HOSTS="10.11.12.104"
 PRODUCTION_HOSTS="peterlyons.com"
@@ -166,7 +166,7 @@ app:prereqs() {
     cd ..
     #rm -rf node-*
     #echo "Installing npm"
-    #curl http://npmjs.org/install.sh | /usr/bin/env PATH=~/node/bin:$PATH sh || exit 4
+    #curl http://npmjs.org/install.sh | sh || exit 4
     for DEP in $(python "./bin/get_prereqs.py")
     do
         npm install "${DEP}" || exit 5
