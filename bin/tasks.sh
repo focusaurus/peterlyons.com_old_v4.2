@@ -131,8 +131,13 @@ kill_stale() {
     fi
 }
 
+cdpd() {
+    cd "${PROJECT_DIR}"
+}
+
 list_templates() {
-    ls ${WORK}/app/templates/*.jade | xargs -n 1 basename | sed -e s/\.jade// \
+    cdpd
+    ls app/templates/*.jade | xargs -n 1 basename | sed -e s/\.jade// \
         | sed -e /layout/d | sed -e /photos/d
 }
 
@@ -173,6 +178,7 @@ app:prereqs() {
     done
 }
 app:start() {
+    cdpd
     kill_stale
     NODE_ENV=test coffee server.coffee &
     echo "$!" > "${PID_FILE}"
@@ -184,6 +190,7 @@ app:start() {
 }
 
 app:stop() {
+    cdpd
     kill_stale
 }
 
