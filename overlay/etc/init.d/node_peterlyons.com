@@ -9,10 +9,11 @@
 # Short-Description: starts node.js application server
 # Description:       starts node.js application server using start-stop-daemon
 ### END INIT INFO
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
+PATH=/home/plyons/node/bin:/sbin:/bin:/usr/sbin:/usr/bin
 NAME=node_peterlyons.com
 PID=/var/run/node_peterlyons.com.pid
-DAEMON_OPTS="PATH=/usr/bin coffee server.coffee"
+DAEMON_OPTS="PATH=/home/plyons/node/bin:/usr/bin coffee server.coffee"
+PROJECT_DIR=/home/plyons/projects/peterlyons.com
 
 test -x /usr/bin/env || exit 0
 
@@ -21,7 +22,7 @@ set -e
 start() {
     echo "Starting $NAME: "
     start-stop-daemon --start --pidfile $PID --make-pidfile --user www-data \
-        --group www-data --background --exec /usr/bin/env -- $DAEMON_OPTS
+    --group www-data --chdir ${PROJECT_DIR} --background --exec /usr/bin/env -- $DAEMON_OPTS
     echo "done."
 }
 
