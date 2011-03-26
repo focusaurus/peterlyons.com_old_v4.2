@@ -65,7 +65,7 @@ route = (page) ->
 
 route page for page in pages
 
-app.get '/app/photos', (req, res)->
+app.get '/photos', (req, res)->
   locals.title = "Photo Gallery"
   conf = config.photos
   fs.readdir conf.galleryDir, (err, names)->

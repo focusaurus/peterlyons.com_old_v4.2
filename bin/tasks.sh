@@ -3,14 +3,14 @@ TASK_SCRIPT="${0}"
 export PATH=~/node/bin:$PATH
 
 ########## Define Environments ##########
+SITE="peterlyons.com"
+PRODUCTION_HOSTS="peterlyons.com"
+STAGING_HOSTS="10.11.12.104"
+REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com"
 BRANCH="node_express_coffeescript"
 NODE_VERSION="0.4.3"
-OVERLAY="${PROJECT_DIR}/overlay"
-PRODUCTION_HOSTS="peterlyons.com"
 PROJECT_DIR=~/projects/peterlyons.com
-REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com"
-SITE="peterlyons.com"
-STAGING_HOSTS="10.11.12.104"
+OVERLAY="${PROJECT_DIR}/overlay"
 
 ########## No-Op Test Tasks for sudo, root, and normal user ##########
 test:uptime() {
@@ -55,16 +55,23 @@ git-core
 libssl-dev
 #Needed to build node.js
 make
+#For monitoring
+monit
+#For Wordpress blog
+mysql-server
+mysql-client
 #Needed for get_prereqs (will normally always be available on Ubuntu anyway)
 python
 #This is our web server
 nginx
+#For Wordpress blog
+php5-cgi
 EOF
 }
 
-os:init_scripts() {
-    rm /etc/nginx/sites-enabled/default
-    link "/etc/ngink/sites-enabled/${SITE}"
+os:init_scripts() { #TASK: sudo
+    [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
+    link "/etc/nginx/sites-enabled/${SITE}"
     link "/etc/monit/conf.d/php5-cgi_${SITE}.monitrc"
     link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
     link "/etc/monit/conf.d/node_${SITE}.monitrc"
