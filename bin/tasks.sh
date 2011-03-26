@@ -60,6 +60,8 @@ monit
 #For Wordpress blog
 mysql-server
 mysql-client
+#We use perl in the tasks.sh script for quick command line file editing
+perl
 #Needed for get_prereqs (will normally always be available on Ubuntu anyway)
 python
 #This is our web server
@@ -72,6 +74,17 @@ EOF
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
+    #This can be a little confusing. When running remotely, you have to
+    #pass staging as the last argument as well since the script reads
+    #"tasks.sh staging os:init_scripts" as
+    #"copy yourself to staging and then run os:init_scripts"
+    #but we also want the script to know that it's in the staging environment
+    #when it is executed remotely, so we can tweak things as necessary
+    #thus you must run
+    #tasks.sh staging os:init_scripts staging
+    if [ "${1}" == "staging" ]; then
+        perl -pi -e "s/server_name.*/server_name staging.${SITE};/" "${OVERLAY}/etc/nginx/sites-available/${SITE}"
+    fi
     link "/etc/monit/conf.d/php5-cgi_${SITE}.monitrc"
     link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
     link "/etc/monit/conf.d/node_${SITE}.monitrc"
@@ -82,6 +95,7 @@ os:init_scripts() { #TASK: sudo
     cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
     update-rc.d "node_${SITE}" defaults
     update-rc.d "php5-cgi_${SITE}" defaults
+    /etc/init.d/nginx reload
 }
 
 ########## User Section ##########
