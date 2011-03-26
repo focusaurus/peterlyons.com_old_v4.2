@@ -1,0 +1,7 @@
+#node.js app server for peterlyons.com (photo gallery and basic templates)
+check process "node_peterlyons.com"
+    with pidfile "/home/plyons/projects/peterlyons.com/tmp/server.pid"
+    start = "/usr/bin/service node_peterlyons.com start"
+    stop = "/usr/bin/service node_peterlyons.com stop"
+    if failed port 9400 protocol http then restart
+    if 5 restarts within 5 cycles then timeout

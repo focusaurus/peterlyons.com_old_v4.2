@@ -5,12 +5,12 @@ server {
     error_log /var/log/nginx/peterlyons.com.error.log;
 
     location / {
-        root /var/www/peterlyons.com;
-        index index.php index.html;
+        root /home/plyons/projects/peterlyons.com/overlay/var/www/peterlyons.com;
+        index index.php index.html home.html;
         # this serves static files that exist without running other rewrite tests
         if (-f $request_filename) {
             expires 30d;
-            #break;
+            break;
         }
         # this sends all non-existing file or directory requests to index.php
         if (!-e $request_filename) {
@@ -27,18 +27,12 @@ server {
 
     location /app/ {
         rewrite /app(.*) $1 break;
-        proxy_pass http://localhost:9100;
+        proxy_pass http://localhost:9400;
     }
     
     error_page 404 /error404.html;
 
     error_page 502 /error502.html;
-    # redirect server error pages to the static page /50x.html
-    #
-    #error_page 500 502 503 504 /50x.html;
-    #location = /50x.html {
-    #    root /var/www/nginx-default;
-    #}
 
     # pass the PHP scripts to FastCGI server
     location ~ \.php$ {

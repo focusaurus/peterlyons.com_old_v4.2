@@ -55,6 +55,8 @@ page 'smartears', 'SmartEars: Ear Training Software'
 page 'oberlin', 'Music from Oberlin'
 page 'code_conventions', 'Code Conventions'
 page 'favorites', 'Favorite Musicians'
+page 'error404', 'Not Found'
+page 'error502', 'Oops'
 
 route = (page) ->
   app.get '/' + page.URI, (req, res)->

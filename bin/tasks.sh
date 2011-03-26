@@ -1,16 +1,17 @@
 #!/bin/bash
-#cd "$(dirname ${0})/.."
-#DIR=$(pwd)
-#source "${DIR}/bin/site_conf.sh"
 TASK_SCRIPT="${0}"
 export PATH=~/node/bin:$PATH
+
 ########## Define Environments ##########
-STAGING_HOSTS="10.11.12.104"
-PRODUCTION_HOSTS="peterlyons.com"
-REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com"
 BRANCH="node_express_coffeescript"
-PROJECT_DIR=~/projects/peterlyons.com
 NODE_VERSION="0.4.3"
+OVERLAY="${PROJECT_DIR}/overlay"
+PRODUCTION_HOSTS="peterlyons.com"
+PROJECT_DIR=~/projects/peterlyons.com
+REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com"
+SITE="peterlyons.com"
+STAGING_HOSTS="10.11.12.104"
+
 ########## No-Op Test Tasks for sudo, root, and normal user ##########
 test:uptime() {
     uptime
@@ -21,6 +22,12 @@ test:uptime_sudo() { #TASK: sudo
     id
 }
 ########## OS Section ##########
+link() {
+    if [ ! -h "${1}" ]; then
+        ln -s "${OVERLAY}${1}" "${1}"
+    fi
+}
+
 #Wrapper function for getting everything in the OS bootstrapped
 os:initial_setup() { #TASK:sudo
     os:prereqs
@@ -44,6 +51,8 @@ curl
 g++
 #Source Code Management
 git-core
+#Needed to build node.js with SSL support
+libssl-dev
 #Needed to build node.js
 make
 #Needed for get_prereqs (will normally always be available on Ubuntu anyway)
@@ -53,7 +62,20 @@ nginx
 EOF
 }
 
-
+os:init_scripts() {
+    rm /etc/nginx/sites-enabled/default
+    link "/etc/ngink/sites-enabled/${SITE}"
+    link "/etc/monit/conf.d/php5-cgi_${SITE}.monitrc"
+    link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
+    link "/etc/monit/conf.d/node_${SITE}.monitrc"
+    link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
+    link "/etc/init.d/php5-cgi_${SITE}"
+    link "/etc/init.d/node_${SITE}"
+    cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
+    cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
+    update-rc.d "node_${SITE}" defaults
+    update-rc.d "php5-cgi_${SITE}" defaults
+}
 
 ########## User Section ##########
 #Wrapper function
@@ -67,12 +89,11 @@ user:initial_setup() {
 #and the end user's authentication will be proxied from the end user's
 #desktop to the app server through to the git SCM host
 user:ssh_config() {
-    if [ ! -d ~/.ssh ]; then
-        mkdir ~/.ssh
-    fi
+    KEYS=~/.ssh/authorized_keys2
+    [ ! -d ~/.ssh ] || mkdir ~/.ssh
     #This is plyons's public SSH key
-    if ! grep "^ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEArdBAo5y" ~/.ssh/authorized_keys > /dev/null 2>&1; then
-        cat <<EOF | tr -d '\n' >> ~/.ssh/authorized_keys
+    if ! grep "^ssh-rsa AAAAB3NzaC1yc2EAAAABI" "${KEYS}" > /dev/null 2>&1; then
+        cat <<EOF | tr -d '\n' >> "${KEYS}"
 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEArdBAo5yfb43w5/N3nxQvpDH6tCIvwvsJu/FrvRFiM8
 +s/lGP0XxihzHYOJH/IdEz+WnjnKMBCWT/we3ZbWMFQ32yMzXAj2B+noaranIOLJ7C52uZrWoS2OOO
 qWtwuj4jZLZ9v7cLvxC9v69b8dqyBOJG3YlIzqFQeYT7p4I1XWDRfwhsuX738zhvBYSx4w3tkZDmEp
@@ -81,7 +102,7 @@ sSl0+xNVjugBjNP81ynP3nUkeH+Ap2IUrJK5RnGpLXg+EX1DpPypXvn67SpHvz0+DgQuKwL+AYQdFS
 == zoot MacBook pro
 EOF
     #Need a trailing newline
-    echo >> ~/.ssh/authorized_keys
+    echo >> "${KEYS}"
     fi
     if ! grep "^Host git.peterlyons.com" ~/.ssh/config > /dev/null 2>&1; then
         cat <<EOF>> ~/.ssh/config
@@ -162,14 +183,15 @@ app:prereqs() {
     cd "${PROJECT_DIR}"
     [ -d tmp ] || mkdir tmp
     cd tmp
-    #echo "Installing node.js version ${NODE_VERSION}"
-    #curl --silent --remote-name \
-    #    "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
-    #tar xzf node-v${NODE_VERSION}.tar.gz
-    #cd node-v${NODE_VERSION}
-    #./configure --without-ssl --prefix=~/node && make && make install && make && make install
+    echo "Installing node.js version ${NODE_VERSION}"
+    curl --silent --remote-name \
+        "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
+    tar xzf node-v${NODE_VERSION}.tar.gz
+    cd node-v${NODE_VERSION}
+    ./configure  --prefix=~/node && make && make install && make && make install
     cd ..
-    #rm -rf node-*
+    rm -rf node-*
+    cd ..
     #echo "Installing npm"
     #curl http://npmjs.org/install.sh | sh || exit 4
     for DEP in $(python "./bin/get_prereqs.py")
@@ -180,7 +202,7 @@ app:prereqs() {
 app:start() {
     cdpd
     kill_stale
-    NODE_ENV=test coffee server.coffee &
+    NODE_ENV=${1-test} coffee server.coffee &
     echo "$!" > "${PID_FILE}"
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then
@@ -201,7 +223,8 @@ app:build_static() {
         URL="${DEVURL}/${URI}"
         echo -n "${URI}, "
         EXIT_CODE=0
-        curl --silent "${URL}" --output "${WORK}/${STATIC}/${URI}.html" || EXIT_CODE=$?
+        curl --silent "${URL}" --output \
+            "${WORK}/${STATIC}/${URI}.html" || EXIT_CODE=$?
         if [ ${EXIT_CODE} -ne 0 ]; then
             echo "FAILED to retrieve ${URL}"
             exit ${EXIT_CODE}
@@ -253,6 +276,7 @@ else
     do
         echo "Running task ${OP} on ${HOST} as ${SUDO-$USER}"
         scp "${TASK_SCRIPT}" "${HOST}:/tmp"
-        ssh -t "${HOST}" "${SUDO}" bash  "/tmp/$(basename ${TASK_SCRIPT})" "${OP}" "${@}"
+        ssh -t "${HOST}" "${SUDO}" bash  \
+            "/tmp/$(basename ${TASK_SCRIPT})" "${OP}" "${@}"
     done
 fi
