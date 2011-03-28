@@ -29,8 +29,8 @@ SITE="peterlyons.com"
 PRODUCTION_HOSTS="${SITE}"
 STAGING_HOSTS="staging.${SITE}"
 DEVURL="http://localhost:9400"
-REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com"
-BRANCH="node_express_coffeescript"
+REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com.git"
+BRANCH="master"
 NODE_VERSION="0.4.3"
 PROJECT_DIR=~/projects/peterlyons.com
 OVERLAY="${PROJECT_DIR}/overlay"
@@ -248,11 +248,15 @@ app:prereqs() {
     echo "Installing npm"
     #Yes, I know this is a security risk.  I accept the risk. Life is short.
     curl http://npmjs.org/install.sh | sh || exit 4
+    echo "Installing npm packages"
     for DEP in $(python "./bin/get_prereqs.py")
     do
         npm install "${DEP}" || exit 5
     done
+    echo "Here are the installed npm packages"
+    npm list installed
 }
+
 app:start() {
     cdpd
     kill_stale
