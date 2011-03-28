@@ -1,16 +1,33 @@
 #!/bin/bash
+#This script contains many install/deploy/run related tasks
+#The tasks are defined as shell functions and prefixed with a namespace
+#which is one of os, app, web, user, etc.
+#The goal is that once you figure out how to clone the git repository,
+#You can use this script to get a dev, staging, or production environment
+#up and running.  The script doesn't do 100% automation yet but it does a lot.
+#You run it like this:
+#tasks.sh staging app:start
+#where "staging" is the environment name (defined below) and app:start is the
+#task name.
+#The script can be run locally in which case the task's shell function is just
+#directly executed, or against one or more remote hosts, in which case
+#this script handles copying itself to the remote hosts then running itself
+#on each host.
+
 TASK_SCRIPT="${0}"
 export PATH=~/node/bin:$PATH
 
 ########## Define Environments ##########
 SITE="peterlyons.com"
-PRODUCTION_HOSTS="peterlyons.com"
-STAGING_HOSTS="10.11.12.104"
+PRODUCTION_HOSTS="${SITE}"
+STAGING_HOSTS="staging.${SITE}"
+DEVURL="http://localhost:9400"
 REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com"
 BRANCH="node_express_coffeescript"
 NODE_VERSION="0.4.3"
 PROJECT_DIR=~/projects/peterlyons.com
 OVERLAY="${PROJECT_DIR}/overlay"
+PUBLIC="${OVERLAY}/var/www/${SITE}"
 
 ########## No-Op Test Tasks for sudo, root, and normal user ##########
 test:uptime() {
@@ -29,7 +46,7 @@ link() {
 }
 
 #Wrapper function for getting everything in the OS bootstrapped
-os:initial_setup() { #TASK:sudo
+os:initial_setup() { #TASK: sudo
     os:prereqs
 }
 
@@ -37,7 +54,7 @@ os:initial_setup() { #TASK:sudo
 #These are the packages we need above and beyond the basic Ubuntu 10.10
 #server default install.  There are prereqs included in that default config
 #that we don't explicitly restate here (openssh-server, etc)
-os:prereqs() { #TASK:sudo
+os:prereqs() { #TASK: sudo
     if ! which apt-get >/dev/null; then
         echo "apt-get not found in PATH.  Is this really an Ubuntu box?" \
             " Is your PATH correct?" 1>&2
@@ -245,12 +262,16 @@ app:build_static() {
         echo -n "${URI}, "
         EXIT_CODE=0
         curl --silent "${URL}" --output \
-            "${WORK}/${STATIC}/${URI}.html" || EXIT_CODE=$?
+            "${PUBLIC}/${URI}.html" || EXIT_CODE=$?
         if [ ${EXIT_CODE} -ne 0 ]; then
             echo "FAILED to retrieve ${URL}"
             exit ${EXIT_CODE}
         fi
     done
+    echo "header_boilerplate.php"
+    curl --silent "${DEVURL}/home?wordpress=1" | \
+        sed '/WORDPRESS HEADER BOILERPLATE/d' > \
+        "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
 }
 
 
@@ -284,7 +305,7 @@ case "${OP}" in
 esac
 
 #figure out sudo
-if egrep "^${OP}\(\).*#TASK:\s*sudo" "${TASK_SCRIPT}" > /dev/null; then
+if egrep "^${OP}\(\).*#TASK: sudo" "${TASK_SCRIPT}" > /dev/null; then
     SUDO=sudo
 fi
 

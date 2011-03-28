@@ -9,27 +9,13 @@ app = express.createServer()
 app.use express.methodOverride()
 app.use express.bodyParser()
 app.use app.router
-app.use(require('stylus').middleware({src: __dirname + '/public'}))
+#app.use(require('stylus').middleware({src: config.staticDir}))
 #app.use express.static(__dirname + '/public')
-app.use express.static(__dirname + '/overlay/var/www/' + config.site)
+app.use express.static(config.staticDir)
 app.set 'view engine', 'jade'
 app.set 'views', __dirname + '/app/templates'
 
-locals =
-  config: config
-  navLinks: []
-  title: ""
-
-locals.navLinks.push({uri: "/home.html", label: "Home"})
-locals.navLinks.push({uri: "/problog", label: "Blog (Technology)"})
-locals.navLinks.push({uri: "/persblog", label: "Blog (Personal)"})
-locals.navLinks.push({uri: "#{config.photos.galleryURI}", label: "Photo Gallery"})
-locals.navLinks.push({uri: "/oberlin.html", label: "Sounds from Oberlin"})
-locals.navLinks.push({uri: "/code_conventions.html", label: "Code Conventions"})
-locals.navLinks.push({uri: "/smartears.html", label: "SmartEars"})
-locals.navLinks.push({uri: "/bigclock.html", label: "BigClock"})
-locals.wordpress = false
-
+partials = {}
 #This pre-loads all included partials
 fs.readdir app.set('views'), (err, names) ->
   if err
@@ -40,11 +26,12 @@ fs.readdir app.set('views'), (err, names) ->
       fs.readFile app.set('views') + "/" + name, (err, data) ->
         if err
           throw err
-        locals[key] = data.toString()
-        console.log "Stored data in key #{key}: #{locals[key].slice(0, 20)}..."
+        partials[key] = data.toString()
+        console.log "Stored data in key #{key}: #{partials[key].slice(0, 20)}..."
 pages = []
 page = (URI, title)->
-  pages.push {URI: URI, title: title, staticURI: URI + ".html"}
+  pages.push {URI: URI, title: title}
+page '', 'Peter Lyons: Web Development, Startups, Music'
 page 'home', 'Peter Lyons: Web Development, Startups, Music'
 page 'bands', 'My Bands'
 page 'bigclock', 'BigClock: a full screen desktop clock in java'
@@ -60,13 +47,21 @@ page 'error502', 'Oops'
 
 route = (page) ->
   app.get '/' + page.URI, (req, res)->
-    locals.title = page.title
-    res.render page.URI, {locals: locals}
+    locals =
+      config: config
+      title: page.title
+      partials: partials
+      wordpress: req.param 'wordpress'
+    res.render page.URI or "home", {locals: locals}
 
 route page for page in pages
 
 app.get '/photos', (req, res)->
-  locals.title = "Photo Gallery"
+  locals =
+    config: config
+    title: "Photo Gallery"
+    partials: partials
+    wordpress: false
   conf = config.photos
   fs.readdir conf.galleryDir, (err, names)->
     throw err if err
@@ -98,6 +93,7 @@ app.get '/photos', (req, res)->
       locals.photo = locals.photos[index]
       locals.photo.next = locals.photos[index + 1] or locals.photos[0]
       locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
+      #TODO set locals.title to something that includes the photo name
       res.render 'photos', {locals: locals}
 
 console.log "#{config.site} server starting on port #{config.port}"
