@@ -5,7 +5,8 @@ import sys
 from StringIO import StringIO
 from optparse import OptionParser
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../overlay/var/www/webware/peterlyons.com/lib"))
+#We need to be able to import the iptcinfo.py module
+sys.path.insert(0, os.path.dirname(__file__))
 from iptcinfo import IPTCInfo
 
 NO_IMAGE_DIR = "Image directory '%s' not found. Aborting.\n"
