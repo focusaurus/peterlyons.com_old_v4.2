@@ -37,6 +37,7 @@ OVERLAY="${PROJECT_DIR}/overlay"
 PUBLIC="${OVERLAY}/var/www/${SITE}"
 
 ########## No-Op Test Tasks for sudo, root, and normal user ##########
+#Use these to make sure your passwordless ssh is working, hosts are correct, etc
 test:uptime() {
     uptime
 }
@@ -208,8 +209,10 @@ cdpd() {
 
 list_templates() {
     cdpd
+    #We skip layout because it's just the layout and photos because
+    #it's a dynamic page
     ls app/templates/*.jade | xargs -n 1 basename | sed -e s/\.jade// \
-        | sed -e /layout/d | sed -e /photos/d
+        -e /layout/d -e /photos/d
 }
 
 
