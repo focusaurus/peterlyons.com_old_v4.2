@@ -1,2 +1,4 @@
-AppServer.log
 *~
+*.pyc
+AppServer.log
+tmp
