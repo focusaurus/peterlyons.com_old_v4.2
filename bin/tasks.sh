@@ -14,6 +14,13 @@
 #this script handles copying itself to the remote hosts then running itself
 #on each host.
 
+#Too bootstrap a new staging host, you would run
+#tasks.sh staging os:initial_setup
+#tasks.sh staging user:initial_setup
+#tasks.sh staging app:initial_setup
+#tasks.sh staging os:init_scripts
+#Then on the host run "sudo service node_peterlyons.com start" to start the app
+
 TASK_SCRIPT="${0}"
 export PATH=~/node/bin:$PATH
 
@@ -39,12 +46,6 @@ test:uptime_sudo() { #TASK: sudo
     id
 }
 ########## OS Section ##########
-link() {
-    if [ ! -h "${1}" ]; then
-        ln -s "${OVERLAY}${1}" "${1}"
-    fi
-}
-
 #Wrapper function for getting everything in the OS bootstrapped
 os:initial_setup() { #TASK: sudo
     os:prereqs
@@ -88,18 +89,27 @@ php5-cgi
 EOF
 }
 
+#Helper function for symlinking files in the git work area out into the OS
+link() {
+    if [ ! -h "${1}" ]; then
+        ln -s "${OVERLAY}${1}" "${1}"
+    fi
+}
+
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
-    #This can be a little confusing. When running remotely, you have to
-    #pass staging as the last argument as well since the script reads
-    #"tasks.sh staging os:init_scripts" as
-    #"copy yourself to staging and then run os:init_scripts"
-    #but we also want the script to know that it's in the staging environment
+    #This can be a little confusing. When running remotely, 
+    #If you ever wanted to do this on production,
+    #you have to pass "production" as the last argument as well
+    #since the script reads
+    #"tasks.sh production os:init_scripts" as
+    #"copy yourself to production and then run os:init_scripts"
+    #but we also want the script to know that it's in the production environment
     #when it is executed remotely, so we can tweak things as necessary
     #thus you must run
-    #tasks.sh staging os:init_scripts staging
-    if [ "${1}" == "staging" ]; then
+    #tasks.sh production os:init_scripts production
+    if [ "${1}" != "production" ]; then
         perl -pi -e "s/server_name.*/server_name staging.${SITE};/" "${OVERLAY}/etc/nginx/sites-available/${SITE}"
     fi
     link "/etc/monit/conf.d/php5-cgi_${SITE}.monitrc"
@@ -128,7 +138,8 @@ user:initial_setup() {
 #desktop to the app server through to the git SCM host
 user:ssh_config() {
     KEYS=~/.ssh/authorized_keys2
-    [ ! -d ~/.ssh ] || mkdir ~/.ssh
+    [ -d ~/.ssh ] || mkdir ~/.ssh
+    touch "${KEYS}"
     #This is plyons's public SSH key
     if ! grep "^ssh-rsa AAAAB3NzaC1yc2EAAAABI" "${KEYS}" > /dev/null 2>&1; then
         cat <<EOF | tr -d '\n' >> "${KEYS}"
@@ -142,6 +153,7 @@ EOF
     #Need a trailing newline
     echo >> "${KEYS}"
     fi
+    touch ~/.ssh/config
     if ! grep "^Host git.peterlyons.com" ~/.ssh/config > /dev/null 2>&1; then
         cat <<EOF>> ~/.ssh/config
 Host git.peterlyons.com
@@ -202,7 +214,7 @@ list_templates() {
 
 
 app:initial_setup() {
-    #app:clone
+    app:clone
     app:prereqs
 }
 
@@ -230,8 +242,9 @@ app:prereqs() {
     cd ..
     rm -rf node-*
     cd ..
-    #echo "Installing npm"
-    #curl http://npmjs.org/install.sh | sh || exit 4
+    echo "Installing npm"
+    #Yes, I know this is a security risk.  I accept the risk. Life is short.
+    curl http://npmjs.org/install.sh | sh || exit 4
     for DEP in $(python "./bin/get_prereqs.py")
     do
         npm install "${DEP}" || exit 5
