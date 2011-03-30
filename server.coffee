@@ -98,7 +98,7 @@ app.get '/photos', (req, res)->
       res.render 'photos', {locals: locals}
 
 console.log "#{config.site} server starting on port #{config.port}"
-app.configure 'production', ()->
+if 'production' == process.env.NODE_ENV
   app.listen config.port, '127.0.0.1'
-app.configure 'test', ()->
+else
   app.listen config.port

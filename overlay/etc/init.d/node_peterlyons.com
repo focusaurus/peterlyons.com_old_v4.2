@@ -21,8 +21,8 @@ set -e
 
 start() {
     echo -n "Starting $NAME: "
-    start-stop-daemon --start --pidfile $PID --make-pidfile --user www-data \
-        --group www-data --chdir ${PROJECT_DIR} --background \
+    start-stop-daemon --start --pidfile $PID --make-pidfile \
+        --chuid www-data:www-data --chdir ${PROJECT_DIR} --background \
         --exec /usr/bin/env -- $DAEMON_OPTS
     echo "done."
 }
