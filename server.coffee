@@ -56,7 +56,7 @@ route = (page) ->
 
 route page for page in pages
 
-app.get '/photos', (req, res)->
+renderPhotos = (req, res)->
   locals =
     config: config
     title: "Photo Gallery"
@@ -67,6 +67,7 @@ app.get '/photos', (req, res)->
     throw err if err
     #Stupid Mac OS X polluting the user space filesystem
     locals.galleries = _.without(names, '.DS_Store')
+    locals.galleries.sort()
     locals.gallery = conf.defaultGallery
     galleryParam = req.param 'gallery'
     if _.contains locals.galleries, galleryParam
@@ -96,8 +97,14 @@ app.get '/photos', (req, res)->
       #TODO set locals.title to something that includes the photo name
       res.render 'photos', {locals: locals}
 
+app.get '/photos', renderPhotos
+if process.env.NODE_ENV not in ['production', 'staging']
+  #No nginx rewrites in the dev environment, so make this URI also work
+  app.get '/app/photos', renderPhotos
+
 console.log "#{config.site} server starting on port #{config.port}"
-if 'production' == process.env.NODE_ENV
+if process.env.NODE_ENV in ['production', 'staging']
   app.listen config.port, '127.0.0.1'
 else
+  #Listen on all IPs in dev/test (for testing from other machines)
   app.listen config.port
