@@ -67,6 +67,7 @@ app.get '/photos', (req, res)->
     throw err if err
     #Stupid Mac OS X polluting the user space filesystem
     locals.galleries = _.without(names, '.DS_Store')
+    locals.galleries.sort()
     locals.gallery = conf.defaultGallery
     galleryParam = req.param 'gallery'
     if _.contains locals.galleries, galleryParam
