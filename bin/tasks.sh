@@ -257,19 +257,26 @@ app:prereqs() {
     npm list installed
 }
 
-app:start() {
+app:deploy() {
+    cdpd
+    git checkout master
+    git pull origin master    
+    sudo service node_peterlyons.com restart
+}
+
+app:dev_start() {
     cdpd
     kill_stale
-    NODE_ENV=${1-test} coffee server.coffee &
+    NODE_ENV=${1-dev} coffee server.coffee &
     echo "$!" > "${PID_FILE}"
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then
         sleep 1
-        open -a "Google Chrome" "http://localhost:$(coffee bin/get_port.coffee)"
+        open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)"
     fi
 }
 
-app:stop() {
+app:dev_stop() {
     cdpd
     kill_stale
 }
