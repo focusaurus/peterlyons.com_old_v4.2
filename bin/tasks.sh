@@ -163,6 +163,35 @@ EOF
     fi
 }
 
+
+########## Database (mysql) section ##########
+db:prod_to_stage() {
+    #If in there future there are more than 1 production host, just use the
+    #first one in the list
+    HOST=$(echo "${PRODUCTION_HOSTS}" | cut -d " " -f 1)
+    for DB in persblog problog
+    do
+        FILE="/var/tmp/${DB}.bak.sql.bz2"
+        #This does the production backup
+        echo "Enter production password for user ${DB} and DB ${DB} when prompted"
+        ssh -q -t "${HOST}" mysqldump --host localhost \
+            --user "${DB}" --allow-keywords --add-drop-table --password \
+            --add-drop-database --dump-date "${DB}" \| bzip2 -c \
+            \> "${FILE}"
+        #Copy the backup to the local computer
+        scp -q "${HOST}:${FILE}" /var/tmp
+        #Restore the backup locally
+        echo "Enter staging password (twice) for user ${DB} and DB ${DB} when" \
+            " prompted"
+        bzcat "${FILE}" | mysql --host localhost --user "${DB}" --password "${DB}"
+        #This updates the site URL, which must be relative for staging
+        echo "update wp_options set option_value = '/${DB}' where option_name" \
+            " in ('siteurl', 'home');" | mysql -u "${DB}" -p "${DB}"
+        echo "Backup, transfer, restore, and tweak complete for ${DB}"
+    done
+
+}
+
 ########## Web (nginx) Section ##########
 _web() {
     sudo /etc/init.d/nginx "${1}"
@@ -315,7 +344,7 @@ else
 fi
 
 case "${OP}" in
-    app:*|os:*|test:*|user:*|web:*)
+    app:*|db:*|os:*|test:*|user:*|web:*)
         #Op looks valid-ish
     ;;
     *)
@@ -338,7 +367,7 @@ else
     do
         echo "Running task ${OP} on ${HOST} as ${SUDO-$USER}"
         scp "${TASK_SCRIPT}" "${HOST}:/tmp"
-        ssh -t "${HOST}" "${SUDO}" bash  \
+        ssh -q -t "${HOST}" "${SUDO}" bash  \
             "/tmp/$(basename ${TASK_SCRIPT})" "${OP}" "${@}"
     done
 fi
