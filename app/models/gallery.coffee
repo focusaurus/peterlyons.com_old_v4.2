@@ -6,7 +6,8 @@ monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', \
 exports.Gallery = class Gallery
   constructor: (@dirName, @displayName, @startDate) ->
     if not @displayName
-      @displayName = (@dirName or '').replace /_/g, ' '
+      @displayName = @dirName or ''
+      @displayName = @displayName.replace /_/g, ' '
       @displayName = @displayName.slice(0, 1).toUpperCase() + \
         @displayName.slice(1)
       match = @displayName.match dateRE

@@ -182,7 +182,7 @@ code, pre {
     padding-right: 4px;
 }
 
-/** Photo Gallery **/
+/********** Photo Gallery **********/
 .caption {
   font-size: 14pt;
 }
@@ -196,7 +196,7 @@ code, pre {
   margin-right: 4px; 
 }
 
-/** Sounds from Oberlin **/
+/********** Sounds from Oberlin **********/
 table.program {
   border-spacing: 3px;
 }
@@ -207,20 +207,25 @@ td.performers {
 }
 
 
-/** Code Conventions **/
+/********** Code Conventions **********/
 dd {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-/** Photo Admin **/
+/********** Photo Admin **********/
 input.inline {
   border: none;
   outline: none;
   background-color: #EEE;
 }
 
-/** FOOTER **/
+/********** Photo Gallery **********/
+h1.galleryTitle {
+  font-size: 20px;  
+}
+
+/********** FOOTER **********/
 #footer {
   padding-top: 30px; 
 }

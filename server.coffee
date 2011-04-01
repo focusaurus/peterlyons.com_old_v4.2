@@ -17,15 +17,15 @@ app.set 'views', __dirname + '/app/templates'
 
 partials = {}
 #This pre-loads all included partials
-fs.readdir app.set('views'), (err, names) ->
-  if err
-    throw err
+fs.readdir app.set('views'), (error, names) ->
+  if error
+    throw error
   for name in names
     if name.match /.partial$/
       key = name.split('.')[0]
-      fs.readFile app.set('views') + '/' + name, (err, data) ->
-        if err
-          throw err
+      fs.readFile app.set('views') + '/' + name, (error, data) ->
+        if error
+          throw error
         partials[key] = data.toString()
         console.log "Stored data in key #{key}: #{partials[key].slice(0, 20)}..."
 
@@ -60,31 +60,26 @@ route = (page) ->
 route page for page in pages
 
 getGalleries = (callback) ->
-  #fs.readFile config.photos.galleryDataPath, (error, data) ->
-    
-  fs.readdir config.photos.galleryDir, (err, names) ->
-    if err
-      return callback(err)
-    #Stupid Mac OS X polluting the user space filesystem
-    galleryDirNames = _.without(names, '.DS_Store')
-    galleryDirNames.sort()
-    galleries = (new gallery.Gallery(dirName) for dirName in galleryDirNames)
-    return callback(null, galleries)
+  fs.readFile config.photos.galleryDataPath, (error, data) ->
+    if error
+      return callback(error)
+    return callback(null, JSON.parse(data))
 
 renderPhotos = (req, res) ->
   locals = _.defaults({title: 'Photo Gallery'}, locals}
   conf = config.photos
-  getGalleries (err, galleries) ->
-    throw err if err
+  getGalleries (error, galleries) ->
+    throw error if error
     locals.galleries = galleries
-    locals.gallery = conf.defaultGallery
+    locals.gallery = new gallery.Gallery(conf.defaultGallery)
     galleryParam = req.param 'gallery'
-    if _.contains locals.galleries, galleryParam
-      locals.gallery = galleryParam
+    galleryNames = _.pluck galleries, 'dirName'
+    if _.contains galleryNames, galleryParam
+      locals.gallery = galleries[galleryNames.indexOf(galleryParam)]
     #Now we run iptc_caption.py to generate a list of photos with captions
     #from the filesystem
     command = ['python ./bin/iptc_caption.py --dir ',
-          "'#{conf.galleryDir}/#{locals.gallery}'"].join ''
+          "'#{conf.galleryDir}/#{locals.gallery.dirName}'"].join ''
     child_process.exec command, (error, photoJSON, stderr) ->
       if error
         console.log error
@@ -92,8 +87,8 @@ renderPhotos = (req, res) ->
         return
       locals.photos = JSON.parse(photoJSON)
       for photo in locals.photos
-        photo.fullSizeURI ="#{conf.photoURI}#{locals.gallery}/#{photo.name}#{conf.extension}"
-        photo.pageURI = "#{conf.galleryURI}?gallery=#{locals.gallery}&photo=#{photo.name}"
+        photo.fullSizeURI ="#{conf.photoURI}#{locals.gallery.dirName}/#{photo.name}#{conf.extension}"
+        photo.pageURI = "#{conf.galleryURI}?gallery=#{locals.gallery.dirName}&photo=#{photo.name}"
 
       #Figure out which photo to display full size.
       photoParam = req.param 'photo'
@@ -107,11 +102,25 @@ renderPhotos = (req, res) ->
       res.render 'photos', {locals: locals}
 
 adminGalleries = (req, res) ->
-  locals = _.defaults {title: 'Manage Photos'}, locals
-  getGalleries (err, galleries) ->
-    throw err if err
-    locals.galleries = galleries
-    res.render 'admin_galleries', {locals: locals}
+  getGalleries (error, jsonGalleries) ->
+    throw error if error
+    if req.param 'discover'
+      jsonNames = _.pluck(jsonGalleries, 'dirName')
+      fs.readdir config.photos.galleryDir, (error, names) ->
+        throw error if error
+        #Stupid Mac OS X polluting the user space filesystem
+        galleryDirNames = _.without(names, '.DS_Store')
+        #galleryDirNames.sort()
+        galleryDirNames = galleryDirNames.filter (name) ->
+           not (jsonNames.indexOf(name) >= 0)
+
+        newGalleries = (new gallery.Gallery(dirName) for dirName in galleryDirNames)
+        allGalleries = jsonGalleries.concat newGalleries
+        locals = _.defaults {title: 'Manage Photos', galleries: allGalleries}, locals
+        res.render 'admin_galleries', {locals: locals}
+    else
+      locals = _.defaults {title: 'Manage Photos', galleries: jsonGalleries}, locals
+      res.render 'admin_galleries', {locals: locals}
 
 updateGalleries = (req, res) ->
   galleries = []
@@ -120,6 +129,10 @@ updateGalleries = (req, res) ->
       continue
     dirName = key.slice('gallery_'.length)
     galleries.push(new gallery.Gallery(dirName, req.body[key]))
+
+  _.sortBy galleries, (gallery) ->
+    gallery.dirName
+
   fs.writeFile './app/data/galleries.json', JSON.stringify(galleries), (error) ->
     if error
       res.send error, 503
