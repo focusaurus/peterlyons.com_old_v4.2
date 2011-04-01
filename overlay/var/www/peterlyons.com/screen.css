@@ -213,6 +213,13 @@ dd {
   margin-bottom: 10px;
 }
 
+/** Photo Admin **/
+input.inline {
+  border: none;
+  outline: none;
+  background-color: #EEE;
+}
+
 /** FOOTER **/
 #footer {
   padding-top: 30px; 

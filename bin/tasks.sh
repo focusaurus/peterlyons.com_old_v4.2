@@ -296,12 +296,12 @@ app:deploy() {
 app:dev_start() {
     cdpd
     kill_stale
-    NODE_ENV=${1-dev} coffee server.coffee &
+    NODE_ENV=${1-dev} supervisor -p server.coffee &
     echo "$!" > "${PID_FILE}"
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then
         sleep 1
-        open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)"
+        open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)${1}"
     fi
 }
 

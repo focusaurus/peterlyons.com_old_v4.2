@@ -16,6 +16,7 @@
     'jasbin': '~1.0',
     'jasmine-node': '~1.0',
     'markdown-js': '*',
+    'node-supervisor': '*',
     'stylus': '~0.7',
     'underscore': '~1.1'
   }

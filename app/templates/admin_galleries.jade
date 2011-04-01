@@ -1,0 +1,15 @@
+h1 Manage Photos
+form#galleries(method='POST', action='/admin/galleries')
+  table.data
+    tr
+      th Display Name
+      th Directory Name
+      th Start Date
+    - each gallery in galleries
+      tr
+        td
+          input.inline(name='gallery_' + gallery.dirName,
+            value=gallery.displayName, size=gallery.displayName.length)
+        td #{gallery.dirName}
+        td #{gallery.startDate}
+  input(type='submit', value='Save')

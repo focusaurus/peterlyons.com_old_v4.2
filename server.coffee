@@ -4,6 +4,7 @@ child_process = require 'child_process'
 fs = require 'fs'
 
 config = require './server_config'
+gallery = require './app/models/gallery'
 
 app = express.createServer()
 app.use express.methodOverride()
@@ -35,7 +36,7 @@ locals =
   wordpress: false
 
 pages = []
-page = (URI, title)->
+page = (URI, title) ->
   pages.push {URI: URI, title: title}
 page '', 'Peter Lyons: Web Development, Startups, Music'
 page 'home', 'Peter Lyons: Web Development, Startups, Music'
@@ -52,25 +53,28 @@ page 'error404', 'Not Found'
 page 'error502', 'Oops'
 
 route = (page) ->
-  app.get '/' + page.URI, (req, res)->
+  app.get '/' + page.URI, (req, res) ->
     locals = _.defaults({title: page.title, wordpress: req.param 'wordpress'}, locals)
     res.render page.URI or 'home', {locals: locals}
 
 route page for page in pages
 
-getGalleries = (callback)->
-  fs.readdir config.photos.galleryDir, (err, names)->
+getGalleries = (callback) ->
+  #fs.readFile config.photos.galleryDataPath, (error, data) ->
+    
+  fs.readdir config.photos.galleryDir, (err, names) ->
     if err
       return callback(err)
     #Stupid Mac OS X polluting the user space filesystem
-    galleries = _.without(names, '.DS_Store')
-    galleries.sort()
+    galleryDirNames = _.without(names, '.DS_Store')
+    galleryDirNames.sort()
+    galleries = (new gallery.Gallery(dirName) for dirName in galleryDirNames)
     return callback(null, galleries)
 
-renderPhotos = (req, res)->
+renderPhotos = (req, res) ->
   locals = _.defaults({title: 'Photo Gallery'}, locals}
   conf = config.photos
-  getGalleries (err, galleries)->
+  getGalleries (err, galleries) ->
     throw err if err
     locals.galleries = galleries
     locals.gallery = conf.defaultGallery
@@ -81,7 +85,7 @@ renderPhotos = (req, res)->
     #from the filesystem
     command = ['python ./bin/iptc_caption.py --dir ',
           "'#{conf.galleryDir}/#{locals.gallery}'"].join ''
-    child_process.exec command, (error, photoJSON, stderr)->
+    child_process.exec command, (error, photoJSON, stderr) ->
       if error
         console.log error
         locals.photos = []
@@ -102,12 +106,25 @@ renderPhotos = (req, res)->
       #TODO set locals.title to something that includes the photo name
       res.render 'photos', {locals: locals}
 
-adminPhotos = (req, res)->
+adminGalleries = (req, res) ->
   locals = _.defaults {title: 'Manage Photos'}, locals
-  getGalleries (err, galleries)->
+  getGalleries (err, galleries) ->
     throw err if err
     locals.galleries = galleries
-    res.render 'photos_admin', {locals: locals}
+    res.render 'admin_galleries', {locals: locals}
+
+updateGalleries = (req, res) ->
+  galleries = []
+  for key of req.body
+    if key.indexOf('gallery_') != 0
+      continue
+    dirName = key.slice('gallery_'.length)
+    galleries.push(new gallery.Gallery(dirName, req.body[key]))
+  fs.writeFile './app/data/galleries.json', JSON.stringify(galleries), (error) ->
+    if error
+      res.send error, 503
+    else
+      res.redirect '/admin/galleries'
 
 app.get '/photos', renderPhotos
 
@@ -117,6 +134,7 @@ if process.env.NODE_ENV in ['production', 'staging']
 else
   #No nginx rewrites in the dev environment, so make this URI also work
   app.get '/app/photos', renderPhotos
-  app.get '/admin/photos', adminPhotos
+  app.get '/admin/galleries', adminGalleries
+  app.post '/admin/galleries', updateGalleries
   #Listen on all IPs in dev/test (for testing from other machines)
   app.listen config.port
