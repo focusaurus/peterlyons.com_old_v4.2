@@ -1,4 +1,4 @@
-_ = require './overlay/var/www/peterlyons.com/js/underscore.js'
+_ = require './overlay/var/www/peterlyons.com/js/underscore'
 express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'
@@ -10,7 +10,6 @@ app.use express.methodOverride()
 app.use express.bodyParser()
 app.use app.router
 #app.use(require('stylus').middleware({src: config.staticDir}))
-#app.use express.static(__dirname + '/public')
 app.use express.static(config.staticDir)
 app.set 'view engine', 'jade'
 app.set 'views', __dirname + '/app/templates'
@@ -22,12 +21,19 @@ fs.readdir app.set('views'), (err, names) ->
     throw err
   for name in names
     if name.match /.partial$/
-      key = name.split(".")[0]
-      fs.readFile app.set('views') + "/" + name, (err, data) ->
+      key = name.split('.')[0]
+      fs.readFile app.set('views') + '/' + name, (err, data) ->
         if err
           throw err
         partials[key] = data.toString()
         console.log "Stored data in key #{key}: #{partials[key].slice(0, 20)}..."
+
+locals =
+  config: config
+  title: ''
+  partials: partials
+  wordpress: false
+
 pages = []
 page = (URI, title)->
   pages.push {URI: URI, title: title}
@@ -47,34 +53,33 @@ page 'error502', 'Oops'
 
 route = (page) ->
   app.get '/' + page.URI, (req, res)->
-    locals =
-      config: config
-      title: page.title
-      partials: partials
-      wordpress: req.param 'wordpress'
-    res.render page.URI or "home", {locals: locals}
+    locals = _.defaults({title: page.title, wordpress: req.param 'wordpress'}, locals)
+    res.render page.URI or 'home', {locals: locals}
 
 route page for page in pages
 
-renderPhotos = (req, res)->
-  locals =
-    config: config
-    title: "Photo Gallery"
-    partials: partials
-    wordpress: false
-  conf = config.photos
-  fs.readdir conf.galleryDir, (err, names)->
-    throw err if err
+getGalleries = (callback)->
+  fs.readdir config.photos.galleryDir, (err, names)->
+    if err
+      return callback(err)
     #Stupid Mac OS X polluting the user space filesystem
-    locals.galleries = _.without(names, '.DS_Store')
-    locals.galleries.sort()
+    galleries = _.without(names, '.DS_Store')
+    galleries.sort()
+    return callback(null, galleries)
+
+renderPhotos = (req, res)->
+  locals = _.defaults({title: 'Photo Gallery'}, locals}
+  conf = config.photos
+  getGalleries (err, galleries)->
+    throw err if err
+    locals.galleries = galleries
     locals.gallery = conf.defaultGallery
     galleryParam = req.param 'gallery'
     if _.contains locals.galleries, galleryParam
       locals.gallery = galleryParam
     #Now we run iptc_caption.py to generate a list of photos with captions
     #from the filesystem
-    command = ["python ./bin/iptc_caption.py --dir ",
+    command = ['python ./bin/iptc_caption.py --dir ',
           "'#{conf.galleryDir}/#{locals.gallery}'"].join ''
     child_process.exec command, (error, photoJSON, stderr)->
       if error
@@ -97,14 +102,21 @@ renderPhotos = (req, res)->
       #TODO set locals.title to something that includes the photo name
       res.render 'photos', {locals: locals}
 
+adminPhotos = (req, res)->
+  locals = _.defaults {title: 'Manage Photos'}, locals
+  getGalleries (err, galleries)->
+    throw err if err
+    locals.galleries = galleries
+    res.render 'photos_admin', {locals: locals}
+
 app.get '/photos', renderPhotos
-if process.env.NODE_ENV not in ['production', 'staging']
-  #No nginx rewrites in the dev environment, so make this URI also work
-  app.get '/app/photos', renderPhotos
 
 console.log "#{config.site} server starting on port #{config.port}"
 if process.env.NODE_ENV in ['production', 'staging']
   app.listen config.port, '127.0.0.1'
 else
+  #No nginx rewrites in the dev environment, so make this URI also work
+  app.get '/app/photos', renderPhotos
+  app.get '/admin/photos', adminPhotos
   #Listen on all IPs in dev/test (for testing from other machines)
   app.listen config.port

@@ -16,10 +16,12 @@ if [ -f "${PID_FILE}" ]; then
         rm "${PID_FILE}"
     fi
 fi
-NODE_ENV=test coffee server.coffee &
+NODE_ENV=development coffee server.coffee &
 echo "$!" > "${PID_FILE}"
 echo "new node process started with pid $(cat ${PID_FILE})"
 if [ $(uname) == "Darwin" ]; then
     sleep 1
-    open -a "Google Chrome" "http://localhost:$(coffee bin/get_port.coffee)"
+    #Whatever page we're mostly working on today...
+    DEVURI="/admin/photos"
+    open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)${DEVURI}"
 fi
