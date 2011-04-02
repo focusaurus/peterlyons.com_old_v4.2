@@ -5,6 +5,10 @@ server {
     access_log /var/log/nginx/peterlyons.com.access.log;
     error_log /var/log/nginx/peterlyons.com.error.log;
 
+    upstream express {
+      server localhost:9400;
+    }
+
     location / {
         root /home/plyons/projects/peterlyons.com/overlay/var/www/peterlyons.com;
         index index.php index.html home.html;
@@ -19,18 +23,21 @@ server {
             rewrite ^/problog(.+)$ /problog/index.php?q=$1 last;
         }
     }
-    
+
     # deny access to .htaccess files, if Apache's document root
     # concurs with nginx's one
     location ~ /\.ht {
         deny all;
     }
 
-    location /app/ {
-        rewrite /app(.*) $1 break;
-        proxy_pass http://localhost:9400;
+    #This is important to not break existing links
+    #to /app/photos?gallery=foo&photo=bar
+    rewrite /app(.*) $1;
+
+    location /photos/ {
+        proxy_pass http://express;
     }
-    
+
     error_page 404 /error404.html;
 
     error_page 502 /error502.html;

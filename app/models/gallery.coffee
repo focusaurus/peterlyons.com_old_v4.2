@@ -18,6 +18,11 @@ exports.Gallery = class Gallery
         day = new Number(dateString.slice(6, 8))
         formattedDate =  monthNames[monthIndex] + ' ' + day + ', ' + year
         @displayName = @displayName.replace dateRE, formattedDate
+        if not @startDate
+          try
+            @startDate = new Date(year, monthIndex + 1, day).getTime()
+          catch error
+            #Ignore it and leave @startDate empty
         
           
   

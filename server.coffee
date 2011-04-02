@@ -154,5 +154,6 @@ else
   app.get '/app/photos', renderPhotos
   app.get '/admin/galleries', adminGalleries
   app.post '/admin/galleries', updateGalleries
+  app.use express.logger()
   #Listen on all IPs in dev/test (for testing from other machines)
   app.listen config.port
