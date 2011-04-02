@@ -12,7 +12,7 @@ form#galleries(method='POST', action='/admin/galleries')
             value=gallery.displayName, size=gallery.displayName.length)
         td #{gallery.dirName}
         td
-          input.inline.date(value=gallery.startDate,
+          input.inline.date(value=formatDate(gallery.startDate),
             name='gallery_' + gallery.dirName + '_startDate')
   input(type='submit', value='Save')
 script(type='text/javascript')

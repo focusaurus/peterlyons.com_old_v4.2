@@ -124,6 +124,13 @@ adminGalleries = (req, res) ->
         render res, 'admin_galleries', locals
     else
       locals = {title: 'Manage Photos', galleries: jsonGalleries}
+      #BUGBUG try to re-generate the autocomputed start date
+      locals.galleries = (new gallery.Gallery(g.dirName, g.displayName, g.startDate) for g in jsonGalleries)
+      locals.formatDate = (timestamp) ->
+        if not timestamp
+          return ''
+        date = new Date(timestamp)
+        return "#{date.getMonth() + 1}/#{date.getDate()}/#{date.getFullYear()}"
       render res, 'admin_galleries', locals
 
 updateGalleries = (req, res) ->
@@ -133,7 +140,8 @@ updateGalleries = (req, res) ->
     if not match
       continue
     dirName = match[1]
-    galleries.push(new gallery.Gallery(dirName, req.body[key]))
+    startDate = req.body['gallery_' + dirName + '_startDate']
+    galleries.push(new gallery.Gallery(dirName, req.body[key], startDate))
 
   _.sortBy galleries, (gallery) ->
     gallery.dirName

@@ -3,6 +3,7 @@ utils = require './TestUtils'
 describe 'the home page', ->
 
   it 'should have the intro material', ->
+    self = this
     utils.testPage '/home', this, (err, browser, status)->
       if err
         self.fail(err.message)

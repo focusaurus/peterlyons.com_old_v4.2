@@ -9,6 +9,7 @@ describe 'Pages using the main layout', ->
     
   for URI in URIs
     it "'#{URI} should have the basic layout HTML", ->
+      self = this
       utils.testPage URI, this, (err, browser, status)->
         if err
           self.fail(err.message)
