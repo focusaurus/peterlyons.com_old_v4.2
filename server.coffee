@@ -29,7 +29,7 @@ fs.readdir app.set('views'), (error, names) ->
         partials[key] = data.toString()
         console.log "Stored data in key #{key}: #{partials[key].slice(0, 20)}..."
 
-locals =
+defaultLocals =
   config: config
   title: ''
   partials: partials
@@ -52,10 +52,14 @@ page 'favorites', 'Favorite Musicians'
 page 'error404', 'Not Found'
 page 'error502', 'Oops'
 
+render = (res, URI, newLocals) ->
+  locals = _.defaults(newLocals, defaultLocals)
+  res.render URI, {locals: locals}
+
 route = (page) ->
   app.get '/' + page.URI, (req, res) ->
-    locals = _.defaults({title: page.title, wordpress: req.param 'wordpress'}, locals)
-    res.render page.URI or 'home', {locals: locals}
+    render(res, page.URI or 'home', \
+      {title: page.title, wordpress: req.param 'wordpress'})
 
 route page for page in pages
 
@@ -66,7 +70,7 @@ getGalleries = (callback) ->
     return callback(null, JSON.parse(data))
 
 renderPhotos = (req, res) ->
-  locals = _.defaults({title: 'Photo Gallery'}, locals}
+  locals = {title: 'Photo Gallery'}
   conf = config.photos
   getGalleries (error, galleries) ->
     throw error if error
@@ -99,7 +103,7 @@ renderPhotos = (req, res) ->
       locals.photo.next = locals.photos[index + 1] or locals.photos[0]
       locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
       #TODO set locals.title to something that includes the photo name
-      res.render 'photos', {locals: locals}
+      render res, 'photos', locals
 
 adminGalleries = (req, res) ->
   getGalleries (error, jsonGalleries) ->
@@ -116,18 +120,19 @@ adminGalleries = (req, res) ->
 
         newGalleries = (new gallery.Gallery(dirName) for dirName in galleryDirNames)
         allGalleries = jsonGalleries.concat newGalleries
-        locals = _.defaults {title: 'Manage Photos', galleries: allGalleries}, locals
-        res.render 'admin_galleries', {locals: locals}
+        locals = {title: 'Manage Photos', galleries: allGalleries}
+        render res, 'admin_galleries', locals
     else
-      locals = _.defaults {title: 'Manage Photos', galleries: jsonGalleries}, locals
-      res.render 'admin_galleries', {locals: locals}
+      locals = {title: 'Manage Photos', galleries: jsonGalleries}
+      render res, 'admin_galleries', locals
 
 updateGalleries = (req, res) ->
   galleries = []
   for key of req.body
-    if key.indexOf('gallery_') != 0
+    match = key.match /gallery_(.*)_displayName/
+    if not match
       continue
-    dirName = key.slice('gallery_'.length)
+    dirName = match[1]
     galleries.push(new gallery.Gallery(dirName, req.body[key]))
 
   _.sortBy galleries, (gallery) ->

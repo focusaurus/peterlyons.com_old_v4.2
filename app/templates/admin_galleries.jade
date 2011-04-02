@@ -6,10 +6,16 @@ form#galleries(method='POST', action='/admin/galleries')
       th Directory Name
       th Start Date
     - each gallery in galleries
-      tr
+      tr.gallery
         td
-          input.inline(name='gallery_' + gallery.dirName,
+          input.inline(name='gallery_' + gallery.dirName + '_displayName',
             value=gallery.displayName, size=gallery.displayName.length)
         td #{gallery.dirName}
-        td #{gallery.startDate}
+        td
+          input.inline.date(value=gallery.startDate,
+            name='gallery_' + gallery.dirName + '_startDate')
   input(type='submit', value='Save')
+script(type='text/javascript')
+    $(document).ready(function() {
+      $('input.date').datepicker();
+    });

@@ -1,6 +1,6 @@
-h1.galleryTitle Photo Gallery: #{gallery.displayName}
-a(href=photo.prev.pageURI) &lt;&lt;previous&nbsp;
-a(href=photo.next.pageURI) next&gt;&gt;
+h1.galleryName Photo Gallery: #{gallery.displayName}
+a#prev(href=photo.prev.pageURI) &lt;&lt;previous&nbsp;
+a#next(href=photo.next.pageURI) next&gt;&gt;
 a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next.name, id="photolink")
   img#photo(alt=photo.caption, title=photo.caption, src=photo.fullSizeURI)
 
