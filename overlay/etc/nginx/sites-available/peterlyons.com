@@ -1,7 +1,7 @@
 server {
     listen 80;
-    #BE CAREFUL.  Check the production version into git, not staging.peterlyons.com
-    server_name peterlyons.com www.peterlyons.com;
+    #This matches peterlyons.com and *.peterlyons.com
+    server_name .peterlyons.com; 
     access_log /var/log/nginx/peterlyons.com.access.log;
     error_log /var/log/nginx/peterlyons.com.error.log;
 
