@@ -1,9 +1,9 @@
 config = require '../../server_config'
 dateREs =
-  YMD: /20\d{6}/
-  MDY: /(\d{1,2})\/(\d{1,2})\/((\d{2}|\d{4}))/
-  MDYY: /(\d{1,2})\/(\d{1,2})\/((\d{2}|\d{4}))/
+  YMD: /(19|20)\d{6}/
+  MDY: /(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})/
   timestamp: /\d{13}/
+
 monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', \
  'August', 'September', 'October', 'November', 'December']
 
@@ -41,13 +41,15 @@ exports.Gallery = class Gallery
         @startDate = startDateFromDirName.getTime()
 
   parseDate: (dateString) ->
-    if dateREs.YMD.test dateString
+    #Timestamp test must come before YMD test
+    if dateREs.timestamp.test dateString
+      return new Date(new Number(dateString))
+    else if dateREs.YMD.test dateString
       return @parseYMD dateString
     else if dateREs.MDY.test dateString
-      return @parseDMY dateString
-    else if dateREs.timestamp.test dateString
-      return new Date(new Number(dateString))
+      return @parseMDY dateString
     else
+      console.log "BUGBUG cannot parse date #{dateString}"
       return null
 
   parseYMD: (ymd) ->
@@ -56,7 +58,7 @@ exports.Gallery = class Gallery
     day = new Number(ymd.slice(6, 8))
     return new Date(year, month - 1, day)
 
-  parseDMY: (dmy) ->
+  parseMDY: (dmy) ->
     [month, day, year] = dmy.split('/')
     if year.length == 2
       year = new Date().getFullYear().toString().slice(0, 2) + year

@@ -125,7 +125,7 @@ adminGalleries = (req, res) ->
     else
       locals = {title: 'Manage Photos', galleries: jsonGalleries}
       #BUGBUG try to re-generate the autocomputed start date
-      locals.galleries = (new gallery.Gallery(g.dirName, g.displayName, g.startDate) for g in jsonGalleries)
+      #locals.galleries = (new gallery.Gallery(g.dirName, g.displayName, g.startDate) for g in jsonGalleries)
       locals.formatDate = (timestamp) ->
         if not timestamp
           return ''

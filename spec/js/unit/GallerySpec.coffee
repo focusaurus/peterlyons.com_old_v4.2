@@ -56,3 +56,7 @@ describe 'the gallery model', ->
       it 'should handle MM/DD/YY', ->
         gal = new gallery.Gallery("test", "test", "04/02/11")
         expect(gal.startDate).toEqual(new Date(2011, 3, 2).getTime())
+
+      it 'should handle years before 2000', ->
+        gal = new gallery.Gallery("test", "test", "08/01/1999")
+        expect(gal.startDate).toEqual(new Date(1999, 7, 1).getTime())
