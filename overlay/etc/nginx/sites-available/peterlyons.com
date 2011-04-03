@@ -1,7 +1,7 @@
 server {
     listen 80;
     #BE CAREFUL.  Check the production version into git, not staging.peterlyons.com
-    server_name peterlyons.com;
+    server_name peterlyons.com www.peterlyons.com;
     access_log /var/log/nginx/peterlyons.com.access.log;
     error_log /var/log/nginx/peterlyons.com.error.log;
 
@@ -19,7 +19,7 @@ server {
             rewrite ^/problog(.+)$ /problog/index.php?q=$1 last;
         }
     }
-    
+
     # deny access to .htaccess files, if Apache's document root
     # concurs with nginx's one
     location ~ /\.ht {
@@ -30,7 +30,7 @@ server {
         rewrite /app(.*) $1 break;
         proxy_pass http://localhost:9400;
     }
-    
+
     error_page 404 /error404.html;
 
     error_page 502 /error502.html;
