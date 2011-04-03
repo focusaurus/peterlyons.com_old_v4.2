@@ -143,9 +143,9 @@ updateGalleries = (req, res) ->
     startDate = req.body['gallery_' + dirName + '_startDate']
     galleries.push(new gallery.Gallery(dirName, req.body[key], startDate))
 
-  _.sortBy galleries, (gallery) ->
-    gallery.dirName
-
+  galleries = _.sortBy galleries, (gallery) ->
+    gallery.startDate
+  galleries.reverse()
   fs.writeFile './app/data/galleries.json', JSON.stringify(galleries), (error) ->
     if error
       res.send error, 503
