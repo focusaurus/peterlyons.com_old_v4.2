@@ -100,7 +100,7 @@ link() {
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
-    #This can be a little confusing. When running remotely, 
+    #This can be a little confusing. When running remotely,
     #If you ever wanted to do this on production,
     #you have to pass "production" as the last argument as well
     #since the script reads
@@ -161,6 +161,35 @@ Host git.peterlyons.com
   ForwardAgent yes
 EOF
     fi
+}
+
+
+########## Database (mysql) section ##########
+db:prod_to_stage() {
+    #If in there future there are more than 1 production host, just use the
+    #first one in the list
+    HOST=$(echo "${PRODUCTION_HOSTS}" | cut -d " " -f 1)
+    for DB in persblog problog
+    do
+        FILE="/var/tmp/${DB}.bak.sql.bz2"
+        #This does the production backup
+        echo "Enter production password for user ${DB} and DB ${DB} when prompted"
+        ssh -q -t "${HOST}" mysqldump --host localhost \
+            --user "${DB}" --allow-keywords --add-drop-table --password \
+            --add-drop-database --dump-date "${DB}" \| bzip2 -c \
+            \> "${FILE}"
+        #Copy the backup to the local computer
+        scp -q "${HOST}:${FILE}" /var/tmp
+        #Restore the backup locally
+        echo "Enter staging password (twice) for user ${DB} and DB ${DB} when" \
+            " prompted"
+        bzcat "${FILE}" | mysql --host localhost --user "${DB}" --password "${DB}"
+        #This updates the site URL, which must be relative for staging
+        echo "update wp_options set option_value = '/${DB}' where option_name" \
+            " in ('siteurl', 'home');" | mysql -u "${DB}" -p "${DB}"
+        echo "Backup, transfer, restore, and tweak complete for ${DB}"
+    done
+
 }
 
 ########## Web (nginx) Section ##########
@@ -260,19 +289,19 @@ app:prereqs() {
 app:deploy() {
     cdpd
     git checkout master
-    git pull origin master    
+    git pull origin master
     sudo service node_peterlyons.com restart
 }
 
 app:dev_start() {
     cdpd
     kill_stale
-    NODE_ENV=${1-dev} coffee server.coffee &
+    NODE_ENV=${1-dev} supervisor -p server.coffee &
     echo "$!" > "${PID_FILE}"
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then
         sleep 1
-        open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)"
+        open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)${1}"
     fi
 }
 
@@ -301,6 +330,32 @@ app:build_static() {
         "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
 }
 
+app:prod_release() {
+    echo "Performing a production peterlyons.com release"
+    eval $(ssh-agent -s) && ssh-add
+    git checkout develop
+    git pull origin develop
+    jasbin || exit 5
+    echo "Current version is $(cat version.txt)"
+    echo -n "New version: "
+    read NEW_VERSION
+    git checkout -b "release-${NEW_VERSION}" develop
+    echo "${NEW_VERSION}" > version.txt
+    git commit -a -m "Bumped version number to ${NEW_VERSION}"
+    echo "ABOUT TO MERGE INTO MASTER. CTRL-C now to abort. ENTER to proceed."
+    read DONTCARE
+    git checkout master
+    git merge --no-ff "release-${NEW_VERSION}"
+    echo "Now type notes for the new tag"
+    git tag -a "v${NEW_VERSION}"
+    git checkout develop
+    git merge --no-ff "release-${NEW_VERSION}"
+    git branch -d "release-${NEW_VERSION}"
+    git push origin develop
+    git checkout master
+    git push origin master
+    echo "Ready to go. Type './bin/tasks.sh production app:deploy' to push to production"
+}
 
 if ! expr "${1}" : '.*:' > /dev/null; then
     ENV_NAME="${1}"
@@ -322,7 +377,7 @@ else
 fi
 
 case "${OP}" in
-    app:*|os:*|test:*|user:*|web:*)
+    app:*|db:*|os:*|test:*|user:*|web:*)
         #Op looks valid-ish
     ;;
     *)
@@ -345,7 +400,7 @@ else
     do
         echo "Running task ${OP} on ${HOST} as ${SUDO-$USER}"
         scp "${TASK_SCRIPT}" "${HOST}:/tmp"
-        ssh -t "${HOST}" "${SUDO}" bash  \
+        ssh -q -t "${HOST}" "${SUDO}" bash  \
             "/tmp/$(basename ${TASK_SCRIPT})" "${OP}" "${@}"
     done
 fi
