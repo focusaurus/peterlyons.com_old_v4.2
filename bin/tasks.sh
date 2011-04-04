@@ -100,7 +100,7 @@ link() {
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
-    #This can be a little confusing. When running remotely, 
+    #This can be a little confusing. When running remotely,
     #If you ever wanted to do this on production,
     #you have to pass "production" as the last argument as well
     #since the script reads
@@ -289,7 +289,7 @@ app:prereqs() {
 app:deploy() {
     cdpd
     git checkout master
-    git pull origin master    
+    git pull origin master
     sudo service node_peterlyons.com restart
 }
 
@@ -330,6 +330,32 @@ app:build_static() {
         "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
 }
 
+app:prod_release() {
+    echo "Performing a production peterlyons.com release"
+    eval $(ssh-agent -s) && ssh-add
+    git checkout develop
+    git pull origin develop
+    jasbin || exit 5
+    echo "Current version is $(cat version.txt)"
+    echo -n "New version: "
+    read NEW_VERSION
+    git checkout -b "release-${NEW_VERSION}" develop
+    echo "${NEW_VERSION}" > version.txt
+    git commit -a -m "Bumped version number to ${NEW_VERSION}"
+    echo "ABOUT TO MERGE INTO MASTER. CTRL-C now to abort. ENTER to proceed."
+    read DONTCARE
+    git checkout master
+    git merge --no-ff "release-${NEW_VERSION}"
+    echo "Now type notes for the new tag"
+    git tag -a "v${NEW_VERSION}"
+    git checkout develop
+    git merge --no-ff "release-${NEW_VERSION}"
+    git branch -d "release-${NEW_VERSION}"
+    git push origin develop
+    git checkout master
+    git push origin master
+    echo "Ready to go. Type './bin/tasks.sh production app:deploy' to push to production"
+}
 
 if ! expr "${1}" : '.*:' > /dev/null; then
     ENV_NAME="${1}"
