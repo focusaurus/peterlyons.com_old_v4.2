@@ -354,6 +354,7 @@ app:prod_release() {
     git push origin develop
     git checkout master
     git push origin master
+    git checkout develop #Not good form to leave master checked out
     echo "Ready to go. Type './bin/tasks.sh production app:deploy' to push to production"
 }
 
