@@ -156,7 +156,7 @@ span.indent {
 }
 
 li.widget {
-  list-style-type: none; 
+  list-style-type: none;
 }
 
 /**MAIN CONTENT AREA**/
@@ -171,7 +171,7 @@ li.widget {
 }
 
 img.social {
-  padding-right: 5px; 
+  padding-right: 5px;
 }
 
 code, pre {
@@ -192,8 +192,12 @@ code, pre {
   display: block;
 }
 
+.gallerylink {
+  margin-left: 20px;
+}
+
 .thumbnail {
-  margin-right: 4px; 
+  margin-right: 4px;
 }
 
 /********** Sounds from Oberlin **********/
@@ -222,10 +226,10 @@ input.inline {
 
 /********** Photo Gallery **********/
 h1.galleryName {
-  font-size: 20px;  
+  font-size: 20px;
 }
 
 /********** FOOTER **********/
 #footer {
-  padding-top: 30px; 
+  padding-top: 30px;
 }

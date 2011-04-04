@@ -67,7 +67,9 @@ getGalleries = (callback) ->
   fs.readFile config.photos.galleryDataPath, (error, data) ->
     if error
       return callback(error)
-    return callback(null, JSON.parse(data))
+    galleries = (new gallery.Gallery(jg.dirName, jg.displayName, jg.startDate) \
+      for jg in JSON.parse(data))
+    return callback(null, galleries)
 
 renderPhotos = (req, res) ->
   locals = {title: 'Photo Gallery'}
@@ -126,10 +128,9 @@ adminGalleries = (req, res) ->
       locals = {title: 'Manage Photos', galleries: jsonGalleries}
       #BUGBUG try to re-generate the autocomputed start date
       #locals.galleries = (new gallery.Gallery(g.dirName, g.displayName, g.startDate) for g in jsonGalleries)
-      locals.formatDate = (timestamp) ->
-        if not timestamp
+      locals.formatDate = (date) ->
+        if not date
           return ''
-        date = new Date(timestamp)
         return "#{date.getMonth() + 1}/#{date.getDate()}/#{date.getFullYear()}"
       render res, 'admin_galleries', locals
 
