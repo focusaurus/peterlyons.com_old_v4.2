@@ -104,7 +104,7 @@ renderPhotos = (req, res) ->
       locals.photo = locals.photos[index]
       locals.photo.next = locals.photos[index + 1] or locals.photos[0]
       locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
-      #TODO set locals.title to something that includes the photo name
+      locals.title = "#{locals.gallery.displayName} Photo Gallery"
       render res, 'photos', locals
 
 adminGalleries = (req, res) ->

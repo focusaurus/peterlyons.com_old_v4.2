@@ -9,7 +9,7 @@ describe 'the photos page', ->
         self.fail(err.message)
         asyncSpecDone()
         return
-      expect(browser.text('title')).toEqual 'Photo Gallery | Peter Lyons'
+      expect(browser.text('title')).toContain 'Photo Gallery | Peter Lyons'
       expect(browser.querySelector('h1.galleryName')).toBeDefined()
       expect(browser.querySelector('img#photo')).toBeDefined()
       expect(browser.querySelector('a#prev')).toBeDefined()

@@ -1,7 +1,7 @@
 h1.galleryName Photo Gallery: #{gallery.displayName}
 a#prev(href=photo.prev.pageURI) &lt;&lt;previous&nbsp;
 a#next(href=photo.next.pageURI) next&gt;&gt;
-a#photolink(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next.name)
+a#photolink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName + '&photo=' + photo.next.name)
   img#photo(alt=photo.caption, title=photo.caption, src=photo.fullSizeURI)
 
 h1.caption#caption #{photo.caption}
@@ -23,13 +23,15 @@ h1 Other Photo Galleries
     h2.year #{currentYear}
   a.gallerylink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName) #{gallery.displayName}
   br
-script(type="text/javascript")
+- var amp = '&amp;';
+script(type='text/javascript')
   function showPhoto(img, caption, name) {
-    $("#photo").attr("src", img);
-    $("#photo").attr("alt", caption);
-    $("#photo").attr("title", caption);
-    $("#caption").text(caption);
-    $("#photolink").attr("href", "#{config.photos.galleryURI}");
+    $('#photo').attr('src', img);
+    $('#photo').attr('alt', caption);
+    $('#photo').attr('title', caption);
+    $('#caption').text(caption);
+    //-This is a stupid jsdom issue with a literal ampersand character
+    $('#photolink').attr('href', '#{gallery.URI()}#{amp}photo=' + name);
     window.scrollTo(0, 0);
     return true;
   }

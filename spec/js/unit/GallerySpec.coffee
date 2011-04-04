@@ -65,3 +65,8 @@ describe 'the gallery model', ->
         gal = new gallery.Gallery("test", "test",
           new Date(1999, 7, 1).toISOString())
         expect(gal.startDate).toEqual(new Date(1999, 7, 1))
+
+    describe 'URI', ->
+      it 'should return the right value', ->
+        gal = new gallery.Gallery("dirName1", "Test Gal", "20110402")
+        expect(gal.URI()).toEqual('/app/photos?gallery=dirName1')

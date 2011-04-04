@@ -74,3 +74,6 @@ exports.Gallery = class Gallery
       @startDate = parseDate '' + @startDate
     else
       @startDate = startDateFromDirName or null
+
+  URI: () ->
+    return "#{config.photos.galleryURI}?gallery=#{@dirName}"
