@@ -19,12 +19,14 @@ html(lang="en")
     meta(name="description", content="The web site for Peter Lyons, Web Developer and Musician")
     meta(name="copyright", content="2001, Peter Lyons")
     link(rel="stylesheet", href="/screen.css", type:"text/css")
+    link(rel="stylesheet", href="/css/overcast/jquery-ui.css", type:"text/css")
+    script(type="text/javascript", src="/js/jquery.js")
+    script(type="text/javascript", src="/js/jquery-ui.js")
     link(href="/favicon.ico", type="image/x-icon", rel="icon")
     link(href="/favicon.ico", type="image/x-icon", rel="shortcut icon")
     link(rel="openid.server", href="http://www.livejournal.com/openid/server.bml")
     link(rel="openid.delegate", href="http://focusaurus.livejournal.com/")
     link(href='http://fonts.googleapis.com/css?family=Inconsolata', rel='stylesheet', type='text/css')
-    script(type="text/javascript", src="/js/jquery.js")
   body
     #header
       a(href="/")
@@ -79,4 +81,3 @@ html(lang="en")
         //WORDPRESS HEADER BOILERPLATE. DELETE FROM HERE DOWN.
       - else
         !{body}
-       

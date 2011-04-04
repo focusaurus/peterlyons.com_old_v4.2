@@ -1,6 +1,7 @@
-a(href=photo.prev.pageURI) &lt;&lt;previous&nbsp;
-a(href=photo.next.pageURI) next&gt;&gt;
-a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.next.name, id="photolink")
+h1.galleryName Photo Gallery: #{gallery.displayName}
+a#prev(href=photo.prev.pageURI) &lt;&lt;previous&nbsp;
+a#next(href=photo.next.pageURI) next&gt;&gt;
+a#photolink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName + '&photo=' + photo.next.name)
   img#photo(alt=photo.caption, title=photo.caption, src=photo.fullSizeURI)
 
 h1.caption#caption #{photo.caption}
@@ -8,19 +9,31 @@ h1.caption#caption #{photo.caption}
   - jsCaption = photo.caption.replace("'", "\\'").replace('"', "&quot;").trim()
   -  altCaption = photo.caption.replace('"', "&quot;").trim()
   - onClick = "showPhoto('" + photo.fullSizeURI + "', '" + jsCaption + "', '" + photo.name + "');return false"
-  a(href=config.photos.galleryURI + '?gallery=' + gallery + '&photo=' + photo.name , onClick=onClick)
-    img.thumbnail(src=config.photos.photoURI + gallery + '/' + photo.name + config.photos.thumbExtension, alt=altCaption, title=altCaption)
+  a(href=config.photos.galleryURI + '?gallery=' + gallery.dirName + '&photo=' + photo.name , onClick=onClick)
+    img.thumbnail(src=config.photos.photoURI + gallery.dirName + '/' + photo.name + config.photos.thumbExtension, alt=altCaption, title=altCaption)
 h1 Other Photo Galleries
 - each gallery in galleries
-  a(href=config.photos.galleryURI + '?gallery=' + gallery) #{gallery}
+  - var index = galleries.indexOf(gallery)
+  - var prevIndex = index - 1
+  - if (prevIndex < 0)
+    - prevIndex = galleries.length - 1
+  - var currentYear = gallery.startDate.getFullYear()
+  - var previousYear = galleries[prevIndex].startDate.getFullYear()
+  - if (index === 0 || currentYear != previousYear)
+    h2.year #{currentYear}
+  a.gallerylink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName) #{gallery.displayName}
   br
-script(type="text/javascript")
+script(type='text/javascript')
   function showPhoto(img, caption, name) {
-    $("#photo").attr("src", img);
-    $("#photo").attr("alt", caption);
-    $("#photo").attr("title", caption);
-    $("#caption").text(caption);
-    $("#photolink").attr("href", "#{config.photos.galleryURI}");
+    $('#photo').attr('src', img);
+    $('#photo').attr('alt', caption);
+    $('#photo').attr('title', caption);
+    $('#caption').text(caption);
+    //Have to omit any literal ampersand here or zombie chokes.
+    //https://github.com/assaf/zombie/issues/62/#comment_952554
+    //String.fromCharCode(38) is an ampersand
+    $('#photolink').attr('href', '#{gallery.URI()}' + String.fromCharCode(38) +
+      'photo=' + name);
     window.scrollTo(0, 0);
     return true;
   }
