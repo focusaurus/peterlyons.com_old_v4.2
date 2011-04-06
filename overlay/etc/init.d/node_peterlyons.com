@@ -16,6 +16,9 @@ DAEMON_OPTS="PATH=/home/plyons/node/bin:/usr/bin NODE_ENV=production /home/plyon
 PROJECT_DIR=/home/plyons/projects/peterlyons.com
 
 test -x /usr/bin/env || exit 0
+if [ ! -d $(dirname "${PID}") ]; then
+    mkdir -p $(dirname "${PID}")
+fi
 
 set -e
 
