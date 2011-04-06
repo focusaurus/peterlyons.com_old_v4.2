@@ -1,11 +1,9 @@
-upstream express {
-    server localhost:9400;
-}
-
 server {
     listen 80;
     #This matches peterlyons.com and *.peterlyons.com
-    server_name .peterlyons.com; 
+    server_name .peterlyons.com;
+    #This is essential so we can use the same configuration in production and staging
+    server_name_in_redirect off;
     access_log /var/log/nginx/peterlyons.com.access.log;
     error_log /var/log/nginx/peterlyons.com.error.log;
 
@@ -30,12 +28,9 @@ server {
         deny all;
     }
 
-    #This is important to not break existing links
-    #to /app/photos?gallery=foo&photo=bar
-    rewrite /app(.*) $1;
-
-    location /photos/ {
-        proxy_pass http://express;
+    location /app/ {
+        rewrite /app(.*) $1 break;
+        proxy_pass http://localhost:9400;
     }
 
     error_page 404 /error404.html;
