@@ -29,6 +29,7 @@ SITE="peterlyons.com"
 PRODUCTION_HOSTS="${SITE}"
 STAGING_HOSTS="staging.${SITE}"
 DEVURL="http://localhost:9400"
+PRODURL="http://${SITE}"
 REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com.git"
 BRANCH="master"
 NODE_VERSION="0.4.3"
@@ -356,6 +357,36 @@ app:prod_release() {
     git push origin master
     git checkout develop #Not good form to leave master checked out
     echo "Ready to go. Type './bin/tasks.sh production app:deploy' to push to production"
+}
+
+#TODO validate against the live node pages, including /app/photos, /persblog
+#TODO validate the production site by URL
+app:validate() {
+    echo "Validating HTML: "
+    local ERRORS=0
+    local TMP=photos_tmp
+    curl --silent "${DEVURL}/app/photos" --output "${PUBLIC}/${TMP}.html"
+    for URI in $(list_templates) "${TMP}"
+    do
+        printf "\t${URI}.html:\t\t"
+        EXIT_CODE=0
+        curl --silent "http://validator.w3.org/check" --form \
+            "fragment=<${PUBLIC}/${URI}.html" | \
+            egrep "was successfully checked as" > /dev/null || EXIT_CODE=$?
+        if [ ${EXIT_CODE} -ne 0 ]; then
+            echo "INVALID"
+            ERRORS=$((ERRORS + 1))
+        else
+            echo "valid"
+        fi
+    done
+    rm "${PUBLIC}/${TMP}.html"
+    if [ ${ERRORS} -ne 0 ]; then
+        echo "ERROR: ${ERRORS} documents are invalid" 1>&2
+        exit 5
+    else
+        echo "SUCCESS: All documents successfully validated"
+    fi
 }
 
 if ! expr "${1}" : '.*:' > /dev/null; then
