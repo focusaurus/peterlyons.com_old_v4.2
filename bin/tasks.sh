@@ -138,7 +138,7 @@ user:initial_setup() {
 #and the end user's authentication will be proxied from the end user's
 #desktop to the app server through to the git SCM host
 user:ssh_config() {
-    KEYS=~/.ssh/authorized_keys2
+    KEYS=~/.ssh/authorized_keys
     [ -d ~/.ssh ] || mkdir ~/.ssh
     touch "${KEYS}"
     #This is plyons's public SSH key

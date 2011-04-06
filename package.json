@@ -10,6 +10,7 @@
     'node': '*'
   },
   'depedencies': {
+    'async': '~0.1',
     'coffee-script': '~1.0',
     'express': '~1.0',
     'jade': '~0.10',
