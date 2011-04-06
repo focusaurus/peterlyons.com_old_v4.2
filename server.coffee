@@ -72,14 +72,18 @@ getGalleries = (callback) ->
       for jg in JSON.parse(data))
     return callback(null, galleries)
 
+#Load photo metadata from a photos.json file in the gallery directory
 getPhotoJSON = (locals, callback) ->
   fs.readFile locals.gallery.dirPath + "/" + "photos.json", (error, photoJSON) ->
     if error
       return callback()
     p = locals.photos
+    #This extends locals.photos with all the new photos
     p.push.apply(p, photoJSONToObject locals.gallery, photoJSON)
     callback()
 
+#Try the earlier approach where captions were embedded in IPTC info in
+#the photo .jpg files directly
 getPhotoIPTC = (locals, callback) ->
   if locals.photos
     #photoList has already been loaded from flat .json file
@@ -87,13 +91,14 @@ getPhotoIPTC = (locals, callback) ->
     return callback()
 
   #Now we run iptc_caption.py to generate a list of photos with captions
-  #from the filesystem
+  #from the filesystem. This program writes JSON to stdout
   command = ['python ./bin/iptc_caption.py --dir ',
               "'#{config.photos.galleryDir}/#{gallery.dirName}'"].join ''
   child_process.exec command, (error, photoJSON, stderr) ->
     if error
       console.log error
       return callback()
+    #This extends locals.photos with all the new photos
     p = locals.photos
     p.push.apply(p, photoJSONToObject locals.gallery, photoJSON)
     callback()
