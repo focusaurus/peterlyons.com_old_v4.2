@@ -1,20 +1,34 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>My Career | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears"><meta name="author" content="Peter Lyons"><meta name="description" content="The web site for Peter Lyons, Web Developer and Musician"><meta name="copyright" content="2001, Peter Lyons"><link rel="stylesheet" href="/screen.css" type="text/css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css" type="text/css"><script type="text/javascript" src="/js/jquery.js"></script><script type="text/javascript" src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css"></head><body><div id="header"><a href="/"><img src="/images/peter_lyons_logo.png" alt="Peter Lyons" class="logo"></a></div><div id="site_nav"><div class="technology"><div class="gray">Technology</div><img src="/images/keyboard_icon_alt.png" class="keyboard_icon"><div class="nav_links"><a href="/problog">Blog</a><br><a href="/career.html">Career</a><br><a href="/hackstars.html">HackStars</a><br>Projects<br><span class="indent"><a href="/linkzie.html">Linkzie</a></span><br><span class="indent"><a href="/smartears.html">SmartEars</a></span><br><span class="indent"><a href="/bigclock.html">BigClock</a></span><br><a href="/code_conventions.html">Code Conventions</a></div></div><div class="music"><div class="gray">Music</div><img src="/images/sax_icon.png" class="sax_icon"><div class="nav_links"><a href="/bands.html">Bands</a><br><a href="/oberlin.html">Oberlin</a><br><a href="/favorites.html">Favorites</a></div></div><div class="personal"><div class="gray">Personal</div><img src="/images/peter_icon.png" class="peter_icon"><div class="nav_links"><a href="/persblog">Blog</a><br><a href="/app/photos">Photos</a></div></div></div><div id="main_content"><p>I have a <strong><a href="resume.pdf">traditional resume availabe in PDF format</a></strong> for those
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>My Career | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears"><meta name="author" content="Peter Lyons"><meta name="description" content="The web site for Peter Lyons, Web Developer and Musician"><meta name="copyright" content="2001, Peter Lyons"><link rel="stylesheet" href="/screen.css" type="text/css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css" type="text/css"><script type="text/javascript" src="/js/jquery.js"></script><script type="text/javascript" src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css"></head><body><div id="header"><a href="/"><img src="/images/peter_lyons_logo.png" alt="Peter Lyons" class="logo"></a></div><div id="site_nav"><div class="technology"><div class="gray">Technology</div><img src="/images/keyboard_icon_alt.png" class="keyboard_icon"><div class="nav_links"><a href="/problog">Blog</a><br><a href="/career.html">Career</a><br><a href="/hackstars.html">HackStars</a><br>Projects<br><span class="indent"><a href="/linkzie.html">Linkzie</a></span><br><span class="indent"><a href="/smartears.html">SmartEars</a></span><br><span class="indent"><a href="/bigclock.html">BigClock</a></span><br><a href="/code_conventions.html">Code Conventions</a></div></div><div class="music"><div class="gray">Music</div><img src="/images/sax_icon.png" class="sax_icon"><div class="nav_links"><a href="/bands.html">Bands</a><br><a href="/oberlin.html">Oberlin</a><br><a href="/favorites.html">Favorites</a></div></div><div class="personal"><div class="gray">Personal</div><img src="/images/peter_icon.png" class="peter_icon"><div class="nav_links"><a href="/persblog">Blog</a><br><a href="/app/photos">Photos</a></div></div></div><div id="main_content"><script type="text/javascript">
+(function() {
+  window.reversePhases = function() {
+    var parent, phase, phases, _i, _len, _results;
+    phases = [];
+    parent = $("div.phase").parent();
+    $("div.phase").each(function(index, div) {
+      $(div).remove();
+      return phases.unshift($(div));
+    });
+    _results = [];
+    for (_i = 0, _len = phases.length; _i < _len; _i++) {
+      phase = phases[_i];
+      _results.push(parent.append(phase));
+    }
+    return _results;
+  };
+}).call(this);
+</script><p>I have a <strong><a href="resume.pdf">traditional resume availabe in PDF format</a></strong> for those
 looking for the lo-fi version.</p>
 
 <p>This page will chronicle my career in a more narrative and rich format than a
-standard resume can offer. It is in reverse chronological order so read the top
-sections for the most recent items or start at the bottom and work up to go from
-beginning to end.</p>
+standard resume can offer.</p>
 
-<h1>Phase 4: Web Developer and Start-Up Junkie</h1>
+<p><a href="javascript:reversePhases();"> Click to switch between chronological and reverse chronological order.</a></p><div class="phase"><h1>Phase 4: Web Developer and Start-Up Junkie</h1>
 
 <p>After 6.5 years working on enterprise software, in January 2011 I quit my
 job with HP to work on building web applications and start-up businesses.
 You can check out a little pet project I build with Ruby on Rails and jQuery
 over at <a target="_blank" href="https://linkzie.com">linkzie.com: A Simple
-Bookmark Manager</a>.</p>
-
-<h1>Phase 3B: Software Engineer at Hewlett-Packard</h1>
+Bookmark Manager</a>.</p></div><div class="phase"><h1>Phase 3B: Software Engineer at Hewlett-Packard</h1>
 
 <p>Dates: November 2007-January 2011</p>
 
@@ -58,9 +72,7 @@ to shipping.</p>
 <li>Designing features for rapid application development</li>
 <li>Unit testing and system testing in complex distributed environments</li>
 <li>Software Patent draft and application process. I am listed as an inventor on three pending patent applications.</li>
-</ul>
-
-<h1>Phase 3A: Software Engineer at Opsware</h1>
+</ul></div><div class="phase"><h1>Phase 3A: Software Engineer at Opsware</h1>
 
 <p>Dates: June 2006-November 2007</p>
 
@@ -92,9 +104,7 @@ to shipping.</p>
 <ul>
 <li>Planning for enterprise software release schedules</li>
 <li>How to quickly resolve escalated customer issues, including remote hands-off troubleshooting</li>
-</ul>
-
-<h1>Phase 2B: Consultant at Opsware</h1>
+</ul></div><div class="phase"><h1>Phase 2B: Consultant at Opsware</h1>
 
 <p>Dates: August 2004-June 2006</p>
 
@@ -137,13 +147,11 @@ to shipping.</p>
 <li>General exposure to enterprise software sales</li>
 <li>Writing for technical documentation</li>
 <li>Road Warrior Kung-Fu</li>
-</ul>
-
-<h1>Phase 2A: Consultant at Accenture Technology Solutions</h1>
+</ul></div><div class="phase"><h1>Phase 2A: Consultant at Accenture Technology Solutions</h1>
 
 <p>Dates: November 2002-August 2004</p>
 
-<p>In the tough economy after 9/11, I took a position at a new subsidiary of <a href="http://www.accenture.com/">Accenture</a> called <a href="http://www.linkedin.com/company/accenture-technology-solutions">Accenture Technology Solutions</a> (ATS).  ATS was formed to add more technical depth to Accenture&#39;s staff of consultants.  Here I got exposure to large enterprises and became a jack-of-all-trades technologist.  We were building projects on the Microsoft platform.  I got to spend time both programming new applications as well as building the data center cages where we hosted the applications from scratch.  I learned networking in detail and became a Cisco Certified Network Associate (CCNA) and got to configure Cisco switches and routers.  I became heavily involved in projects to the level where I would assist with selecting and purchasing equipment (racks, servers, cables, switches), physically racking, stacking, and cabling it in the data center, installing the operating systems (using automation scripts I had written), installing and configuring MS Exchage Server, Active Directory, and ISA Server, configuring the switches and networking topology, and coordinating with the data center staff on our Internet connection, firewall rules.  I also helped provision and configure a dedicated T1 line we used for administrative access out of band from our office to the data center.</p>
+<p>In the tough economy after 9/11, I took a position at a new subsidiary of <a href="http://www.accenture.com/">Accenture</a> called <a href="http://www.linkedin.com/company/accenture-technology-solutions">Accenture Technology Solutions</a> (ATS).  ATS was formed to add more technical depth to Accenture&#39;s staff of consultants.  Here I got exposure to large enterprises and became a jack-of-all-trades technologist.  We were building projects on the Microsoft platform.  I got to spend time both programming new applications as well as building the data center cages where we hosted the applications from scratch.  I learned networking in detail and became a Cisco Certified Network Associate (CCNA) and got to configure Cisco switches and routers.  I became heavily involved in projects to the level where I would assist with selecting and purchasing equipment (racks, servers, cables, switches), physically racking, stacking, and cabling it in the data center, installing the operating systems (using automation scripts I had written), installing and configuring MS Exchage Server, Active Directory, and ISA Server, configuring the switches and networking topology, and coordinating with the data center staff on our Internet connection and firewall rules.  I also helped provision and configure a dedicated T1 line we used for administrative access out of band from our office to the data center.</p>
 
 <p>I got exposure to large, complex, high-budget (8-figure) projects and the logistics of navigating that.  My primary client during this period was AT&amp;T and I was also involved with Payless Shoes and Jelly Belly Candy Company.</p>
 
@@ -180,9 +188,7 @@ to shipping.</p>
 <li>Full stack process from ordering equipment through go live through operations</li>
 <li>TCP/IP networking and firewalling</li>
 <li>General exposure to the Microsoft stack</li>
-</ul>
-
-<h1>Phase 1: Web Development</h1>
+</ul></div><div class="phase"><h1>Phase 1: Web Development</h1>
 
 <p>Dates: August 2001-September 2002</p>
 
@@ -244,5 +250,5 @@ turned out to be a key language two jobs later at Opsware.</p>
 <li>Extreme Programming (XP)</li>
 <li>Object-Relational Modeling (ORM)</li>
 <li>Apple Core Foundation APIs</li>
-</ul>
+</ul></div>
 </div></body></html>

@@ -49,6 +49,7 @@ exports.Gallery = class Gallery
     #avoid errors if these are undefined
     @dirName = @dirName or ''
     @displayName = @displayName or @dirName
+    @dirPath = config.photos.galleryDir + '/' + @dirName
 
     #First, check the dirname for an embedded date like 20110402
     match = @dirName.match YMD
