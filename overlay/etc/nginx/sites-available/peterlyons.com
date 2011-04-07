@@ -1,13 +1,13 @@
+upstream express {
+    server localhost:9400;
+}
+
 server {
     listen 80;
     #This matches peterlyons.com and *.peterlyons.com
     server_name .peterlyons.com; 
     access_log /var/log/nginx/peterlyons.com.access.log;
     error_log /var/log/nginx/peterlyons.com.error.log;
-
-    upstream express {
-      server localhost:9400;
-    }
 
     location / {
         root /home/plyons/projects/peterlyons.com/overlay/var/www/peterlyons.com;
