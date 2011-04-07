@@ -35,8 +35,8 @@ BRANCH="master"
 NODE_VERSION="0.4.3"
 PROJECT_DIR=~/projects/peterlyons.com
 OVERLAY="${PROJECT_DIR}/overlay"
-PUBLIC="${OVERLAY}/var/www/${SITE}"
-
+PUBLIC="${PROJECT_DIR}/public"
+BRANCH=master
 ########## No-Op Test Tasks for sudo, root, and normal user ##########
 #Use these to make sure your passwordless ssh is working, hosts are correct, etc
 test:uptime() {
@@ -101,19 +101,6 @@ link() {
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
-    #This can be a little confusing. When running remotely,
-    #If you ever wanted to do this on production,
-    #you have to pass "production" as the last argument as well
-    #since the script reads
-    #"tasks.sh production os:init_scripts" as
-    #"copy yourself to production and then run os:init_scripts"
-    #but we also want the script to know that it's in the production environment
-    #when it is executed remotely, so we can tweak things as necessary
-    #thus you must run
-    #tasks.sh production os:init_scripts production
-    if [ "${1}" != "production" ]; then
-        perl -pi -e "s/server_name.*/server_name staging.${SITE};/" "${OVERLAY}/etc/nginx/sites-available/${SITE}"
-    fi
     link "/etc/monit/conf.d/php5-cgi_${SITE}.monitrc"
     link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
     link "/etc/monit/conf.d/node_${SITE}.monitrc"
@@ -289,8 +276,10 @@ app:prereqs() {
 
 app:deploy() {
     cdpd
-    git checkout master
-    git pull origin master
+    echo "Deploying branch ${1-BRANCH}"
+    git fetch origin --tags
+    git checkout --track -b "${1-BRANCH}" || git checkout "${1-BRANCH}"
+    git pull origin "${1-BRANCH}"
     sudo service node_peterlyons.com restart
 }
 

@@ -1,8 +1,8 @@
 exports.site = 'peterlyons.com'
 exports.port = 9400
 exports.appURI = '/app'
-exports.staticDir = './overlay/var/www/' + exports.site
-exports.photos = 
+exports.staticDir = './public'
+exports.photos =
   photoURI: '/photos/'
   galleryURI: exports.appURI + '/photos'
   galleryDir:  exports.staticDir + '/photos'
