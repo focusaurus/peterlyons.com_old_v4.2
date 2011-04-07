@@ -36,7 +36,7 @@ NODE_VERSION="0.4.3"
 PROJECT_DIR=~/projects/peterlyons.com
 OVERLAY="${PROJECT_DIR}/overlay"
 PUBLIC="${PROJECT_DIR}/public"
-
+BRANCH=master
 ########## No-Op Test Tasks for sudo, root, and normal user ##########
 #Use these to make sure your passwordless ssh is working, hosts are correct, etc
 test:uptime() {
@@ -289,8 +289,10 @@ app:prereqs() {
 
 app:deploy() {
     cdpd
-    git checkout master
-    git pull origin master
+    echo "Deploying branch ${1-BRANCH}"
+    git fetch origin --tags
+    git checkout "${1-BRANCH}"
+    git pull origin "${1-BRANCH}"
     sudo service node_peterlyons.com restart
 }
 
