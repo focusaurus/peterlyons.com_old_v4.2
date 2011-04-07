@@ -359,28 +359,45 @@ app:prod_release() {
     echo "Ready to go. Type './bin/tasks.sh production app:deploy' to push to production"
 }
 
-#TODO validate against the live node pages, including /app/photos, /persblog
-#TODO validate the production site by URL
 app:validate() {
     echo "Validating HTML: "
     local ERRORS=0
     local TMP=photos_tmp
-    curl --silent "${DEVURL}/app/photos" --output "${PUBLIC}/${TMP}.html"
-    for URI in $(list_templates) "${TMP}"
+    BASE="${DEVURL}"
+    EXT=""
+    if [ "${1}" == "production" ]; then
+        BASE="${PRODURL}"
+        EXT=".html"
+        echo "Validating the PRODUCTION site"
+    fi
+    for URI in $(list_templates) app/photos
     do
-        printf "\t${URI}.html:\t\t"
-        EXIT_CODE=0
+        printf '  %-25s' "${URI}: "
+        local TMP_HTML="/tmp/tmp_html.$$.html"
+        local FETCH_EC=0
+        curl --silent "${BASE}/${URI}${EXT}" --output "${TMP_HTML}" || \
+            FETCH_EC=$?
+        if [ ${FETCH_EC} -eq 7 ]; then
+            echo "SERVER IS NOT RUNNING. ABORTING."
+            exit ${FETCH_EC}
+        fi
+        if [ ${FETCH_EC} -ne 0 ]; then
+            echo "FAILED (${FETCH_EC}"
+            ERRORS=$((ERRORS + 1))
+            continue
+        fi
+        local VALID_EC=0
         curl --silent "http://validator.w3.org/check" --form \
-            "fragment=<${PUBLIC}/${URI}.html" | \
-            egrep "was successfully checked as" > /dev/null || EXIT_CODE=$?
-        if [ ${EXIT_CODE} -ne 0 ]; then
+            "fragment=<${TMP_HTML}" | \
+            egrep "was successfully checked as" > /dev/null || VALID_EC=$?
+        if [ ${VALID_EC} -ne 0 ]; then
             echo "INVALID"
             ERRORS=$((ERRORS + 1))
         else
             echo "valid"
         fi
+        rm "${TMP_HTML}"
     done
-    rm "${PUBLIC}/${TMP}.html"
     if [ ${ERRORS} -ne 0 ]; then
         echo "ERROR: ${ERRORS} documents are invalid" 1>&2
         exit 5
