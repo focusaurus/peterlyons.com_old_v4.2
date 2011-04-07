@@ -359,18 +359,23 @@ app:prod_release() {
     echo "Ready to go. Type './bin/tasks.sh production app:deploy' to push to production"
 }
 
-#TODO validate against the live node pages, including /app/photos, /persblog
-#TODO validate the production site by URL
 app:validate() {
     echo "Validating HTML: "
     local ERRORS=0
     local TMP=photos_tmp
+    BASE="${DEVURL}"
+    EXT=""
+    if [ "${1}" == "production" ]; then
+        BASE="${PRODURL}"
+        EXT=".html"
+        echo "Validating the PRODUCTION site"
+    fi
     for URI in $(list_templates) app/photos
     do
         printf '  %-25s' "${URI}: "
         local TMP_HTML="/tmp/tmp_html.$$.html"
         local FETCH_EC=0
-        curl --silent "${DEVURL}/${URI}" --output "${TMP_HTML}" || \
+        curl --silent "${BASE}/${URI}${EXT}" --output "${TMP_HTML}" || \
             FETCH_EC=$?
         if [ ${FETCH_EC} -eq 7 ]; then
             echo "SERVER IS NOT RUNNING. ABORTING."
