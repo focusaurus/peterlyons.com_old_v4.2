@@ -1,5 +1,5 @@
 async = require 'async'
-_ = require './overlay/var/www/peterlyons.com/js/underscore'
+_ = require './public/js/underscore'
 express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'

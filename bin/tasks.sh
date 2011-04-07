@@ -35,7 +35,7 @@ BRANCH="master"
 NODE_VERSION="0.4.3"
 PROJECT_DIR=~/projects/peterlyons.com
 OVERLAY="${PROJECT_DIR}/overlay"
-PUBLIC="${OVERLAY}/var/www/${SITE}"
+PUBLIC="${PROJECT_DIR}/public"
 
 ########## No-Op Test Tasks for sudo, root, and normal user ##########
 #Use these to make sure your passwordless ssh is working, hosts are correct, etc
