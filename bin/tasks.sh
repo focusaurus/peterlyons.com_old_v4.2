@@ -276,10 +276,10 @@ app:prereqs() {
 
 app:deploy() {
     cdpd
-    echo "Deploying branch ${1-BRANCH}"
+    echo "Deploying branch ${1-${BRANCH}}"
     git fetch origin --tags
-    git checkout --track -b "${1-BRANCH}" || git checkout "${1-BRANCH}"
-    git pull origin "${1-BRANCH}"
+    git checkout --track -b "${1-${BRANCH}}" || git checkout "${1-${BRANCH}}"
+    git pull origin "${1-${BRANCH}}"
     sudo service node_peterlyons.com restart
 }
 
