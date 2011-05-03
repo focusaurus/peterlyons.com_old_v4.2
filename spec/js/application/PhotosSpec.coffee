@@ -4,7 +4,7 @@ describe 'the photos page', ->
 
   it 'should have the photo surrounding structure', ->
     self = this
-    utils.testPage '/app/photos', this, (err, browser, status)->
+    utils.testPage '/photos', this, (err, browser, status)->
       if err
         self.fail(err.message)
         asyncSpecDone()
