@@ -228,8 +228,8 @@ list_templates() {
     cdpd
     #We skip layout because it's just the layout and photos because
     #it's a dynamic page
-    ls app/templates/*.jade | xargs -n 1 basename | sed -e s/\.jade// \
-        -e /layout/d -e /photos/d -e /admin_galleries/d
+    ls app/templates/*.{jade,md} | xargs -n 1 basename | sed -e s/\.jade// \
+        -e /layout/d -e /photos/d -e /admin_galleries/d -e s/\.md//
 }
 
 
@@ -307,7 +307,7 @@ app:debug() {
 
 app:build_static() {
     echo "Generating HTML for static templated pages from ${DEVURL}..."
-    for URI in $(list_templates)
+    for URI in $(list_templates) leveling_up
     do
         URL="${DEVURL}/${URI}"
         echo -n "${URI}, "
