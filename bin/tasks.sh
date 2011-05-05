@@ -14,7 +14,7 @@
 #this script handles copying itself to the remote hosts then running itself
 #on each host.
 
-#Too bootstrap a new staging host, you would run
+#To bootstrap a new staging host, you would run
 #tasks.sh staging os:initial_setup
 #tasks.sh staging user:initial_setup
 #tasks.sh staging app:initial_setup
@@ -248,7 +248,6 @@ app:clone() {
     cd
 }
 
-
 app:prereqs() {
     cd "${PROJECT_DIR}"
     [ -d tmp ] || mkdir tmp
@@ -291,13 +290,19 @@ app:dev_start() {
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then
         sleep 1
-        open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)${1}"
+        #open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)${1}"
     fi
 }
 
 app:dev_stop() {
     cdpd
     kill_stale
+}
+
+app:debug() {
+  cdpd
+  kill_stale
+  coffee --nodejs --debug server.coffee
 }
 
 app:build_static() {
