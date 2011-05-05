@@ -4,7 +4,6 @@ express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'
 markdown = require 'markdown-js'
-jsdom = require 'jsdom'
 jade = require 'jade'
 
 config = require './server_config'
