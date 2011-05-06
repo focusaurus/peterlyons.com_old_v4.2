@@ -73,7 +73,7 @@ app.get '/leveling_up', (req, res) ->
       return
     body = markdown.makeHtml md
     locals =
-      title: 'Leveling Up: Career Advancement for Software Developers | Peter Lyons'
+      title: 'Leveling Up: Career Advancement for Software Developers'
       body: body
     options =
       locals: _.defaults locals, defaultLocals
