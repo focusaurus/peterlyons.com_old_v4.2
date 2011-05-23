@@ -14,7 +14,7 @@
 #this script handles copying itself to the remote hosts then running itself
 #on each host.
 
-#Too bootstrap a new staging host, you would run
+#To bootstrap a new staging host, you would run
 #tasks.sh staging os:initial_setup
 #tasks.sh staging user:initial_setup
 #tasks.sh staging app:initial_setup
@@ -228,8 +228,8 @@ list_templates() {
     cdpd
     #We skip layout because it's just the layout and photos because
     #it's a dynamic page
-    ls app/templates/*.jade | xargs -n 1 basename | sed -e s/\.jade// \
-        -e /layout/d -e /photos/d -e /admin_galleries/d
+    ls app/templates/*.{jade,md} | xargs -n 1 basename | sed -e s/\.jade// \
+        -e /layout/d -e /photos/d -e /admin_galleries/d -e s/\.md//
 }
 
 
@@ -247,7 +247,6 @@ app:clone() {
     git checkout "${BRANCH}"
     cd
 }
-
 
 app:prereqs() {
     cd "${PROJECT_DIR}"
@@ -291,7 +290,7 @@ app:dev_start() {
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then
         sleep 1
-        open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)${1}"
+        #open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)${1}"
     fi
 }
 
@@ -300,9 +299,15 @@ app:dev_stop() {
     kill_stale
 }
 
+app:debug() {
+  cdpd
+  kill_stale
+  coffee --nodejs --debug server.coffee
+}
+
 app:build_static() {
     echo "Generating HTML for static templated pages from ${DEVURL}..."
-    for URI in $(list_templates)
+    for URI in $(list_templates) leveling_up
     do
         URL="${DEVURL}/${URI}"
         echo -n "${URI}, "

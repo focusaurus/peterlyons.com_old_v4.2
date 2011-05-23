@@ -3,6 +3,8 @@ _ = require './public/js/underscore'
 express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'
+markdown = require 'markdown-js'
+jade = require 'jade'
 
 config = require './server_config'
 gallery = require './app/models/gallery'
@@ -63,6 +65,24 @@ route = (page) ->
       {title: page.title, wordpress: req.param 'wordpress'})
 
 route page for page in pages
+
+app.get '/leveling_up', (req, res) ->
+  fs.readFile __dirname + '/app/templates/leveling_up.md', 'utf8', (error, md) ->
+    if error
+      res.render 'error502'
+      return
+    body = markdown.makeHtml md
+    locals =
+      title: 'Leveling Up: Career Advancement for Software Developers'
+      body: body
+    options =
+      locals: _.defaults locals, defaultLocals
+    template = __dirname + '/app/templates/layout.jade'
+    jade.renderFile template, options, (error, html) ->
+      if error
+        res.render 'error502'
+        return
+      res.send html
 
 getGalleries = (callback) ->
   fs.readFile config.photos.galleryDataPath, (error, data) ->
@@ -190,7 +210,7 @@ updateGalleries = (req, res) ->
 
 app.get '/photos', renderPhotos
 
-console.log "#{config.site} server starting on port #{config.port}"
+console.log "#{config.site} server starting on http://localhost:#{config.port}"
 if process.env.NODE_ENV in ['production', 'staging']
   app.listen config.port, '127.0.0.1'
 else
@@ -198,6 +218,6 @@ else
   app.get '/app/photos', renderPhotos
   app.get '/admin/galleries', adminGalleries
   app.post '/admin/galleries', updateGalleries
-  app.use express.logger()
+  app.use express.logger {format: ':method :url'}
   #Listen on all IPs in dev/test (for testing from other machines)
   app.listen config.port
