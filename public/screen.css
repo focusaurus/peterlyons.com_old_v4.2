@@ -210,6 +210,10 @@ td.performers {
   font-style: italic;
 }
 
+/********** Bands **********/
+img.band {
+  margin-top: 50px;
+}
 
 /********** Code Conventions **********/
 dd {

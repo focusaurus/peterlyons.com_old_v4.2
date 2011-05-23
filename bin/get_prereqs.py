@@ -4,5 +4,5 @@ import os
 
 packagePath = os.path.join(os.path.dirname(__file__), "../package.json")
 package = json.load(open(packagePath))
-for key in package["depedencies"].keys():
+for key in package["dependencies"].keys():
     print key
