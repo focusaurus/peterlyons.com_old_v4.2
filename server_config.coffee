@@ -6,7 +6,7 @@ exports.photos =
   photoURI: '/photos/'
   galleryURI: exports.appURI + '/photos'
   galleryDir:  exports.staticDir + '/photos'
-  defaultGallery: 'winter_2010'
+  defaultGallery: 'spring_2011'
   thumbExtension: '-TN.jpg'
   extension: '.jpg'
   galleryDataPath: './app/data/galleries.json'
