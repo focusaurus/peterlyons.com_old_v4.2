@@ -167,22 +167,18 @@ renderPhotos = (req, res) ->
 adminGalleries = (req, res) ->
   getGalleries (error, jsonGalleries) ->
     throw error if error
-    if req.param 'discover'
-      jsonNames = _.pluck(jsonGalleries, 'dirName')
-      fs.readdir config.photos.galleryDir, (error, names) ->
-        throw error if error
-        #Stupid Mac OS X polluting the user space filesystem
-        galleryDirNames = _.without(names, '.DS_Store')
-        #galleryDirNames.sort()
-        galleryDirNames = galleryDirNames.filter (name) ->
-           not (jsonNames.indexOf(name) >= 0)
+    jsonNames = _.pluck(jsonGalleries, 'dirName')
+    fs.readdir config.photos.galleryDir, (error, names) ->
+      throw error if error
+      #Stupid Mac OS X polluting the user space filesystem
+      galleryDirNames = _.without(names, '.DS_Store')
+      galleryDirNames = galleryDirNames.filter (name) ->
+        console.log "Checking for gallery dir #{name} in JSON"
+        not (jsonNames.indexOf(name) >= 0)
 
-        newGalleries = (new gallery.Gallery(dirName) for dirName in galleryDirNames)
-        allGalleries = jsonGalleries.concat newGalleries
-        locals = {title: 'Manage Photos', galleries: allGalleries}
-        render res, 'admin_galleries', locals
-    else
-      locals = {title: 'Manage Photos', galleries: jsonGalleries}
+      newGalleries = (new gallery.Gallery(dirName) for dirName in galleryDirNames)
+      allGalleries = jsonGalleries.concat newGalleries
+      locals = {title: 'Manage Photos', galleries: allGalleries}
       locals.formatDate = (date) ->
         if not date
           return ''
