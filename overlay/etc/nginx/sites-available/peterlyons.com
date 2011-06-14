@@ -16,6 +16,8 @@ server {
             break;
         }
         # this sends all non-existing file or directory requests to index.php
+        #rewrite...last is safe to use here
+        #http://wiki.nginx.org/IfIsEvil
         if (!-e $request_filename) {
             rewrite ^/persblog(.+)$ /persblog/index.php?q=$1 last;
             rewrite ^/problog(.+)$ /problog/index.php?q=$1 last;
@@ -40,8 +42,6 @@ server {
     # pass the PHP scripts to FastCGI server
     location ~ \.php$ {
         include /etc/nginx/fastcgi_params;
-        #https://nealpoole.com/blog/2011/04/setting-up-php-fastcgi-and-nginx-dont-trust-the-tutorials-check-your-configuration/
-        #try_files $uri =404;
         fastcgi_pass 127.0.0.1:9200;
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME /home/plyons/projects/peterlyons.com/public$fastcgi_script_name;  # same path as above
