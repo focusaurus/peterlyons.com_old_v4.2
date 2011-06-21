@@ -1,64 +1,16 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>SmartEars: Ear Training Software | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears"><meta name="author" content="Peter Lyons"><meta name="description" content="The web site for Peter Lyons, Web Developer and Musician"><meta name="copyright" content="2001, Peter Lyons"><link rel="stylesheet" href="/screen.css" type="text/css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css" type="text/css"><script type="text/javascript" src="/js/jquery.js"></script><script type="text/javascript" src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css"></head><body><div id="header"><a href="/"><img src="/images/peter_lyons_logo.png" alt="Peter Lyons" class="logo"></a></div><div id="site_nav"><div class="technology"><div class="gray">Technology</div><img src="/images/keyboard_icon_alt.png" class="keyboard_icon"><div class="nav_links"><a href="/problog">Blog</a><br><a href="/career.html">Career</a><br>Projects<br><span class="indent"><a href="/linkzie.html">Linkzie</a></span><br><span class="indent"><a href="/smartears.html">SmartEars</a></span><br><span class="indent"><a href="/bigclock.html">BigClock</a></span><br><a href="/leveling_up.html">Leveling Up</a><br><a href="/code_conventions.html">Code Conventions</a></div></div><div class="music"><div class="gray">Music</div><img src="/images/sax_icon.png" class="sax_icon"><div class="nav_links"><a href="/bands.html">Bands</a><br><a href="/oberlin.html">Oberlin</a><br><a href="/favorites.html">Favorites</a></div></div><div class="personal"><div class="gray">Personal</div><img src="/images/peter_icon.png" class="peter_icon"><div class="nav_links"><a href="/persblog">Blog</a><br><a href="/app/photos">Photos</a></div></div></div><div id="main_content"><p>Check out my ear training program (Summer 2001).  This program
-will help you quickly learn to recognize and identify common musical
-structures including intervals, scales/modes, and chords.</p>
+Error: Jade:24
+    22|       click into the Settings Tab and set the Note Delay to 0
+    23| !{partials.webstart}
+  > 24| 
 
-<p><img src="./smartears_screen1.jpg" alt="SmartEars Advanced Chords Screen Shot"/>
-<img src="./smartears_settings.jpg" alt="SmartEars Settings Screen" /></p>
-
-<p><a href="/dist/smartears.jnlp">Start SmartEars!</a></p>
-
-<p>My java friends who don&#39;t want to mess around with Java Web Start can
-download <a href="/dist/smartears.jar">smartears.jar</a> and launch the
-application by typing:</p>
-
-<p><code>java -jar SmartEars.jar</code></p>
-
-<p>Using SmartEars should be (I hope!) largely self-explanatory and easy.
-Two quick tips:
-* To turn off certain answers you are not intrested in 
-  (eg. unisons and octaves) right-click on their button (Command-click on OS X)
-* To hear sounds played simultaneously (as a chord) instead of arpeggiated,
-  click into the Settings Tab and set the Note Delay to 0</p><p>
-I am distributing the program using a technology called Java Web
-Start which will let you launch it from the web or from your
-computer, and will take care of keeping your version up
-to date automatically. If you have never run a Web Start program before,
-you will need to first install Java Web Start on your computer by visiting
-<a href="http://java.sun.com/products/javawebstart/">http://java.sun.com/products/javawebstart/</a>
-</p>
-<p>
-Once you've got Java Web Start, you can download and launch
-the program by clicking the link above.  Once you have dowloaded
-it once, Java Web Start will save the program on your computer, so
-the next time you launch it (either from this web page or through the
-Java Web Start application on your computer) it will start up right
-away.  As I release updates, Java Web Start will automatically make
-sure you have the latest files.
-</p>
-<p>If you've got the Java Runtime Environment 1.3 or newer and Java
-Web Start installed, you should be all set. Web start works on Windows
-95/98/NT/2000/XP. It is installed and configured by default on Mac OS
-X, so if you're using IE on OS X, you should be able to just click the
-link above. On Linux, I have gotten it to work with Mozilla,
-Konqueror, and Netscape 4.76 with no difficulty.  When you install
-Java Web Start, it will update the ~/.mime-types files to include the
-.jnlp mapping needed for Java Web Start, and Netscape should see this,
-but I had to go and manually update my Netscape preferences to include
-the path to the javaws binary and then a '%s'.  To do this, go to the
-Edit menu-->Preferences-->Navigator-->Applications and scroll down
-until you find the one that says "Java Web Start" in the description
-column.  Then hit Edit and check the box where it says Application,
-and in the text field next to it, put the path to your web start
-javaws (eg. /usr/local/java/javaws/javaws) binary followed by ' %s',
-and that should do it.  For Mozilla and Konqueror, and other browsers,
-you just need to go into the "Helper Applications" type section of the
-preferences and map the .jnlp extension and/or the
-application/x-java-jnlp-file mime type to the javaws executable.
-Please <a href="mailto:pete@peterlyons.com">e-mail me</a> with your
-stories of successes/failures on various platforms and browsers.  Note
-that the classic Macintosh OS does not support Java 2, so only OS X
-users can expect this to work.
-</p>
-
-
-</div></body></html>
+Cannot find markdown library, install markdown or discount
+    at /Users/plyons/projects/othenticate.com/node_modules/jade/lib/filters.js:74:17
+    at Object.visitFilter (/Users/plyons/projects/othenticate.com/node_modules/jade/lib/compiler.js:237:30)
+    at Object.visitNode (/Users/plyons/projects/othenticate.com/node_modules/jade/lib/compiler.js:139:31)
+    at Object.visit (/Users/plyons/projects/othenticate.com/node_modules/jade/lib/compiler.js:126:17)
+    at Object.visitBlock (/Users/plyons/projects/othenticate.com/node_modules/jade/lib/compiler.js:152:12)
+    at Object.visitNode (/Users/plyons/projects/othenticate.com/node_modules/jade/lib/compiler.js:139:31)
+    at Object.visit (/Users/plyons/projects/othenticate.com/node_modules/jade/lib/compiler.js:126:17)
+    at Object.compile (/Users/plyons/projects/othenticate.com/node_modules/jade/lib/compiler.js:71:10)
+    at parse (/Users/plyons/projects/othenticate.com/node_modules/jade/lib/jade.js:172:23)
+    at Object.compile (/Users/plyons/projects/othenticate.com/node_modules/jade/lib/jade.js:218:7)
