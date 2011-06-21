@@ -3,7 +3,8 @@ _ = require './public/js/underscore'
 express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'
-markdown = require 'markdown-js'
+#BUGBUG should be able to just require 'markdown-js' but it's crashing. ???
+markdown = require './node_modules/markdown-js'
 jade = require 'jade'
 
 config = require './server_config'

@@ -9,7 +9,8 @@
   "engines": {
     "node": "*"
   },
-  "depedencies": {
+  "files": [],
+  "dependencies": {
     "async": "~0.1",
     "coffee-script": "~1.0",
     "express": "~1.0",
@@ -17,8 +18,9 @@
     "jasbin": "~1.0",
     "jasmine-node": "~1.0",
     "markdown-js": "*",
-    "node-supervisor": "*",
+    "supervisor": "*",
     "stylus": "~0.7",
-    "underscore": "~1.1"
+    "underscore": "~1.1",
+    "zombie": "*"
   }
 }
