@@ -20,7 +20,6 @@
     "markdown-js": "*",
     "supervisor": "*",
     "stylus": "~0.7",
-    "underscore": "~1.1",
-    "zombie": "*"
+    "underscore": "~1.1"
   }
 }
