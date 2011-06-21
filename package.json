@@ -1,24 +1,24 @@
 {
-  'name': 'peterlyons.com',
-  'description': 'The Node/Express Web App that powers the peterlyons.com web site',
-  'version': '0.1.0',
-  'homepage': 'http://peterlyons.com',
-  'repository': 'ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com',
-  'author': 'Peter Lyons <pete@peterlyons.com> (http://peterlyons.com)',
-  'main': 'server.coffee',
-  'engines': {
-    'node': '*'
+  "name": "peterlyons.com",
+  "description": "The Node/Express Web App that powers the peterlyons.com web site",
+  "version": "0.1.0",
+  "homepage": "http://peterlyons.com",
+  "repository": "ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com",
+  "author": "Peter Lyons <pete@peterlyons.com> (http://peterlyons.com)",
+  "main": "server.coffee",
+  "engines": {
+    "node": "*"
   },
-  'depedencies': {
-    'async': '~0.1',
-    'coffee-script': '~1.0',
-    'express': '~1.0',
-    'jade': '~0.10',
-    'jasbin': '~1.0',
-    'jasmine-node': '~1.0',
-    'markdown-js': '*',
-    'node-supervisor': '*',
-    'stylus': '~0.7',
-    'underscore': '~1.1'
+  "depedencies": {
+    "async": "~0.1",
+    "coffee-script": "~1.0",
+    "express": "~1.0",
+    "jade": "~0.10",
+    "jasbin": "~1.0",
+    "jasmine-node": "~1.0",
+    "markdown-js": "*",
+    "node-supervisor": "*",
+    "stylus": "~0.7",
+    "underscore": "~1.1"
   }
 }
