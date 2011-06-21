@@ -52,6 +52,7 @@ defaultLocals =
   title: ''
   partials: partials
   wordpress: false
+  specURIs: []
 
 
 ['galleries', 'photos'].map (controllerName) ->
