@@ -18,7 +18,12 @@ app.use (req, res, next) ->
   res.renderDefaults = (URI, newLocals) ->
     locals = _.defaults(newLocals, defaultLocals)
     if req.param 'test'
-      locals.specURIs = ['/lib/jasmine/jasmine.js', '/lib/jasmine/jasmine-html.js']
+      locals.specURIs = [
+        '/lib/jasmine/jasmine.js'
+        '/lib/jasmine/jasmine-html.js'
+        '/application/LayoutSpec.js'
+      ]
+      locals.testCSS = ['/lib/jasmine/jasmine.css']
     this.render URI, {locals: locals}
   next()
 app.use app.router
@@ -53,6 +58,7 @@ defaultLocals =
   partials: partials
   wordpress: false
   specURIs: []
+  testCSS: []
 
 
 ['galleries', 'photos'].map (controllerName) ->
@@ -60,8 +66,8 @@ defaultLocals =
   controller.setup app
 
 pages = []
-page = (URI, title) ->
-  pages.push {URI: URI, title: title}
+page = (URI, title, spec=null) ->
+  pages.push {URI, title, spec}
 page '', 'Peter Lyons: Web Development, Startups, Music'
 page 'home', 'Peter Lyons: Web Development, Startups, Music'
 page 'bands', 'My Bands'
