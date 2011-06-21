@@ -13,14 +13,22 @@ gallery = require './app/models/gallery'
 app = express.createServer()
 app.use express.bodyParser()
 app.use express.methodOverride()
+#TODO just add a renderDefaults method to the IncomingMessage prototype
 app.use (req, res, next) ->
   res.renderDefaults = (URI, newLocals) ->
     locals = _.defaults(newLocals, defaultLocals)
+    if req.param 'test'
+      locals.specURIs = ['/lib/jasmine/jasmine.js', '/lib/jasmine/jasmine-html.js']
     this.render URI, {locals: locals}
   next()
 app.use app.router
 #app.use(require('stylus').middleware({src: config.staticDir}))
 app.use express.static(config.staticDir)
+if config.env.testing or config.env.development
+  #Note to self. Make sure compiler comes BEFORE static
+  app.use express.compiler(src: __dirname + '/spec/js', enable: ['coffeescript'])
+  app.use express.static(__dirname + '/spec/js')
+
 app.set 'view engine', 'jade'
 app.set 'views', __dirname + '/app/templates'
 

@@ -22,6 +22,8 @@ html(lang="en")
     link(rel="stylesheet", href="/css/overcast/jquery-ui.css", type:"text/css")
     script(type="text/javascript", src="/js/jquery.js")
     script(type="text/javascript", src="/js/jquery-ui.js")
+    - each URI in specURIs
+      script(type="text/javascript", src=URI)
     link(href="/favicon.ico", type="image/x-icon", rel="icon")
     link(href="/favicon.ico", type="image/x-icon", rel="shortcut icon")
     link(rel="openid.server", href="http://www.livejournal.com/openid/server.bml")
