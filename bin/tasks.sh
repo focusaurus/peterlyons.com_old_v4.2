@@ -330,7 +330,7 @@ app:prod_release() {
     eval $(ssh-agent -s) && ssh-add
     git checkout develop
     git pull origin develop
-    jasbin || exit 5
+    #BUGBUG#Disabling#jasbin || exit 5
     echo "Current version is $(cat version.txt)"
     echo -n "New version: "
     read NEW_VERSION
