@@ -304,7 +304,7 @@ app:test() {
 app:dev_start() {
     cdpd
     kill_stale
-    PATH=./node_modules/.bin NODE_ENV=${1-dev} ./node_modules/.bin/supervisor -p app/server.coffee &
+    env PATH=~/node/bin:./node_modules/.bin NODE_ENV=${1-development} ./node_modules/.bin/supervisor -p app/server.coffee &
     echo "$!" > "${PID_FILE}"
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then

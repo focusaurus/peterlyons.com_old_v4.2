@@ -1,1 +1,1 @@
-console.log require('../server_config').port
+console.log require('../config').port

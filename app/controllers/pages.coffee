@@ -1,5 +1,5 @@
 _ = require 'underscore'
-config = require '../../server_config'
+config = require '../../config'
 fs = require 'fs'
 jade = require 'jade'
 markdown = require 'markdown-js'
