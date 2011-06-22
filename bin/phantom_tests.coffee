@@ -52,7 +52,11 @@ runNextTest = ->
 
 openNextURL = () ->
   testName = getQueue()[0]
-  phantom.open (testFunctions[testName].URL or baseURL) + '?test=1'
+  URL = baseURL + testName
+  if testName.indexOf('?') < 0
+    URL += '?'
+  URL += 'test=1'
+  phantom.open URL
 
 ########## State Management Functions ##########
 _getState = ->
@@ -86,22 +90,34 @@ getFailureCount = ->
 ########## Test Functions ##########
 testFunctions = {}
 
-testFunctions.home = (callback) ->
-  out 'running home tests'
-  runJasmine callback
+testFunctions.wordpress = (callback) ->
+  describe 'The wordpress header_boilerplate.php output', ->
+    it 'should include embedded PHP markup', ->
+      done = done: false
+      $.get '/home?wordpress=1', (html, textStatus, response) ->
+        expect(response.status).toEqual 200
+        expect(html).toContain '<?php bloginfo'
+        expect(html).toContain '<?php get_sidebar'
+        expect(html).toContain 'WORDPRESS HEADER BOILERPLATE'
+        done.done = true
+      waitsFor ->
+        done.done out 'running home tests'
+      runJasmine callback
 
-testFunctions.career = (callback) ->
-  runJasmine callback
-testFunctions.career.URL = baseURL + '/career'
-
+pagesToTest = [
+  '/'
+  '/home'
+  '/bands'
+  '/bigclock'
+  '/favorites'
+  '/error404'
+  '/error502'
+]
 out('phantom.state is: ' + phantom.state)
 switch phantom.state
   when ''
     #populate the initial test queue
-    setQueue [
-      'home'
-      'career'
-    ]
+    setQueue pagesToTest
     #This kicks off the test cycle
     openNextURL()
   else
@@ -109,10 +125,10 @@ switch phantom.state
     queue = getQueue()
     test = queue.shift()
     setQueue queue
-    testFunc = testFunctions[test]
-    URL = testFunc.URL or baseURL
-    out "Running test function #{test} for URL #{URL} with args #{testFunc.args}"
-    args = [runNextTest]
-    args.concat testFunc.arguments
-    #This actually runs the test
-    testFunctions[test].apply window, args
+    if typeof(test) == 'string'
+      #It's a URL to load and run jasmine
+      out "Running tests on page #{test}"
+      runJasmine runNextTest
+    else
+      #It's the name of a test function
+      testFunctions[test[0]].apply window,[runNextTest]

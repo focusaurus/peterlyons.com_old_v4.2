@@ -6,7 +6,7 @@ describe 'Pages using the main layout', ->
     expect($('#header img')).toBeDefined()
     expect($('#site_nav a')).toBeDefined()
     expect($('#main_content')).toBeDefined()
-      
+
 describe 'The wordpress header_boilerplate.php output', ->
   
   it 'should include embedded PHP markup', ->
