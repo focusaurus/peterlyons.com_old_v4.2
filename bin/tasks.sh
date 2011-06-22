@@ -279,6 +279,16 @@ app:deploy() {
 
 app:test() {
   cdpd
+  for spec in spec/js/unit/*Spec.coffee
+  do
+    echo "${spec}"
+    local exitCode=0
+    ./node_modules/.bin/jasbin "${spec}" || exitCode=$?
+    if [ $exitCode -ne 0 ]; then
+      echo "${spec} FAILED. Stopping tests."
+      exit $exitCode
+    fi
+  done
   ./node_modules/.bin/coffee -c bin
   phantomjs ./bin/phantom_tests.js
   rm ./bin/phantom_tests.js
