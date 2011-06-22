@@ -3,4 +3,5 @@
 tmp
 node_modules
 public/js/*.js
+spec/js/**/*.js
 bin/*.js
