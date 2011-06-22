@@ -1,5 +1,5 @@
 #node.js app server for peterlyons.com (photo gallery and basic templates)
-check server "node_peterlyons.com"
+check host "node_peterlyons.com"
     start = "/sbin/start node_peterlyons"
     stop = "/sbin/stop node_peterlyons"
     if failed port 9400 protocol http then restart
