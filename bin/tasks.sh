@@ -295,9 +295,9 @@ app:test() {
   rm ./bin/phantom_tests.js
   if [ $exitCode -eq 0 ]; then
       echo "YAY"
-      exit $exitCode
   else
       echo "BOO"
+      exit $exitCode
   fi
 }
 
