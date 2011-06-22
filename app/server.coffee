@@ -1,9 +1,6 @@
-_ = require '../public/js/underscore'
 express = require 'express'
-fs = require 'fs'
 
 config = require '../config'
-gallery = require './models/gallery'
 
 app = express.createServer()
 app.use express.bodyParser()
@@ -18,6 +15,7 @@ if config.env.testing or config.env.development
 app.set 'view engine', 'jade'
 app.set 'views', __dirname + '/templates'
 
+#Load in the controllers
 ['pages', 'galleries', 'photos'].map (controllerName) ->
   controller = require './controllers/' + controllerName
   controller.setup app
