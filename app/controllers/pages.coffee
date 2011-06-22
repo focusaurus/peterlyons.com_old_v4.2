@@ -11,7 +11,7 @@ class Page
 
 Page.render = (req, res) ->
   locals = _.defaults(@locals, defaultLocals)
-  locals.wordpress = req.param 'wordpress'
+  locals.wordpress = req.param 'wordpress', false
   if req.param 'test'
     locals.specURIs = [
       '/lib/jasmine/jasmine.js'
