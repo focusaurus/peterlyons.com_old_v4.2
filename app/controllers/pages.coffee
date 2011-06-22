@@ -11,17 +11,21 @@ class Page
 
 Page.render = (req, res) ->
   locals = _.defaults(@locals, defaultLocals)
+  addTests req, locals
+  locals.specURIs.push.apply locals.specURIs, @specs
+  res.render @view, {locals: locals}
+
+addTests = (req, locals) ->
   locals.wordpress = req.param 'wordpress', false
   if req.param 'test'
     locals.specURIs = [
       '/lib/jasmine/jasmine.js'
       '/lib/jasmine/jasmine-html.js'
       '/application/LayoutSpec.js'
-    ].concat @specs
+    ]
     locals.testCSS = ['/lib/jasmine/jasmine.css']
   if req.param 'start'
     locals.specURIs.start = true
-  res.render @view, {locals: locals}
 
 pages = []
 page = (URI, title, specs) ->
@@ -77,20 +81,24 @@ exports.setup = (app) ->
   route app, page for page in pages
 
   app.get '/leveling_up', (req, res) ->
-    fs.readFile __dirname + '../templates/leveling_up.md', 'utf8', (error, md) ->
+    locals =
+      title: 'Leveling Up: Career Advancement for Software Developers'
+      body: ''
+      wordpress: false
+    locals = _.defaults locals, defaultLocals
+    addTests req, locals
+    locals.specURIs.push.apply locals.specURIs, ['/application/LevelingUpSpec.js']
+    options =
+      locals: locals
+    fs.readFile __dirname + '/../templates/leveling_up.md', 'utf8', (error, md) ->
       if error
-        res.render 'error502'
+        res.render 'error502', options
         return
-      body = markdown.makeHtml md
-      locals =
-        title: 'Leveling Up: Career Advancement for Software Developers'
-        body: body
-      options =
-        locals: _.defaults locals, defaultLocals
+      options.locals.body = markdown.makeHtml md
       template = __dirname + '/../templates/layout.jade'
       jade.renderFile template, options, (error, html) ->
         if error
-          res.render 'error502'
+          res.render 'error502', options
           return
         res.send html
 
