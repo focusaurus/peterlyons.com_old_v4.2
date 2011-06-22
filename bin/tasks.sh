@@ -282,6 +282,13 @@ app:deploy() {
     sudo service node_peterlyons.com restart
 }
 
+app:test() {
+  cdpd
+  ./node_modules/.bin/coffee -c bin
+  phantomjs ./bin/phantom_tests.js
+  rm ./bin/phantom_tests.js
+}
+
 app:dev_start() {
     cdpd
     kill_stale
@@ -290,7 +297,7 @@ app:dev_start() {
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then
         sleep 1
-        #open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)${1}"
+        #open -a "Firefox" "http://localhost:$(./node_modules/.bin/coffee bin/get_port.coffee)${1}"
     fi
 }
 
@@ -302,7 +309,7 @@ app:dev_stop() {
 app:debug() {
   cdpd
   kill_stale
-  coffee --nodejs --debug server.coffee
+  ./node_modules/.bin/coffee --nodejs --debug server.coffee
 }
 
 app:build_static() {

@@ -1,6 +1,5 @@
 ########## Global Setup Stuff ##########
 baseURL = 'http://localhost:9400'
-homePage = baseURL + '/?test=1'
 verbose = phantom.args[0] in ["--verbose", "-v"]
 
 ########## Shared Helper Functions ##########
@@ -53,7 +52,7 @@ runNextTest = ->
 
 openNextURL = () ->
   testName = getQueue()[0]
-  phantom.open testFunctions[testName].URL or homePage
+  phantom.open (testFunctions[testName].URL or baseURL) + '?test=1'
 
 ########## State Management Functions ##########
 _getState = ->
@@ -111,7 +110,7 @@ switch phantom.state
     test = queue.shift()
     setQueue queue
     testFunc = testFunctions[test]
-    URL = testFunc.URL or homePage
+    URL = testFunc.URL or baseURL
     out "Running test function #{test} for URL #{URL} with args #{testFunc.args}"
     args = [runNextTest]
     args.concat testFunc.arguments
