@@ -117,6 +117,7 @@ pagesToTest = [
   '/favorites'
   '/error404'
   '/error502'
+  '/app/photos'
 ]
 pagesToTest = pagesToTest.map (page)-> return [page, 'runJasmine']
 pagesToTest.push ['/', 'wordpress']

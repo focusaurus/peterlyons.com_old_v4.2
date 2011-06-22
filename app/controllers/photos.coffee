@@ -4,6 +4,7 @@ fs = require 'fs'
 config = require '../../server_config'
 gallery = require '../models/gallery'
 galleries = require './galleries'
+{Page} = require './pages'
 
 #Load photo metadata from a photos.json file in the gallery directory
 getPhotoJSON = (locals, callback) ->
@@ -75,7 +76,8 @@ renderPhotos = (req, res) ->
         locals.photo.next = locals.photos[index + 1] or locals.photos[0]
         locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
         locals.title = "#{locals.gallery.displayName} Photo Gallery"
-        res.renderDefaults 'photos', locals
+        page = new Page 'photos', locals.title, locals, ['/application/PhotosSpec.js']
+        Page.render.apply page, [req, res] 
 
 exports.setup = (app) ->
   app.get '/photos', renderPhotos
