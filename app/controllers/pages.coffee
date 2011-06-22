@@ -11,11 +11,10 @@ class Page
 
 Page.render = (req, res) ->
   locals = _.defaults(@locals, defaultLocals)
-  addTests req, locals
-  locals.specURIs.push.apply locals.specURIs, @specs
+  addTests req, locals, @specs
   res.render @view, {locals: locals}
 
-addTests = (req, locals) ->
+addTests = (req, locals, specs=[]) ->
   locals.wordpress = req.param 'wordpress', false
   if req.param 'test'
     locals.specURIs = [
@@ -23,6 +22,7 @@ addTests = (req, locals) ->
       '/lib/jasmine/jasmine-html.js'
       '/application/LayoutSpec.js'
     ]
+    locals.specURIs.push.apply locals.specURIs, specs
     locals.testCSS = ['/lib/jasmine/jasmine.css']
   if req.param 'start'
     locals.specURIs.start = true
@@ -86,8 +86,7 @@ exports.setup = (app) ->
       body: ''
       wordpress: false
     locals = _.defaults locals, defaultLocals
-    addTests req, locals
-    locals.specURIs.push.apply locals.specURIs, ['/application/LevelingUpSpec.js']
+    addTests req, locals, ['/application/LevelingUpSpec.js']
     options =
       locals: locals
     fs.readFile __dirname + '/../templates/leveling_up.md', 'utf8', (error, md) ->
