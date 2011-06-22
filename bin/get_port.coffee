@@ -1,1 +1,1 @@
-console.log require('../server_config.coffee').port
+console.log require('../config').port
