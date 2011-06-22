@@ -107,8 +107,8 @@ os:init_scripts() { #TASK: sudo
     link "/etc/init/node_peterlyons.conf"
     cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
     cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
-    update-rc.d "node_${SITE}" defaults
     update-rc.d "php5-cgi_${SITE}" defaults
+    initctl reload-configuraton
     /etc/init.d/nginx reload
 }
 
