@@ -17,15 +17,15 @@ Page.render = (req, res) ->
       '/lib/jasmine/jasmine.js'
       '/lib/jasmine/jasmine-html.js'
       '/application/LayoutSpec.js'
-    ]
+    ].concat @specs
     locals.testCSS = ['/lib/jasmine/jasmine.css']
   if req.param 'start'
     locals.specURIs.start = true
   res.render @view, {locals: locals}
 
 pages = []
-page = (URI, title, specs=null) ->
-  pages.push new Page(URI, title, specs)
+page = (URI, title, specs) ->
+  pages.push new Page(URI, title, {}, specs)
 page 'home', 'Peter Lyons: Web Development, Startups, Music', ['/application/HomePageSpec.js']
 page 'bands', 'My Bands'
 page 'bigclock', 'BigClock: a full screen desktop clock in java'
@@ -38,7 +38,7 @@ page 'code_conventions', 'Code Conventions'
 page 'favorites', 'Favorite Musicians'
 page 'error404', 'Not Found'
 page 'error502', 'Oops'
-homePage = new Page 'home', pages[0].title, pages[0].specs
+homePage = new Page 'home', pages[0].title, {}, pages[0].specs
 homePage.URI = ''
 pages.push homePage
 
@@ -70,7 +70,8 @@ exports.setup = (app) ->
           if error
             throw error
           partials[key] = data
-          console.log "Stored data in key #{key}: #{partials[key].slice(0, 20)}..."
+          excerpt = data.slice(0, 20).replace '\n', '\\n'
+          console.log "Stored data in key #{key}: #{excerpt}..."
   
   #Route all the simple static pages
   route app, page for page in pages
