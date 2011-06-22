@@ -16,8 +16,8 @@ status = (result, description, indent='') ->
   else
     status = 'FAILED' 
     marker = '*'
-  return "#{marker}#{indent}#{description}: #{status} " + \
-    "(#{result.passedCount} pass/#{result.failedCount} fail)\n"
+  return "#{marker}#{indent}#{description} #{status} " + \
+    "(#{result.passedCount} pass/#{result.failedCount} fail)"
 
 #This is a callback the tests invoke when they finish
 runNextTest = ->
@@ -89,16 +89,15 @@ testFunctions =
     jasmine.getEnv().currentRunner().finishCallback = () ->
       runner = jasmine.getEnv().currentRunner()
       results = runner.results()
-      output = ['\n']
+      output = []
       if verbose
         for suite in runner.suites()
           output.push status(suite.results(), suite.description)
           for spec in suite.specs()
             output.push status(spec.results(), spec.description, '  ')
-          output.push '\n'
               
       countFailure results.failedCount
-      output.push status(results, "Jasmine tests on #{path}")
+      output.push status(results, "Tests on #{path}")
       console.log output.join ''
       callback()
     jasmine.getEnv().execute()
