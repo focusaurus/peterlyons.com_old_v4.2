@@ -92,7 +92,7 @@ EOF
 #Helper function for symlinking files in the git work area out into the OS
 link() {
     if [ ! -h "${1}" ]; then
-        ln -s "${OVERLAY}${1}" "${1}"
+        ln -s -f "${OVERLAY}${1}" "${1}"
     fi
 }
 
@@ -104,7 +104,7 @@ os:init_scripts() { #TASK: sudo
     link "/etc/monit/conf.d/node_${SITE}.monitrc"
     link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
     link "/etc/init.d/php5-cgi_${SITE}"
-    link "/etc/init.d/node_${SITE}"
+    link "/etc/init/node_peterlyons.conf"
     cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
     cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
     update-rc.d "node_${SITE}" defaults
