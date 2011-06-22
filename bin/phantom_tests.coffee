@@ -19,27 +19,6 @@ status = (result, description, indent='') ->
   return "#{marker}#{indent}#{description}: #{status} " + \
     "(#{result.passedCount} pass/#{result.failedCount} fail)\n"
 
-runJasmine = (callback) ->
-  if not jasmine?
-    console.log 'The node.js app server looks to NOT BE RUNNING. START IT.'
-    phantom.exit 15
-  jasmine.getEnv().currentRunner().finishCallback = () ->
-    runner = jasmine.getEnv().currentRunner()
-    results = runner.results()
-    output = ['\n']
-    if verbose
-      for suite in runner.suites()
-        output.push status(suite.results(), suite.description)
-        for spec in suite.specs()
-          output.push status(spec.results(), spec.description, '  ')
-        output.push '\n'
-              
-    countFailure results.failedCount
-    output.push status(results, 'All Jasmine Tests')
-    console.log output.join ''
-    callback()
-  jasmine.getEnv().execute()
-
 #This is a callback the tests invoke when they finish
 runNextTest = ->
   queue = getQueue()
@@ -51,7 +30,7 @@ runNextTest = ->
     openNextURL()
 
 openNextURL = () ->
-  testName = getQueue()[0]
+  testName = getQueue()[0][0]
   URL = baseURL + testName
   if testName.indexOf('?') < 0
     URL += '?'
@@ -88,31 +67,61 @@ getFailureCount = ->
   return state.failCount
 
 ########## Test Functions ##########
-testFunctions = {}
+testFunctions =
+  wordpress: (path, callback) ->
+    describe 'The wordpress header_boilerplate.php output', ->
+      it 'should include embedded PHP markup', ->
+        done = done: false
+        $.get '/?wordpress=1', (html, textStatus, response) ->
+          expect(response.status).toEqual 200
+          expect(html).toContain '<?php bloginfo'
+          expect(html).toContain '<?php get_sidebar'
+          expect(html).toContain 'WORDPRESS HEADER BOILERPLATE'
+          done.done = true
+        waitsFor ->
+          done.done
+    testFunctions.runJasmine path + '?wordpress=1', callback
 
-testFunctions.wordpress = (callback) ->
-  describe 'The wordpress header_boilerplate.php output', ->
-    it 'should include embedded PHP markup', ->
-      done = done: false
-      $.get '/home?wordpress=1', (html, textStatus, response) ->
-        expect(response.status).toEqual 200
-        expect(html).toContain '<?php bloginfo'
-        expect(html).toContain '<?php get_sidebar'
-        expect(html).toContain 'WORDPRESS HEADER BOILERPLATE'
-        done.done = true
-      waitsFor ->
-        done.done out 'running home tests'
-      runJasmine callback
+  runJasmine: (path, callback) ->
+    if not jasmine?
+      console.log 'The node.js app server looks to NOT BE RUNNING. START IT.'
+      phantom.exit 15
+    jasmine.getEnv().currentRunner().finishCallback = () ->
+      runner = jasmine.getEnv().currentRunner()
+      results = runner.results()
+      output = ['\n']
+      if verbose
+        for suite in runner.suites()
+          output.push status(suite.results(), suite.description)
+          for spec in suite.specs()
+            output.push status(spec.results(), spec.description, '  ')
+          output.push '\n'
+              
+      countFailure results.failedCount
+      output.push status(results, "Jasmine tests on #{path}")
+      console.log output.join ''
+      callback()
+    jasmine.getEnv().execute()
 
 pagesToTest = [
   '/'
   '/home'
   '/bands'
   '/bigclock'
+  '/career'
+  '/hackstars'
+  '/linkzie'
+  '/smartears'
+  '/oberlin'
+  '/code_conventions'
   '/favorites'
   '/error404'
   '/error502'
 ]
+pagesToTest = pagesToTest.map (page)-> return [page, 'runJasmine']
+pagesToTest.push ['/', 'wordpress']
+
+out pagesToTest
 out('phantom.state is: ' + phantom.state)
 switch phantom.state
   when ''
@@ -125,10 +134,4 @@ switch phantom.state
     queue = getQueue()
     test = queue.shift()
     setQueue queue
-    if typeof(test) == 'string'
-      #It's a URL to load and run jasmine
-      out "Running tests on page #{test}"
-      runJasmine runNextTest
-    else
-      #It's the name of a test function
-      testFunctions[test[0]].apply window,[runNextTest]
+    testFunctions[test[1]].apply window,[test[0], runNextTest]

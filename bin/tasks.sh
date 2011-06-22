@@ -280,7 +280,7 @@ app:deploy() {
 app:test() {
   cdpd
   ./node_modules/.bin/coffee -c bin
-  phantomjs ./bin/phantom_tests.js -v
+  phantomjs ./bin/phantom_tests.js
   rm ./bin/phantom_tests.js
 }
 
