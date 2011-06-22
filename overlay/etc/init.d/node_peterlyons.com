@@ -12,7 +12,9 @@
 PATH=/home/plyons/node/bin:/sbin:/bin:/usr/sbin:/usr/bin
 NAME=node_peterlyons.com
 PID=/home/plyons/projects/peterlyons.com/tmp/server.pid
-DAEMON_OPTS="PATH=/home/plyons/node/bin:/usr/bin NODE_ENV=production /home/plyons/projects/peterlyons.com/node_modules/coffee-script/bin/coffee server.coffee"
+#BUGBUG TODO figure out why running 'coffee' from othenticate works,
+#the one in peterlyons.com crashes
+DAEMON_OPTS="PATH=/home/plyons/node/bin:/usr/bin NODE_ENV=production /home/plyons/projects/othenticate.com/node_modules/coffee-script/bin/coffee server.coffee"
 PROJECT_DIR=/home/plyons/projects/peterlyons.com
 
 test -x /usr/bin/env || exit 0

@@ -82,8 +82,6 @@ mysql-server
 mysql-client
 #We use perl in the tasks.sh script for quick command line file editing
 perl
-#Needed for get_prereqs (will normally always be available on Ubuntu anyway)
-python
 #This is our web server
 nginx
 #For Wordpress blog
@@ -265,12 +263,9 @@ app:prereqs() {
     #Yes, I know this is a security risk.  I accept the risk. Life is short.
     curl http://npmjs.org/install.sh | sh || exit 4
     echo "Installing npm packages"
-    for DEP in $(python "./bin/get_prereqs.py")
-    do
-        npm install "${DEP}" || exit 5
-    done
+    npm install
     echo "Here are the installed npm packages"
-    npm list installed
+    npm ls
 }
 
 app:deploy() {
@@ -282,15 +277,39 @@ app:deploy() {
     sudo service node_peterlyons.com restart
 }
 
+app:test() {
+  cdpd
+  for spec in spec/js/unit/*Spec.coffee
+  do
+    echo "${spec}"
+    local exitCode=0
+    ./node_modules/.bin/jasbin "${spec}" || exitCode=$?
+    if [ $exitCode -ne 0 ]; then
+      echo "${spec} FAILED. Stopping tests."
+      exit $exitCode
+    fi
+  done
+  ./node_modules/.bin/coffee -c bin
+  exitCode=0
+  phantomjs ./bin/phantom_tests.js || exitCode=$?
+  rm ./bin/phantom_tests.js
+  if [ $exitCode -eq 0 ]; then
+      echo "YAY"
+  else
+      echo "BOO"
+      exit $exitCode
+  fi
+}
+
 app:dev_start() {
     cdpd
     kill_stale
-    PATH=./node_modules/.bin NODE_ENV=${1-dev} ./node_modules/.bin/supervisor -p server.coffee &
+    env PATH=~/node/bin:./node_modules/.bin NODE_ENV=${1-development} ./node_modules/.bin/supervisor -p app/server.coffee &
     echo "$!" > "${PID_FILE}"
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then
         sleep 1
-        #open -a "Firefox" "http://localhost:$(coffee bin/get_port.coffee)${1}"
+        #open -a "Firefox" "http://localhost:$(./node_modules/.bin/coffee bin/get_port.coffee)${1}"
     fi
 }
 
@@ -302,7 +321,7 @@ app:dev_stop() {
 app:debug() {
   cdpd
   kill_stale
-  coffee --nodejs --debug server.coffee
+  ./node_modules/.bin/coffee --nodejs --debug app/server.coffee
 }
 
 app:build_static() {
@@ -330,7 +349,7 @@ app:prod_release() {
     eval $(ssh-agent -s) && ssh-add
     git checkout develop
     git pull origin develop
-    #BUGBUG#Disabling#jasbin || exit 5
+    app:test 
     echo "Current version is $(cat version.txt)"
     echo -n "New version: "
     read NEW_VERSION
