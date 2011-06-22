@@ -1,6 +1,6 @@
 _ = require '../../public/js/underscore'
 fs = require 'fs'
-config = require '../../server_config'
+config = require '../../config'
 gallery = require '../models/gallery'
 
 exports.getGalleries = (callback) ->

@@ -1,4 +1,4 @@
-config = require '../../server_config'
+config = require '../../config'
 
 YMD = /(19|20)\d{6}/
 monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', \

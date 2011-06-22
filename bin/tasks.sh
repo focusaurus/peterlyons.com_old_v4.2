@@ -290,14 +290,21 @@ app:test() {
     fi
   done
   ./node_modules/.bin/coffee -c bin
-  phantomjs ./bin/phantom_tests.js
+  exitCode=0
+  phantomjs ./bin/phantom_tests.js || exitCode=$?
   rm ./bin/phantom_tests.js
+  if [ $exitCode -eq 0 ]; then
+      echo "YAY"
+  else
+      echo "BOO"
+  fi
+  exit $exitCode
 }
 
 app:dev_start() {
     cdpd
     kill_stale
-    PATH=./node_modules/.bin NODE_ENV=${1-dev} ./node_modules/.bin/supervisor -p server.coffee &
+    env PATH=~/node/bin:./node_modules/.bin NODE_ENV=${1-development} ./node_modules/.bin/supervisor -p app/server.coffee &
     echo "$!" > "${PID_FILE}"
     echo "new node process started with pid $(cat ${PID_FILE})"
     if [ $(uname) == "Darwin" ]; then
@@ -314,7 +321,7 @@ app:dev_stop() {
 app:debug() {
   cdpd
   kill_stale
-  ./node_modules/.bin/coffee --nodejs --debug server.coffee
+  ./node_modules/.bin/coffee --nodejs --debug app/server.coffee
 }
 
 app:build_static() {
