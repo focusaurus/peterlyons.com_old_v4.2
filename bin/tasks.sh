@@ -274,7 +274,7 @@ app:deploy() {
     git fetch origin --tags
     git checkout --track -b "${1-${BRANCH}}" || git checkout "${1-${BRANCH}}"
     git pull origin "${1-${BRANCH}}"
-    sudo service node_peterlyons.com restart
+    sudo restart node_peterlyons
 }
 
 app:test() {
@@ -369,7 +369,7 @@ app:prod_release() {
     git checkout master
     git push origin master
     git checkout develop #Not good form to leave master checked out
-    echo "Ready to go. Type './bin/tasks.sh production app:deploy' to push to production"
+    echo "Ready to go. Type     ./bin/tasks.sh production app:deploy     to push to production"
 }
 
 app:validate() {
