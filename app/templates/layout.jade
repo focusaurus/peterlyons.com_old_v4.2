@@ -26,7 +26,7 @@ html(lang="en")
       script(type="text/javascript", src=URI)
     - each URI in testCSS
       link(rel="stylesheet", href=URI, type="text/css")
-    - if (specURIs.length > 0)
+    - if (specURIs.start)
       script
         $(document).ready(function() {
           jasmine.getEnv().addReporter(new jasmine.TrivialReporter());

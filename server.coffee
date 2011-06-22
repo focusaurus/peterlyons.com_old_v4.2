@@ -3,8 +3,7 @@ _ = require './public/js/underscore'
 express = require 'express'
 child_process = require 'child_process'
 fs = require 'fs'
-#BUGBUG should be able to just require 'markdown-js' but it's crashing. ???
-markdown = require './node_modules/markdown-js'
+markdown = require 'markdown-js'
 jade = require 'jade'
 
 config = require './server_config'
@@ -12,7 +11,6 @@ gallery = require './app/models/gallery'
 
 app = express.createServer()
 app.use express.bodyParser()
-app.use express.methodOverride()
 #TODO just add a renderDefaults method to the IncomingMessage prototype
 app.use (req, res, next) ->
   res.renderDefaults = (URI, newLocals) ->
@@ -24,10 +22,13 @@ app.use (req, res, next) ->
         '/application/LayoutSpec.js'
       ]
       locals.testCSS = ['/lib/jasmine/jasmine.css']
+    if req.param 'start'
+      locals.specURIs.start = true
     this.render URI, {locals: locals}
   next()
 app.use app.router
 #app.use(require('stylus').middleware({src: config.staticDir}))
+app.use express.compiler(src: __dirname + '/public', enable: ['coffeescript'])
 app.use express.static(config.staticDir)
 if config.env.testing or config.env.development
   #Note to self. Make sure compiler comes BEFORE static
@@ -59,6 +60,8 @@ defaultLocals =
   wordpress: false
   specURIs: []
   testCSS: []
+
+defaultLocals.specURIs.start = false
 
 
 ['galleries', 'photos'].map (controllerName) ->
