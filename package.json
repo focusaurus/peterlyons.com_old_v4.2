@@ -13,8 +13,8 @@
   "dependencies": {
     "async": "~0.1",
     "coffee-script": "~1.0",
-    "express": "~1.0",
-    "jade": "~0.10",
+    "express": ">=2.0",
+    "jade": "~0.12",
     "jasbin": "~1.0",
     "jasmine-node": "~1.0",
     "markdown-js": "*",
