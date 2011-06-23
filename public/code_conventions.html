@@ -136,37 +136,37 @@ Line principle. For example,</p>
 
 <pre>
 _platformCfg = {
-"FedoraLinux" :
-{ "releases"     : {"1":0,
-                    "2":0,
-                    "3":0},
-"longName"     : "Fedora Core Linux",
-"dfCmd"        : "df -k",
-"sttyUnset"    : "stty noflsh echo",
-"netstatCmd"   : "netstat -na | grep ":%s " | grep LISTEN",
-},
-"RHLinux" :
-{ "releases"     : {"6.2":1,
-"7.1":1,
-"7.2":1,
-"7.3":1,
-"8.0":1,
-"9":0,
-"2.1WS":1,
-"2.1ES":1,
-"2.1AS":1,
-"3WS":1,
-"3ES":1,
-"3AS":1,
-"4WS":1,
-"4ES":1,
-"4AS":1},
-"longName"     : "Red Hat Linux",
-"dfCmd"        : "df -k",
-"sttyUnset"    : "stty noflsh echo",
-"netstatCmd"   : "netstat -na | grep ":%s " | grep LISTEN",
-},
-"SuSELinux" :
+                "FedoraLinux" :
+                { "releases"     : {"1":0,
+                                    "2":0,
+                                    "3":0},
+                "longName"     : "Fedora Core Linux",
+                  "dfCmd"        : "df -k",
+                  "sttyUnset"    : "stty noflsh echo",
+                  "netstatCmd"   : "netstat -na | grep ":%s " | grep LISTEN",
+                },
+                "RHLinux" :
+                { "releases"     : {"6.2":1,
+                                    "7.1":1,
+                                    "7.2":1,
+                                    "7.3":1,
+                                    "8.0":1,
+                                    "9":0,
+                                    "2.1WS":1,
+                                    "2.1ES":1,
+                                    "2.1AS":1,
+                                    "3WS":1,
+                                    "3ES":1,
+                                    "3AS":1,
+                                    "4WS":1,
+                                    "4ES":1,
+                                    "4AS":1},
+                "longName"     : "Red Hat Linux",
+                  "dfCmd"        : "df -k",
+                  "sttyUnset"    : "stty noflsh echo",
+                  "netstatCmd"   : "netstat -na | grep ":%s " | grep LISTEN",
+                },
+                "SuSELinux" :
 &lt;REMAINING OMITTED FOR BREVITY&gt;
 </pre>
 
@@ -184,8 +184,8 @@ _platformCfg["FedoraLinux"] = _fedoraCfg
 
 _rhCfg = _fedoraCfg.copy()
 _rhCfg["releases"] = {"6.2": 1, "7.1": 1, "7.2": 1, "7.3": 1, "8.0": 1,
-"9": 0, "2.1WS": 1, "2.1ES": 1, "2.1AS": 1, "3WS": 1, "3ES": 1,
-"3AS": 1, "4WS": 1, "4ES": 1, "4AS": 1, "5SERVER": 1, "5CLIENT": 1}
+     "9": 0, "2.1WS": 1, "2.1ES": 1, "2.1AS": 1, "3WS": 1, "3ES": 1,
+     "3AS": 1, "4WS": 1, "4ES": 1, "4AS": 1, "5SERVER": 1, "5CLIENT": 1}
 _rhCfg["longName"] = "Red Hat Linux"
 _rhCfg["netstatRe"] = "tcp.+:%s.+LISTEN"
 _platformCfg["RHLinux"] = _rhCfg
