@@ -3,9 +3,9 @@
  * @package WordPress
  * @subpackage Theme_Compat
  * @deprecated 3.0
- * 
+ *
  * This file is here for Backwards compatibility with old themes and will be removed in a future version
- * 
+ *
  */
 _deprecated_file( sprintf( __( 'Theme without %1$s' ), basename(__FILE__) ), '3.0', null, sprintf( __('Please include a %1$s template in your theme.'), basename(__FILE__) ) );
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -53,7 +53,7 @@ if ( post_password_required($post) ) {  // and it doesn't match the cookie
 <?php foreach ($comments as $comment) { ?>
 	<li id="comment-<?php comment_ID() ?>">
 	<?php comment_text() ?>
-	<p><cite><?php comment_type(__('Comment'), __('Trackback'), __('Pingback')); ?> <?php printf(__('by %1$s &#8212; %2$s @ <a href="#comment-%3$s">%4$s</a>'), get_comment_author_link(), get_comment_date(), get_comment_ID(), get_comment_time()); ?></cite></p>
+	<p><cite><?php comment_type(); ?> <?php printf(__('by %1$s &#8212; %2$s @ <a href="#comment-%3$s">%4$s</a>'), get_comment_author_link(), get_comment_date(), get_comment_ID(), get_comment_time()); ?></cite></p>
 	</li>
 
 <?php } // end for each comment ?>
