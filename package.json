@@ -1,11 +1,11 @@
 {
   "name": "peterlyons.com",
   "description": "The Node/Express Web App that powers the peterlyons.com web site",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "http://peterlyons.com",
   "repository": "ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com",
   "author": "Peter Lyons <pete@peterlyons.com> (http://peterlyons.com)",
-  "main": "server.coffee",
+  "main": "app/server.coffee",
   "engines": {
     "node": "*"
   },
