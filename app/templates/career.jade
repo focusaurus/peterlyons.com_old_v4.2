@@ -1,15 +1,11 @@
 :coffeescript
   window.reversePhases = ->
     phases = []
-    parent = $("div.phase").parent()
-    $("div.phase").each (index, div)->
+    parent = $('div.phase').parent()
+    $('div.phase').each (index, div)->
       $(div).remove()
-        phases.unshift $(div)
-        #The above line must be indented an extra level due to a bug in jade
-        #with the coffeescript filter
-        #https://github.com/visionmedia/jade/issues/#issue/197
+      phases.unshift $(div)
     parent.append phase for phase in phases
-
 :markdown
   I have a **[traditional resume availabe in PDF format](resume.pdf)** for those
   looking for the lo-fi version.

@@ -10,10 +10,6 @@ class WP_Importer {
 	 */
 	function __construct() {}
 
-	function WP_Importer() {
-		$this->__construct();
-	}
-
 	/**
 	 * Returns array with imported permalinks from WordPress database
 	 *
@@ -130,7 +126,8 @@ class WP_Importer {
 			}
 			if ( empty( $parsed['path'] ) )
 				$parsed['path'] = '/';
-			if ( !$blog = get_blog_info( $parsed['host'], $parsed['path'] ) ) {
+			$blog = get_blog_details( array( 'domain' => $parsed['host'], 'path' => $parsed['path'] ) );
+			if ( !$blog ) {
 				fwrite( STDERR, "Error: Could not find blog\n" );
 				exit();
 			}
@@ -215,7 +212,7 @@ class WP_Importer {
 	 * @return bool
 	 */
 	function is_user_over_quota() {
-		global $current_user, $current_blog;
+		global $current_blog;
 
 		if ( function_exists( 'upload_is_user_over_quota' ) ) {
 			if ( upload_is_user_over_quota( 1 ) ) {

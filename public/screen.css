@@ -182,6 +182,12 @@ code, pre {
     padding-right: 4px;
 }
 
+/********** Home Page **********/
+p.logo img {
+    margin: 0px 4px;
+    vertial-align: middle;
+}
+
 /********** Photo Gallery **********/
 .caption {
   font-size: 14pt;

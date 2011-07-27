@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Code Conventions | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears"><meta name="author" content="Peter Lyons"><meta name="description" content="The web site for Peter Lyons, Web Developer and Musician"><meta name="copyright" content="2001, Peter Lyons"><link rel="stylesheet" href="/screen.css" type="text/css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css" type="text/css"><script type="text/javascript" src="/js/jquery.js"></script><script type="text/javascript" src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css"></head><body><div id="header"><a href="/"><img src="/images/peter_lyons_logo.png" alt="Peter Lyons" class="logo"></a></div><div id="site_nav"><div class="technology"><div class="gray">Technology</div><img src="/images/keyboard_icon_alt.png" class="keyboard_icon"><div class="nav_links"><a href="/problog">Blog</a><br><a href="/career.html">Career</a><br>Projects<br><span class="indent"><a href="/linkzie.html">Linkzie</a></span><br><span class="indent"><a href="/smartears.html">SmartEars</a></span><br><span class="indent"><a href="/bigclock.html">BigClock</a></span><br><a href="/leveling_up.html">Leveling Up</a><br><a href="/code_conventions.html">Code Conventions</a></div></div><div class="music"><div class="gray">Music</div><img src="/images/sax_icon.png" class="sax_icon"><div class="nav_links"><a href="/bands.html">Bands</a><br><a href="/oberlin.html">Oberlin</a><br><a href="/favorites.html">Favorites</a></div></div><div class="personal"><div class="gray">Personal</div><img src="/images/peter_icon.png" class="peter_icon"><div class="nav_links"><a href="/persblog">Blog</a><br><a href="/app/photos">Photos</a></div></div></div><div id="main_content"><p>This page will document conventions I use when writing computer code.
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Code Conventions | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears"><meta name:author content="Peter Lyons"><meta name="description" content="The web site for Peter Lyons, Web Developer and Musician"><meta name="copyright" content="2001, Peter Lyons"><link rel="stylesheet" href="/screen.css" type="text/css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css" type="text/css"><script type="text/javascript" src="/js/jquery.js"></script><script type="text/javascript" src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css"></head><body><div id="header"><a href="/"><img src="/images/peter_lyons_logo.png" alt="Peter Lyons" class="logo"></a></div><div id="site_nav"><div class="technology"><div class="gray">Technology</div><img src="/images/keyboard_icon_alt.png" alt="" class="keyboard_icon"><div class="nav_links"><a href="/problog">Blog</a><br><a href="/career.html">Career</a><br>Projects<br><span class="indent"><a href="http://othenticate.com">Othenticate </a></span><br><span class="indent"><a href="/linkzie.html">Linkzie</a></span><br><span class="indent"><a href="/smartears.html">SmartEars</a></span><br><span class="indent"><a href="/bigclock.html">BigClock</a></span><br><a href="/leveling_up.html">Leveling Up</a><br><a href="/code_conventions.html">Code Conventions</a></div></div><div class="music"><div class="gray">Music</div><img src="/images/sax_icon.png" alt="" class="sax_icon"><div class="nav_links"><a href="/bands.html">Bands</a><br><a href="/oberlin.html">Oberlin</a><br><a href="/favorites.html">Favorites</a></div></div><div class="personal"><div class="gray">Personal</div><img src="/images/peter_icon.png" alt="" class="peter_icon"><div class="nav_links"><a href="/persblog">Blog</a><br><a href="/app/photos">Photos</a></div></div></div><div id="main_content"><p>This page will document conventions I use when writing computer code.
 Hopefully folks will find them helpful. I will try to explain the reasoning
 behind each convention clearly. I have found the rationale omitted from many
 coding convention guidelines and found that to be frustrating.</p>
@@ -40,7 +40,7 @@ For a sequence of statements where execution or declaration order doesn&#39;t ma
 <dd>
 People have varying mental capacities to keep things in their short term memory. Certain complex or compound statements urge the reader to fill up their short term memory with lots of intermediate products in order to comprehend a single complex statement. I find this difficult and especially frustrating when I&#39;m reading someone else&#39;s code. And the code is broken. And I&#39;m tired and up late because that code is broken. And the author decided to write some fancy 200-character lambda expression with seven intermediate variables. Here&#39;s a real example I encountered at work (altered to protect the guilty):
 
-  elif svd[&#39;method&#39;] == &#39;some.literal.string&#39; and filter(lambda x: type(x) == type((0,)) and x[1], svd.results.get(&#39;test_totals&#39;,{}).items()):  
+    elif svd[&#39;method&#39;] == &#39;some.literal.string&#39; and filter(lambda x: type(x) == type((0,)) and x[1], svd.results.get(&#39;test_totals&#39;,{}).items()):
 
 That&#39;s a single expression! Completely unreadable to me. Clever, but worse
 than worthless.
@@ -75,16 +75,16 @@ straightforward and not full of nasty surprises and tricks.</p>
 <h1>General Guidelines</h1>
 
 <ul>
-<li>Don&#39;t use C-style abbreviations that truncate words or omit certain letters. For example: <code>message-&gt;msg, index-&gt;idx, value-&gt;val, createDispatcher-&gt;crtDisp</code>. I find these highly problematic and irritating. First, they don&#39;t follow a single clear rule about how the abbreviation is achieved (sometimes truncation, sometimes dropping just vowels, sometimes dropping certain consonants). Secondly, they aren&#39;t clearly pronouncable. Pronouncability helps when discussing code and thinking about it in an audible voice in one&#39;s own mind. Thirdly, the premises that originated this convention (presumably ease of typing or length limits imposed by early languages and tools) are no longer relevant. All decent editors have word completion and/or code completion. Modern languages and tools don&#39;t have tiny eight-character length limits anymore. Also, as a native English speaker I find it hard enough to parse these things. I assume this is especially difficult for non-native speakers. Editor&#39;s note: Never abbreviate the word "password" in code. Don&#39;t use "pass". Don&#39;t use "passwd". Don&#39;t use "pwd". Don&#39;t use "pword". Don&#39;t do it. I will hunt you down. You must be stopped. The following exceptions are accomodating because of their extreme popularity: <code>database-&gt;Db (so connectToDatabase-&gt;connectToDb), identifier-&gt;Id</code>.  </li>
-<li>Acronyms should be in all caps, even if this eliminates your <code>camelCase</code> boundaries. Examples (how I prefer it): <code>startHTTPDownload, leaveURLAlone, disconnectTCP</code>. This is just because acronyms must always be capitalized by their nature. It&#39;s part of what makes them an acronym.  </li>
-<li>In configuration files, interactive prompts, and examples, the most usable terms for end users to enter for boolean options are "yes" and "no". These should be used in documentation and examples. We should be case insensitive and lenient and accept many synonyms such as "enabled", "true", "t", "on", "1".  </li>
-<li>In log files favor fewer distinct log statements, but pack a lot of data into each log statements (include IDs, full paths, lots of context info)  </li>
-<li>Don&#39;t code statements that are optional or will automatically be handled by the system (examples below)  </li>
-<li>The official guidelines I link to disallow this already, but just to be clear, don&#39;t use ASCII art layout tricks with extra spaces to try to beautify or create vertical alignment in your code.  </li>
-<li>Don&#39;t leave decoys. This applies to files, directories, classes, methods, properties, variables, database tables, database table columns, etc. If something is unused and unneeded because it was coded and never actually tied into the execution path of the program, delete it. If it was previously used and isn&#39;t any more, delete it. All this decoy stuff just waste&#39;s the reader&#39;s time trying to understand it or assuming it does get executed and wasting time (potentially lots of time). If it&#39;s perfectly valid code that you might need later, you can pull it from your source control system later. If you really can&#39;t part with it, create a clearly labeled "graveyard" file or directory or package where you can stash it where it is clear that it is not executing.  </li>
-<li>I favor the term "invalid" to "illegal" since it is more accurate and the word "illegal" has a very specific connotation to me  </li>
-<li>Some folks advocate a length limit on methods or functions. They say that chunks of related code should be refactored out into a separate function and then called from the original function. I usually do not find this helpful. Generally, if code is only executed once, I don&#39;t put it into it&#39;s own function. I find long methods are perfectly readable top to bottom and actually more readable than jumping all over the place to numerous helper functions that are not referenced elsewhere. So if a function has relatively small chunks of related code one after the other, I&#39;m fine with it being one really long function. After all, this is the essence of computation: a long list of instructions. However, things can become less readable when there is a relatively long stretch of code that goes off on a tangent that is loosely coupled to the rest of the code. In that case, it makes sense to refactor out to a dedicated function. For example: 10 lines of validation, 25 lines of parsing, 12 lines of computing A, 30 lines of computing B, 25 lines of formatting the result - this can all be in one function. However, 6 lines of validation, 4 lines of parsing, 200 lines of computing B, 3 lines of formatting the result - it makes sense to compute B in a separate function. It&#39;s long enough that it is hard to maintain context on the surronding code while reading all the code that computes B.  </li>
-<li>Avoid double negatives with boolean variables. Instead, use a positive verb whose meaning is negative. <code>skipCache = True</code> is better than <code>noCache = True</code>.  </li>
+<li>Don&#39;t use C-style abbreviations that truncate words or omit certain letters. For example: <code>message-&gt;msg, index-&gt;idx, value-&gt;val, createDispatcher-&gt;crtDisp</code>. I find these highly problematic and irritating. First, they don&#39;t follow a single clear rule about how the abbreviation is achieved (sometimes truncation, sometimes dropping just vowels, sometimes dropping certain consonants). Secondly, they aren&#39;t clearly pronouncable. Pronouncability helps when discussing code and thinking about it in an audible voice in one&#39;s own mind. Thirdly, the premises that originated this convention (presumably ease of typing or length limits imposed by early languages and tools) are no longer relevant. All decent editors have word completion and/or code completion. Modern languages and tools don&#39;t have tiny eight-character length limits anymore. Also, as a native English speaker I find it hard enough to parse these things. I assume this is especially difficult for non-native speakers. Editor&#39;s note: Never abbreviate the word "password" in code. Don&#39;t use "pass". Don&#39;t use "passwd". Don&#39;t use "pwd". Don&#39;t use "pword". Don&#39;t do it. I will hunt you down. You must be stopped. The following exceptions are accomodating because of their extreme popularity: <code>database-&gt;Db (so connectToDatabase-&gt;connectToDb), identifier-&gt;Id</code>.</li>
+<li>Acronyms should be in all caps, even if this eliminates your <code>camelCase</code> boundaries. Examples (how I prefer it): <code>startHTTPDownload, leaveURLAlone, disconnectTCP</code>. This is just because acronyms must always be capitalized by their nature. It&#39;s part of what makes them an acronym.</li>
+<li>In configuration files, interactive prompts, and examples, the most usable terms for end users to enter for boolean options are "yes" and "no". These should be used in documentation and examples. We should be case insensitive and lenient and accept many synonyms such as "enabled", "true", "t", "on", "1".</li>
+<li>In log files favor fewer distinct log statements, but pack a lot of data into each log statements (include IDs, full paths, lots of context info)</li>
+<li>Don&#39;t code statements that are optional or will automatically be handled by the system (examples below)</li>
+<li>The official guidelines I link to disallow this already, but just to be clear, don&#39;t use ASCII art layout tricks with extra spaces to try to beautify or create vertical alignment in your code.</li>
+<li>Don&#39;t leave decoys. This applies to files, directories, classes, methods, properties, variables, database tables, database table columns, etc. If something is unused and unneeded because it was coded and never actually tied into the execution path of the program, delete it. If it was previously used and isn&#39;t any more, delete it. All this decoy stuff just waste&#39;s the reader&#39;s time trying to understand it or assuming it does get executed and wasting time (potentially lots of time). If it&#39;s perfectly valid code that you might need later, you can pull it from your source control system later. If you really can&#39;t part with it, create a clearly labeled "graveyard" file or directory or package where you can stash it where it is clear that it is not executing.</li>
+<li>I favor the term "invalid" to "illegal" since it is more accurate and the word "illegal" has a very specific connotation to me</li>
+<li>Some folks advocate a length limit on methods or functions. They say that chunks of related code should be refactored out into a separate function and then called from the original function. I usually do not find this helpful. Generally, if code is only executed once, I don&#39;t put it into it&#39;s own function. I find long methods are perfectly readable top to bottom and actually more readable than jumping all over the place to numerous helper functions that are not referenced elsewhere. So if a function has relatively small chunks of related code one after the other, I&#39;m fine with it being one really long function. After all, this is the essence of computation: a long list of instructions. However, things can become less readable when there is a relatively long stretch of code that goes off on a tangent that is loosely coupled to the rest of the code. In that case, it makes sense to refactor out to a dedicated function. For example: 10 lines of validation, 25 lines of parsing, 12 lines of computing A, 30 lines of computing B, 25 lines of formatting the result - this can all be in one function. However, 6 lines of validation, 4 lines of parsing, 200 lines of computing B, 3 lines of formatting the result - it makes sense to compute B in a separate function. It&#39;s long enough that it is hard to maintain context on the surronding code while reading all the code that computes B.</li>
+<li>Avoid double negatives with boolean variables. Instead, use a positive verb whose meaning is negative. <code>skipCache = True</code> is better than <code>noCache = True</code>.</li>
 </ul>
 
 <h1>Python Conventions</h1>
@@ -115,16 +115,16 @@ consistency though, it totally gums up the works and slows me to a frustrating
 crawl.</p>
 
 <ul>
-<li>Prefer double quotes for most strings. Python allows either, but we should just pick one that we use primarily. Double quotes makes switching between java/c/python easier and allows embedding apostrophes, which is probably slightly more common than needing to embed double quotes. If your string literal needs to contain double quotes, use single quotes.  </li>
-<li>Use <code>camelCase</code> names for variables and methods. Do not use <code>lowercase_with_underscores</code>. This makes switching between java and python easier and seems to be the overall winner in the OO languages I am familiar with. Note that this is in contradiction with <a href="http://www.python.org/dev/peps/pep-0008/">PEP 8</a>, but in my experience <code>camelCase</code> is just the winner across multiple OO languages and at this point trying to convert to <code>lowercase_with_underscores</code> just seems like an uphil battle. I could potentially convinced to stick to <a href="http://www.python.org/dev/peps/pep-0008/">PEP 8</a> here, but as of now I use <code>camelCase</code>, as do many python libraries.  </li>
-<li>Import statements should be one per line (don&#39;t use import modone, modtwo, modthree). (Make One Choice principle), (Fewer Statements Per Line)  </li>
-<li>When order of execution is not important, imports should be sorted asciibetically (When In Doubt, Alphabetize). This is within the import statement groupings described in <a href="http://www.python.org/dev/peps/pep-0008/">PEP 8</a>.  </li>
-<li>import statements should all be done at the beginning of the module unless there is a legitimate reason to do otherwise (Make One Choice)  </li>
-<li>Most of the time, I avoid the "from" keyword in imports and keep the module/package namespace explicit (i.e. always use os.path). The reason is this keeps it clear exactly where each function is coming from. If you have more than one <code>from somepkg import *</code> line in a module, the reader may have to do annoying busywork to track down which module contains a particular function. (Readability Is King).  </li>
-<li>class member property initializations in constructors should be done asciibetically unless execution order matters (When In Doubt, Alphabetize)  </li>
-<li>Prefer the string substitution <code>%</code> operator over using <code>+</code> to build strings. I just find it more elegant and easier to change the string later. I use this exclusively in accordance with the Make One Choice principle.  </li>
-<li>Don&#39;t bother closing file objects in short-lived programs such as command line utilities or scripts. Files will be closed automatically by the interpreter. Explicit closing is often regarded as "good form", but I see no strong justification for this for small programs, or even in larger programs where the open file variable is inside a local method/function scope. It&#39;s code that you get essentially for free anyway and typing it just means you could do it wrong or make a typo.  </li>
-<li>Always have a new line after an <code>if</code> statement. (Make One Choice)  </li>
+<li>Prefer double quotes for most strings. Python allows either, but we should just pick one that we use primarily. Double quotes makes switching between java/c/python easier and allows embedding apostrophes, which is probably slightly more common than needing to embed double quotes. If your string literal needs to contain double quotes, use single quotes.</li>
+<li>Use <code>camelCase</code> names for variables and methods. Do not use <code>lowercase_with_underscores</code>. This makes switching between java and python easier and seems to be the overall winner in the OO languages I am familiar with. Note that this is in contradiction with <a href="http://www.python.org/dev/peps/pep-0008/">PEP 8</a>, but in my experience <code>camelCase</code> is just the winner across multiple OO languages and at this point trying to convert to <code>lowercase_with_underscores</code> just seems like an uphil battle. I could potentially convinced to stick to <a href="http://www.python.org/dev/peps/pep-0008/">PEP 8</a> here, but as of now I use <code>camelCase</code>, as do many python libraries.</li>
+<li>Import statements should be one per line (don&#39;t use import modone, modtwo, modthree). (Make One Choice principle), (Fewer Statements Per Line)</li>
+<li>When order of execution is not important, imports should be sorted asciibetically (When In Doubt, Alphabetize). This is within the import statement groupings described in <a href="http://www.python.org/dev/peps/pep-0008/">PEP 8</a>.</li>
+<li>import statements should all be done at the beginning of the module unless there is a legitimate reason to do otherwise (Make One Choice)</li>
+<li>Most of the time, I avoid the "from" keyword in imports and keep the module/package namespace explicit (i.e. always use os.path). The reason is this keeps it clear exactly where each function is coming from. If you have more than one <code>from somepkg import *</code> line in a module, the reader may have to do annoying busywork to track down which module contains a particular function. (Readability Is King).</li>
+<li>class member property initializations in constructors should be done asciibetically unless execution order matters (When In Doubt, Alphabetize)</li>
+<li>Prefer the string substitution <code>%</code> operator over using <code>+</code> to build strings. I just find it more elegant and easier to change the string later. I use this exclusively in accordance with the Make One Choice principle.</li>
+<li>Don&#39;t bother closing file objects in short-lived programs such as command line utilities or scripts. Files will be closed automatically by the interpreter. Explicit closing is often regarded as "good form", but I see no strong justification for this for small programs, or even in larger programs where the open file variable is inside a local method/function scope. It&#39;s code that you get essentially for free anyway and typing it just means you could do it wrong or make a typo.</li>
+<li>Always have a new line after an <code>if</code> statement. (Make One Choice)</li>
 </ul>
 
 <p>When building lengthy inline data structures such as dictionaries or lists,
@@ -136,37 +136,37 @@ Line principle. For example,</p>
 
 <pre>
 _platformCfg = {
-  "FedoraLinux" :  
-  { "releases"     : {"1":0,  
-    "2":0,  
-  "3":0},  
-  "longName"     : "Fedora Core Linux",  
-    "dfCmd"        : "df -k",  
-  "sttyUnset"    : "stty noflsh echo",  
-  "netstatCmd"   : "netstat -na | grep ":%s " | grep LISTEN",  
-  },  
-  "RHLinux" :  
-  { "releases"     : {"6.2":1,  
-    "7.1":1,  
-  "7.2":1,  
-  "7.3":1,  
-  "8.0":1,  
-  "9":0,  
-  "2.1WS":1,  
-  "2.1ES":1,  
-  "2.1AS":1,  
-  "3WS":1,  
-  "3ES":1,  
-  "3AS":1,  
-  "4WS":1,  
-  "4ES":1,  
-  "4AS":1},  
-  "longName"     : "Red Hat Linux",  
-    "dfCmd"        : "df -k",  
-  "sttyUnset"    : "stty noflsh echo",  
-  "netstatCmd"   : "netstat -na | grep ":%s " | grep LISTEN",  
-  },  
-  "SuSELinux" :
+                "FedoraLinux" :
+                { "releases"     : {"1":0,
+                                    "2":0,
+                                    "3":0},
+                "longName"     : "Fedora Core Linux",
+                  "dfCmd"        : "df -k",
+                  "sttyUnset"    : "stty noflsh echo",
+                  "netstatCmd"   : "netstat -na | grep ":%s " | grep LISTEN",
+                },
+                "RHLinux" :
+                { "releases"     : {"6.2":1,
+                                    "7.1":1,
+                                    "7.2":1,
+                                    "7.3":1,
+                                    "8.0":1,
+                                    "9":0,
+                                    "2.1WS":1,
+                                    "2.1ES":1,
+                                    "2.1AS":1,
+                                    "3WS":1,
+                                    "3ES":1,
+                                    "3AS":1,
+                                    "4WS":1,
+                                    "4ES":1,
+                                    "4AS":1},
+                "longName"     : "Red Hat Linux",
+                  "dfCmd"        : "df -k",
+                  "sttyUnset"    : "stty noflsh echo",
+                  "netstatCmd"   : "netstat -na | grep ":%s " | grep LISTEN",
+                },
+                "SuSELinux" :
 &lt;REMAINING OMITTED FOR BREVITY&gt;
 </pre>
 
@@ -184,8 +184,8 @@ _platformCfg["FedoraLinux"] = _fedoraCfg
 
 _rhCfg = _fedoraCfg.copy()
 _rhCfg["releases"] = {"6.2": 1, "7.1": 1, "7.2": 1, "7.3": 1, "8.0": 1,
-  "9": 0, "2.1WS": 1, "2.1ES": 1, "2.1AS": 1, "3WS": 1, "3ES": 1,  
-  "3AS": 1, "4WS": 1, "4ES": 1, "4AS": 1, "5SERVER": 1, "5CLIENT": 1}
+     "9": 0, "2.1WS": 1, "2.1ES": 1, "2.1AS": 1, "3WS": 1, "3ES": 1,
+     "3AS": 1, "4WS": 1, "4ES": 1, "4AS": 1, "5SERVER": 1, "5CLIENT": 1}
 _rhCfg["longName"] = "Red Hat Linux"
 _rhCfg["netstatRe"] = "tcp.+:%s.+LISTEN"
 _platformCfg["RHLinux"] = _rhCfg
@@ -194,28 +194,28 @@ _platformCfg["RHLinux"] = _rhCfg
 <p>Why?</p>
 
 <ol>
-<li>Tracebacks with any errors in the first version will always print the first line, since the python interpreter considers it a single monster statement. Basically, you&#39;re hosed in knowing specifically where the problem is. (Fewer Statements Per Line)  </li>
-<li>Second version does not duplicate constant values, making it easier to change them in one place and be done with it. (Don&#39;t Repeat Yourself)  </li>
-<li>Second version is more expressive. It clearly indicates that you are copying all the data for one key and then just changing some values. The inline literal version requires you to eyeball all the data to attempt to make that determination.  </li>
-<li>As a general rule, I prefer more simple statements over fewer complex/compound statements since they require less working memory in your brain (Think In Small Chunks)  </li>
+<li>Tracebacks with any errors in the first version will always print the first line, since the python interpreter considers it a single monster statement. Basically, you&#39;re hosed in knowing specifically where the problem is. (Fewer Statements Per Line)</li>
+<li>Second version does not duplicate constant values, making it easier to change them in one place and be done with it. (Don&#39;t Repeat Yourself)</li>
+<li>Second version is more expressive. It clearly indicates that you are copying all the data for one key and then just changing some values. The inline literal version requires you to eyeball all the data to attempt to make that determination.</li>
+<li>As a general rule, I prefer more simple statements over fewer complex/compound statements since they require less working memory in your brain (Think In Small Chunks)</li>
 </ol>
 
 <h1>Java Conventions</h1>
 
 <ul>
-<li>Follow <a href="http://www.oracle.com/technetwork/java/codeconvtoc-136057.html">Oracle&#39;s Java Code Conventions</a> for formatting rules, etc.  </li>
-<li>I prefer <code>Collection.isEmpty()</code> over <code>Collection.size() == 0</code> because it is more directly expressive of the intent  </li>
-<li>Prefer java.util.List and the other collection classes to arrays. In general they are easier to work with and convenient. Arrays have a tendency to be annoying in java and require System.arraycopy or java.util.Arrays methods.  </li>
-<li>Prefer returning an empty collection instead of null. Null requires the caller to explicitly check for it. If you return an empty collection, the calling code that handles non-empty and empty are the same. The caller can always call <code>isEmpty</code> and special case that as needed.  </li>
-<li>When order of execution is not important (as is almost always the case in Java), imports should be sorted asciibetically (When In Doubt, Alphabetize). A blank line separating groups of related imports (standard java, each third party library, internal libraries, etc) are OK but I usually don&#39;t use them because the alphabetical sorting makes finding what the reader is looking for pretty easy already.  </li>
-<li>Never omit the curly braces from an <code>if</code> statement or other block beginner. (Make One Choice)  </li>
+<li>Follow <a href="http://www.oracle.com/technetwork/java/codeconvtoc-136057.html">Oracle&#39;s Java Code Conventions</a> for formatting rules, etc.</li>
+<li>I prefer <code>Collection.isEmpty()</code> over <code>Collection.size() == 0</code> because it is more directly expressive of the intent</li>
+<li>Prefer java.util.List and the other collection classes to arrays. In general they are easier to work with and convenient. Arrays have a tendency to be annoying in java and require System.arraycopy or java.util.Arrays methods.</li>
+<li>Prefer returning an empty collection instead of null. Null requires the caller to explicitly check for it. If you return an empty collection, the calling code that handles non-empty and empty are the same. The caller can always call <code>isEmpty</code> and special case that as needed.</li>
+<li>When order of execution is not important (as is almost always the case in Java), imports should be sorted asciibetically (When In Doubt, Alphabetize). A blank line separating groups of related imports (standard java, each third party library, internal libraries, etc) are OK but I usually don&#39;t use them because the alphabetical sorting makes finding what the reader is looking for pretty easy already.</li>
+<li>Never omit the curly braces from an <code>if</code> statement or other block beginner. (Make One Choice)</li>
 </ul>
 
 <h1>Bourne Shell Conventions</h1>
 
 <ul>
-<li>I exclusively use double quotes and curly braces when referencing variables: <code>"${MY_VAR}"</code>. This can avoid bugs when the value has embedded spaces. In certain circumstances you will need to omit the double quotes to get the correct behavior, but this will usually behave properly and handle values with spaces properly. (Make One Choice)  </li>
-<li>I use <code>UPPER_CASE_WITH_UNDERSCORES</code> for all variable names because that seems to be the clear convention.  </li>
+<li>I exclusively use double quotes and curly braces when referencing variables: <code>"${MY_VAR}"</code>. This can avoid bugs when the value has embedded spaces. In certain circumstances you will need to omit the double quotes to get the correct behavior, but this will usually behave properly and handle values with spaces properly. (Make One Choice)</li>
+<li>I use <code>UPPER_CASE_WITH_UNDERSCORES</code> for all variable names because that seems to be the clear convention.</li>
 </ul>
 
 <h1>Comments</h1>

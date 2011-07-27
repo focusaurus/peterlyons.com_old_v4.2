@@ -246,14 +246,14 @@ switch($step) {
 <script type="text/javascript" src="../wp-includes/js/jquery/jquery.js"></script>
 <script type="text/javascript" src="js/password-strength-meter.js"></script>
 <script type="text/javascript" src="js/user-profile.js"></script>
-<script type="text/javascript" src="js/utils.js"></script>
+<script type="text/javascript" src="../wp-includes/js/l10n.js"></script>
 <script type='text/javascript'>
 /* <![CDATA[ */
 var pwsL10n = {
  empty: "<?php echo esc_js( __( 'Strength indicator' ) ); ?>",
  short: "<?php echo esc_js( __( 'Very weak' ) ); ?>",
  bad: "<?php echo esc_js( __( 'Weak' ) ); ?>",
- good: "<?php echo esc_js( __( 'Medium' ) ); ?>",
+ good: "<?php echo esc_js( _x( 'Medium', 'password strength' ) ); ?>",
  strong: "<?php echo esc_js( __( 'Strong' ) ); ?>",
  mismatch: "<?php echo esc_js( __( 'Mismatch' ) ); ?>"
 };
