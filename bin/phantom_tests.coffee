@@ -56,6 +56,10 @@ jasmineWrapper = (page, next) ->
       window.result
     out result.output.join('')
     countFailure result.failedCount
+    if result.failedCount == 0
+      console.log '.'
+    else
+      console.log 'F'
     next()
   , 5 * 1000
 
@@ -91,4 +95,8 @@ pagesToTest.map (URI) ->
   actions.push new Test(baseURL + URI + '?test=1', jasmineWrapper)
 
 window.interact page, actions, verbose, ->
+  if failureCount == 0
+    console.log "all tests passed"
+  else
+    console.log "*** #{failureCount} TESTS FAILED ***"
   phantom.exit failureCount

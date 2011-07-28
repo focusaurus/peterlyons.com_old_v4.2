@@ -24,7 +24,7 @@ window.waitFor = (testFx, onReady, timeOutMillis=3000) ->
                 phantom.exit(1)
             else
                 # Condition fulfilled (timeout and/or condition is 'true')
-                console.log "'waitFor()' finished in #{new Date().getTime() - start}ms."
+                #console.log "'waitFor()' finished in #{new Date().getTime() - start}ms."
                 if typeof onReady is 'string' then eval onReady else onReady() #< Do what it's supposed to do once the condition is fulfilled
                 clearInterval interval #< Stop this interval
     interval = setInterval f, 250 #< repeat check every 250ms

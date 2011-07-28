@@ -349,7 +349,7 @@ app:prod_release() {
     eval $(ssh-agent -s) && ssh-add
     git checkout develop
     git pull origin develop
-    #BUGBUG disabling tests until phantomjs upgrade done.# app:test 
+    app:test
     echo "Current version is $(cat version.txt)"
     echo -n "New version: "
     read NEW_VERSION
