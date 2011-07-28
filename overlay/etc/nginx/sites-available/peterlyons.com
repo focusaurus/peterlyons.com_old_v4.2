@@ -1,5 +1,5 @@
 server {
-    listen 80;
+    listen 80 default_server;
     #This matches peterlyons.com and *.peterlyons.com
     server_name .peterlyons.com;
     #This is essential so we can use the same configuration in production and staging
