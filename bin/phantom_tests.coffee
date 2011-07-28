@@ -1,107 +1,74 @@
 ########## Global Setup Stuff ##########
 baseURL = 'http://localhost:9400'
 verbose = phantom.args[0] in ["--verbose", "-v"]
+phantom.injectJs 'interact.coffee'
+phantom.injectJs 'waitfor.coffee'
 
 ########## Shared Helper Functions ##########
 out = (message) ->
   if verbose
     console.log '>...' + message
+failureCount = 0
+countFailure = (count) ->
+  failureCount += count
 
-status = (result, description, indent='') ->
-  marker = ''
-  if result.skipped
-    status = 'SKIPPED'
-  else if result.failedCount == 0
-    status = 'passed'
-  else
-    status = 'FAILED' 
-    marker = '*'
-  return "#{marker}#{indent}#{description} #{status} " + \
-    "(#{result.passedCount} pass/#{result.failedCount} fail)"
+runJasmine = ->
+  window.result = done: false, output: ['\n']
+  if not jasmine?
+    console.log 'The app server looks to NOT BE RUNNING. START IT.'
+    window.result.done = true
+    return
 
-#This is a callback the tests invoke when they finish
-runNextTest = ->
-  queue = getQueue()
-  if queue.length == 0
-    #We're done
-    out 'DONE'
-    phantom.exit getFailureCount()
-  else
-    openNextURL()
+  status = (result, description, indent='') ->
+    marker = ''
+    if result.skipped
+      label = 'SKIPPED'
+    else if result.failedCount == 0
+      label = 'passed'
+    else
+      label = 'FAILED' 
+      marker = '*'
+    return "#{marker}#{indent}#{description}: #{label} " + \
+      "(#{result.passedCount} pass/#{result.failedCount} fail)\n"
 
-openNextURL = () ->
-  testName = getQueue()[0][0]
-  URL = baseURL + testName
-  if testName.indexOf('?') < 0
-    URL += '?'
-  URL += 'test=1'
-  phantom.open URL
+  output = window.result.output
+  jasmine.getEnv().currentRunner().finishCallback = ->
+    runner = jasmine.getEnv().currentRunner()
+    for suite in runner.suites()
+      output.push status(suite.results(), suite.description)
+      for spec in suite.specs()
+        output.push status(spec.results(), spec.description, '  ')
+      output.push '\n'
 
-########## State Management Functions ##########
-_getState = ->
-  if phantom.state
-    return JSON.parse phantom.state
-  else
-    return {failCount: 0, queue: []}
+    results = runner.results()
+    output.push status(results, 'All Jasmine Tests')
+    window.result.failedCount = results.failedCount
+    window.result.done = true
+  jasmine.getEnv().execute()
 
-_setState = (state) ->
-  out "Saving queue: #{state.queue} with failCount #{state.failCount}"
-  phantom.state = JSON.stringify state
+jasmineWrapper = (page, next) ->
+  page.evaluate runJasmine
+  waitFor ->
+    page.evaluate ->
+      window.result?.done or false
+  , ->
+    result = page.evaluate ->
+      window.result
+    out result.output.join('')
+    countFailure result.failedCount
+    next()
+  , 5 * 1000
 
-getQueue = ->
-  return _getState().queue
-
-setQueue = (queue) ->
-  state = _getState()
-  state.queue = queue
-  _setState state
-  return queue
-
-countFailure = (count=1) ->
-  state = _getState()
-  state.failCount += count
-  _setState state
-
-getFailureCount = ->
-  state = _getState()
-  return state.failCount
-
-########## Test Functions ##########
-testFunctions =
-  wordpress: (path, callback) ->
-    describe 'The wordpress header_boilerplate.php output', ->
-      it 'should include embedded PHP markup', ->
-        done = done: false
-        $.get '/?wordpress=1', (html, textStatus, response) ->
-          expect(response.status).toEqual 200
-          expect(html).toContain '<?php bloginfo'
-          expect(html).toContain '<?php get_sidebar'
-          expect(html).toContain 'WORDPRESS HEADER BOILERPLATE'
-          done.done = true
-        waitsFor ->
-          done.done
-    testFunctions.runJasmine path + '?wordpress=1', callback
-
-  runJasmine: (path, callback) ->
-    if not jasmine?
-      console.log 'The node.js app server looks to NOT BE RUNNING. START IT.'
-      phantom.exit 15
-    jasmine.getEnv().currentRunner().finishCallback = () ->
-      runner = jasmine.getEnv().currentRunner()
-      results = runner.results()
-      output = []
-      if verbose
-        for suite in runner.suites()
-          output.push status(suite.results(), suite.description)
-          for spec in suite.specs()
-            output.push status(spec.results(), spec.description, '  ')
-              
-      countFailure results.failedCount
-      output.push status(results, "Tests on #{path}")
-      console.log output.join ''
-      callback()
-    jasmine.getEnv().execute()
-
+page = new WebPage()
+page.settings.loadImages = false
+page.settings.loadPlugins = false
+page.onConsoleMessage = (message) ->
+  if message.indexOf("Unsafe JavaScript") == 0
+    return
+  out message
+class Test
+  constructor: (@URI, @toRun) ->
+########## Custom Logic ##########
 pagesToTest = [
   '/'
   '/home'
@@ -119,20 +86,9 @@ pagesToTest = [
   '/app/photos'
   '/leveling_up'
 ]
-pagesToTest = pagesToTest.map (page)-> return [page, 'runJasmine']
-pagesToTest.push ['/', 'wordpress']
+actions = []
+pagesToTest.map (URI) ->
+  actions.push new Test(baseURL + URI + '?test=1', jasmineWrapper)
 
-out pagesToTest
-out('phantom.state is: ' + phantom.state)
-switch phantom.state
-  when ''
-    #populate the initial test queue
-    setQueue pagesToTest
-    #This kicks off the test cycle
-    openNextURL()
-  else
-    #parse the queue JSON
-    queue = getQueue()
-    test = queue.shift()
-    setQueue queue
-    testFunctions[test[1]].apply window,[test[0], runNextTest]
+window.interact page, actions, verbose, ->
+  phantom.exit failureCount
