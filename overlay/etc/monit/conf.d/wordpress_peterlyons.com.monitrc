@@ -1,0 +1,6 @@
+#php5-cgi for peterlyons.com (Wordpress blogs PHP implementation)
+check host "wordpress_peterlyons.com" with address 127.0.0.1
+    start = "/sbin/start wordpress_peterlyons"
+    stop = "/sbin/stop wordpress_peterlyons"
+    if failed host 127.0.0.1 port 9200 then restart
+    if 5 restarts within 5 cycles then timeout
