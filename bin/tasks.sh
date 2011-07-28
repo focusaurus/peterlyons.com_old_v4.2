@@ -99,7 +99,7 @@ link() {
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
-    link "/etc/monit/conf.d/php5-cgi_${SITE}.monitrc"
+    link "/etc/monit/conf.d/wordpress_${SITE}.monitrc"
     link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
     link "/etc/monit/conf.d/node_${SITE}.monitrc"
     link "/etc/monit/conf.d/mysql_${SITE}.monitrc"

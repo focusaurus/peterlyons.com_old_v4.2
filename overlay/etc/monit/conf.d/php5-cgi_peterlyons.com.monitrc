@@ -1,7 +1,0 @@
-#php5-cgi for peterlyons.com (Wordpress blogs PHP implementation)
-check process "php5-cgi_peterlyons.com"
-    with pidfile "/var/run/php5-cgi_peterlyons.com.pid"
-    start = "/usr/bin/service php5-cgi_peterlyons.com start"
-    stop = "/usr/bin/service php5-cgi_peterlyons.com stop"
-    if failed host 127.0.0.1 port 9200 then restart
-    if 5 restarts within 5 cycles then timeout
