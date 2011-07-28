@@ -76,7 +76,7 @@ exports.setup = (app) ->
           partials[key] = data
           excerpt = data.slice(0, 20).replace '\n', '\\n'
           console.log "Stored data in key #{key}: #{excerpt}..."
-  
+
   #Route all the simple static pages
   route app, page for page in pages
 
