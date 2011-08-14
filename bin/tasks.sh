@@ -99,16 +99,15 @@ link() {
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
-    link "/etc/monit/conf.d/php5-cgi_${SITE}.monitrc"
+    link "/etc/monit/conf.d/wordpress_${SITE}.monitrc"
     link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
     link "/etc/monit/conf.d/node_${SITE}.monitrc"
     link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
-    link "/etc/init.d/php5-cgi_${SITE}"
     link "/etc/init/node_peterlyons.conf"
+    link "/etc/init/wordpress_peterlyons.conf"
     cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
     cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
-    update-rc.d "php5-cgi_${SITE}" defaults
-    initctl reload-configuraton
+    initctl reload-configuration
     /etc/init.d/nginx reload
 }
 
