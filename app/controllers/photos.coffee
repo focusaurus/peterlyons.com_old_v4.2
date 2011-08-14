@@ -51,7 +51,7 @@ renderPhotos = (req, res) ->
   galleries.getGalleries (error, galleries) ->
     throw error if error
     locals.galleries = galleries
-    locals.gallery = new gallery.Gallery(conf.defaultGallery)
+    locals.gallery = _.sortBy(galleries, (g) -> g.startDate).slice(-1)[0]
     galleryParam = req.param 'gallery'
     galleryNames = _.pluck galleries, 'dirName'
     if _.contains galleryNames, galleryParam
