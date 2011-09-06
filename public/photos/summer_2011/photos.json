@@ -97,22 +97,6 @@
     "name" : "046_train_graffitti"
   },
   {
-    "caption" : "Test model I built for my hexayurt",
-    "name" : "050_hexayurt_model"
-  },
-  {
-    "caption" : "This is my shelter for Burning Man 2011",
-    "name" : "051_hexayurt"
-  },
-  {
-    "caption" : "It's 6 feet in the center and across the base",
-    "name" : "056_hexayurt"
-  },
-  {
-    "caption" : "view from the interior at the ceiling",
-    "name" : "057_hexayurt"
-  },
-  {
     "caption" : "Got a mohawk and some color. Just for fun.",
     "name" : "060_mohawk"
   },
@@ -123,5 +107,21 @@
   {
     "caption" : "",
     "name" : "062_mohawk"
+  },
+  {
+    "caption" : "I found Stedfast's venue transportation amusing",
+    "name" : "070_stedfast_gear"
+  },
+  {
+    "caption" : "The Dickens Opera House floor",
+    "name" : "071_dickens_opera_house"
+  },
+  {
+    "caption" : "Teenage punk sensations Stedfast",
+    "name" : "072_stedfast"
+  },
+  {
+    "caption" : "They did a costume change before playing their first number. Logan loved it.",
+    "name" : "074_steadfast"
   }
 ]

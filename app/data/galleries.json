@@ -1,5 +1,11 @@
 [
   {
+    "dirName" : "burning_man_2011",
+    "dirPath" : "./public/photos/burning_man_2011",
+    "displayName" : "Burning Man 2011",
+    "startDate" : "2011-08-24T06:00:00.000Z"
+  },
+  {
     "dirName" : "summer_2011",
     "dirPath" : "./public/photos/summer_2011",
     "displayName" : "Summer 2011",
