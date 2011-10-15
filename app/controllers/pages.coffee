@@ -94,11 +94,11 @@ exports.setup = (app) ->
         res.render 'error502', options
         return
       options.locals.body = markdown.makeHtml md
-      template = __dirname + '/../templates/layout.jade'
-      jade.renderFile template, options, (error, html) ->
+      fs.readFile __dirname + '/../templates/layout.jade', 'utf8', (error, template) ->
         if error
           res.render 'error502', options
           return
-        res.send html
+        fn = jade.compile template, options
+        res.send fn(options.locals)
 
 exports.Page = Page
