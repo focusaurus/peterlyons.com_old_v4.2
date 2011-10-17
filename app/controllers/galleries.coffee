@@ -3,6 +3,14 @@ fs = require 'fs'
 config = require '../../config'
 gallery = require '../models/gallery'
 
+defaultLocals =
+  config: config
+  title: ''
+  partials: []
+  wordpress: false
+  specURIs: []
+  testCSS: []
+
 exports.getGalleries = (callback) ->
   fs.readFile config.photos.galleryDataPath, (error, data) ->
     if error
@@ -12,7 +20,7 @@ exports.getGalleries = (callback) ->
     return callback(null, galleries)
 
 adminGalleries = (req, res) ->
-  getGalleries (error, jsonGalleries) ->
+  exports.getGalleries (error, jsonGalleries) ->
     throw error if error
     jsonNames = _.pluck(jsonGalleries, 'dirName')
     fs.readdir config.photos.galleryDir, (error, names) ->
@@ -31,7 +39,8 @@ adminGalleries = (req, res) ->
           if not date
             return ''
           return "#{date.getMonth() + 1}/#{date.getDate()}/#{date.getFullYear()}"
-      res.renderDefaults 'admin_galleries', locals
+      locals = _.defaults locals, defaultLocals
+      res.render 'admin_galleries', locals
 
 updateGalleries = (req, res) ->
   galleries = []
