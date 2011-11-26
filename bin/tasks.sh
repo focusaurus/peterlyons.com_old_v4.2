@@ -344,6 +344,9 @@ app:build_static() {
 }
 
 app:prod_release() {
+    echo "Hey did you remember to run ./bin/tasks.sh app:build_static?"
+    echo "CTRL-C if you forgot. Go do it. ENTER to proceed."
+    read DONTCARE
     echo "Performing a production peterlyons.com release"
     eval $(ssh-agent -s) && ssh-add
     git checkout develop
