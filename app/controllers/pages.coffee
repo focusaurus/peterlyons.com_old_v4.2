@@ -80,6 +80,19 @@ exports.setup = (app) ->
   #Route all the simple static pages
   route app, page for page in pages
 
+  renderMarkdown = (markdownPath, options, res) ->
+    fs.readFile __dirname + markdownPath, 'utf8', (error, md) ->
+      if error
+        res.render 'error502', options
+        return
+      options.locals.body = markdown.makeHtml md
+      fs.readFile __dirname + '/../templates/layout.jade', 'utf8', (error, template) ->
+        if error
+          res.render 'error502', options
+          return
+        fn = jade.compile template, options
+        res.send fn(options.locals)
+
   app.get '/leveling_up', (req, res) ->
     locals =
       title: 'Leveling Up: Career Advancement for Software Developers'
@@ -89,16 +102,16 @@ exports.setup = (app) ->
     addTests req, locals, ['/application/LevelingUpSpec.js']
     options =
       locals: locals
-    fs.readFile __dirname + '/../templates/leveling_up.md', 'utf8', (error, md) ->
-      if error
-        res.render 'error502', options
-        return
-      options.locals.body = markdown.makeHtml md
-      template = __dirname + '/../templates/layout.jade'
-      jade.renderFile template, options, (error, html) ->
-        if error
-          res.render 'error502', options
-          return
-        res.send html
+    renderMarkdown '/../templates/leveling_up.md', options, res
+
+  app.get '/web_prog', (req, res) ->
+    locals =
+      title: 'Web Programming Concepts for Non-Programmers'
+      body: ''
+      wordpress: false
+    locals = _.defaults locals, defaultLocals
+    options =
+      locals: locals
+    renderMarkdown '/../templates/web_prog.md', options, res
 
 exports.Page = Page

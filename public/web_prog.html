@@ -1,0 +1,181 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Web Programming Concepts for Non-Programmers | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears"><meta name:author content="Peter Lyons"><meta name="description" content="The web site for Peter Lyons, Web Developer and Musician"><meta name="copyright" content="2001, Peter Lyons"><link rel="stylesheet" href="/screen.css" type="text/css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css" type="text/css"><script type="text/javascript" src="/js/jquery.js"></script><script type="text/javascript" src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css"></head><body><div id="header"><a href="/"><img src="/images/peter_lyons_logo.png" alt="Peter Lyons" class="logo"></a></div><div id="site_nav"><div class="technology"><div class="gray">Technology</div><img src="/images/keyboard_icon_alt.png" alt="" class="keyboard_icon"><div class="nav_links"><a href="/problog">Blog</a><br><a href="/career.html">Career</a><br>Projects<br><span class="indent"><a href="http://othenticate.com">Othenticate </a></span><br><span class="indent"><a href="/linkzie.html">Linkzie</a></span><br><span class="indent"><a href="/smartears.html">SmartEars</a></span><br><span class="indent"><a href="/bigclock.html">BigClock</a></span><br><a href="/leveling_up.html">Leveling Up</a><br><a href="/code_conventions.html">Code Conventions</a><br><a href="/web_prog.html">Web Programming</a></div></div><div class="music"><div class="gray">Music</div><img src="/images/sax_icon.png" alt="" class="sax_icon"><div class="nav_links"><a href="/bands.html">Bands</a><br><a href="/oberlin.html">Oberlin</a><br><a href="/favorites.html">Favorites</a></div></div><div class="personal"><div class="gray">Personal</div><img src="/images/peter_icon.png" alt="" class="peter_icon"><div class="nav_links"><a href="/persblog">Blog</a><br><a href="/app/photos">Photos</a></div></div></div><div id="main_content"><h1>Web Programming Concepts for Non-programmers</h1>
+
+<p>After this class you will know a lot more about LAMP and POST and I don't mean this.</p>
+
+<p><img src="/images/2011/lamp_post.jpg" alt="Lamp Post" width="200px"/></p>
+
+<h2>Class Materials</h2>
+
+<p>Please bring to the class:</p>
+
+<ul>
+<li>a laptop with wifi</li>
+<li>Google Chrome web browser installed
+<ul><li><a href="http://www.google.com/chrome">Download Google Chrome here</a> if you don't already have it</li></ul></li>
+</ul>
+
+<h2>Web Basics</h2>
+
+<ul>
+<li>Internet vs. the Web</li>
+<li>5-minute lightning history of the web
+<ul><li>Tim Berners-Lee, Marc Andreessen</li>
+<li>Mosaic, Netscape, Yahoo</li>
+<li>See <a href="http://en.wikipedia.org/wiki/History_of_the_World_Wide_Web">the wikipedia article</a> for more details, although it is fairly lacking.</li></ul></li>
+<li>Browsers and servers</li>
+<li>URLs, Documents, HTML, Hyperlinks</li>
+<li>HTTP, CSS, Javascript</li>
+</ul>
+
+<h2>Web "Sites" Part 1</h2>
+
+<ul>
+<li>HTML
+<ul><li>Basic formatting elements</li></ul></li>
+<li>CSS
+<ul><li>Separating content from style</li></ul></li>
+<li>Browser tools
+<ul><li>View source</li>
+<li>Chrome Inspector, Firebug</li>
+<li>clear cache</li>
+<li>view cookies, etc</li></ul></li>
+</ul>
+
+<h2>Exercise: Write a web page from scratch</h2>
+
+<pre><code>&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8" /&gt;
+  &lt;title&gt;Hey, this is my awesome HTML5 document!&lt;/title&gt;
+  &lt;!--[if IE]&gt;
+    &lt;script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"&gt;&lt;/script&gt;
+  &lt;![endif]--&gt;
+&lt;/head&gt;
+
+&lt;body id="home"&gt;
+
+  &lt;h1&gt;Hello, Web!&lt;/h1&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<ul>
+<li>Exercise steps
+<ul><li>bold</li>
+<li>paragraphs</li>
+<li>link to another site</li></ul></li>
+<li>Reference
+<ul><li><a href="http://www.w3schools.com/html/">w3schools interactive HTML tutorial</a></li>
+<li><a href="http://www.w3schools.com/css/">w3schools interactive CSS tutorial</a></li></ul></li>
+</ul>
+
+<h2>Exercise: Add some Cascading Style Sheets</h2>
+
+<pre><code>&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8" /&gt;
+  &lt;title&gt;HTML5 boilerplate—all you really need…&lt;/title&gt;
+  &lt;link rel="stylesheet" type="text/css" href="screen.css" /&gt;
+  &lt;!--[if IE]&gt;
+    &lt;script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"&gt;&lt;/script&gt;
+  &lt;![endif]--&gt;
+&lt;/head&gt;
+
+&lt;body id="home"&gt;
+
+  &lt;h1&gt;HTML5 boilerplate&lt;/h1&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+
+p {
+  font-color: red;
+  font-size: 3em;
+}
+</code></pre>
+
+<h2>Web "Sites" Part 2</h2>
+
+<ul>
+<li>Flash
+<ul><li>games</li>
+<li>multimedia</li>
+<li>terrible restaurant sites</li></ul></li>
+<li>Plugins</li>
+<li>Audio</li>
+</ul>
+
+<h2>Web Applications</h2>
+
+<ul>
+<li>Dynamically generated HTML</li>
+<li>Sessions, Cookies</li>
+<li>Databases</li>
+<li>CGI</li>
+<li>Application Servers</li>
+<li>Web Servers</li>
+<li>Forms</li>
+<li>HTTP Methods</li>
+<li>APIs, XML, JSON</li>
+</ul>
+
+<h2>Web Application Stacks</h2>
+
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Web_application_framework">Wikipedia article summarizing Web Application Frameworks</a></li>
+<li>Microsoft
+<ul><li>Windows Server</li>
+<li>.NET Framework</li>
+<li><a href="http://www.microsoft.com/servers/en/us/default.aspx">Microsoft Server Software Catalog</a></li>
+<li>Internet Information Services (IIS) (<a href="http://www.iis.net/">official site</a>)</li>
+<li><a href="http://www.asp.net/">ASP.NET</a></li></ul></li>
+<li><a href="http://en.wikipedia.org/wiki/LAMP_(software_bundle">LAMP</a>)
+<ul><li>Linux, Apache, MySQL, PHP</li></ul></li>
+<li>CakePHP</li>
+<li>Droopal</li>
+<li>Joomla</li>
+<li>Django (Python)</li>
+<li>Ruby on Rails (Ruby)</li>
+<li>Perl/CGI</li>
+<li>Google Web Toolkit (GWT)</li>
+<li>Java/J2EE</li>
+</ul>
+
+<h2>Security and Privacy</h2>
+
+<ul>
+<li>TLS and encryption vs clear text</li>
+<li>Cookies, cross domain rules</li>
+<li>SQL injection</li>
+<li>XSS</li>
+</ul>
+
+<h2>HTML5 and modern web applications</h2>
+
+<ul>
+<li>The Document Object Model - <a href="http://www.w3.org/DOM/">DOM</a>
+<ul><li>Official API specification for representing a document on the web</li></ul></li>
+<li>AJAX</li>
+<li>Javascript, V8, SpiderMonkey</li>
+<li>HTML5 semantic elements</li>
+<li>jQuery</li>
+</ul>
+
+<h2>Exercise: Manipulate a web page's DOM using JavaScript</h2>
+
+<ul>
+<li>Open <a href="http://jquery.org/">the jQuery home page</a></li>
+<li>Click on View -> Developer -> JavaScript Console</li>
+</ul>
+
+<p>_</p>
+
+<pre><code>$('#jq-header').hide()
+$('#jq-header').show()
+</code></pre>
+
+<h2>Search Engine Optimization</h2>
+</div></body></html>
