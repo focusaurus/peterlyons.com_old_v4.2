@@ -218,6 +218,23 @@ _platformCfg["RHLinux"] = _rhCfg
 <li>I use <code>UPPER_CASE_WITH_UNDERSCORES</code> for all variable names because that seems to be the clear convention.</li>
 </ul>
 
+<h1>Ruby Conventions</h1>
+
+<ul>
+<li>Prefer double quotes for most strings. Ruby allows either, but we should just pick one that we use primarily. Double quotes makes switching between java/c/python/ruby/coffeescript easier and allows embedding apostrophes, which is probably slightly more common than needing to embed double quotes. Interpolation is also supported. If your string literal needs to contain double quotes, use single quotes.</li>
+<li>Prefer string interpolation to building up strings with operators</li>
+</ul>
+
+<h1>CoffeeScript Conventions</h1>
+
+<ul>
+<li>Prefer double quotes for most strings. CoffeeScript allows either, but we should just pick one that we use primarily. Double quotes makes switching between java/c/python/ruby/coffeescript easier and allows embedding apostrophes, which is probably slightly more common than needing to embed double quotes. If your string literal needs to contain double quotes, use single quotes.  Since CoffeeScript is compiled to javascript, there&#39;s no performance implication, but even in Ruby, it doesn&#39;t seem to matter.</li>
+<li>Prefer string interpolation to building up strings with operators</li>
+<li>Make liberal use of array literals with one item per line and no commas</li>
+<li>Omit parentheses for function definitions that take no arguments</li>
+<li>I personally don&#39;t like a space after a function argument list like this: <code>someFunc = (one, two) -&amp;</code>, but Jeremy Ashkenas seems to like it, so go with it.</li>
+</ul>
+
 <h1>Comments</h1>
 
 <p>This article pre-dates my blog, but you can post any comments you have on this
