@@ -273,7 +273,12 @@ app:deploy() {
     git fetch origin --tags
     git checkout --track -b "${1-${BRANCH}}" || git checkout "${1-${BRANCH}}"
     git pull origin "${1-${BRANCH}}"
-    sudo restart node_peterlyons
+    sudo initctl reload-configuration
+    if sudo status node_peterlyons; then
+        sudo restart node_peterlyons
+    else
+        sudo start node_peterlyons
+    fi
 }
 
 app:test() {
