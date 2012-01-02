@@ -41,17 +41,14 @@ p.big {
 }
 code,
 pre {
-  background-color: #94b6d7;
+  background-color: #c7ede8;
+  color: #66aef3;
   font-family: courier, serif;
+  font-style: italic;
   overflow: auto;
   padding-left: 4px;
   padding-right: 4px;
 }
 li {
   padding-top: 4px;
-}
-#main_content {
-  margin: 20px auto;
-  padding-top: 0px;
-  width: 960px;
 }
