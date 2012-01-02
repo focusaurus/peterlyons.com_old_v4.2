@@ -15,7 +15,7 @@ html(lang="en")
       - else
         title Peter Lyons
     meta(name="keywords", content="peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears")
-    meta(name:"author", content="Peter Lyons")
+    meta(name="author", content="Peter Lyons")
     meta(name="description", content="The web site for Peter Lyons, Web Developer and Musician")
     meta(name="copyright", content="2001, Peter Lyons")
     link(rel="stylesheet", href="/screen.css", type="text/css")
@@ -39,63 +39,9 @@ html(lang="en")
     link(href="/favicon.ico", type="image/x-icon", rel="shortcut icon")
     link(rel="openid.server", href="http://www.livejournal.com/openid/server.bml")
     link(rel="openid.delegate", href="http://focusaurus.livejournal.com/")
-    link(href='http://fonts.googleapis.com/css?family=Inconsolata', rel='stylesheet', type='text/css')
+    //link(href='http://fonts.googleapis.com/css?family=Inconsolata', rel='stylesheet', type='text/css')
   body
-    #header
-      a(href="/")
-        img(src="/images/peter_lyons_logo.png", alt="Peter Lyons", class="logo")
-
-    #site_nav
-      .technology
-        .gray Technology
-        img.keyboard_icon(src="/images/keyboard_icon_alt.png", alt="")
-        .nav_links
-          a(href="/problog") Blog
-          br
-          a(href="/career.html") Career
-          br
-          = "Projects"
-          br
-          span.indent
-            a(href="http://othenticate.com") Othenticate
-          br
-          span.indent
-            a(href="/linkzie.html") Linkzie
-          br
-          span.indent
-            a(href="/smartears.html") SmartEars
-          br
-          span.indent
-            a(href="/bigclock.html") BigClock
-          br
-          a(href="/leveling_up.html") Leveling Up
-          br
-          a(href="/code_conventions.html") Code Conventions
-          br
-          a(href="/web_prog.html") Web Programming
-
-      .music
-        .gray Music
-        img.sax_icon(src="/images/sax_icon.png", alt="")
-        .nav_links
-          a(href="/bands.html") Bands
-          br
-          a(href="/oberlin.html") Oberlin
-          br
-          a(href="/favorites.html") Favorites
-
-      .personal
-        .gray Personal
-        img.peter_icon(src="/images/peter_icon.png", alt="")
-        .nav_links
-          a(href="/persblog") Blog
-          br
-          a(href=config.appURI + "/photos") Photos
-          br
-          a(href="http://www.flickr.com/photos/88096431@N00/") Flickr Photo Stream
-      - if (wordpress)
-        | <?php get_sidebar(); ?>
-    #main_content
+    header
       - if (wordpress)
         //- CAREFUL. The following line has an essential trailing white space
         | 

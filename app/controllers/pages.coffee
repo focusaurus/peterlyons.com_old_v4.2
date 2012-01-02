@@ -114,4 +114,13 @@ exports.setup = (app) ->
       locals: locals
     renderMarkdown '/../templates/web_prog.md', options, res
 
+  app.get '/practices', (req, res) ->
+    locals =
+      title: 'Practices and Values'
+      body: ''
+      wordpress: false
+    locals = _.defaults locals, defaultLocals
+    options =
+      locals: locals
+    renderMarkdown '/../templates/practices.md', options, res
 exports.Page = Page
