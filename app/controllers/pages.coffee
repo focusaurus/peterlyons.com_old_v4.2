@@ -9,10 +9,30 @@ class Page
     @locals.title = @title
     @view = @URI
 
-Page.render = (req, res) ->
-  locals = _.defaults(@locals, defaultLocals)
-  addTests req, locals, @specs
-  res.render @view, {locals: locals}
+  render: (req, res) =>
+    if /\.md$/.test @view
+      @locals.body = ""
+      locals = _.defaults locals, defaultLocals
+      options =
+        locals: locals
+      renderMarkdown '/../templates/web_prog.md', options, res
+    locals = _.defaults @locals, defaultLocals
+    addTests req, locals, @specs
+    res.render @view, {locals: locals}
+
+class MarkdownPage extends Page
+  constructor: (@URI, @title="", @locals={}, @specs=[]) ->
+    @locals.title = @title
+    @locals.body = ""
+
+  render: (req, res) =>
+    debugger
+    locals = _.defaults @locals, defaultLocals
+    options =
+      locals: locals
+    addTests req, locals, @specs
+
+    renderMarkdown "/../templates/#{@URI}.md", options, res
 
 addTests = (req, locals, specs=[]) ->
   locals.wordpress = req.param 'wordpress', false
@@ -26,6 +46,19 @@ addTests = (req, locals, specs=[]) ->
     locals.testCSS = ['/lib/jasmine/jasmine.css']
   if req.param 'start'
     locals.specURIs.start = true
+
+renderMarkdown = (markdownPath, options, res) ->
+  fs.readFile __dirname + markdownPath, 'utf8', (error, md) ->
+    if error
+      res.render 'error502', options
+      return
+    options.locals.body = markdown.makeHtml md
+    fs.readFile __dirname + '/../templates/layout.jade', 'utf8', (error, template) ->
+      if error
+        res.render 'error502', options
+        return
+      fn = jade.compile template, options
+      res.send fn(options.locals)
 
 pages = []
 page = (URI, title, specs) ->
@@ -42,6 +75,13 @@ page 'code_conventions', 'Code Conventions'
 page 'favorites', 'Favorite Musicians'
 page 'error404', 'Not Found'
 page 'error502', 'Oops'
+
+markdownPage = (URI, title, specs) ->
+  pages.push new MarkdownPage(URI, title, {}, specs)
+markdownPage "leveling_up", "Leveling Up: Career Advancement for Software Developers", ['/application/LevelingUpSpec.js']
+markdownPage "web_prog", "Web Programming Concepts for Non-Programmers"
+markdownPage "practices", "Practices and Values"
+markdownPage "stacks", "Technology Stacks"
 homePage = new Page 'home', pages[0].title, {}, pages[0].specs
 homePage.URI = ''
 pages.push homePage
@@ -60,7 +100,7 @@ defaultLocals.specURIs.start = false
 
 route = (app, page) ->
   app.get '/' + page.URI, (req, res) ->
-    Page.render.apply page, [req, res]
+    page.render req, res
 
 exports.setup = (app) ->
   #This pre-loads all included partials
@@ -80,47 +120,4 @@ exports.setup = (app) ->
   #Route all the simple static pages
   route app, page for page in pages
 
-  renderMarkdown = (markdownPath, options, res) ->
-    fs.readFile __dirname + markdownPath, 'utf8', (error, md) ->
-      if error
-        res.render 'error502', options
-        return
-      options.locals.body = markdown.makeHtml md
-      fs.readFile __dirname + '/../templates/layout.jade', 'utf8', (error, template) ->
-        if error
-          res.render 'error502', options
-          return
-        fn = jade.compile template, options
-        res.send fn(options.locals)
-
-  app.get '/leveling_up', (req, res) ->
-    locals =
-      title: 'Leveling Up: Career Advancement for Software Developers'
-      body: ''
-      wordpress: false
-    locals = _.defaults locals, defaultLocals
-    addTests req, locals, ['/application/LevelingUpSpec.js']
-    options =
-      locals: locals
-    renderMarkdown '/../templates/leveling_up.md', options, res
-
-  app.get '/web_prog', (req, res) ->
-    locals =
-      title: 'Web Programming Concepts for Non-Programmers'
-      body: ''
-      wordpress: false
-    locals = _.defaults locals, defaultLocals
-    options =
-      locals: locals
-    renderMarkdown '/../templates/web_prog.md', options, res
-
-  app.get '/practices', (req, res) ->
-    locals =
-      title: 'Practices and Values'
-      body: ''
-      wordpress: false
-    locals = _.defaults locals, defaultLocals
-    options =
-      locals: locals
-    renderMarkdown '/../templates/practices.md', options, res
 exports.Page = Page

@@ -1,6 +1,6 @@
 a {
-  text-decoration: none;
   color: #66aef3;
+  text-decoration: none;
 }
 body {
   background-color: #f4e9df;
@@ -8,10 +8,10 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 14px;
   letter-spacing: 0.1em;
-  margin: 0 auto;
-  padding-left: 20px;
-  max-width: 800px;
-  min-width: 600px;
+  line-height: 2em;
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 h1,
 h2,
@@ -31,9 +31,8 @@ img {
   border: none;
 }
 img.icon {
+  padding: 0 4px;
   vertical-align: middle;
-  padding-left: 4px;
-  padding-right: 4px;
 }
 p.big {
   font-size: 20px;
@@ -44,11 +43,17 @@ pre {
   background-color: #c7ede8;
   color: #66aef3;
   font-family: courier, serif;
-  font-style: italic;
+  line-height: 1em;
   overflow: auto;
   padding-left: 4px;
   padding-right: 4px;
 }
 li {
   padding-top: 4px;
+}
+#wrap {
+  margin: 0 auto;
+  max-width: 800px;
+  min-width: 600px;
+  text-align: left;
 }

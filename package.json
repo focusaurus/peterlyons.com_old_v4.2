@@ -15,11 +15,13 @@
     "coffee-script": "~1.0",
     "express": ">=2.0",
     "jade": ">=0.12.4",
-    "jasbin": "~1.0",
-    "jasmine-node": "~1.0",
     "markdown-js": "*",
-    "supervisor": "*",
     "stylus": "~0.7",
     "underscore": "~1.1"
+  },
+  "devDependencies": {
+    "node-inspector": "*",
+    "jasbin": "~1.0",
+    "jasmine-node": "~1.0"
   }
 }
