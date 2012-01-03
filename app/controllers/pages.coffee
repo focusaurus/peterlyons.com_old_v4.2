@@ -26,7 +26,6 @@ class MarkdownPage extends Page
     @locals.body = ""
 
   render: (req, res) =>
-    debugger
     locals = _.defaults @locals, defaultLocals
     options =
       locals: locals
