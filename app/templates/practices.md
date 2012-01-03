@@ -73,7 +73,7 @@
 ##Devops
 
 * Clear development, staging, production environments from day one
-* staging means production minus users
+* Staging means production minus users
 * Should be able to rebuild entire app infrastructure with code and docs in the main source code repository
 * Git Flow branch management structure
 * Semantic Versioning
