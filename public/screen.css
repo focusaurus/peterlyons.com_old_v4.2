@@ -27,6 +27,18 @@ h1 {
 h2 {
   font-size: 2em;
 }
+header {
+  padding: 20px 0;
+}
+header > nav > a {
+  padding: 20px;
+}
+header > h1 {
+  display: inline;
+}
+header > nav {
+  display: inline;
+}
 img {
   border: none;
 }
