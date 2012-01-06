@@ -344,7 +344,7 @@ app:build_static() {
     done
     echo "header_boilerplate.php"
     curl --silent "${DEVURL}/home?wordpress=1" | \
-        sed '/WORDPRESS HEADER BOILERPLATE/d' > \
+        sed '/WORDPRESS HEADER BOILERPLATE/q' | sed '$d' > \
         "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
 }
 
