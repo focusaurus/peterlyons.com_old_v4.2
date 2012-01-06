@@ -184,7 +184,8 @@ img .icon {
   vertical-align: middle;
 }
 li {
-  padding-top: 4px;
+  line-height: 2em;
+  padding-left: 30px;
 }
 .banner p {
   font-size: 18px;
@@ -197,4 +198,10 @@ li {
   margin: 0 auto;
   max-width: 800px;
   min-width: 600px;
+}
+#practices li {
+  font-weight: bold;
+}
+#practices li li {
+  font-weight: normal;
 }

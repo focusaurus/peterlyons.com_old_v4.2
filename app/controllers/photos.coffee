@@ -77,7 +77,7 @@ renderPhotos = (req, res) ->
         locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
         locals.title = "#{locals.gallery.displayName} Photo Gallery"
         page = new Page 'photos', locals.title, locals, ['/application/PhotosSpec.js']
-        Page.render.apply page, [req, res] 
+        page.render req, res
 
 exports.setup = (app) ->
   app.get '/photos', renderPhotos

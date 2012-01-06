@@ -1,3 +1,4 @@
+<section id="practices">
 #Practices
 
 ##General Orientation
@@ -13,7 +14,7 @@
 * Correctness and clarity are king
     * readability and maintainability are more important than brevity
 * Clever is bad. Period.
-    * Remove all magic (see Django)
+    * Remove all magic (see [Django Pony](http://djangopony.com/))
 * Libraries over frameworks
     * My code invokes library methods
     * No "your code goes here" boilerplate
@@ -49,7 +50,7 @@
 
 * Lots of thorough pure unit tests. Fast (no I/O). High code coverage.
 * Modular code. Mock objects. Dependency injection.
-* Factories over fixtures
+* Factories as opposed to fixtures
 * Test only the first-party code written for this application
 * A small handful of end to end system tests
 * phantomjs for headless system test automation
@@ -78,3 +79,4 @@
 * Git Flow branch management structure
 * Semantic Versioning
 * Modified 12-Factor principles
+</section>
