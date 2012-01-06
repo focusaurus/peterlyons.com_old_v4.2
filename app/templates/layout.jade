@@ -54,6 +54,7 @@ html(lang="en")
       - if (wordpress)
         //- CAREFUL. The following line has an essential trailing white space
         | 
+        | <?php get_sidebar(); ?>
         //WORDPRESS HEADER BOILERPLATE. DELETE FROM HERE DOWN.
       - else
         !{body}
