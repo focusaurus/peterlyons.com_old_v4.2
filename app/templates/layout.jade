@@ -45,17 +45,20 @@ html(lang="en")
       header
         h1
           a(href="/") Peter Lyons
-        h2 node.js coder for hire
-        nav
-          a(href="/problog") Blog
-          a(href="/practices") Practices
-          a(href="/stacks") Stacks
-          a(href="/career") Career
-      - if (wordpress)
-        //- CAREFUL. The following line has an essential trailing white space
-        | 
-        | <?php get_sidebar(); ?>
-        //WORDPRESS HEADER BOILERPLATE. DELETE FROM HERE DOWN.
+        if wordpress
+          //- CAREFUL. The following line has an essential trailing white space
+          | 
+          nav.blog
+            a(href="feed") Subscribe
+            | <?php get_sidebar(); ?>
+          //WORDPRESS HEADER BOILERPLATE. DELETE FROM HERE DOWN.
+        else
+          h2 node.js coder for hire
+          nav
+            a(href="/problog") Blog
+            a(href="/practices") Practices
+            a(href="/stacks") Stacks
+            a(href="/career") Career
       - else
         !{body}
     footer
