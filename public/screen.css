@@ -90,9 +90,26 @@ td {
 a img {
   border: none;
 }
+/*
+I am not dealing with font size insanity. Here's the deal.
+The main body/content font size is zero
+Font sizes increase/decrease relative to that with simple sequential integers:
+-2, -1, 0, 1, 2, 3, 4, 5
+Each one is "a bit" larger than the previous as defined here
+I generally only need h1-h3,
+so h3 should be size 1 (just a bit larger than normal text),
+h2 should be size 2,
+and h1 should be size 3
+Use REM units for fanciness but also include pixels for unsupported browsers
+http://snook.ca/archives/html_and_css/font-size-with-rem
+*/
 a {
   color: #66aef3;
   text-decoration: none;
+}
+article h1 {
+  font-size: 24px;
+  font-size: 2.4rem;
 }
 body {
   background-color: #f4e9df;

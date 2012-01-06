@@ -8,17 +8,19 @@ rounded(radius=10px)
   -webkit-border-radius radius
   -moz-border-radius radius
 
-//I am not dealing with font size insanity. Here's the deal.
-//The main body/content font size is zero
-//Font sizes increase/decrease relative to that with simple sequential integers:
-// -2, -1, 0, 1, 2, 3, 4, 5
-//Each one is "a bit" larger than the previous as defined here
-//I generally only need h1-h3,
-//so h3 should be size 1 (just a bit larger than normal text),
-// h2 should be size 2,
-// and h1 should be size 3
-//Use REM units for fanciness but also include pixels for unsupported browsers
-//http://snook.ca/archives/html_and_css/font-size-with-rem
+/*
+I am not dealing with font size insanity. Here's the deal.
+The main body/content font size is zero
+Font sizes increase/decrease relative to that with simple sequential integers:
+-2, -1, 0, 1, 2, 3, 4, 5
+Each one is "a bit" larger than the previous as defined here
+I generally only need h1-h3,
+so h3 should be size 1 (just a bit larger than normal text),
+h2 should be size 2,
+and h1 should be size 3
+Use REM units for fanciness but also include pixels for unsupported browsers
+http://snook.ca/archives/html_and_css/font-size-with-rem
+*/
 fontsize(size)
   pixels =  8 if size < -1
   pixels = 10 if size == -1
@@ -39,6 +41,10 @@ pad3 = 30px
 a
   color dark2
   text-decoration none
+
+article
+  h1
+    fontsize 2
 
 body
   background-color light1
