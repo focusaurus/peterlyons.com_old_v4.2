@@ -16,7 +16,8 @@
     "express": ">=2.0",
     "jade": ">=0.12.4",
     "markdown-js": "*",
-    "stylus": "~0.7",
+    "nib": "*",
+    "stylus": "~0.22",
     "underscore": "~1.1"
   },
   "devDependencies": {

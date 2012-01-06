@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Practices and Values | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears"><meta name="author" content="Peter Lyons"><meta name="description" content="The web site for Peter Lyons, Web Developer and Musician"><meta name="copyright" content="2001, Peter Lyons"><link rel="stylesheet" href="/screen.css" type="text/css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css" type="text/css"><script src="/js/jquery.js"></script><script src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><!--link(href='http://fonts.googleapis.com/css?family=Inconsolata', rel='stylesheet')--></head><body><div id="wrap"><header><h1>Peter Lyons</h1><h2>node.js coder for hire</h2><nav><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><h1>Practices</h1>
+
+<h2>General Orientation</h2>
+
+<ul>
+<li>Pragmatic Craftsmanship (see The Pragmatic Programmer, Code Complete)</li>
+<li>The #1 primary mandate of the software engineer is managing complexity</li>
+<li>Simple, small, consistent tools
+<ul><li>Small languages that foster consistency such as CoffeeScript or Python</li>
+<li>One and preferably only one good way to do it</li>
+<li>Significant white space fosters consistency, so I use it</li>
+<li>Small core library plus good package management such as node.js with npm</li>
+<li>Big, complex, heterogeneous languages like Perl and Ruby aren't compatible with my general orientation (but I will code in Ruby when appropriate)</li></ul></li>
+<li>Correctness and clarity are king
+<ul><li>readability and maintainability are more important than brevity</li></ul></li>
+<li>Clever is bad. Period.
+<ul><li>Remove all magic (see Django)</li></ul></li>
+<li>Libraries over frameworks
+<ul><li>My code invokes library methods</li>
+<li>No "your code goes here" boilerplate</li></ul></li>
+<li>Right tool for the right job</li>
+<li>Slow, calm, and correct
+<ul><li>I build working software that is well-crafted</li></ul></li>
+</ul>
+
+<h2>Data Modeling</h2>
+
+<ul>
+<li>Integrity-first
+<ul><li>Default attitude is traditional referential integrity with transactions and strict expectations of data consistency and durability</li>
+<li>Sacrifice consistency, integrity or durability to get performance or convenience when warranted</li>
+<li>Properly coding for collections of data where individual records can vary greatly is difficult. Stick with consistent records.</li>
+<li>Disciplined data migrations should be part of the normal development process</li></ul></li>
+<li>Minimalism
+<ul><li>Each field and record has perpetual maintainance cost</li>
+<li>Only add more data when clearly driven by current features</li>
+<li>Prune stale data as early as possible</li></ul></li>
+<li>Conform to common system model in end-user terms
+<ul><li>Avoid abstractions</li>
+<li>Keep naming clear and consistent with the system model and user interface</li>
+<li>Model collections based on semantics as opposed to raw data similarity</li></ul></li>
+</ul>
+
+<h2>Programming Paradigm</h2>
+
+<ul>
+<li>Multi-paradigm taking the best elements of procedural, functional, object oriented</li>
+<li>Pure functional with no side effects has great testability</li>
+<li>Use built-in data structures (lists, maps) for simple cases, but go to objects as soon as it is non-trivial</li>
+<li>Encapsulation and composition as opposed to complex inheritence hierarchy</li>
+<li>Prefer basic procedural conditions and loops when they are clearer than complex functional or object oriented patterns</li>
+</ul>
+
+<h2>Testing</h2>
+
+<ul>
+<li>Lots of thorough pure unit tests. Fast (no I/O). High code coverage.</li>
+<li>Modular code. Mock objects. Dependency injection.</li>
+<li>Factories over fixtures</li>
+<li>Test only the first-party code written for this application</li>
+<li>A small handful of end to end system tests</li>
+<li>phantomjs for headless system test automation</li>
+</ul>
+
+<h2>Process</h2>
+
+<ul>
+<li>Scrum/Agile
+<ul><li>Short iterations of fixed length</li>
+<li>Working, deployed software is delivered every iteration</li>
+<li>Single prioritized work queue</li></ul></li>
+<li>Velocity
+<ul><li>Establish team velocity</li>
+<li>Each iteration a team should be able to do only 1 or 2 large items, a handful of medium items, and a dozen or so small items</li></ul></li>
+<li>Estimates
+<ul><li>Avoid them as much as possible</li>
+<li>Build trust based on past performance instead</li>
+<li>When unavoidable, keep it simple: small, medium, large</li>
+<li>Work items must be decomposed until they fit in a single sprint (there is no extra large)</li></ul></li>
+<li>Lean Startup/Minimum Viable Product. Launch and learn. Rinse and repeat.</li>
+</ul>
+
+<h2>Devops</h2>
+
+<ul>
+<li>Clear development, staging, production environments from day one</li>
+<li>Staging means production minus users</li>
+<li>Should be able to rebuild entire app infrastructure with code and docs in the main source code repository</li>
+<li>Git Flow branch management structure</li>
+<li>Semantic Versioning</li>
+<li>Modified 12-Factor principles</li>
+</ul>
+<footer><nav><h1>Technology</h1><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions.html">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie.html">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears.html">SmartEars</a><a href="/bigclock.html">BigClock</a></nav><nav><h1>Music</h1><a href="/bands.html">Bands</a><a href="/oberlin.html">Oberlin</a><a href="/favorites.html">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Blog</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photo Stream</a><a href="/app/photos">Photos (Summer 2011 and earlier)</a></nav></footer></div></body></html>

@@ -20,12 +20,12 @@ html(lang="en")
     meta(name="copyright", content="2001, Peter Lyons")
     link(rel="stylesheet", href="/screen.css", type="text/css")
     link(rel="stylesheet", href="/css/overcast/jquery-ui.css", type="text/css")
-    script(type="text/javascript", src="/js/jquery.js")
-    script(type="text/javascript", src="/js/jquery-ui.js")
+    script(src="/js/jquery.js")
+    script(src="/js/jquery-ui.js")
     - each URI in specURIs
-      script(type="text/javascript", src=URI)
+      script(src=URI)
     - each URI in testCSS
-      link(rel="stylesheet", href=URI, type="text/css")
+      link(rel="stylesheet", href=URI)
     - if (specURIs.start)
       script
         $(document).ready(function() {
@@ -39,11 +39,12 @@ html(lang="en")
     link(href="/favicon.ico", type="image/x-icon", rel="shortcut icon")
     link(rel="openid.server", href="http://www.livejournal.com/openid/server.bml")
     link(rel="openid.delegate", href="http://focusaurus.livejournal.com/")
-    //link(href='http://fonts.googleapis.com/css?family=Inconsolata', rel='stylesheet', type='text/css')
+    //link(href='http://fonts.googleapis.com/css?family=Inconsolata', rel='stylesheet')
   body
     #wrap
       header
         h1 Peter Lyons
+        h2 node.js coder for hire
         nav
           a(href="/problog") Blog
           a(href="/practices") Practices
@@ -55,3 +56,28 @@ html(lang="en")
         //WORDPRESS HEADER BOILERPLATE. DELETE FROM HERE DOWN.
       - else
         !{body}
+      footer
+        nav
+          h1 Technology
+          a(href="/problog") Blog
+          a(href="/leveling_up") Leveling Up
+          a(href="/practices") Practices
+          a(href="/code_conventions.html") Code Conventions
+          a(href="/stacks") Stacks
+          a(href="/career") Career
+        nav
+          h1 Projects
+          a(href="/linkzie.html") Linkzie
+          a(href="http://othenticate.com") Othenticate
+          a(href="/smartears.html") SmartEars
+          a(href="/bigclock.html") BigClock
+        nav
+          h1 Music
+          a(href="/bands.html") Bands
+          a(href="/oberlin.html") Oberlin
+          a(href="/favorites.html") Favorites
+        nav
+          h1 Personal
+          a(href="/persblog") Blog
+          a(href="http://www.flickr.com/photos/88096431@N00/") Flickr Photo Stream
+          a(href=config.appURI + "/photos") Photos (Summer 2011 and earlier)
