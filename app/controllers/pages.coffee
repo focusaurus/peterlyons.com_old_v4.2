@@ -9,16 +9,14 @@ class Page
     @locals.title = @title
     @view = @URI
 
+  makeOptions: (req) =>
+    options =
+      locals: _.defaults @locals, defaultLocals
+    addTests req, options.locals, @specs
+    options
+
   render: (req, res) =>
-    if /\.md$/.test @view
-      @locals.body = ""
-      locals = _.defaults locals, defaultLocals
-      options =
-        locals: locals
-      renderMarkdown '/../templates/web_prog.md', options, res
-    locals = _.defaults @locals, defaultLocals
-    addTests req, locals, @specs
-    res.render @view, {locals: locals}
+    res.render @view, @makeOptions(req)
 
 class MarkdownPage extends Page
   constructor: (@URI, @title="", @locals={}, @specs=[]) ->
@@ -26,12 +24,19 @@ class MarkdownPage extends Page
     @locals.body = ""
 
   render: (req, res) =>
-    locals = _.defaults @locals, defaultLocals
-    options =
-      locals: locals
-    addTests req, locals, @specs
-
-    renderMarkdown "/../templates/#{@URI}.md", options, res
+    self = this
+    options = @makeOptions req
+    fs.readFile __dirname + "/../templates/#{@URI}.md", 'utf8', (error, md) ->
+      if error
+        res.render 'error502', options
+        return
+      options.locals.body = "<article id='#{self.URI}'>" + markdown.makeHtml(md) + "</article>"
+      fs.readFile __dirname + '/../templates/layout.jade', 'utf8', (error, template) ->
+        if error
+          res.render 'error502', options
+          return
+        fn = jade.compile template, options
+        res.send fn(options.locals)
 
 addTests = (req, locals, specs=[]) ->
   locals.wordpress = req.param 'wordpress', false
@@ -45,19 +50,6 @@ addTests = (req, locals, specs=[]) ->
     locals.testCSS = ['/lib/jasmine/jasmine.css']
   if req.param 'start'
     locals.specURIs.start = true
-
-renderMarkdown = (markdownPath, options, res) ->
-  fs.readFile __dirname + markdownPath, 'utf8', (error, md) ->
-    if error
-      res.render 'error502', options
-      return
-    options.locals.body = markdown.makeHtml md
-    fs.readFile __dirname + '/../templates/layout.jade', 'utf8', (error, template) ->
-      if error
-        res.render 'error502', options
-        return
-      fn = jade.compile template, options
-      res.send fn(options.locals)
 
 pages = []
 page = (URI, title, specs) ->

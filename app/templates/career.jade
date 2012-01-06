@@ -2,10 +2,10 @@
   window.reversePhases = ->
     phases = []
     parent = $("div.phase").parent()
-    $("div.phase").each (index, div)->
+    $("div.phase").each (index, div) ->
       $(div).remove()
       phases.unshift $(div)
-    $("footer").before phase for phase in phases
+    parent.append phase for phase in phases
 :markdown
   I have a **[traditional resume availabe in PDF format](resume.pdf)** for those
   looking for the lo-fi version.

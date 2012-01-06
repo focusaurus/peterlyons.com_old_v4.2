@@ -1,4 +1,3 @@
-<section id="practices">
 #Practices
 
 ##General Orientation
@@ -79,4 +78,3 @@
 * Git Flow branch management structure
 * Semantic Versioning
 * Modified 12-Factor principles
-</section>

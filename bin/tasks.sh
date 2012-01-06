@@ -330,7 +330,7 @@ app:debug() {
 
 app:build_static() {
     echo "Generating HTML for static templated pages from ${DEVURL}..."
-    for URI in $(list_templates) leveling_up
+    for URI in $(list_templates)
     do
         URL="${DEVURL}/${URI}"
         echo -n "${URI}, "

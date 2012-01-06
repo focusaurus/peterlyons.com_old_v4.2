@@ -46,7 +46,7 @@ body
   font-family Verdana, Arial, Helvetica, sans-serif
   letter-spacing 0.1em
   line-height 1.6em
-  padding 0 pad2
+  padding 0
   fontsize 0
 
 code, pre
@@ -58,12 +58,15 @@ code, pre
   padding pad1
 
 footer
+  background-color dark1
+  margin-top pad3
+  padding-bottom pad2
   a
     rounded()
     padding 0 pad1
     display block
     &:hover
-      background-color dark1
+      background-color light1
   h1
     fontsize 1
   nav
@@ -88,17 +91,25 @@ h3
 header
   text-align center
   padding-bottom pad2
-  > h1
+  h1
     fontsize 3
-  > h2
-    fontsize 3
-    font-family courier, serif, fixed
+    padding 0
+    a
+      color dark3
+  h2
     color black
-  > nav
+    font-family courier, serif, fixed
+    fontsize 3
+    padding 0
+  nav
     display inline
-    > a
+    a
       fontsize 1
-      padding pad2
+      margin pad2
+      padding pad1 pad2
+      rounded()
+      &:hover
+        background-color dark1
 
 //This should reset the default font size to 10 pixels, which makes for clean
 //rem units
@@ -122,8 +133,9 @@ li
   img
     padding pad1 0
 
-#wrap
+.content
   margin 0 auto
+  padding 0 pad2
   max-width 800px
   min-width 600px
 
