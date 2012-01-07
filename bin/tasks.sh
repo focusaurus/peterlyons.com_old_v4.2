@@ -342,10 +342,13 @@ app:build_static() {
             exit ${EXIT_CODE}
         fi
     done
-    echo "header_boilerplate.php"
-    curl --silent "${DEVURL}/home?wordpress=1" | \
-        sed '/WORDPRESS HEADER BOILERPLATE/q' | sed '$d' > \
-        "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
+    echo "wordpress PHP integrated files:"
+    echo "-----"
+    #curl --silent "${DEVURL}/home?wordpress=1" | \
+    #    sed '/WORDPRESS HEADER BOILERPLATE/q' | sed '$d' > \
+    #    "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
+    cdpd
+    coffee bin/wordpress_integrate.coffee
 }
 
 app:prod_release() {
