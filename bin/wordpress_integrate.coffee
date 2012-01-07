@@ -24,7 +24,10 @@ locals =
   testCSS: []
   wordpress: true
 html = render templatePath, locals
-deleteIndex = html.indexOf("<!--WORDPRESS HEADER BOILERPLATE. DELETE FROM HERE DOWN.-->")
-html = html.slice(0, deleteIndex)
+marker = "</nav>"
+deleteIndex = html.indexOf marker
+html = html.slice 0, deleteIndex + marker.length
+html = html + "\n"
 outputPath = __dirname + "/../public/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
+console.log "generated #{outputPath}"
 fs.writeFileSync outputPath, html, "utf8"
