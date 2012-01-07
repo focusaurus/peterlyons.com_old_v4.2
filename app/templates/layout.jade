@@ -10,7 +10,7 @@ html(lang="en")
         | <?php if ( is_singular() ) wp_enqueue_script( "comment-reply" ); ?>
         | <?php wp_head(); ?>
     else
-      if (title)
+      if title
         title #{title} | Peter Lyons
       else
         title Peter Lyons
@@ -22,11 +22,11 @@ html(lang="en")
     link(rel="stylesheet", href="/css/overcast/jquery-ui.css", type="text/css")
     script(src="/js/jquery.js")
     script(src="/js/jquery-ui.js")
-    each URI in specURIs
+    - each URI in specURIs
       script(src=URI)
-    each URI in testCSS
-      link(rel="stylesheet", href=URI)
-    if (specURIs.start)
+    - each URI2 in testCSS
+      link(rel="stylesheet", href=URI2)
+    if specURIs.start
       script
         $(document).ready(function() {
           jasmine.getEnv().addReporter(new jasmine.TrivialReporter());

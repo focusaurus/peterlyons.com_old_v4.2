@@ -159,7 +159,7 @@ h2,
 h3 {
   color: #4f4e57;
   line-height: 1.5em;
-  padding: 4px;
+  padding: 0 4px;
 }
 h1 {
   font-size: 36px;
@@ -180,13 +180,15 @@ header {
 header h1 {
   font-size: 36px;
   font-size: 3.6rem;
+  font-family: courier, serif, fixed;
   padding: 0;
+  text-transform: lowercase;
 }
 header h1 a {
-  color: #4f4e57;
+  color: #000;
 }
 header h2 {
-  color: #000;
+  color: #4f4e57;
   font-family: courier, serif, fixed;
   font-size: 36px;
   font-size: 3.6rem;

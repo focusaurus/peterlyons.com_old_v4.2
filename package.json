@@ -11,18 +11,18 @@
   },
   "files": [],
   "dependencies": {
-    "async": "~0.1",
-    "coffee-script": "~1.0",
+    "async": "0.1.x",
+    "coffee-script": "1.2.x",
     "express": ">=2.0",
-    "jade": ">=0.12.4",
+    "jade": "0.20.x",
     "markdown-js": "*",
     "nib": "*",
-    "stylus": "~0.22",
-    "underscore": "~1.1"
+    "stylus": "0.22.x",
+    "underscore": "1.1.x"
   },
   "devDependencies": {
     "node-inspector": "*",
-    "jasbin": "~1.0",
-    "jasmine-node": "~1.0"
+    "jasbin": "1.0.x",
+    "jasmine-node": "1.0.x"
   }
 }
