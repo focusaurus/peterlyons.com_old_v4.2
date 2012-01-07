@@ -6,6 +6,8 @@ server {
     server_name_in_redirect off;
     access_log /var/log/nginx/peterlyons.com.access.log;
     error_log /var/log/nginx/peterlyons.com.error.log;
+    error_page 404 /error404.html;
+    error_page 502 /error502.html;
 
     location / {
         root /home/plyons/projects/peterlyons.com/public;
@@ -19,15 +21,8 @@ server {
         #rewrite...last is safe to use here
         #http://wiki.nginx.org/IfIsEvil
         if (!-e $request_filename) {
-            rewrite ^/persblog(.+)$ /persblog/index.php?q=$1 last;
-            rewrite ^/problog(.+)$ /problog/index.php?q=$1 last;
+            rewrite ^/(problog|persblog)(.+)$ /$1/index.php?q=$2 last;
         }
-    }
-
-    # deny access to .htaccess files, if Apache's document root
-    # concurs with nginx's one
-    location ~ /\.ht {
-        deny all;
     }
 
     location /app/ {
@@ -35,9 +30,6 @@ server {
         proxy_pass http://localhost:9400;
     }
 
-    error_page 404 /error404.html;
-
-    error_page 502 /error502.html;
 
     # pass the PHP scripts to FastCGI server
     location ~ \.php$ {
