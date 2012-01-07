@@ -2,11 +2,29 @@ config = require "../config"
 fs = require "fs"
 jade = require "jade"
 
-output = __dirname + "/../public/persblog/wp-content/themes/fluid-blue/footer.php"
-footerJade = fs.readFileSync(
-  __dirname + "/../app/templates/includes/footer.jade", "utf8")
-func = jade.compile footerJade, {layout: false}
-footerHTML = func({config})
+render = (templatePath, locals={}) ->
+  template = fs.readFileSync templatePath, "utf8"
+  renderFunc = jade.compile template, {filename: templatePath}
+  renderFunc locals
+
+templatePath = __dirname + "/../app/templates/includes/footer.jade"
+locals =
+  config: config
+footerHTML = render templatePath, locals
 html =  "\n</div><!-- main_content -->\n#{footerHTML}</body></html>\n"
-console.log "generated #{output}"
-fs.writeFileSync(output , html, "utf8")
+outputPath = __dirname + "/../public/persblog/wp-content/themes/fluid-blue/footer.php"
+fs.writeFileSync(outputPath , html, "utf8")
+console.log "generated #{outputPath}"
+
+templatePath = __dirname + "/../app/templates/layout.jade"
+locals =
+  body: "TEST1"
+  config: config
+  specURIs: []
+  testCSS: []
+  wordpress: true
+html = render templatePath, locals
+deleteIndex = html.indexOf("<!--WORDPRESS HEADER BOILERPLATE. DELETE FROM HERE DOWN.-->")
+html = html.slice(0, deleteIndex)
+outputPath = __dirname + "/../public/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
+fs.writeFileSync outputPath, html, "utf8"
