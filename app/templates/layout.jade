@@ -54,9 +54,10 @@ html(lang="en")
             a(href="/career") Career
       if wordpress
         nav.blog
-          a(href="feed") Subscribe
-          <form method="get" id="searchform" action="/problog/">
-          <input type="text" size="20" name="s" id="s" value="Search..." onblur="if(this.value=='') this.value='Search...';" onfocus="if(this.value=='Search...') this.value='';">
-          </form>
+          | <a href="<?php echo site_url('feed') ?>">
+          | <img src="<?php echo esc_url( includes_url( 'images/rss.png' ) ); ?>" /></a>
+          | <form method="get" id="searchform" action="/problog/">
+          |  <input type="text" size="20" name="s" id="s" value="Search..." onblur="if(this.value=='') this.value='Search...';" onfocus="if(this.value=='Search...') this.value='';">
+          |  </form>
       !{body}
     include includes/footer
