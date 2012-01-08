@@ -104,7 +104,7 @@ Use REM units for fanciness but also include pixels for unsupported browsers
 http://snook.ca/archives/html_and_css/font-size-with-rem
 */
 a {
-  color: #66aef3;
+  color: #268bd2;
   text-decoration: none;
 }
 a img {
@@ -116,8 +116,8 @@ article h1 {
   font-size: 2.4rem;
 }
 body {
-  background-color: #f4e9df;
-  color: #8f776a;
+  background-color: #fdf6e3;
+  color: #93a1a1;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   letter-spacing: 0.1em;
   line-height: 1.6em;
@@ -125,16 +125,21 @@ body {
   font-size: 14px;
   font-size: 1.4rem;
 }
-code,
+code {
+  background-color: #eee8d5;
+  color: #586e75;
+  font-family: courier, monospace, serif;
+}
 pre {
-  background-color: #c7ede8;
-  color: #66aef3;
-  font-family: courier, serif;
+  background-color: #002b36;
+  color: #93a1a1;
+  font-family: courier, monospace, serif;
   overflow: auto;
+  margin: 20px 0;
   padding: 4px;
 }
 footer {
-  background-color: #8f776a;
+  background-color: #eee8d5;
   margin-top: 30px;
   padding-bottom: 20px;
 }
@@ -146,7 +151,7 @@ footer a {
   display: block;
 }
 footer a:hover {
-  background-color: #f4e9df;
+  background-color: #fdf6e3;
 }
 footer h1 {
   font-size: 18px;
@@ -160,7 +165,7 @@ footer nav {
 h1,
 h2,
 h3 {
-  color: #4f4e57;
+  color: #586e75;
   line-height: 1.5em;
 }
 h1 {
@@ -182,7 +187,7 @@ header {
 header h1 {
   font-size: 36px;
   font-size: 3.6rem;
-  font-family: courier, serif, fixed;
+  font-family: courier, monospace, serif;
   padding: 0;
   text-transform: lowercase;
 }
@@ -190,8 +195,8 @@ header h1 a {
   color: #000;
 }
 header h2 {
-  color: #4f4e57;
-  font-family: courier, serif, fixed;
+  color: #586e75;
+  font-family: courier, monospace, serif;
   font-size: 36px;
   font-size: 3.6rem;
   padding: 0;
@@ -209,7 +214,7 @@ header nav a {
   -moz-border-radius: 10px;
 }
 header nav a:hover {
-  background-color: #8f776a;
+  background-color: #eee8d5;
 }
 html {
   font-size: 62.5%;

@@ -1,6 +1,6 @@
 @import "../../../node_modules/nib/lib/nib/reset.styl"
 global-reset()
-@import "kona_coast.color"
+@import "solarized.color"
 
 ////////// mixins //////////
 rounded(radius=10px)
@@ -36,10 +36,11 @@ fontsize(size)
 pad1 = 4px
 pad2 = 20px
 pad3 = 30px
+codefont = courier, monospace, serif
 
 ////////// alphabetical site-wide rules for default HTML elements //////////
 a
-  color dark2
+  color blue
   text-decoration none
   img
     vertical-align middle
@@ -50,23 +51,31 @@ article
     fontsize 2
 
 body
-  background-color light1
-  color dark1
+  background-color lightbg1
+  color content1
   font-family Verdana, Arial, Helvetica, sans-serif
   letter-spacing 0.1em
   line-height 1.6em
   padding 0
   fontsize 0
 
-code, pre
-  background-color light2
-  color dark2
-  font-family courier, serif
+//For inline code snippets (wrapping OK)
+code
+  background-color lightbg2
+  color content4
+  font-family codefont
+
+//For multiline code blocks (formatted, no wrapping)
+pre
+  background-color darkbg1
+  color content1
+  font-family codefont
   overflow auto
+  margin pad2 0
   padding pad1
 
 footer
-  background-color dark1
+  background-color lightbg2
   margin-top pad3
   padding-bottom pad2
   a
@@ -74,7 +83,7 @@ footer
     padding 0 pad1
     display block
     &:hover
-      background-color light1
+      background-color lightbg1
   h1
     fontsize 1
   nav
@@ -83,7 +92,7 @@ footer
     vertical-align top
 
 h1, h2, h3
-  color dark3
+  color content4
   line-height 1.5em
 
 h1
@@ -102,12 +111,12 @@ header
     a
       color black
     fontsize 3
-    font-family courier, serif, fixed
+    font-family codefont
     padding 0
     text-transform lowercase
   h2
-    color dark3
-    font-family courier, serif, fixed
+    color content4
+    font-family codefont
     fontsize 3
     padding 0
   nav
@@ -118,7 +127,7 @@ header
       padding pad1 pad2
       rounded()
       &:hover
-        background-color dark1
+        background-color lightbg2
 
 //This should reset the default font size to 10 pixels, which makes for clean
 //rem units
