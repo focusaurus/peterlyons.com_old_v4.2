@@ -13,9 +13,9 @@
   "dependencies": {
     "async": "0.1.x",
     "coffee-script": "1.2.x",
-    "express": ">=2.0",
+    "express": "2.5.x",
     "jade": "0.20.x",
-    "markdown-js": "*",
+    "markdown-js": "0.0.x",
     "nib": "*",
     "stylus": "0.22.x",
     "underscore": "1.1.x"

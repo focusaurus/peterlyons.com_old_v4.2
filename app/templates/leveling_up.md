@@ -438,12 +438,12 @@ For years I used a simple section at the top of my journal file to manage my sho
     [+]This is a task I have already completed
     [.]This is a task I have started but not completed
     []This is a task I intend to complete today
-    
+
     ---------------------------------
     |TODO SOON|
     ---------------------------------
     []These tasks should be done in the next few days
-    
+
     ---------------------------------
     |TODO LATER|
     ---------------------------------
@@ -493,7 +493,7 @@ You want to prepare a document (again HTML email is strongly encouraged here) th
 * How YOU want to have things be in the future
     * This is crucial. This is your chance to state your desires and intentions.
     * Just come right out with it. If you want to be a team lead within the next 3 months, say so. If you want to work from home on Fridays, this is the place to state that.
-    
+
 During the review your manager will likely have a basic agenda already set. There will be a slot on this agenda for you to review your work from the previous period and talk about your goals for your career. This is your chance to shine. Review your document verbally, adding additional details and color as needed.
 
 There will be one or more standard forms that need to be filled in. Don't let the format of your company's standard document constrain you. Create your own document using the format above or some variation that expresses exactly what you want and exactly how you want to achieve it. You can then take the raw content from your custom document and copy/paste it into your company's standard document as needed. For reference, [here is a sample PDF form of a typical annual performance review template](https://service.govdelivery.com/service/edition.html?edition_id=5534).
@@ -532,4 +532,3 @@ If you are uncertain about the veracity or value of the tips in this article, I 
 # Comments
 
 Please share your responses to this article on my [blog post for this article](/problog/2011/05/leveling-up).
-

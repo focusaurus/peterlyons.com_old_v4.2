@@ -1,8 +1,13 @@
 _ = require 'underscore'
 config = require '../../config'
 fs = require 'fs'
-jade = require 'jade'
-markdown = require 'markdown-js'
+
+defaultLocals =
+  config: config
+  title: ''
+  wordpress: false
+  specURIs: []
+  testCSS: []
 
 class Page
   constructor: (@URI, @title='', @locals={}, @specs=[]) ->
@@ -12,6 +17,7 @@ class Page
   makeOptions: (req) =>
     options =
       locals: _.defaults @locals, defaultLocals
+      layout: "layout.jade"
     addTests req, options.locals, @specs
     options
 
@@ -24,19 +30,7 @@ class MarkdownPage extends Page
     @locals.body = ""
 
   render: (req, res) =>
-    self = this
-    options = @makeOptions req
-    fs.readFile __dirname + "/../templates/#{@URI}.md", 'utf8', (error, md) ->
-      if error
-        res.render 'error502', options
-        return
-      options.locals.body = "<article id='#{self.URI}'>" + markdown.makeHtml(md) + "</article>"
-      fs.readFile __dirname + '/../templates/layout.jade', 'utf8', (error, template) ->
-        if error
-          res.render 'error502', options
-          return
-        fn = jade.compile template, options
-        res.send fn(options.locals)
+    res.render @URI + ".md"
 
 addTests = (req, locals, specs=[]) ->
   locals.wordpress = req.param 'wordpress', false
@@ -76,16 +70,6 @@ markdownPage "stacks", "Technology Stacks"
 homePage = new Page 'home', pages[0].title, {}, pages[0].specs
 homePage.URI = ''
 pages.push homePage
-
-partials = {}
-
-defaultLocals =
-  config: config
-  title: ''
-  partials: partials
-  wordpress: false
-  specURIs: []
-  testCSS: []
 
 defaultLocals.specURIs.start = false
 
