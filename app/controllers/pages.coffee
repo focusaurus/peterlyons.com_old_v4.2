@@ -8,11 +8,16 @@ defaultLocals =
   wordpress: false
   specURIs: []
   testCSS: []
+defaultLocals.specURIs.start = false
 
 class Page
-  constructor: (@URI, @title='', @locals={}, @specs=[]) ->
+  constructor: (@view, @title='', @locals={}, @specs=[]) ->
+    if @view.indexOf(".") >= 0
+      @URI = @view.split(".")[0]
+    else
+      @URI = @view
+      @view = "#{@view}.jade"
     @locals.title = @title
-    @view = @URI
 
   makeOptions: (req) =>
     options =
@@ -23,14 +28,6 @@ class Page
 
   render: (req, res) =>
     res.render @view, @makeOptions(req)
-
-class MarkdownPage extends Page
-  constructor: (@URI, @title="", @locals={}, @specs=[]) ->
-    @locals.title = @title
-    @locals.body = ""
-
-  render: (req, res) =>
-    res.render @URI + ".md"
 
 addTests = (req, locals, specs=[]) ->
   locals.wordpress = req.param 'wordpress', false
@@ -60,18 +57,13 @@ page 'code_conventions', 'Code Conventions'
 page 'favorites', 'Favorite Musicians'
 page 'error404', 'Not Found'
 page 'error502', 'Oops'
-
-markdownPage = (URI, title, specs) ->
-  pages.push new MarkdownPage(URI, title, {}, specs)
-markdownPage "leveling_up", "Leveling Up: Career Advancement for Software Developers", ['/application/LevelingUpSpec.js']
-markdownPage "web_prog", "Web Programming Concepts for Non-Programmers"
-markdownPage "practices", "Practices and Values"
-markdownPage "stacks", "Technology Stacks"
+page "leveling_up.md", "Leveling Up: Career Advancement for Software Developers", ['/application/LevelingUpSpec.js']
+page "web_prog.md", "Web Programming Concepts for Non-Programmers"
+page "practices.md", "Practices and Values"
+page "stacks.md", "Technology Stacks"
 homePage = new Page 'home', pages[0].title, {}, pages[0].specs
 homePage.URI = ''
 pages.push homePage
-
-defaultLocals.specURIs.start = false
 
 route = (app, page) ->
   app.get '/' + page.URI, (req, res) ->
