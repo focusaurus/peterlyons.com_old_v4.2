@@ -151,7 +151,7 @@ footer h1 {
 }
 footer nav {
   display: inline-block;
-  padding: 4px 20px;
+  padding: 4px 20px 0 0;
   vertical-align: top;
 }
 h1,
@@ -159,7 +159,6 @@ h2,
 h3 {
   color: #4f4e57;
   line-height: 1.5em;
-  padding: 0 4px;
 }
 h1 {
   font-size: 36px;
