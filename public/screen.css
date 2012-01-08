@@ -107,6 +107,10 @@ a {
   color: #66aef3;
   text-decoration: none;
 }
+a img {
+  vertical-align: middle;
+  padding-right: 4px;
+}
 article h1 {
   font-size: 24px;
   font-size: 2.4rem;
