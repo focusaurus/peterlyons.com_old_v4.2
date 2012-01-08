@@ -226,11 +226,11 @@ li {
 p {
   margin-top: 20px;
 }
-.banner p {
+.intro p {
   font-size: 18px;
   font-size: 1.8rem;
 }
-.banner img {
+.intro img {
   padding: 4px 0;
 }
 .content {
