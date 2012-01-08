@@ -18,13 +18,13 @@ app.register ".md",
     (locals) -> html
 app.set "view engine", "jade"
 app.set "view options",
+ layout: "layout.jade"
  locals:
    config: config
-   title: ''
-   wordpress: false
    specURIs: []
    testCSS: []
- layout: "layout.jade"
+   title: ''
+   wordpress: false
 app.set "views", __dirname + "/templates"
 
 #Load in the controllers

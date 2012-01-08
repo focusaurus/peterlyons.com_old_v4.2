@@ -69,22 +69,8 @@ route = (app, page) ->
   app.get '/' + page.URI, (req, res) ->
     page.render req, res
 
-exports.setup = (app) ->
-  #This pre-loads all included partials
-  fs.readdir app.set('views'), (error, names) ->
-    if error
-      throw error
-    for name in names
-      if name.match /.partial$/
-        key = name.split('.')[0]
-        fs.readFile app.set('views') + '/' + name, 'utf8', (error, data) ->
-          if error
-            throw error
-          partials[key] = data
-          excerpt = data.slice(0, 20).replace '\n', '\\n'
-          console.log "Stored data in key #{key}: #{excerpt}..."
-
+setup = (app) ->
   #Route all the simple static pages
   route app, page for page in pages
 
-exports.Page = Page
+module.exports = {setup, Page}
