@@ -521,7 +521,7 @@ Most successful careers involve working for at least several different companies
 
 # About the Author
 
-Peter Lyons has worked as a software developer and technology consultant since 2001. His career is detailed [on his web site at http://peterlyons.com/career.html](http://peterlyons.com/career.html). He has worked at small (30 or fewer employees), medium (500 employees), and large (10s or 100s of thousands of employees) companies and consulted at many Fortune 500 businesses. As he learnt the skills described in this article, he was able to advance his career rapidly. Of course, if he had known at the beginning what he knows now, things might have advanced even more quickly.
+Peter Lyons has worked as a software developer and technology consultant since 2001. His career is detailed [his career page](/career). He has worked at small (30 or fewer employees), medium (500 employees), and large (10s or 100s of thousands of employees) companies and consulted at many Fortune 500 businesses. As he learnt the skills described in this article, he was able to advance his career rapidly. Of course, if he had known at the beginning what he knows now, things might have advanced even more quickly.
 
 ## Exhibit A: Salary Chart
 
