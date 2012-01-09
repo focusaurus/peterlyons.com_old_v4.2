@@ -52,13 +52,15 @@ html(lang="en")
             a(href="/practices") Practices
             a(href="/stacks") Stacks
             a(href="/career") Career
+            a(href="/problog/feed")
+              img(src="/persblog/wp-includes/images/rss.png")
+
       if wordpress
         nav.blog
-          a(href="feed") Subscribe
-          | <?php get_sidebar(); ?>
-        //- CAREFUL. The following lines has an essential trailing white space
-        | 
-        //WORDPRESS HEADER BOILERPLATE. DELETE FROM HERE DOWN.
-        | 
+          | <a href="<?php echo site_url('feed') ?>">
+          | <img src="<?php echo esc_url( includes_url( 'images/rss.png' ) ); ?>" /></a>
+          | <form method="get" id="searchform" action="/problog/">
+          |  <input type="text" size="20" name="s" id="s" value="Search..." onblur="if(this.value=='') this.value='Search...';" onfocus="if(this.value=='Search...') this.value='';">
+          |  </form>
       !{body}
     include includes/footer

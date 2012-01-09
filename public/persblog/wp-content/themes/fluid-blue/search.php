@@ -3,9 +3,7 @@
 
 	<?php if (have_posts()) : ?>
 
-		<h2><?php _e('Search') ?></h2>
-		
-		<p> Results for <em><?php echo $_GET['s'] ?></em></p>
+		<p> Search results for <em><?php echo $_GET['s'] ?></em></p>
 
 		<?php while (have_posts()) : the_post(); ?>
 
@@ -39,5 +37,4 @@
 
 	</div>
 
-<?php get_sidebar(); ?>
 <?php get_footer(); ?>

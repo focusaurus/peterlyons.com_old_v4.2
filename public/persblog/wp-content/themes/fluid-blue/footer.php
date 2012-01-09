@@ -1,10 +1,3 @@
 
-    <div id="footer">
-      <a href="<?php bloginfo('rss2_url'); ?>">Entries (RSS)</a> and <a href="<?php bloginfo('comments_rss2_url'); ?>">Comments (RSS)</a>. Valid <a href="http://validator.w3.org/check/referer" title="This page validates as XHTML 1.0 Transitional"><abbr title="eXtensible HyperText Markup Language">XHTML</abbr></a> and <a href="http://jigsaw.w3.org/css-validator/check/referer"><abbr title="Cascading Style Sheets">CSS</abbr></a>.<br />
-      Powered by <a href="http://wordpress.org/" title="Powered by WordPress.">WordPress</a> and <a href="http://srinig.com/wordpress/themes/fluid-blue/">Fluid Blue theme</a> (With some tweaking by Pete). <br />
-      <!-- <?php echo get_num_queries(); ?> queries. <?php timer_stop(1); ?> seconds. -->
-      <?php wp_footer(); ?>
-    </div><!-- footer -->
-  </div> <!-- main_content -->
-</body>
-</html>
+</div><!-- main_content -->
+<footer><div class="content"><nav><h1>Technology</h1><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Blog</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photo Stream</a><a href="/app/photos">Photos (Summer 2011 and earlier)</a></nav></div></footer></body></html>
