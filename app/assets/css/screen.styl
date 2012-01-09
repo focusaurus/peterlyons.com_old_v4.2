@@ -42,9 +42,6 @@ codefont = courier, monospace, serif
 a
   color blue
   text-decoration none
-  img
-    vertical-align middle
-    padding-right pad1
 
 article
   h1
@@ -74,6 +71,10 @@ pre
   margin pad2 0
   padding pad1
 
+figcaption
+  fontsize 2
+  margin pad2 0
+
 footer
   background-color lightbg2
   margin-top pad3
@@ -94,6 +95,8 @@ footer
 h1, h2, h3
   color content4
   line-height 1.5em
+  &:not(:first-of-type)
+    padding-top pad2
 
 h1
   fontsize 3
@@ -134,11 +137,13 @@ header
 html
   font-size 62.5%
 
-img
-  border none
-  .icon
-    padding 0 pad1
-    vertical-align middle
+img.icon
+  padding-right pad1
+  vertical-align middle
+
+img.thumbnail
+  margin pad2 pad1
+  vertical-align bottom
 
 li
   line-height 2em
@@ -159,6 +164,10 @@ p
   padding 0 pad2
   max-width 800px
   min-width 600px
+
+#nextPrev
+  a
+    padding-right pad2
 
 #practices
   li

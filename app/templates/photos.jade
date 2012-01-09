@@ -4,21 +4,26 @@ p
   a(href="http://www.flickr.com/photos/88096431@N00/") my Flickr photo stream.
   | I enjoyed writing and maintaining my own photo software for a decade or so,
   | but it's time to move on.
-h1.galleryName Photo Gallery: #{gallery.displayName}
-a#prev(href=photo.prev.pageURI) &lt;&lt;previous&nbsp;
-a#next(href=photo.next.pageURI) next&gt;&gt;
+h1.galleryName(data-galleryURI=gallery.URI()) Photo Gallery: #{gallery.displayName}
+#nextPrev
+  a(href=photo.prev.pageURI) &lt;&lt;previous&nbsp;
+  a(href=photo.next.pageURI) next&gt;&gt;
 a#photolink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName + '&photo=' + photo.next.name)
   img#photo(alt=photo.caption, title=photo.caption, src=photo.fullSizeURI)
 
-h1.caption#caption #{photo.caption}
-- each photo in photos
+figcaption#caption #{photo.caption}
+each photo in photos
   - jsCaption = photo.caption.replace("'", "\\'").replace('"', "&quot;").trim()
   -  altCaption = photo.caption.replace('"', "&quot;").trim()
   - onClick = "showPhoto('" + photo.fullSizeURI + "', '" + jsCaption + "', '" + photo.name + "');return false"
-  a(href=config.photos.galleryURI + '?gallery=' + gallery.dirName + '&photo=' + photo.name , onClick=onClick)
+  a.thumbnail(
+      href=config.photos.galleryURI + '?gallery=' + gallery.dirName + '&photo=' + photo.name,
+      data-name=photo.name,
+      data-fullSizeURI=photo.fullSizeURI,
+      data-caption=jsCaption)
     img.thumbnail(src=config.photos.photoURI + gallery.dirName + '/' + photo.name + config.photos.thumbExtension, alt=altCaption, title=altCaption)
 h1 Other Photo Galleries
-- each gallery in galleries
+each gallery in galleries
   - var index = galleries.indexOf(gallery)
   - var prevIndex = index - 1
   - if (prevIndex < 0)
@@ -29,17 +34,17 @@ h1 Other Photo Galleries
     h2.year #{currentYear}
   a.gallerylink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName) #{gallery.displayName}
   br
-script(type='text/javascript')
-  function showPhoto(img, caption, name) {
-    $('#photo').attr('src', img);
-    $('#photo').attr('alt', caption);
-    $('#photo').attr('title', caption);
-    $('#caption').text(caption);
-    //Have to omit any literal ampersand here or zombie chokes.
-    //https://github.com/assaf/zombie/issues/62/#comment_952554
-    //String.fromCharCode(38) is an ampersand
-    $('#photolink').attr('href', '#{gallery.URI()}' + String.fromCharCode(38) +
-      'photo=' + name);
-    window.scrollTo(0, 0);
-    return true;
-  }
+:coffeescript
+  $ ->
+    $("a.thumbnail").click (event)->
+      event.preventDefault()
+      $("#photo").attr "src", $(this).attr("data-fullSizeURI")
+      $("#photo").attr "alt", $(this).attr("data-caption")
+      $("#photo").attr "title", $(this).attr("data-caption")
+      $("#caption").text $(this).attr("data-caption")
+      #Have to omit any literal ampersand here or zombie chokes.
+      #https://github.com/assaf/zombie/issues/62/#comment_952554
+      #String.fromCharCode(38) is an ampersand
+      photoURI = $(".galleryName").attr("data-galleryURI") + "&photo=" + $(this).attr("data-name")
+      $("#photolink").attr "href", photoURI
+      window.scrollTo 0, $("#photo").position().top - 5

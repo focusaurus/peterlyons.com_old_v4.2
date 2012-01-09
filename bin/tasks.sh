@@ -307,14 +307,11 @@ app:test() {
 
 app:dev_start() {
     cdpd
-    kill_stale
-    env PATH=~/node/bin:./node_modules/.bin NODE_ENV=${1-development} ./node_modules/.bin/supervisor -p app/server.coffee &
-    echo "$!" > "${PID_FILE}"
-    echo "new node process started with pid $(cat ${PID_FILE})"
-    if [ $(uname) == "Darwin" ]; then
+    while true
+    do
+        coffee app/server.coffee
         sleep 1
-        #open -a "Firefox" "http://localhost:$(./node_modules/.bin/coffee bin/get_port.coffee)${1}"
-    fi
+    done
 }
 
 app:dev_stop() {
@@ -427,6 +424,11 @@ app:validate() {
     else
         echo "SUCCESS: All documents successfully validated"
     fi
+}
+
+app:watch() {
+    cdpd
+    stylus -w -o public app/assets/css/screen.styl
 }
 
 if ! expr "${1}" : '.*:' > /dev/null; then

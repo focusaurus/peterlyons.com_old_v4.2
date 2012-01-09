@@ -107,10 +107,6 @@ a {
   color: #268bd2;
   text-decoration: none;
 }
-a img {
-  vertical-align: middle;
-  padding-right: 4px;
-}
 article h1 {
   font-size: 24px;
   font-size: 2.4rem;
@@ -137,6 +133,11 @@ pre {
   overflow: auto;
   margin: 20px 0;
   padding: 4px;
+}
+figcaption {
+  font-size: 24px;
+  font-size: 2.4rem;
+  margin: 20px 0;
 }
 footer {
   background-color: #eee8d5;
@@ -167,6 +168,11 @@ h2,
 h3 {
   color: #586e75;
   line-height: 1.5em;
+}
+h1:not(:first-of-type),
+h2:not(:first-of-type),
+h3:not(:first-of-type) {
+  padding-top: 20px;
 }
 h1 {
   font-size: 36px;
@@ -219,12 +225,13 @@ header nav a:hover {
 html {
   font-size: 62.5%;
 }
-img {
-  border: none;
-}
-img .icon {
-  padding: 0 4px;
+img.icon {
+  padding-right: 4px;
   vertical-align: middle;
+}
+img.thumbnail {
+  margin: 20px 4px;
+  vertical-align: bottom;
 }
 li {
   line-height: 2em;
@@ -245,6 +252,9 @@ p {
   padding: 0 20px;
   max-width: 800px;
   min-width: 600px;
+}
+#nextPrev a {
+  padding-right: 20px;
 }
 #practices li {
   font-weight: bold;
