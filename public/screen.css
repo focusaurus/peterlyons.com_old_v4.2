@@ -126,6 +126,9 @@ code {
   color: #586e75;
   font-family: courier, monospace, serif;
 }
+pre > code {
+  background-color: #002b36;
+}
 pre {
   background-color: #002b36;
   color: #93a1a1;
