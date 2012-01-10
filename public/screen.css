@@ -137,6 +137,12 @@ pre {
   margin: 20px 0;
   padding: 4px;
 }
+dd {
+  margin-left: 20px;
+}
+dt {
+  font-weight: bold;
+}
 figcaption {
   font-size: 24px;
   font-size: 2.4rem;
@@ -175,7 +181,7 @@ h3 {
 h1:not(:first-of-type),
 h2:not(:first-of-type),
 h3:not(:first-of-type) {
-  padding-top: 20px;
+  padding-top: 30px;
 }
 h1 {
   font-size: 36px;
@@ -256,10 +262,6 @@ p {
   margin-left: 15%;
   margin-right: 15%;
   transition: margin 0.3s ease-out;
-  margin: 0 auto;
-  padding: 0 20px;
-  max-width: 800px;
-  min-width: 600px;
 }
 #practices li {
   font-weight: bold;
@@ -281,9 +283,19 @@ nav.photos a {
 }
 @media screen and (max-width: 960px) {
   .content {
-    margin-left: 7.5%;
-    margin-right: 7.5%;
+    margin-left: 5%;
+    margin-right: 5%;
     transition: margin 0.3s ease-out;
+  }
+  header h2 {
+    font-size: 18px;
+    font-size: 1.8rem;
+  }
+  header p {
+    display: block;
+  }
+  header p:after {
+    content: "960";
   }
 }
 @media screen and (max-width: 720px) {
@@ -291,5 +303,8 @@ nav.photos a {
     margin-left: 0.5%;
     margin-right: 0.5%;
     transition: margin 0.3s ease-out;
+  }
+  header p:after {
+    content: "720";
   }
 }

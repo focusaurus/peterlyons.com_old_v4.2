@@ -81,6 +81,12 @@ pre
   margin pad2 0
   padding pad1
 
+dd
+  margin-left pad2
+
+dt
+  font-weight bold
+
 figcaption
   fontsize 2
   margin pad2 0
@@ -106,7 +112,7 @@ h1, h2, h3
   color content4
   line-height 1.5em
   &:not(:first-of-type)
-    padding-top pad2
+    padding-top pad3
 
 h1
   fontsize 3
@@ -173,12 +179,10 @@ p
 
 .content
   wrapper()
-  margin 0 auto
-  padding 0 pad2
-  max-width 800px
-  min-width 600px
-
-
+  //margin 0 auto
+  //padding 0 pad2
+  //max-width 800px
+  //min-width 600px
 
 #practices
   li
@@ -205,8 +209,19 @@ nav.photos
 ////////// Responsive layout //////////
 @media screen and (max-width: 960px)
   .content
-    wrapper(85%)
+    wrapper(90%)
+  header
+    h2
+      fontsize 1
+    p
+      display block
+      &:after
+        content "960"
 
 @media screen and (max-width: 720px)
   .content
     wrapper(99%)
+  header
+    p
+      &:after
+        content "720"

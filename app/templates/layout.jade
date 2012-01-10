@@ -18,6 +18,8 @@ html(lang="en")
     meta(name="author", content="Peter Lyons")
     meta(name="description", content="The web site for Peter Lyons, Web Developer and Musician")
     meta(name="copyright", content="2001, Peter Lyons")
+    //This seems to make it way too big on mobile
+    //meta(name="viewport", content="width=device-width")
     link(rel="stylesheet", href="/screen.css", type="text/css")
     link(rel="stylesheet", href="/css/overcast/jquery-ui.css", type="text/css")
     script(src="/js/jquery.js")
@@ -43,6 +45,7 @@ html(lang="en")
   body
     .content
       header
+        p BUGBUG responsive layout max-width:
         h1
           a(href="/") Peter Lyons
         if !wordpress
