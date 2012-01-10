@@ -10,11 +10,12 @@ rounded(radius=10px)
 
 // Provide our wrapper mixin for responsive layout
 //https://gist.github.com/1549029
-wrapper(site-width=70%)
+wrapper(site-width=60%)
   site-margin = ((100% - site-width) / 2)
   margin-left: site-margin
   margin-right: site-margin
   transition: margin 0.3s ease-out
+
 /*
 I am not dealing with font size insanity. Here's the deal.
 The main body/content font size is zero
@@ -148,7 +149,7 @@ header
   h2
     color content4
     font-family SpecialEliteRegular
-    fontsize 2
+    fontsize 3
     padding 0
   nav
     white-space nowrap
@@ -181,13 +182,7 @@ li
 p
   margin-top pad2
 
-////////// Based on IDs or Classes //////////
-.intro
-  p
-    fontsize 1
-  img
-    padding pad1 0
-
+////////// Shared Based on IDs or Classes //////////
 .content
   wrapper()
   //margin 0 auto
@@ -195,12 +190,21 @@ p
   //max-width 800px
   //min-width 600px
 
+////////// Home page //////////
+.intro
+  p
+    fontsize 1
+  img
+    padding pad1 0
+
+////////// Practices //////////
 #practices
   li
     font-weight bold
     li
      font-weight normal
 
+////////// Blog //////////
 nav.blog
   form
     display inline-block
@@ -217,8 +221,17 @@ nav.photos
 #photo
   display block
 
+////////// Oberlin //////////
+table.program
+  td
+    &:not(:first-of-type)
+      padding-left pad2
+td.performers
+  text-align center
+  padding-bottom pad2
+
 ////////// Responsive layout //////////
-@media screen and (max-width: 960px)
+@media handheld and (max-width: 960px), screen and (max-device-width: 960px), screen and (max-width: 960px)
   .content
     wrapper(90%)
   header
@@ -228,10 +241,7 @@ nav.photos
       display block
       &:after
         content "960"
-
-@media screen and (max-width: 720px)
-  .content
-    wrapper(99%)
+@media handheld and (max-width: 720px), screen and (max-device-width: 720px), screen and (max-width: 720px)
   header
     p
       &:after

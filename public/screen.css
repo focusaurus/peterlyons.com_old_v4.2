@@ -219,8 +219,8 @@ header h1 a {
 header h2 {
   color: #586e75;
   font-family: SpecialEliteRegular;
-  font-size: 24px;
-  font-size: 2.4rem;
+  font-size: 36px;
+  font-size: 3.6rem;
   padding: 0;
 }
 header nav {
@@ -257,17 +257,17 @@ li {
 p {
   margin-top: 20px;
 }
+.content {
+  margin-left: 20%;
+  margin-right: 20%;
+  transition: margin 0.3s ease-out;
+}
 .intro p {
   font-size: 18px;
   font-size: 1.8rem;
 }
 .intro img {
   padding: 4px 0;
-}
-.content {
-  margin-left: 15%;
-  margin-right: 15%;
-  transition: margin 0.3s ease-out;
 }
 #practices li {
   font-weight: bold;
@@ -287,7 +287,14 @@ nav.photos a {
 #photo {
   display: block;
 }
-@media screen and (max-width: 960px) {
+table.program td:not(:first-of-type) {
+  padding-left: 20px;
+}
+td.performers {
+  text-align: center;
+  padding-bottom: 20px;
+}
+@media handheld and (max-width: 960px), screen and (max-device-width: 960px), screen and (max-width: 960px) {
   .content {
     margin-left: 5%;
     margin-right: 5%;
@@ -304,12 +311,7 @@ nav.photos a {
     content: "960";
   }
 }
-@media screen and (max-width: 720px) {
-  .content {
-    margin-left: 0.5%;
-    margin-right: 0.5%;
-    transition: margin 0.3s ease-out;
-  }
+@media handheld and (max-width: 720px), screen and (max-device-width: 720px), screen and (max-width: 720px) {
   header p:after {
     content: "720";
   }
