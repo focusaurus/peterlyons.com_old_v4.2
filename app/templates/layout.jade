@@ -17,9 +17,8 @@ html(lang="en")
     meta(name="keywords", content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock")
     meta(name="author", content="Peter Lyons")
     meta(name="description", content="Pete Lyons, node.js coder for hire")
-    meta(name="copyright", content="2001, Peter Lyons")
-    //This seems to make it way too big on mobile
-    //meta(name="viewport", content="width=device-width")
+    //-This seems to make it way too big on mobile
+    //-meta(name="viewport", content="width=device-width")
     link(rel="stylesheet", href="/screen.css")
     link(rel="stylesheet", href="/css/overcast/jquery-ui.css")
     script(src="/js/jquery.js")
@@ -42,7 +41,7 @@ html(lang="en")
     link(rel="openid.server", href="http://www.livejournal.com/openid/server.bml")
     link(rel="openid.delegate", href="http://focusaurus.livejournal.com/")
     link(href="http://fonts.googleapis.com/css?family=Inconsolata", rel="stylesheet")
-    //link(href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono", rel="stylesheet")
+    //-link(href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono", rel="stylesheet")
   body
     .content
       header
@@ -57,7 +56,7 @@ html(lang="en")
             a(href="/stacks") Stacks
             a(href="/career") Career
             a(href="/problog/feed")
-              img(src="/persblog/wp-includes/images/rss.png")
+              img(src="/persblog/wp-includes/images/rss.png", alt="feed")
 
       if wordpress
         nav.blog

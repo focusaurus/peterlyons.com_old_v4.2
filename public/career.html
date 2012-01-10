@@ -1,31 +1,32 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>My Career | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"><meta name="author" content="Peter Lyons"><meta name="description" content="Pete Lyons, node.js coder for hire"><meta name="copyright" content="2001, Peter Lyons"><!--This seems to make it way too big on mobile--><!--meta(name="viewport", content="width=device-width")--><link rel="stylesheet" href="/screen.css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css"><script src="/js/jquery.js"></script><script src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"><!--link(href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono", rel="stylesheet")--></head><body><div class="content"><header><p>BUGBUG responsive layout max-width:</p><h1><a href="/">Peter Lyons</a></h1><h2>node.js coder for hire</h2><nav><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a><a href="/problog/feed"><img src="/persblog/wp-includes/images/rss.png"></a></nav></header><script type="text/javascript">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>My Career | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"><meta name="author" content="Peter Lyons"><meta name="description" content="Pete Lyons, node.js coder for hire"><link rel="stylesheet" href="/screen.css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css"><script src="/js/jquery.js"></script><script src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"></head><body><div class="content"><header><p>BUGBUG responsive layout max-width:</p><h1><a href="/">Peter Lyons</a></h1><h2>node.js coder for hire</h2><nav><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a><a href="/problog/feed"><img src="/persblog/wp-includes/images/rss.png" alt="feed"></a></nav></header><script type="text/javascript">
 (function() {
 
-  window.reversePhases = function() {
-    var parent, phase, phases, _i, _len, _results;
-    phases = [];
-    parent = $("div.phase").parent();
-    $("div.phase").each(function(index, div) {
-      $(div).remove();
-      return phases.unshift($(div));
+  $(function() {
+    return $("#reverse").click(function() {
+      var parent, phase, phases, _i, _len, _results;
+      phases = [];
+      parent = $("div.phase").parent();
+      $("div.phase").each(function(index, div) {
+        $(div).remove();
+        return phases.unshift($(div));
+      });
+      _results = [];
+      for (_i = 0, _len = phases.length; _i < _len; _i++) {
+        phase = phases[_i];
+        _results.push(parent.append(phase));
+      }
+      return _results;
     });
-    _results = [];
-    for (_i = 0, _len = phases.length; _i < _len; _i++) {
-      phase = phases[_i];
-      _results.push(parent.append(phase));
-    }
-    return _results;
-  };
+  });
 
 }).call(this);
-</script><p><article id="career">
-I have a <strong><a href="resume.pdf">traditional resume availabe in PDF format</a></strong> for those
+</script><p>I have a <strong><a href="resume.pdf">traditional resume availabe in PDF format</a></strong> for those
 looking for the lo-fi version.</p>
 
 <p>This page will chronicle my career in a more narrative and rich format than a
 standard resume can offer.</p>
 
-<p><a href="javascript:reversePhases();"> Click to switch between chronological and reverse chronological order.</a></p><div class="phase"><h1>Phase 4: Web Developer and Start-Up Junkie</h1>
+<p><a id="reverse" href="#">Click to switch between chronological and reverse chronological order.</a></p><div class="phase"><h1>Phase 4: Web Developer and Start-Up Junkie</h1>
 
 <p>After 6.5 years working on enterprise software, in January 2011 I quit my
 job with HP to work on building web applications and start-up businesses.</p>
@@ -294,7 +295,6 @@ turned out to be a key language two jobs later at Opsware.</p>
 <li>Unit Testing and Test Driven Development (TDD)</li>
 <li>Extreme Programming (XP)</li>
 <li>Object-Relational Modeling (ORM)</li>
-<li>Apple Core Foundation APIs
-</article></li>
+<li>Apple Core Foundation APIs</li>
 </ul></div>
 </div><footer><div class="content"><nav><h1>Technology</h1><a href="/">Home</a><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Blog</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photo Stream</a><a href="/app/photos">Photos (Summer 2011 and earlier)</a></nav></div></footer></body></html>

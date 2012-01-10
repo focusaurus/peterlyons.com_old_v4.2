@@ -1,20 +1,20 @@
 :coffeescript
-  window.reversePhases = ->
-    phases = []
-    parent = $("div.phase").parent()
-    $("div.phase").each (index, div) ->
-      $(div).remove()
-      phases.unshift $(div)
-    parent.append phase for phase in phases
+  $ ->
+   $("#reverse").click ->
+        phases = []
+        parent = $("div.phase").parent()
+        $("div.phase").each (index, div) ->
+          $(div).remove()
+          phases.unshift $(div)
+        parent.append phase for phase in phases
 :markdown
-  <article id="career">
   I have a **[traditional resume availabe in PDF format](resume.pdf)** for those
   looking for the lo-fi version.
 
   This page will chronicle my career in a more narrative and rich format than a
   standard resume can offer.
 
-  <a href="javascript:reversePhases();"> Click to switch between chronological and reverse chronological order.</a>
+  <a id="reverse" href="#">Click to switch between chronological and reverse chronological order.</a>
 
 .phase
   :markdown
@@ -271,4 +271,3 @@
     * Extreme Programming (XP)
     * Object-Relational Modeling (ORM)
     * Apple Core Foundation APIs
-    </article>

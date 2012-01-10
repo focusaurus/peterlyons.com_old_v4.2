@@ -8,10 +8,11 @@ h1.galleryName(data-galleryURI=gallery.URI()) Photo Gallery: #{gallery.displayNa
 #nextPrev
   a(href=photo.prev.pageURI) &lt;&lt;previous&nbsp;
   a(href=photo.next.pageURI) next&gt;&gt;
-a#photolink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName + '&photo=' + photo.next.name)
-  img#photo(alt=photo.caption, title=photo.caption, src=photo.fullSizeURI)
+figure
+  a#photolink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName + '&photo=' + photo.next.name)
+    img#photo(alt=photo.caption, title=photo.caption, src=photo.fullSizeURI)
 
-figcaption#caption #{photo.caption}
+  figcaption#caption #{photo.caption}
 each photo in photos
   - jsCaption = photo.caption.replace("'", "\\'").replace('"', "&quot;").trim()
   -  altCaption = photo.caption.replace('"', "&quot;").trim()

@@ -2,7 +2,7 @@
 
 After this class you will know a lot more about LAMP and POST and I don't mean this.
 
-<img src="/images/2011/lamp_post.jpg" alt="Lamp Post" width="200px"/>
+<img src="/images/2011/lamp_post.jpg" alt="Lamp Post" width="200"/>
 
 ##Class Materials
 
