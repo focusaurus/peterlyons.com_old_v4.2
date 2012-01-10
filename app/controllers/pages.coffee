@@ -45,7 +45,7 @@ addTests = (req, locals, specs=[]) ->
 pages = []
 page = (URI, title, specs) ->
   pages.push new Page(URI, title, {}, specs)
-page 'home', 'Peter Lyons: Web Development, Startups, Music', ['/application/HomePageSpec.js']
+page 'home', 'Peter Lyons: node.js coder for hire', ['/application/HomePageSpec.js']
 page 'bands', 'My Bands'
 page 'bigclock', 'BigClock: a full screen desktop clock in java'
 page 'career', 'My Career'

@@ -103,6 +103,12 @@ and h1 should be size 3
 Use REM units for fanciness but also include pixels for unsupported browsers
 http://snook.ca/archives/html_and_css/font-size-with-rem
 */
+@font-face {
+  font-family: 'SpecialEliteRegular';
+  src: url("/fonts/SpecialElite-webfont.eot?#iefix") format('embedded-opentype'), url("/fonts/SpecialElite-webfont.woff") format('woff'), url("/fonts/SpecialElite-webfont.ttf") format('truetype'), url("/fonts/SpecialElite-webfont.svg#SpecialEliteRegular") format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
 a {
   color: #268bd2;
   text-decoration: none;
@@ -124,7 +130,7 @@ body {
 code {
   background-color: #eee8d5;
   color: #586e75;
-  font-family: courier, monospace, serif;
+  font-family: Inconsolata, courier new, monospace, serif;
 }
 pre > code {
   background-color: #002b36;
@@ -132,7 +138,7 @@ pre > code {
 pre {
   background-color: #002b36;
   color: #93a1a1;
-  font-family: courier, monospace, serif;
+  font-family: Inconsolata, courier new, monospace, serif;
   overflow: auto;
   margin: 20px 0;
   padding: 4px;
@@ -202,7 +208,7 @@ header {
 header h1 {
   font-size: 36px;
   font-size: 3.6rem;
-  font-family: courier, monospace, serif;
+  font-family: SpecialEliteRegular;
   padding: 0;
   text-transform: lowercase;
 }
@@ -212,9 +218,9 @@ header h1 a {
 }
 header h2 {
   color: #586e75;
-  font-family: courier, monospace, serif;
-  font-size: 36px;
-  font-size: 3.6rem;
+  font-family: SpecialEliteRegular;
+  font-size: 24px;
+  font-size: 2.4rem;
   padding: 0;
 }
 header nav {
