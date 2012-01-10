@@ -202,6 +202,7 @@ header h1 {
 }
 header h1 a {
   color: #000;
+  letter-spacing: 0.6em;
 }
 header h2 {
   color: #586e75;
@@ -211,7 +212,7 @@ header h2 {
   padding: 0;
 }
 header nav {
-  display: inline;
+  white-space: nowrap;
 }
 header nav a {
   font-size: 18px;
@@ -252,13 +253,13 @@ p {
   padding: 4px 0;
 }
 .content {
+  margin-left: 15%;
+  margin-right: 15%;
+  transition: margin 0.3s ease-out;
   margin: 0 auto;
   padding: 0 20px;
   max-width: 800px;
   min-width: 600px;
-}
-#nextPrev a {
-  padding-right: 20px;
 }
 #practices li {
   font-weight: bold;
@@ -268,4 +269,27 @@ p {
 }
 nav.blog form {
   display: inline-block;
+}
+nav.photos a {
+  display: block;
+}
+#nextPrev a {
+  padding-right: 20px;
+}
+#photo {
+  display: block;
+}
+@media screen and (max-width: 960px) {
+  .content {
+    margin-left: 7.5%;
+    margin-right: 7.5%;
+    transition: margin 0.3s ease-out;
+  }
+}
+@media screen and (max-width: 720px) {
+  .content {
+    margin-left: 0.5%;
+    margin-right: 0.5%;
+    transition: margin 0.3s ease-out;
+  }
 }

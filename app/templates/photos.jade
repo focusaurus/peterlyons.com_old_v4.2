@@ -20,20 +20,20 @@ each photo in photos
       href=config.photos.galleryURI + '?gallery=' + gallery.dirName + '&photo=' + photo.name,
       data-name=photo.name,
       data-fullSizeURI=photo.fullSizeURI,
-      data-caption=jsCaption)
+      data-caption=altCaption)
     img.thumbnail(src=config.photos.photoURI + gallery.dirName + '/' + photo.name + config.photos.thumbExtension, alt=altCaption, title=altCaption)
 h1 Other Photo Galleries
-each gallery in galleries
-  - var index = galleries.indexOf(gallery)
-  - var prevIndex = index - 1
-  - if (prevIndex < 0)
-    - prevIndex = galleries.length - 1
-  - var currentYear = gallery.startDate.getFullYear()
-  - var previousYear = galleries[prevIndex].startDate.getFullYear()
-  - if (index === 0 || currentYear != previousYear)
-    h2.year #{currentYear}
-  a.gallerylink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName) #{gallery.displayName}
-  br
+nav.photos
+  each gallery in galleries
+    - var index = galleries.indexOf(gallery)
+    - var prevIndex = index - 1
+    - if (prevIndex < 0)
+      - prevIndex = galleries.length - 1
+    - var currentYear = gallery.startDate.getFullYear()
+    - var previousYear = galleries[prevIndex].startDate.getFullYear()
+    - if (index === 0 || currentYear != previousYear)
+      h2.year #{currentYear}
+    a.gallerylink(href=config.photos.galleryURI + '?gallery=' + gallery.dirName) #{gallery.displayName}
 :coffeescript
   $ ->
     $("a.thumbnail").click (event)->
