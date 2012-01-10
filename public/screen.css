@@ -238,7 +238,8 @@ img.thumbnail {
 }
 li {
   line-height: 2em;
-  padding-left: 30px;
+  margin-left: 30px;
+  list-style-type: circle;
 }
 p {
   margin-top: 20px;
