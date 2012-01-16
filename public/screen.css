@@ -105,12 +105,12 @@ http://snook.ca/archives/html_and_css/font-size-with-rem
 */
 @font-face {
   font-family: 'SpecialEliteRegular';
-  src: url("/fonts/SpecialElite-webfont.eot?#iefix") format('embedded-opentype'), url("/fonts/SpecialElite-webfont.woff") format('woff'), url("/fonts/SpecialElite-webfont.ttf") format('truetype'), url("/fonts/SpecialElite-webfont.svg#SpecialEliteRegular") format('svg');
+  src: url("fonts/SpecialElite-webfont.eot?#iefix") format('embedded-opentype'), url("fonts/SpecialElite-webfont.woff") format('woff'), url("fonts/SpecialElite-webfont.ttf") format('truetype'), url("fonts/SpecialElite-webfont.svg#SpecialEliteRegular") format('svg');
   font-weight: normal;
   font-style: normal;
 }
 a {
-  color: #268bd2;
+  color: #00f;
   text-decoration: none;
 }
 article h1 {
@@ -118,33 +118,33 @@ article h1 {
   font-size: 2.4rem;
 }
 body {
-  background-color: #fdf6e3;
-  color: #93a1a1;
+  background-color: #f4f1dd;
+  color: #434136;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   letter-spacing: 0.1em;
   line-height: 1.6em;
   padding: 0;
-  font-size: 14px;
-  font-size: 1.4rem;
+  font-size: 12px;
+  font-size: 1.2rem;
 }
 code {
-  background-color: #eee8d5;
-  color: #586e75;
-  font-family: Inconsolata, courier new, monospace, serif;
+  background-color: lightbg2;
+  color: content4;
+  font-family: Inconsolata, "courier new", monospace, serif;
 }
 pre > code {
-  background-color: #002b36;
+  background-color: darkbg1;
 }
 pre {
-  background-color: #002b36;
-  color: #93a1a1;
-  font-family: Inconsolata, courier new, monospace, serif;
+  background-color: darkbg1;
+  color: content1;
+  font-family: Inconsolata, "courier new", monospace, serif;
   overflow: auto;
-  margin: 20px 0;
-  padding: 4px;
+  margin: 14px 0;
+  padding: 5px;
 }
 dd {
-  margin-left: 20px;
+  margin-left: 14px;
 }
 dt {
   font-weight: bold;
@@ -152,36 +152,67 @@ dt {
 figcaption {
   font-size: 24px;
   font-size: 2.4rem;
-  margin: 20px 0;
+  margin: 14px 0;
 }
 footer {
-  background-color: #eee8d5;
+  background-color: #2c2a20;
+  border-top: #88c200 solid 2px;
   margin-top: 30px;
-  padding-bottom: 20px;
+  padding-bottom: 14px;
 }
 footer a {
-  border-radius: 10px;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  padding: 0 4px;
+  color: #fefdfa;
   display: block;
+  padding: 0 5px;
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
 }
 footer a:hover {
-  background-color: #fdf6e3;
+  background-color: lightbg1;
 }
 footer h1 {
-  font-size: 18px;
-  font-size: 1.8rem;
+  color: #a19d83;
+  font-family: "Six Caps", sans-serif;
+  font-size: 16px;
+  font-size: 1.6rem;
+  text-transform: uppercase;
 }
 footer nav {
   display: inline-block;
-  padding: 4px 20px 0 0;
+  padding: 5px 14px 0 0;
   vertical-align: top;
+}
+footer nav a:before {
+  content: "> ";
+}
+footer nav.connect a:before {
+  content: "";
+}
+footer.license {
+  color: #a19d83;
+  font-size: 10px;
+  font-size: 1rem;
+  margin: 0;
+  padding-top: 5px;
+  background-color: #201e17;
+  border-top: #575342 solid 1px;
+}
+footer.license a {
+  display: inline;
+  font-size: 10px;
+  font-size: 1rem;
+  padding: 0;
+  white-space: nowrap;
+}
+footer.license img {
+  padding-right: 5px;
+  vertical-align: middle;
 }
 h1,
 h2,
 h3 {
-  color: #586e75;
+  color: content4;
   line-height: 1.5em;
 }
 h1:not(:first-of-type),
@@ -198,55 +229,61 @@ h2 {
   font-size: 2.4rem;
 }
 h3 {
-  font-size: 18px;
-  font-size: 1.8rem;
+  font-size: 16px;
+  font-size: 1.6rem;
 }
 header {
-  text-align: center;
-  padding-bottom: 20px;
+  padding-bottom: 14px;
 }
 header h1 {
+  font-family: "Six Caps", sans-serif;
   font-size: 36px;
   font-size: 3.6rem;
-  font-family: SpecialEliteRegular;
+  text-transform: uppercase;
+  float: left;
   padding: 0;
-  text-transform: lowercase;
+  text-transform: uppercase;
 }
 header h1 a {
-  color: #000;
-  letter-spacing: 0.4em;
+  color: #434136;
 }
-header h2 {
-  color: #586e75;
-  font-family: SpecialEliteRegular;
-  font-size: 36px;
-  font-size: 3.6rem;
-  padding: 0;
+header img {
+  float: left;
 }
 header nav {
+  float: right;
+  margin-top: 14px;
   white-space: nowrap;
 }
 header nav a {
-  font-size: 18px;
-  font-size: 1.8rem;
-  margin: 20px;
-  padding: 4px 20px;
-  border-radius: 10px;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
+  background-color: #434136;
+  color: #fcfaf1;
+  margin: 5px;
+  padding: 0 14px;
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  text-transform: uppercase;
 }
-header nav a:hover {
-  background-color: #eee8d5;
+header nav .current {
+  background-color: #88c200;
+}
+hr {
+  background-color: #434136;
+  border: none;
+  clear: both;
+  height: 0.3em;
+  margin-top: 14px;
 }
 html {
   font-size: 62.5%;
 }
 img.icon {
-  padding-right: 4px;
+  padding-right: 5px;
   vertical-align: middle;
 }
 img.thumbnail {
-  margin: 20px 4px;
+  margin: 14px 5px;
   vertical-align: bottom;
 }
 li {
@@ -255,19 +292,23 @@ li {
   list-style-type: circle;
 }
 p {
-  margin-top: 20px;
+  margin-top: 14px;
 }
 .content {
   margin-left: 20%;
   margin-right: 20%;
   transition: margin 0.3s ease-out;
 }
+.highlight {
+  color: #88c200;
+}
 .intro p {
-  font-size: 18px;
-  font-size: 1.8rem;
+  font-size: 24px;
+  font-size: 2.4rem;
+  font-family: Oldenburg, serif;
 }
 .intro img {
-  padding: 4px 0;
+  padding: 5px 0;
 }
 #practices li {
   font-weight: bold;
@@ -282,17 +323,17 @@ nav.photos a {
   display: block;
 }
 #nextPrev a {
-  padding-right: 20px;
+  padding-right: 14px;
 }
 #photo {
   display: block;
 }
 table.program td:not(:first-of-type) {
-  padding-left: 20px;
+  padding-left: 14px;
 }
 td.performers {
   text-align: center;
-  padding-bottom: 20px;
+  padding-bottom: 14px;
 }
 @media handheld and (max-width: 960px), screen and (max-device-width: 960px), screen and (max-width: 960px) {
   .content {
@@ -301,18 +342,14 @@ td.performers {
     transition: margin 0.3s ease-out;
   }
   header h2 {
-    font-size: 18px;
-    font-size: 1.8rem;
-  }
-  header p {
-    display: block;
-  }
-  header p:after {
-    content: "960";
+    font-size: 16px;
+    font-size: 1.6rem;
   }
 }
 @media handheld and (max-width: 720px), screen and (max-device-width: 720px), screen and (max-width: 720px) {
-  header p:after {
-    content: "720";
+  .content {
+    margin-left: 0.5%;
+    margin-right: 0.5%;
+    transition: margin 0.3s ease-out;
   }
 }
