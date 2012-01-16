@@ -79,22 +79,19 @@ body
   fontsize 0
 
 //For inline code snippets (wrapping OK)
-code
-  background-color lightbg2
-  color content4
+code, pre
+  background-color light3
+  color dark3
   font-family codefont
 
-pre > code
-  background-color darkbg1
+code
+  padding 0 pad1
 
 //For multiline code blocks (formatted, no wrapping)
 pre
-  background-color darkbg1
-  color content1
-  font-family codefont
   overflow auto
   margin pad2 0
-  padding pad1
+  padding pad2
 
 dd
   margin-left pad2
@@ -154,13 +151,13 @@ h1, h2, h3
     padding-top pad3
 
 h1
-  fontsize 3
+  titlefont 3
 
 h2
-  fontsize 2
+  titlefont 2
 
 h3
-  fontsize 1
+  titlefont 1
 
 header
   padding-bottom pad2
@@ -231,6 +228,7 @@ p
   p
     fontsize 2
     font-family Oldenburg, serif
+    line-height 1.3em
   img
     padding pad1 0
 

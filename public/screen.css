@@ -127,21 +127,19 @@ body {
   font-size: 12px;
   font-size: 1.2rem;
 }
-code {
-  background-color: lightbg2;
-  color: content4;
+code,
+pre {
+  background-color: #fefdfa;
+  color: #434136;
   font-family: Inconsolata, "courier new", monospace, serif;
 }
-pre > code {
-  background-color: darkbg1;
+code {
+  padding: 0 5px;
 }
 pre {
-  background-color: darkbg1;
-  color: content1;
-  font-family: Inconsolata, "courier new", monospace, serif;
   overflow: auto;
   margin: 14px 0;
-  padding: 5px;
+  padding: 14px;
 }
 dd {
   margin-left: 14px;
@@ -221,16 +219,22 @@ h3:not(:first-of-type) {
   padding-top: 30px;
 }
 h1 {
+  font-family: "Six Caps", sans-serif;
   font-size: 36px;
   font-size: 3.6rem;
+  text-transform: uppercase;
 }
 h2 {
+  font-family: "Six Caps", sans-serif;
   font-size: 24px;
   font-size: 2.4rem;
+  text-transform: uppercase;
 }
 h3 {
+  font-family: "Six Caps", sans-serif;
   font-size: 16px;
   font-size: 1.6rem;
+  text-transform: uppercase;
 }
 header {
   padding-bottom: 14px;
@@ -306,6 +310,7 @@ p {
   font-size: 24px;
   font-size: 2.4rem;
   font-family: Oldenburg, serif;
+  line-height: 1.3em;
 }
 .intro img {
   padding: 5px 0;
