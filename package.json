@@ -14,6 +14,7 @@
     "async": "0.1.x",
     "coffee-script": "1.2.x",
     "express": "2.5.x",
+    "glob": "2.0.x",
     "jade": "0.20.x",
     "markdown-js": "0.0.x",
     "nib": "*",

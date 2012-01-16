@@ -28,7 +28,7 @@ app.set "view options",
 app.set "views", __dirname + "/templates"
 
 #Load in the controllers
-["pages", "galleries", "photos"].map (controllerName) ->
+["pages", "galleries", "photos", "blog"].map (controllerName) ->
   controller = require "./controllers/" + controllerName
   controller.setup app
 
