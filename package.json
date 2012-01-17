@@ -23,6 +23,8 @@
   "devDependencies": {
     "node-inspector": "*",
     "jasbin": "1.0.x",
-    "jasmine-node": "1.0.x"
+    "jasmine-node": "1.0.x",
+    "mysql": "0.9.x",
+    "asyncjs": "0.0.x"
   }
 }
