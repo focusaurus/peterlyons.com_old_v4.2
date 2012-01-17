@@ -41,7 +41,7 @@ fontsize(size)
   pixels = 12 if size ==  0 //Base size 0 for main body content
   pixels = 18 if size ==  1
   pixels = 24 if size ==  2
-  pixels = 30 if size ==  3
+  pixels = 28 if size ==  3
   pixels = 40 if size > 3
   font-size unit(pixels, px)
   font-size unit((pixels/10), rem)
@@ -114,8 +114,9 @@ hr
 
 //For multiline code blocks (formatted, no wrapping)
 pre
-  overflow auto
+  border 1px solid dark3
   margin pad2 0
+  overflow auto
   padding pad2
 
 dd
@@ -149,6 +150,7 @@ footer
   background-color dark5
   border-top dark1 solid 2px
   margin-top pad3
+  padding-bottom pad4
   a
     color light3
     padding 0 pad1
@@ -171,6 +173,8 @@ footer
       padding-bottom pad3
       &:before
         content none
+      img
+        padding-right pad3
 footer.license
   background-color dark6
   border-top light4 solid 1px
