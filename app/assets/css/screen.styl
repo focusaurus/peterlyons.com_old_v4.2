@@ -19,7 +19,6 @@ wrapper(site-width=60%)
 titlefont(size=1)
   font-family "AWConquerorInline-Regular", sans-serif
   fontsize size
-  text-transform uppercase
 /*
 "
 I am not dealing with font size insanity. Here is the deal.
@@ -157,9 +156,9 @@ footer
     rounded()
   h1
     color light5
-    titlefont()
+    fontsize 1
   li
-    list-style-image url("/images/bullet_gt_1.png")
+    list-style-image url("/images/bullet_gt_1_pad.png")
   nav
     display inline-block
     padding pad1 pad4 0 0
@@ -167,7 +166,7 @@ footer
     a
       display block
       &:before
-        content url("/images/bullet_gt_1.png")
+        content url("/images/bullet_gt_1_pad.png")
   nav.connect
     a
       padding-bottom pad3

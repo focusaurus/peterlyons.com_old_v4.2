@@ -219,14 +219,12 @@ footer a {
   -moz-border-radius: 2px;
 }
 footer h1 {
-  color: #a19d83;
-  font-family: "AWConquerorInline-Regular", sans-serif;
+  color: #a29c85;
   font-size: 16px;
   font-size: 1.6rem;
-  text-transform: uppercase;
 }
 footer li {
-  list-style-image: url("/images/bullet_gt_1.png");
+  list-style-image: url("/images/bullet_gt_1_pad.png");
 }
 footer nav {
   display: inline-block;
@@ -237,7 +235,7 @@ footer nav a {
   display: block;
 }
 footer nav a:before {
-  content: url("/images/bullet_gt_1.png");
+  content: url("/images/bullet_gt_1_pad.png");
 }
 footer nav.connect a {
   padding-bottom: 8px;
@@ -251,7 +249,7 @@ footer nav.connect a img {
 footer.license {
   background-color: #201e17;
   border-top: #575342 solid 1px;
-  color: #a19d83;
+  color: #a29c85;
   font-size: 10px;
   font-size: 1rem;
   margin: 0;
@@ -279,7 +277,6 @@ header h1 {
   font-family: "AWConquerorInline-Regular", sans-serif;
   font-size: 40px;
   font-size: 4rem;
-  text-transform: uppercase;
   float: left;
   line-height: 100%;
   padding: 0;
@@ -357,7 +354,6 @@ img.icon {
   font-family: "AWConquerorInline-Regular", sans-serif;
   font-size: 40px;
   font-size: 4rem;
-  text-transform: uppercase;
   border-bottom: 2px solid #434137;
 }
 #chops .highlight {
