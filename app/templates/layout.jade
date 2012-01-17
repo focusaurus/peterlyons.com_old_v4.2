@@ -41,22 +41,21 @@ html(lang="en")
     link(rel="openid.server", href="http://www.livejournal.com/openid/server.bml")
     link(rel="openid.delegate", href="http://focusaurus.livejournal.com/")
     link(href="http://fonts.googleapis.com/css?family=Inconsolata", rel="stylesheet")
-    //-link(href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono", rel="stylesheet")
+    link(href="http://fonts.googleapis.com/css?family=Six+Caps", rel="stylesheet")
+    link(href="http://fonts.googleapis.com/css?family=Oldenburg", rel="stylesheet")
   body
     .content
       header
-        p BUGBUG responsive layout max-width:
+        img(src="/images/peter_lyons_logo_icon.png", alt="Peter Lyons Logo")
         h1
           a(href="/") Peter Lyons
         if !wordpress
-          h2 node.js coder for hire
           nav
+            a(href="/") Home
             a(href="/problog") Blog
             a(href="/practices") Practices
             a(href="/stacks") Stacks
             a(href="/career") Career
-            a(href="/problog/feed")
-              img(src="/persblog/wp-includes/images/rss.png", alt="feed")
 
       if wordpress
         nav.blog
@@ -66,4 +65,13 @@ html(lang="en")
           | <a href="<?php echo site_url('feed') ?>">
           | <img src="<?php echo esc_url( includes_url( 'images/rss.png' ) ); ?>" /></a>
       !{body}
+      :coffeescript
+        $ ->
+          $("header nav a").each (index, link) ->
+            $link = $(link)
+            if $link.attr("href") == document.location.pathname
+              $link.addClass "current"
+            else
+              $link.removeClass "current"
     include includes/footer
+
