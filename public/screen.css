@@ -91,7 +91,8 @@ a img {
   border: none;
 }
 /*
-I am not dealing with font size insanity. Here's the deal.
+"
+I am not dealing with font size insanity. Here is the deal.
 The main body/content font size is zero
 Font sizes increase/decrease relative to that with simple sequential integers:
 -2, -1, 0, 1, 2, 3, 4, 5
@@ -102,24 +103,100 @@ h2 should be size 2,
 and h1 should be size 3
 Use REM units for fanciness but also include pixels for unsupported browsers
 http://snook.ca/archives/html_and_css/font-size-with-rem
+"
 */
 @font-face {
-  font-family: 'SpecialEliteRegular';
-  src: url("fonts/SpecialElite-webfont.eot?#iefix") format('embedded-opentype'), url("fonts/SpecialElite-webfont.woff") format('woff'), url("fonts/SpecialElite-webfont.ttf") format('truetype'), url("fonts/SpecialElite-webfont.svg#SpecialEliteRegular") format('svg');
-  font-weight: normal;
-  font-style: normal;
+  font-family: "AWConquerorInline-Regular";
+  src: url("/fonts/AWConquerorInline-Regular.otf") format("opentype");
+}
+@font-face {
+  font-family: "Archer-Light-Pro";
+  src: url("/fonts/Archer-Light-Pro.otf") format("opentype");
+}
+@font-face {
+  font-family: "Archer-Medium-Pro";
+  src: url("/fonts/Archer-Medium-Pro.otf") format("opentype");
 }
 a {
-  color: #00f;
+  color: #367c84;
+  font-weight: bold;
   text-decoration: none;
+}
+a.button {
+  display: inline-block;
+  font-weight: bold;
+  margin: 5px 0;
 }
 article h1 {
   font-size: 24px;
   font-size: 2.4rem;
 }
+code,
+pre {
+  background-color: #fefdfa;
+  color: #434137;
+  font-family: Inconsolata, "courier new", monospace, serif;
+}
+code {
+  padding: 0 2px;
+}
+h1,
+h2,
+h3 {
+  color: #434137;
+  font-weight: bold;
+  line-height: 1.5em;
+}
+h1:not(:first-of-type),
+h2:not(:first-of-type),
+h3:not(:first-of-type) {
+  padding-top: 8px;
+}
+h1 {
+  font-size: 30px;
+  font-size: 3rem;
+}
+h2 {
+  font-size: 24px;
+  font-size: 2.4rem;
+}
+h3 {
+  font-size: 18px;
+  font-size: 1.8rem;
+}
+hr {
+  background-color: #434137;
+  border: none;
+  clear: both;
+  height: 0.3em;
+  margin-top: 2px;
+}
+pre {
+  overflow: auto;
+  margin: 5px 0;
+  padding: 5px;
+}
+dd {
+  margin-left: 5px;
+}
+dt {
+  font-weight: bold;
+}
+li {
+  line-height: 2em;
+  list-style-image: url("/images/bullet_gt_1.png");
+  margin-left: 30px;
+}
+li li {
+  list-style-image: url("/images/bullet_gt_2.png");
+}
+p {
+  margin-top: 5px;
+}
 body {
+  background-image: url("/images/background.png");
   background-color: #f4f1dd;
-  color: #434136;
+  color: #434137;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   letter-spacing: 0.1em;
   line-height: 1.6em;
@@ -127,234 +204,226 @@ body {
   font-size: 12px;
   font-size: 1.2rem;
 }
-code,
-pre {
-  background-color: #fefdfa;
-  color: #434136;
-  font-family: Inconsolata, "courier new", monospace, serif;
-}
-code {
-  padding: 0 5px;
-}
-pre {
-  overflow: auto;
-  margin: 14px 0;
-  padding: 14px;
-}
-dd {
-  margin-left: 14px;
-}
-dt {
-  font-weight: bold;
-}
-figcaption {
-  font-size: 24px;
-  font-size: 2.4rem;
-  margin: 14px 0;
-}
 footer {
   background-color: #2c2a20;
-  border-top: #88c200 solid 2px;
-  margin-top: 30px;
-  padding-bottom: 14px;
+  border-top: #b55e1a solid 2px;
+  margin-top: 8px;
 }
 footer a {
   color: #fefdfa;
-  display: block;
-  padding: 0 5px;
+  padding: 0 2px;
   border-radius: 2px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
 }
-footer a:hover {
-  background-color: lightbg1;
-}
 footer h1 {
   color: #a19d83;
-  font-family: "Six Caps", sans-serif;
-  font-size: 16px;
-  font-size: 1.6rem;
+  font-family: "AWConquerorInline-Regular", sans-serif;
+  font-size: 18px;
+  font-size: 1.8rem;
   text-transform: uppercase;
+}
+footer li {
+  list-style-image: url("/images/bullet_gt_1.png");
 }
 footer nav {
   display: inline-block;
-  padding: 5px 14px 0 0;
+  padding: 2px 30px 0 0;
   vertical-align: top;
 }
+footer nav a {
+  display: block;
+}
 footer nav a:before {
-  content: "> ";
+  content: url("/images/bullet_gt_1.png");
+}
+footer nav.connect a {
+  padding-bottom: 8px;
 }
 footer nav.connect a:before {
-  content: "";
+  content: none;
 }
 footer.license {
+  background-color: #201e17;
+  border-top: #575342 solid 1px;
   color: #a19d83;
   font-size: 10px;
   font-size: 1rem;
   margin: 0;
-  padding-top: 5px;
-  background-color: #201e17;
-  border-top: #575342 solid 1px;
+  padding: 5px 0;
+}
+footer.license:last-of-type {
+  clear: both;
 }
 footer.license a {
-  display: inline;
   font-size: 10px;
   font-size: 1rem;
   padding: 0;
   white-space: nowrap;
 }
 footer.license img {
-  padding-right: 5px;
+  padding-right: 30px;
   vertical-align: middle;
 }
-h1,
-h2,
-h3 {
-  color: content4;
-  line-height: 1.5em;
-}
-h1:not(:first-of-type),
-h2:not(:first-of-type),
-h3:not(:first-of-type) {
-  padding-top: 30px;
-}
-h1 {
-  font-family: "Six Caps", sans-serif;
-  font-size: 36px;
-  font-size: 3.6rem;
-  text-transform: uppercase;
-}
-h2 {
-  font-family: "Six Caps", sans-serif;
-  font-size: 24px;
-  font-size: 2.4rem;
-  text-transform: uppercase;
-}
-h3 {
-  font-family: "Six Caps", sans-serif;
-  font-size: 16px;
-  font-size: 1.6rem;
-  text-transform: uppercase;
-}
 header {
-  padding-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid #434137;
 }
 header h1 {
-  font-family: "Six Caps", sans-serif;
-  font-size: 36px;
-  font-size: 3.6rem;
+  font-family: "AWConquerorInline-Regular", sans-serif;
+  font-size: 40px;
+  font-size: 4rem;
   text-transform: uppercase;
   float: left;
+  line-height: 100%;
   padding: 0;
   text-transform: uppercase;
 }
-header h1 a {
-  color: #434136;
-}
 header img {
   float: left;
+  padding-right: 5px;
 }
 header nav {
-  float: right;
-  margin-top: 14px;
+  display: block;
+  clear: both;
+  margin-top: 5px;
+  padding-top: 8px;
   white-space: nowrap;
 }
 header nav a {
-  background-color: #434136;
+  color: #434137;
+  font-weight: normal;
+}
+header nav a,
+a.button {
+  background-color: #434137;
   color: #fcfaf1;
   margin: 5px;
-  padding: 0 14px;
+  opacity: 0.75;
+  padding: 5px;
   border-radius: 2px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
-  text-transform: uppercase;
 }
-header nav .current {
-  background-color: #88c200;
-}
-hr {
-  background-color: #434136;
-  border: none;
-  clear: both;
-  height: 0.3em;
-  margin-top: 14px;
+a.current {
+  background-color: #b55e1a;
+  opacity: 1;
 }
 html {
   font-size: 62.5%;
 }
 img.icon {
-  padding-right: 5px;
+  padding-right: 2px;
   vertical-align: middle;
-}
-img.thumbnail {
-  margin: 14px 5px;
-  vertical-align: bottom;
-}
-li {
-  line-height: 2em;
-  margin-left: 30px;
-  list-style-type: circle;
-}
-p {
-  margin-top: 14px;
 }
 .content {
   margin-left: 20%;
   margin-right: 20%;
   transition: margin 0.3s ease-out;
 }
+.respond {
+  position: fixed;
+}
 .highlight {
-  color: #88c200;
+  color: #b55e1a;
 }
-.intro p {
-  font-size: 24px;
-  font-size: 2.4rem;
-  font-family: Oldenburg, serif;
-  line-height: 1.3em;
+#intro p.intro {
+  font-size: 30px;
+  font-size: 3rem;
+  font-family: Archer-Light-Pro, serif;
+  line-height: 1.1em;
+  margin: 30px 0;
 }
-.intro img {
-  padding: 5px 0;
+#intro img {
+  padding: 2px 0;
+  float: right;
 }
 #practices li {
-  font-weight: bold;
+  margin: 0;
 }
 #practices li li {
   font-weight: normal;
 }
+#chops {
+  margin-top: 30px;
+}
+#chops h2 {
+  font-family: "AWConquerorInline-Regular", sans-serif;
+  font-size: 40px;
+  font-size: 4rem;
+  text-transform: uppercase;
+  border-bottom: 2px solid #434137;
+}
+#chops .highlight {
+  font-family: Inconsolata;
+}
+#chops h3 {
+  margin-top: 8px;
+}
+#chops .links {
+  margin: 30px 0;
+}
+#chops .links a {
+  margin-right: 30px;
+}
+#writing {
+  border-top: 1px solid #367c84;
+  margin-top: 8px;
+  padding-top: 8px;
+}
 nav.blog form {
   display: inline-block;
+}
+figcaption {
+  font-size: 24px;
+  font-size: 2.4rem;
+  margin: 5px 0;
+}
+img.thumbnail {
+  margin: 5px 2px;
+  vertical-align: bottom;
 }
 nav.photos a {
   display: block;
 }
 #nextPrev a {
-  padding-right: 14px;
+  padding-right: 5px;
 }
 #photo {
   display: block;
 }
 table.program td:not(:first-of-type) {
-  padding-left: 14px;
+  padding-left: 5px;
 }
 td.performers {
   text-align: center;
-  padding-bottom: 14px;
+  padding-bottom: 5px;
 }
-@media handheld and (max-width: 960px), screen and (max-device-width: 960px), screen and (max-width: 960px) {
+@media handheld and (max-width: 1156px), screen and (max-device-width: 1156px), screen and (max-width: 1156px) {
+  .respond:after {
+    content: "1156";
+  }
   .content {
-    margin-left: 5%;
-    margin-right: 5%;
+    margin-left: 10%;
+    margin-right: 10%;
     transition: margin 0.3s ease-out;
   }
-  header h2 {
-    font-size: 16px;
-    font-size: 1.6rem;
+}
+@media handheld and (max-width: 960px), screen and (max-device-width: 960px), screen and (max-width: 960px) {
+  .respond:after {
+    content: "960";
+  }
+  .content {
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    transition: margin 0.3s ease-out;
   }
 }
 @media handheld and (max-width: 720px), screen and (max-device-width: 720px), screen and (max-width: 720px) {
-  .content {
-    margin-left: 0.5%;
-    margin-right: 0.5%;
-    transition: margin 0.3s ease-out;
+  .respond:after {
+    content: "720";
+  }
+  img.hero {
+    display: none;
   }
 }

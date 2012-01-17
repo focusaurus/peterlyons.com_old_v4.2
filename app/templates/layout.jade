@@ -44,9 +44,11 @@ html(lang="en")
     link(href="http://fonts.googleapis.com/css?family=Six+Caps", rel="stylesheet")
     link(href="http://fonts.googleapis.com/css?family=Oldenburg", rel="stylesheet")
   body
+    .respond
+      | Media:
     .content
       header
-        img(src="/images/logo.png", alt="Peter Lyons Logo")
+        img(src="/images/peter_lyons_logo_icon.png", alt="Peter Lyons Logo")
         h1
           a(href="/") Peter Lyons
         if !wordpress
@@ -64,7 +66,6 @@ html(lang="en")
           |  </form>
           | <a href="<?php echo site_url('feed') ?>">
           | <img src="<?php echo esc_url( includes_url( 'images/rss.png' ) ); ?>" /></a>
-      hr
       !{body}
       :coffeescript
         $ ->
