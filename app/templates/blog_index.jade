@@ -1,0 +1,6 @@
+ul
+  each post in posts
+    li
+      a(href=post.URI())
+        = post.title
+      = post.presented.date

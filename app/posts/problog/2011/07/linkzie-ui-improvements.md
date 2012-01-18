@@ -1,3 +1,0 @@
-I just pushed out a new release of [https://linkzie.com]().  There is no longer any need to have an "Organize your links" button.  You can always organize you categories by dragging them around by their name.  You can always organize your links by dragging them by a little crosshairs icon that is displayed to the right of each link when you mouse over it.  The commands to edit or delete items are now in a little pop-up context menu to the right of each link and they are more intuitive to use.
-
-I think this UI makes Linkzie very easy to use and the code is much simpler now and the UI should respond more snappily.  Try it out and let me know what you think!

@@ -16,6 +16,9 @@ app.register ".md",
   compile: (md, options) ->
     html = markdown md
     (locals) -> html
+app.register ".html",
+  compile: (html, options) ->
+    (locals) -> html
 app.set "view engine", "jade"
 app.set "view options",
  layout: "layout.jade"

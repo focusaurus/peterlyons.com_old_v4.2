@@ -1,35 +1,65 @@
 _ = require "underscore"
 fs = require "fs"
-glob = require "glob"
+asyncjs = require "asyncjs"
 pages = require "./pages"
 path = require "path"
+util = require "util"
 
-class Post extends pages.Page
-  constructor: (@view, @title='', @locals={}, @specs=[]) ->
-    match = @view.match /(\w+)\/(\d{4,})\/(\d{2})\/([\w-_]+)/
-    @URI = "/" + match[0]
-    @metadataPath = @view.replace ".md", ".json"
+{Post, leadZero} = require("../models/post")
+cache =
+  posts: []
 
-  loadMetadata: (callback) =>
-    self = this
-    path.exists @metadataPath, (exists) ->
-      return if not exists
-      fs.readFile self.metadataPath, "utf8", (error, jsonString) ->
-        return callback(error) if error
-        metadata = JSON.parse jsonString
-        self.publish_date = new Date(metadata.publish_date)
-        callback()
+class PostPage extends pages.Page
+  constructor: (@post, @locals={}, @specs=[]) ->
+    @title = @post.title
+
+  render: (res) ->
+    console.log "rendering post", util.inspect(@post)
+    options = @makeOptions res.req
+    res.render @post.viewPath(), options
+
+class BlogIndex extends pages.Page
+  constructor: (@posts, @title='', @locals={}, @specs=[]) ->
+
+  render: (res) ->
+    options = @makeOptions res.req
+    options.locals.posts = @posts
+    res.render "blog_index", options
+
+presentPost = (post) ->
+  date = leadZero(post.publish_date.getMonth() + 1)
+  date = date + "/" + leadZero(post.publish_date.getDay() + 1)
+  date = date + "/" + post.publish_date.getFullYear()
+  presented = {}
+  presented = _.extend presented, post
+  presented.date = date
+  presented
 
 setup = (app) ->
-  postGlob = path.normalize(__dirname + "/../posts/problog/**/*.md")
-  glob.glob postGlob, (error, paths) ->
-    throw error if error
-    for path in paths
-      post = new Post path
-      post.loadMetadata (error) ->
-        throw error if error
-        console.log post.view, post.URI, post.publish_date
-        app.get post.URI, (req, res) ->
-          post.render req, res
+  asyncjs.walkfiles(path.normalize(__dirname + "/../posts"), null, asyncjs.PREORDER)
+  .stat()
+  .each (file, next) ->
+    return next() if file.stat.isDirectory()
+    return next() if not /\.(md|html)$/.test file.name
+    post = new Post
+    cache.posts.push post
+    post.base = path.resolve(path.join(__dirname, "../posts"))
+    #TODO fix up
+    noExt = file.path.substr 0, file.path.lastIndexOf('.')
+    post.loadMetadata "#{noExt}.json", "problog", (error) ->
+      return next(error) if error
+      console.log post.view, post.URI(), post.publish_date
+      app.get "/" + post.URI(), (req, res) ->
+        new PostPage(post.presented).render res
+      next()
+      post.presented = presentPost(post)
+  .end ->
+    cache.posts = _.sortBy cache.posts, (post) ->
+      post.publish_date
+    .reverse()
+    console.log "real asyncjs walkfiles"
+
+  app.get "/problog", (req, res) ->
+    new BlogIndex(cache.posts, "Blog Index").render res
 
 module.exports = {setup}
