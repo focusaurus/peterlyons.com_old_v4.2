@@ -1,4 +1,5 @@
 _ = require "underscore"
+date = require "../../date"
 fs = require "fs"
 asyncjs = require "asyncjs"
 pages = require "./pages"
@@ -32,7 +33,9 @@ presentPost = (post) ->
   date = date + "/" + post.publish_date.getFullYear()
   presented = {}
   presented = _.extend presented, post
-  presented.date = date
+  presented.title = presented.title.trim()
+  presented.name = presented.name.trim()
+  presented.date = post.publish_date.toString "MMM dd, yyyy"
   presented
 
 setup = (app) ->
@@ -46,7 +49,7 @@ setup = (app) ->
     post.base = path.resolve(path.join(__dirname, "../posts"))
     #TODO fix up
     noExt = file.path.substr 0, file.path.lastIndexOf('.')
-    post.loadMetadata "#{noExt}.json", "problog", (error) ->
+    post.load "#{noExt}.json", "problog", (error) ->
       return next(error) if error
       console.log post.view, post.URI(), post.publish_date
       app.get "/" + post.URI(), (req, res) ->
@@ -62,4 +65,13 @@ setup = (app) ->
   app.get "/problog", (req, res) ->
     new BlogIndex(cache.posts, "Blog Index").render res
 
+  app.get "/problog/feed", (req, res) ->
+    options =
+      layout: false
+      pretty: true
+      locals:
+        posts: cache.posts
+        site: "http://peterlyons.com" #TODO soft code this
+    res.header "Content-Type", "text/xml"
+    res.render "feed", options
 module.exports = {setup}
