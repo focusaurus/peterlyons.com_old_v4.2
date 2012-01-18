@@ -38,7 +38,7 @@ client = mysql.createClient
   password: "Strap...it3"
   port: 23306
   database: "problog"
-postQuery = "select * from wp_posts where post_status = 'publish' and post_type = 'post' order by post_date_gmt limit 25;"
+postQuery = "select * from wp_posts where post_status = 'publish' and post_type = 'post' order by post_date_gmt;"
 client.query postQuery, (error, results, fields) ->
   asyncjs.list(results).map(buildPost).each(savePost).each(saveMetadata).end (error) ->
     if error
