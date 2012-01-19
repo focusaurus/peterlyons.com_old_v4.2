@@ -13,6 +13,7 @@ exports.photos =
   thumbExtension: "-TN.jpg"
   extension: ".jpg"
   galleryDataPath: "./app/data/galleries.json"
+  serveDirect: true
 exports.tests = false
 #exports.env =
 #  production: false
@@ -23,13 +24,15 @@ exports.tests = false
 #exports.env[currentEnv] = true
 
 switch process.env.NODE_ENV
-  when "production"
+  when "production", "staging"
     exports.site = "peterlyons.com"
     exports.baseURL = "http://#{exports.site}"
     exports.loopback = true
+    exports.photos.serveDirect = false
   when "staging"
     exports.site = "staging.peterlyons.com"
     exports.baseURL = "http://#{exports.site}"
     exports.loopback = true
+    exports.photos.serveDirect = false
   when "development", "test"
     exports.tests = true

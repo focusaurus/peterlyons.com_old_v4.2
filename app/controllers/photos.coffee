@@ -76,11 +76,11 @@ renderPhotos = (req, res) ->
         locals.photo.next = locals.photos[index + 1] or locals.photos[0]
         locals.photo.prev = locals.photos[index - 1] or _.last(locals.photos)
         locals.title = "#{locals.gallery.displayName} Photo Gallery"
-        page = new Page 'photos', locals.title, locals, ['/application/PhotosSpec.js']
+        page = new Page 'photos', locals, ['/application/PhotosSpec.js']
         page.render req, res
 
 exports.setup = (app) ->
   app.get '/photos', renderPhotos
-  if process.env.NODE_ENV not in ['production', 'staging']
+  if config.photos.serveDirect
     #No nginx rewrites in the dev environment, so make this URI also work
     app.get '/app/photos', renderPhotos
