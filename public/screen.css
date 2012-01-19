@@ -376,6 +376,10 @@ img.icon {
 nav.blog form {
   display: inline-block;
 }
+.date {
+  font-family: "Archer-Medium-Pro";
+  float: right;
+}
 figcaption {
   font-size: 20px;
   font-size: 2rem;

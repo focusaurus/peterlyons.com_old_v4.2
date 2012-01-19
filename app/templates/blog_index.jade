@@ -1,6 +1,6 @@
 ul
   each post in posts
-    li
+    li.post
       a(href="/" + post.URI())
         = post.title
-      = "&nbsp;" + post.presented.date
+      span.date= "&nbsp;" + post.presented.date
