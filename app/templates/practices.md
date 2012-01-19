@@ -2,6 +2,7 @@
 
 ##General Orientation
 
+
 * Pragmatic Craftsmanship (see The Pragmatic Programmer, Code Complete)
 * The #1 primary mandate of the software engineer is managing complexity
 * Simple, small, consistent tools
@@ -20,6 +21,8 @@
 * Right tool for the right job
 * Slow, calm, and correct
     * I build working software that is well-crafted
+
+See also my [code conventions](/code_conventions)
 
 ##Data Modeling
 

@@ -1,0 +1,28 @@
+<p>
+So I've been hosting my own <a href="http://moinmo.in/">MoinMoin</a> wiki for a while.  I use it pretty heavily to manage my own little projects, packing lists, and whatnot.  I used MoinMoin initially because it is written in python and we were using it at work.  It has served me reasonably well, but I decide to shut it down and migrate all my data over to <a href="http://gitit.johnmacfarlane.net/">gitit</a> instead.
+</p>
+<p>
+My reasoning for the migration includes the following factors.
+</p>
+<ul>
+<li>
+MoinMoin seems as far as I can tell to be impossible if not difficult to run under nginx, and in this world of low-RAM VPSes where I keep all my online stuff, nginx beats apache soundly in this regard, so I've moved everything over to nginx
+</li>
+<li>
+I never really liked the notion of WikiWords to create links.  I wasted a lot of mental cycles worrying about how to prevent MoinMoin from making RedHat a hyperlink unintentionally, etc. Thus I wanted to move to a different markup, such as <a href="http://daringfireball.net/projects/markdown/">markdown</a>, which seems to be pretty widely used, especially in github projects for README files.
+</li>
+<li>
+Using git as the data store is just perfect and brilliant.  I'm only now realizing the magic of git's "no single master repo" distributed nature and now I can confidently add stuff to my wiki from multiple machines via either a web browser or a text editor and know that everything will eventually be merged up perfectly. This is one less thing for me to worry about manually rsyncing around the next time I move to a different VPS host.
+</li>
+<li>
+MoinMoin has several glaring warning signs about programmers running wild with no product sense. For example, they don't have configuration files.  They have python code you edit.  The ruby community is another big fan of this misguided approach. Folks, asking programmers to edit code in a language they know to achieve complicated configuration (a la routes.rb) is fine.  Asking sysadmins to configure basic shit like which TCP port your program should listen on is not.  Make a configuration file, preferably in dead simple key=value format.
+</li>
+<li>Another glaring warning sign is how MoinMoin handles its default content (help pages, etc), of which there is quite a lot.  It just dumps them into your wiki right next to your own home-grown content with no distinction.  There is no copy-on-write mechanism and no easy way to extract a list of pages you actually care about.  I ended up combining some globbing telling me which pages had at least 2 revisions with a manual scan of page names to fish out my data from the sea of default MoinMoin pages.  In hindsight, the smarter thing would have been to install a blank MoinMoin wiki, extract the set of page names, and then do a difference with the set of page names of my existing wiki, but my approach of just <code>ls */revisions/00000002</code> worked almost as well, missing only a handful of pages, which a manual scan caught.
+</li>
+</ul>
+<p>
+Sadly, gitit is not provided as an out of the box Ubuntu x64 package, which I REALLY prefer not to mess with.  But alas, as with most webby stuff, I have to accept my fate and deal with manual installation, configuration, maintenance, and upgrade.  Other than that fact, gitit has been working well enough so far. I had to write my own init script for it, but that is just annoying as opposed to a serious drawback.
+</p>
+<p>
+The cool part about this migration was I was able to for the most part script it.  I wrote a python script that would take the VERY limited set of MoinMoin syntax that I use (primarily headers, lists, and links) and convert it to markdown.  Sadly its seems MoinMoin is one of the few markup formats that pandoc cannot use as input. :-( I also coded my script to start with revision 00000001 (used by MoinMoin) and commit each distinct MoinMoin page revision into git sequentially.  Now in my migrated gitit repo, I have the full MoinMoin edit history for every page, which is pretty sweet.
+</p>

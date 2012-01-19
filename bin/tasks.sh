@@ -226,7 +226,11 @@ list_templates() {
     #We skip layout because it's just the layout and photos because
     #it's a dynamic page
     ls app/templates/*.{jade,md} | xargs -n 1 basename | sed -e s/\.jade// \
-        -e /layout/d -e /photos/d -e /admin_galleries/d -e s/\.md//
+        -e /layout/d \
+        -e /photos/d \
+        -e /admin_galleries/d \
+        -e /feed/d \
+        -e s/\.md//
 }
 
 

@@ -148,7 +148,7 @@ body
 footer
   background-color dark5
   border-top dark1 solid 2px
-  margin-top pad3
+  margin-top pad4
   padding-bottom pad4
   a
     color light3
@@ -195,11 +195,10 @@ header
   border-bottom 3px solid dark3
   padding-bottom pad3
   margin-bottom pad3
+  margin-top pad3
   h1
     titlefont 4
-    float left
     line-height 100%
-    padding 0
     text-transform uppercase
   img
     float left
@@ -214,7 +213,7 @@ header
       color dark3
       font-weight normal
 
-header nav a, a.button
+header nav a, a.button, #reverse
   background-color dark3
   color light2
   margin pad2
@@ -286,10 +285,28 @@ img.icon
   margin-top pad3
   padding-top pad3
 
+////////// Career //////////
+p.reverse
+  margin pad4 0
+
+#reverse
+    margin 0
+
 ////////// Blog //////////
 nav.blog
   form
     display inline-block
+.date
+  font-family "Archer-Medium-Pro"
+  float right
+#subscribe
+  margin pad3 0
+  img
+    padding-left pad2
+// li.post
+//   padding-left pad2
+//   &:nth-child(even)
+//     background light2
 
 ////////// Photos //////////
 figcaption

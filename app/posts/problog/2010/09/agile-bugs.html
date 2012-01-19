@@ -1,0 +1,79 @@
+<p>
+<a href="http://testobsessed.com/2009/03/13/handling-bugs-in-an-agile-context/">Handling Bugs in an Agile Context</a> is a blog post I came across via <a href="http://news.ycombinator.com">Hacker News</a> this morning.  As is often my experience when reading material on Agile from my perspective of an enterprise software developer, the experience was one of frustration and disbelief.
+</p>
+<p>
+So let me quote the portions of the article I find untenable in a enterprise software realm.
+</p>
+<blockquote>
+<p>
+Let’s start with the Product Owner. Not all Agile teams use this term. So where my definition says “Product Owner,” substitute in the title or name of the person who, in your organization, is responsible for defining what the software should do. This person might be a Business Analyst, a Product Manager, or some other Business Stakeholder.
+</p>
+<p>
+This person is not anyone on the implementation team. Yes, the testers or programmers may have opinions about what’s a bug and what’s not. The implementation team can advise the Product Owner. But the Product Owner decides.
+</p>
+</blockquote>
+<p>
+Most of this matches my experience to some degree.  Yes we have product owners that are primarily business people.  We actually have about two levels of these, we have what we call "Product Managers" who set the more abstract direction for the product overall, and another role called "Functional Architect" that is a mostly technical person that deals with more detailed issues.  One way to think about this is the Product Manager decides mostly WHAT the product will do, and the Functional Architect refines that and specifies HOW the product will behave in detail.  Note the Functional Architect doesn't define how the IMPLEMENTATION will be done, just the more detailed behavior.
+</p>
+<blockquote>
+<p>
+This person is also not the end user or customer. When end users or customers encounter problems in the field, we listen to them. The Product Owner takes their opinions and preferences and needs into account. But the Product Owner is the person who ultimately decides if the customer has found something that violates valid expectations of the behavior of the system.
+</p>
+<p>
+Yes, that does put a lot of responsibility on the shoulders of the Product Owner, but that’s where the responsibility belongs. Defining what the software should and should not do is a business decision, not a technical decision.
+</p>
+</blockquote>
+<p>
+Well, that would be great if it worked that way, but it doesn't.  The product owner doesn't have enough technical skill or understanding of the details to make decisions on specific bugs.  I'm talking about deep, subtle bugs.  Think error handling, file encoding, network performance tuning, etc.  If a customer complains that our NFS server should by default be configured for a block size of 32768, I'm sorry but the product owner is just not equipped to make a decision on that.  Yes, the technical team could explain the situation to him or her in enough detail for understanding, but the decision would be a "no brainer" dictated by how the team framed the explanation.  There are trade-off decisions where the tech lead for the feature needs to make a trade off between two things that are both desirable, like high throughput and low latency.  And it's not like we get these once in a blue moon. They happen many times in every sprint.  We live them day in and day out, and it's the job of the implementation team to independently make good decisions on them.  It's a bit demeaning to the implementation team to suggest that they are mere instruments of the product owner's omniscient will.  It's a TEAM.  EVERYONE takes into account many factors in making decisions on designs, implementations, and bugs every day. The team needs authority and autonomy to make the set of decisions that it is appropriate for them to own, and decisions need to escalate as appropriate for their scope and impact.  In my experience, 95% of all bugs are correctly resolved by the team members without any input from the product owner.
+</p>
+<blockquote>
+<p>
+Before we declare a story “Done,” if we find something that would violate the Product Owner’s expectations, we fix it. We don’t argue about it, we don’t debate or triage, we just fix it. This is what it means to have a zero tolerance for bugs. This is how we keep the code base clean and malleable and maintainable. That’s how we avoid accumulating technical debt. We do not tolerate broken windows in our code. And we make sure that there are one or more automated tests that would cover that same case so the problem won’t creep back in. Ever.
+</p>
+</blockquote>
+<p>
+Well, that's cute but again, sometimes it's not possible to do that.  Here's a real world example.  I built a feature that installed some ZIP packages onto some servers.  We tested it.  It passed and worked.  We moved on to the next sprint.  Later on, we found out that if the ZIP file's install path contained non-ascii characters, we ran into problems and it failed.  OK, so that's a bug.  So you are saying "we fix it".  You say "We don’t argue about it, we don’t debate or triage, we just fix it". Well, in this case, after several days of me trying to "just fix it", I informed the team that in order to correctly fix this bug I would have to re-implement the entire user story taking a very different approach.  This would take several days and since it was a de-facto rewrite, all of the tests would need to be re-run.  So how does your advice apply here?  It doesn't. We needed to debate and discuss and plan and adjust the backlog and otherwise deal with this reality.  I wish I could go to the fire departments that are currently battling the giant wildfire in the next town over and say "Don't debate. Just extinguish it".  But it's not a helpful thing to say.
+</p>
+<blockquote>
+<p>
+And since we just fix them as we find them, we don’t need a name for these things. We don’t need to prioritize them. We don’t need to track them in a bug tracking system. We just take care of them right away.
+</p>
+</blockquote>
+<p>
+Sorry, but this is the delusional rubbish the agile community puts out that makes it OK for me to dismiss you as utterly and hopelessly clueless.  Have you really never heard of a bug that is time consuming or difficult to fix?  Have you never seen a bug that needs multiple completely different fixes tried before one that really works is identified?  Are you accepting applications for citizenship in your universe?  It sounds nice.
+</p>
+<blockquote>
+<p>
+Usually the motivation for wanting to keep a record of things we won’t fix is to cover our backsides so that when the Product Owner comes back and says “Hey! Why didn’t you catch this?” we can point to the bug database and say “We did too catch it and you said not to fix it. Neener neener neener.” If an Agile team needs to keep CYA records, they have problems that bug tracking won’t fix.
+</p>
+</blockquote>
+<p>
+Well, we have a lot of bugs.  My product has been around for almost a decade now.  There's value in tracking them.  For one, it gives management some concrete numbers to understand that they have technical debt, the product has issues, and we're accumulating more.  For two, people hit the bugs. They hit them over and over again.  It's a waste to have the issue re-triaged, re-explained every time.  We track them so there's one place that explains what this bug is, how it is reproduced, why we haven't fixed it, and how you can work around it.  Whether we track this in a bug tracker or a wiki or a KB or whatever doesn't seem as important to me as acknowledging the fact that there are issues that might affect users continually for quite a while (maybe for the rest of the life of the product), and not tracking that data makes the problem worse.
+</p>
+<blockquote>
+<p>
+Further, there is a high cost to such record keeping.
+</p>
+</blockquote>
+<p>
+Arguably.  But there is also a cost to just abandoning them and leaving the new team members and customers to encounter them over and over again and refile the same bug.  Yes, sometimes these things last a long time and there's no cost effective way to solve them.  For example, in early versions of my product we installed Windows OSes via a DOS boot environment.  There was no other viable alternative at the time.  DOS has crippling network issues that we couldn't solve, so under some circumstances copying a full OS over the network on DOS would result in DOS hanging.  We can't fix this.  We just waited for Microsoft to announce WinPE, but that took several years.  Instead we documented that if you had an Intel NIC and encountered this issue, there was an obscure workaround you had to do.  This seems like a perfectly valid use of a long-term bug database to me.
+</p>
+<blockquote>
+<p>
+And if we’re not doing things right, we may find out that there are an overwhelming number of the little critters escaping. That’s when we know that we have a real problem with our process. 
+</p>
+</blockquote>
+<p>
+OR, maybe we have a legacy code base with technical debt. Maybe the folks who wrote that code don't work here anymore and this is the only way we find the problems with it.  This doesn't necessarily mean we're not doing Agile correctly.
+</p>
+<blockquote>
+<p>
+Stop the bugs at the source instead of trying to corral and manage the little critters.
+</p>
+</blockquote>
+<p>
+Thanks. Tell that to my several million lines of legacy code in a half dozen languages that runs on 72 different operating system versions.  Done "stopping them at the source" yet?  I'll wait.  Still not done?  Hmm, what's the problem?
+</p>
+<p>
+Anyway, that concludes my response to this blog post.  The general theme I see in the Agile world is the practitioners are mostly working from a mindset of small web development projects with a new code base.  Building enterprise software has realities that create real struggles for us, and we're looking for help, but the pundits out there generally dismiss our struggles without really understanding them and acknowledging their reality.  And that's what I find so frustrating.  The truth is most of these agile folks could probably provide us with real useful insights, but they first need to come to terms that we have some real problems that need to be considered even if they don't fit within their idealized vision for agile utopia.
+</p>

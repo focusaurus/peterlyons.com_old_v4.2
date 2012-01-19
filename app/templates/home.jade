@@ -1,6 +1,6 @@
 section#intro
   img.hero(src="/images/pete_hero.png", alt="Pete")
-  p.intro <span class="highlight">node.js coder for hire</span>.
+  p.intro <span class="highlight">node.js coder for hire.</span>
   p.intro I'm a freelance web developer<br> specializing in custom application development.
   h3 The Stack
   :markdown
@@ -60,9 +60,9 @@ section#writing
     li
       a(href="http://stackoverflow.com/questions/2430423/which-xml-library-for-what-purposes/2430541#2430541", target="_blank") DOM vs. SAX for XML processing
 :coffeescript
-  speed = -> Math.random() * 200 + 75
+  speed = -> Math.random() * 200 + 50
   $ ->
-    header = $("header h2")
+    header = $("#intro .highlight")
     subtitle = header.text()
     header.text("")
     pushLetter = ->
