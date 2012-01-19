@@ -1,0 +1,216 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>How to run two wordpress blogs on one web site | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"><meta name="author" content="Peter Lyons"><meta name="description" content="Pete Lyons, node.js coder for hire"><link rel="stylesheet" href="/screen.css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css"><script src="/js/jquery.js"></script><script src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><h1>How to run two wordpress blogs on one web site</h1><p>
+There is ample detailed information out there on installing wordpress.  However, I wanted to just provide a small supplement about setting up two distinct wordpress blogs within a single apache2 web site. The system I am using is Ubuntu Linux 8.10, but other than the package installation, the configuration steps should be the same on other linux distributions.
+</p>
+
+<p>
+As a first step, read through the <a href="http://codex.wordpress.org/Getting_Started_with_WordPress#Installation">Wordpress Installation Instructions</a>.  You will find them to be thorough and clear. The starting point for my setup is that I already had a web site up and running under apache2.  I just wanted to add the Wordpress (and underlying MySQL database) setup and have two separate blogs with separate themes and content.
+</p>
+
+<p>
+So here's my starting setup:
+</p>
+
+<ul>
+    <li>Ubuntu 8.10 on an amd64 system</li>
+    <li>apache2 already installed and working</li>
+    <li>static content for the web site deployed in <code>/var/www/example.com</code></li>
+    <li>MySQL and Wordpress are not yet installed</li>
+</ul>
+
+<h4>Install wordpress and mysql</h4>
+
+<p>First let's install wordpress and mysql.  I'll do this on the command line using the <code>apt-get</code> program, but you can <a href="https://help.ubuntu.com/8.10/add-applications/C/advanced.html">use one of the graphical options as well</a></p>
+
+<pre>sudo apt-get install wordpress virtual-mysql-server</pre>
+
+<p>
+You should see a bunch of packages that will get installed and press <code>y</code> to proceed.  The MySQL install will prompt you to create a new mysql root account password, so go ahead and do that.
+</p>
+
+<h4>Set up the wordpress databases</h4>
+
+<p>OK, so let's say we are going to call our blogs blog1 and blog2.  We need to create mysql databases for them.  Note that you may see tutorials telling you you can store the data for two separate blogs in one database.  While true, two databases is a much cleaner way to go.  End users shouldn't be going around making up database table names.  So, we are going to use the mysql command line tools to do this.  Again, the wordpress docs here are fine and describe graphical alternatives as well. Let's connect to mysql (use the password you created above) as root and create the databases.  We'll call them blog1 and blog2 and we'll also set up user accounts inside mysql that wordpress will use to access the databases.  Again for simplicity, we'll also call the user accounts blog1 and blog2.  Replace "MakeUpPassword" with your own chosen password.</p>
+
+<div class="code">
+<pre>mysql -u root -p
+create database blog1;
+GRANT ALL PRIVILEGES ON blog1.* TO "blog1"@"localhost" IDENTIFIED BY "MakeUpPassword";
+flush privileges;
+create database blog2;
+GRANT ALL PRIVILEGES ON blog2.* TO "blog2"@"localhost" IDENTIFIED BY "MakeUpPassword";
+flush privileges;
+quit;
+</pre>
+</div>
+<h4>Install wordpress files and configure DB access</h4>
+
+<p>OK, when we installed wordpress above, Ubuntu put a copy of the wordpress PHP files into <code>/usr/share/wordpress</code>, so now we're going to make 2 copies, one for each blog, underneath our web site's document root.  Note that since these are two blogs in the same web site, we don't want either blog to be the top level home page of the site, so each gets its own separate subdirectory.
+</p>
+
+<div class="code">
+<pre>
+sudo mkdir -p /var/www/example.com/blog1 /var/www/example.com/blog2
+sudo cp -r /usr/share/wordpress/* /var/www/example.com/blog1
+sudo cp -r /usr/share/wordpress/* /var/www/example.com/blog2
+sudo chown -R www-data:www-data /var/www/example.com/blog*
+</pre>
+</div>
+<p>
+Now I should note that Debian/Ubuntu has a customized wordpress configuration.  Often, these are well crafted by the experts and will save you a lot of time and hassle if you  follow the patterns they suggest.  In this case, I don't think their setup exactly matches my goal of two different blogs under one web site, so I am bypassing their pattern and doing my own simple alternative.  So what happens is that by default the file <code>/usr/share/wordpress/wp-config.php is a symbolic link to /etc/wordpress/wp-config.php</code>, and when we copied these files, that symlink was copied too, which means if we aren't careful both of our blogs will point at the same database, making them one blog instead of two!  So we do the following:
+</p>
+
+<div class="code">
+<pre>
+sudo rm /var/www/example.com/blog*/wp-config.php
+sudo cp /usr/share/wordpress/wp-config-sample.php /var/www/example.com/blog1/wp-config.php
+sudo cp /usr/share/wordpress/wp-config-sample.php /var/www/example.com/blog2/wp-config.php
+sudo chown -R www-data:www-data /var/www/example.com/blog*
+</pre>
+</div>
+<p>OK, now each blog has it's own separate copy of wp-config.php.  Go ahead and edit those files to point blog1 at the blog1 database and blog2 at the blog2 database using vi or your text editor of choice.  When done, they should look as follows:
+</p>
+
+
+<pre>/var/www/example.com/blog1/wp-config.php</pre>
+
+<br/>
+<div class="code">
+<pre>
+&lt;?php
+// ** MySQL settings ** //
+define('DB_NAME', 'blog1');    // The name of the database
+define('DB_USER', 'blog1');     // Your MySQL username
+define('DB_PASSWORD', 'yourpasswordhere'); // ...and password
+define('DB_HOST', 'localhost');    // 99% chance you won't need to change this value
+define('DB_CHARSET', 'utf8');
+define('DB_COLLATE', '');
+
+// Change SECRET_KEY to a unique phrase.  You won't have to remember it later,
+// so make it long and complicated.  You can visit http://api.wordpress.org/secret-key/1.0/
+// to get a secret key generated for you, or just make something up.
+// Change this to a unique phrase.
+define('SECRET_KEY', 'put your unique phrase here -- yes you change this now');
+
+// You can have multiple installations in one database if you give each a unique prefix
+$table_prefix  = 'wp_';   // Only numbers, letters, and underscores please!
+
+// Change this to localize WordPress.  A corresponding MO file for the
+// chosen language must be installed to wp-content/languages.
+// For example, install de.mo to wp-content/languages and set WPLANG to 'de'
+// to enable German language support.
+define ('WPLANG', '');
+
+/* That's all, stop editing! Happy blogging. */
+
+define('ABSPATH', dirname(__FILE__).'/');
+require_once(ABSPATH.'wp-settings.php');
+?&gt;
+</pre>
+</div>
+
+<br/>
+<pre>/var/www/example.com/blog2/wp-config.php</pre>
+
+<br/>
+<div class="code">
+<pre>
+&lt;?php
+// ** MySQL settings ** //
+define('DB_NAME', 'blog2');    // The name of the database
+define('DB_USER', 'blog2');     // Your MySQL username
+define('DB_PASSWORD', 'yourpasswordhere'); // ...and password
+define('DB_HOST', 'localhost');    // 99% chance you won't need to change this value
+define('DB_CHARSET', 'utf8');
+define('DB_COLLATE', '');
+
+// Change SECRET_KEY to a unique phrase.  You won't have to remember it later,
+// so make it long and complicated.  You can visit http://api.wordpress.org/secret-key/1.0/
+// to get a secret key generated for you, or just make something up.
+// Change this to a unique phrase.
+define('SECRET_KEY', 'put your unique phrase here -- yes you change this now');
+
+// You can have multiple installations in one database if you give each a unique prefix
+$table_prefix  = 'wp_';   // Only numbers, letters, and underscores please!
+
+// Change this to localize WordPress.  A corresponding MO file for the
+// chosen language must be installed to wp-content/languages.
+// For example, install de.mo to wp-content/languages and set WPLANG to 'de'
+// to enable German language support.
+define ('WPLANG', '');
+
+/* That's all, stop editing! Happy blogging. */
+
+define('ABSPATH', dirname(__FILE__).'/');
+require_once(ABSPATH.'wp-settings.php');
+?&gt;
+</pre>
+</div>
+
+<h4>Permalinks</h4>
+<p>
+OK, now let's make sure we have mod_rewrite enabled for wordpress permalinks, then we restart apache2 to get our new software and config to take effect. We'll also make sure we have a writeable .htaccess file so wordpress can set it up for us.
+</p>
+
+<div class="code">
+<pre>
+sudo a2enmod rewrite
+sudo apache2ctl restart
+sudo touch /var/www/example.com/blog1/.htaccess
+sudo touch /var/www/example.com/blog2/.htaccess
+sudo chown www-data:www-data /var/www/example.com/blog*/.htaccess
+sudo chmod 644 /var/www/example.com/blog*/.htaccess
+</pre>
+</div>
+
+<p>
+Almost done, we can now point a web browser to <a href="http://localhost/blog1/wp-admin/install.php">http://localhost/blog1/wp-admin/install.php</a> and fill out that form and launch the wordpress self-install.  Repeat the process for blog2 at <a href="http://localhost/blog2/wp-admin/install.php">http://localhost/blog2/wp-admin/install.php</a>. Now, this is going to set up the blog in the database and create the admin user with a default password.  If your computer has a mail transport agent running, you should get the email with the default password.  If not, you won't, which is what happened to me, so we can just set the admin password to one of our choosing.  First, we need to know the MD5 checksum of our chosen password. You can use <a href="http://epleweb.com/md5/">this online form</a> to get the MD5 of your password, but sending your password to some random web site in clear text is too insecure for me.  Therefore, if you have python, you can use this little python one-liner to do it.  This will securely prompt you for your password and print out the corresponding MD5.  Nothing is sent over the network. You will end up with a 32-character hex string.  Use this instead of the  For details from wordpress, read <a href="http://codex.wordpress.org/Resetting_Your_Password">resetting your password</a> in the wordpress online docs.  The cheat sheet is below.
+</p>
+
+<pre>python -c "import getpass,md5;m=md5.new();m.update(getpass.getpass());print m.hexdigest()"</pre>
+
+<p>
+OK, so let's set this password into mysql so we can start managing our blog
+</p>
+
+<div class="code">
+<pre>
+mysql -u root -p
+use blog1;
+update wp_users set user_pass="useyour32charhexstringmd5here" where user_nicename="admin";
+use blog2;
+update wp_users set user_pass="useyour32charhexstringmd5here" where user_nicename="admin";
+quit;
+</pre>
+</div>
+
+<p>
+OK, you are good to go to <a href="http://localhost/blog1">http://localhost/blog1</a>, log in as admin, and start managing your blog. You can go in and set up custom pretty permalinks in the admin section and when you save, wordpress should be able to write the rewrite settings to the .htaccess file we set up for you. Good luck and happy blogging!
+</p>
+<script type="text/javascript">
+(function() {
+
+  $(function() {
+    return $("header nav a").each(function(index, link) {
+      var $link, URI, href, parent, same;
+      $link = $(link);
+      href = $link.attr("href");
+      URI = document.location.pathname;
+      console.log(URI, href, URI.indexOf(href));
+      same = URI === href;
+      parent = URI.indexOf(href) >= 0 && href !== "/";
+      if (same || parent) {
+        return $link.addClass("current");
+      } else {
+        return $link.removeClass("current");
+      }
+    });
+  });
+
+}).call(this);
+</script></div><footer><div class="content"><nav><h1>Technology</h1><a href="/">Home</a><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav class="connect"><h1>Connect With Me</h1><a href="/problog/feed"><img src="/images/feed.png" height="24" alt="Subscribe to my Atom feed" title="Subscribe to my Atom Feed" class="icon">Subscribe
+</a><a href="http://www.linkedin.com/in/peterlyons1"><img src="/images/linkedin_icon.png" alt="LinkedIn" title="LinkedIn" class="icon">LinkedIn
+</a><a href="http://stackoverflow.com/users/266795/peter-lyons"><img src="/images/stackoverflow_icon.png" alt="stackoverflow" title="stackoverflow" class="icon">stackoverflow
+</a><a href="https://github.com/focusaurus"><img src="/images/github_icon.png" alt="github" title="github" class="icon">github
+</a><a href="https://twitter.com/#!/focusaurus"><img src="/images/twitter_icon.png" alt="twitter" title="twitter" class="icon">twitter
+</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border:0;width:88px;height:31px" src="/images/valid_css.png" alt="Valid CSS!"></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
+</a></p></div></footer></body></html>

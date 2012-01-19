@@ -332,9 +332,9 @@ app:build_static() {
     echo "Generating HTML for static templated pages from ${DEVURL}..."
     for URI in $(list_templates)
     do
-        URL="${DEVURL}/${URI}"
+        local URL="${DEVURL}/${URI}"
         echo -n "${URI}, "
-        EXIT_CODE=0
+        local EXIT_CODE=0
         curl --silent "${URL}" --output \
             "${PUBLIC}/${URI}.html" || EXIT_CODE=$?
         if [ ${EXIT_CODE} -ne 0 ]; then
@@ -346,10 +346,14 @@ app:build_static() {
     cd app/posts
     for JSON in $(find . -type f -name \*.json)
     do
-        URI="${JSON%.*}"
-        URI=$(echo "${URI}" |cut -d . -f2-)
+        local URI="${JSON%.*}"
+        local URI=$(echo "${URI}" |cut -d . -f2-)
         echo "Saving ${URI} to ${PUBLIC}${URI}.html"
-        URL="${DEVURL}${URI}"
+        local DIR=$(dirname "${URI}")
+        local DIR="${PUBLIC}${DIR}"
+        [ -e "${DIR}" ] || mkdir -p "${DIR}"
+        local URL="${DEVURL}${URI}"
+        local EXIT_CODE=0
         curl --silent "${URL}" --output \
             "${PUBLIC}${URI}.html" || EXIT_CODE=$?
         if [ ${EXIT_CODE} -ne 0 ]; then

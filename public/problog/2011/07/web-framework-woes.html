@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Web Framework Woes | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"><meta name="author" content="Peter Lyons"><meta name="description" content="Pete Lyons, node.js coder for hire"><link rel="stylesheet" href="/screen.css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css"><script src="/js/jquery.js"></script><script src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><h1>Web Framework Woes</h1><p>
+So my attitude for most of this year has been one of reserving judgement in favor of direct experience.  As part of this, I have been trying all the latest "Kool-Aid" web development technologies even if at first glance they didn't sit right with me.  So I started building the <a href="http://othenticate.com">Othenticate</a> infrastructure on a shiny stack of mongodb, node.js, express, mongoose, jade, and stylus.  For the most part, I love this stack.  However, after I while I have come to the conclusion that for a micropreneur project such as mine, traditional RDBMS (PostgreSQL) is going to be more appropriate than dealing with the trade-offs that NoSQL is making.  I won't need to scale to millions of objects, and I want ACID, a schema, and mature tools at the data layer.  So I've decided I want to use PostgreSQL instead of MongoDB.  However, along with this came the realization that it seems that there is no mature Object-Relational Mapper (ORM) on the node stack for PostgreSQL.  There also does not seem to be a mature schema migration framework.  Basically all of the other elements of the node stack are fantastic to work with, but these two might just be deal breakers for me.
+</p>
+<p>
+So I started thinking along the lines of another stack I might use if I wanted a good PostgreSQL ORM and schema migrator.  There seem to be two obvious candidates: Django and Rails, and maybe some smaller ones and probably the option of cobbling together a hybrid stack of python components.  In contemplating learning another web development framework (Django) or doing another Rails project, I started doing some analysis.  Below are some of my thoughts on these stacks.
+</p>
+<p>
+First, Node.js and friends. I've been coding in node.js/express for a while and for the most part finding it fantastic.  The frameworks are cleanly designed and easy to understand and work with.  The environment is in general pretty straightforward (compared to rails).  Node starts up instantly and has fantastic debugging support that work seamlessly with chrome's debugger via the node-inspector module.  I can graphically debug the client side code in the browser, the server side code, my jasmine tests, even my server side node.js command line unit tests can be debugged in chrome.  I LOVE the fact that I can re-use my model classes across the browser and server. The only real pain points are the lack of ORM, schema migrator, and the hassle of async callbacks (which is mild but it's still a hassle).  Jade for templating with stylus for CSS is almost perfect.
+</p>
+<p>
+I've also been working in rails for a while now.  Overall  the node/express environment feels like a better match for me.  Ruby has been influenced by Perl and Perl is utter anathema to me.  The fact that  Rails is written in Ruby is pretty much a kiss of death for me.  However, I do love ActiveRecord and the rails schema migration subsystem.  But that's about it.  Rails templating has decent choices although Jade is the clear king in my mind.  I don't care much for the Rails controller model and routing mechanism either.  But perhaps the paramount rails stopping point for me is just the way the community operates.  It's a mess of gems and fads and hipsterism and uncontrolled software erosion.  The documentation can't keep up with it so you end up in a sea of partially-clueful blog posts.  My overall reaction to this just ends up being "this doesn't feel right".
+</p>
+<p>
+So I've started to give serious consideration to Django.  I do like python quite a lot. I was hoping Ruby would be the next major language I work in extensively, but I don't think I'm going to go down that path much farther. Working with CoffeeScript has made python feel much less elegant to me, but I can deal with it.  I hear good things about the South subsystem in Django and the docs look good.  I really don't want to recode my whole current effort though.  So these days I'm torn.  Here's a summary of my reactions in bullets.
+</p>
+<h3>Node.js/Express/Etc - the good</h3>
+<ul>
+<li>Love CoffeeScript</li>
+<li>Express/Connect are elegant. They are libraries you use, not a framework you must inject your code into</li>
+<li>Jade and Stylus are rapidly approaching Nirvana status</li>
+<li>Debugging support is top-notch</li>
+<li>The functional programming sits pretty well with me</li>
+<li>High concurrency through solid design is pretty sweet</li>
+</ul>
+
+<h3>Node.js/Express/Etc - the bad</h3>
+<ul>
+<li>No good ORM for PostgreSQL</li>
+<li>No good schema migrator for PostgreSQL</li>
+<li>Event model means stack traces are often useless</li>
+<li>No intelligent reloading of changed code on the fly</li>
+<li>The async stuff, while manageable, is clearly a hinderance compared to synchronous code.  It does force you to be a little more considered than you might otherwise be, though</li>
+</ul>
+
+<h3>Rails - the good</h3>
+<ul>
+  <li>ActiveRecord is awesome</li>
+  <li>Good schema migrator</li>
+  <li>Lots of handy gems</li>
+  <li>Culture of thorough testing</li>
+</ul>
+<h3>Rails - the bad</h3>
+<ul>
+  <li>Ruby is a kitchen sink language</li>
+  <li>Not quite optimized for modern web apps</li>
+  <li>Docs and blog culture don't suite me</li>
+  <li>A big freaking mess with ruby versions, RVM, gems, bundles</li>
+  <li>Not javascript means code duplication</li>
+</ul>
+<h3>Django - the predicted good</h3>
+<ul>
+  <li>South/ORM/Schema are supposedly very good</li>
+  <li>Python</li>
+  <li>Docs look good</li>
+</ul>
+
+<h3>Django - the predicted bad</h3>
+<ul>
+  <li>The python community has a long history of web frameworks that don't catch on.  Django seems to be the winner, but I am still skeptical</li>
+  <li>Not JavaScript means code duplication</li>
+  <li>Seems like there might not be any intelligent autoreloading of code during development</li>
+ </ul>
+
+<script type="text/javascript">
+(function() {
+
+  $(function() {
+    return $("header nav a").each(function(index, link) {
+      var $link, URI, href, parent, same;
+      $link = $(link);
+      href = $link.attr("href");
+      URI = document.location.pathname;
+      console.log(URI, href, URI.indexOf(href));
+      same = URI === href;
+      parent = URI.indexOf(href) >= 0 && href !== "/";
+      if (same || parent) {
+        return $link.addClass("current");
+      } else {
+        return $link.removeClass("current");
+      }
+    });
+  });
+
+}).call(this);
+</script></div><footer><div class="content"><nav><h1>Technology</h1><a href="/">Home</a><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav class="connect"><h1>Connect With Me</h1><a href="/problog/feed"><img src="/images/feed.png" height="24" alt="Subscribe to my Atom feed" title="Subscribe to my Atom Feed" class="icon">Subscribe
+</a><a href="http://www.linkedin.com/in/peterlyons1"><img src="/images/linkedin_icon.png" alt="LinkedIn" title="LinkedIn" class="icon">LinkedIn
+</a><a href="http://stackoverflow.com/users/266795/peter-lyons"><img src="/images/stackoverflow_icon.png" alt="stackoverflow" title="stackoverflow" class="icon">stackoverflow
+</a><a href="https://github.com/focusaurus"><img src="/images/github_icon.png" alt="github" title="github" class="icon">github
+</a><a href="https://twitter.com/#!/focusaurus"><img src="/images/twitter_icon.png" alt="twitter" title="twitter" class="icon">twitter
+</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border:0;width:88px;height:31px" src="/images/valid_css.png" alt="Valid CSS!"></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
+</a></p></div></footer></body></html>

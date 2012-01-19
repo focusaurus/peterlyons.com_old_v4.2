@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Node docs vs. Rails docs | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"><meta name="author" content="Peter Lyons"><meta name="description" content="Pete Lyons, node.js coder for hire"><link rel="stylesheet" href="/screen.css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css"><script src="/js/jquery.js"></script><script src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><h1>Node docs vs. Rails docs</h1><p>
+I've been working with <a href="http://nodejs.org">Node.js</a> a lot recently and enjoying it.  However, I'm not sure entirely WHY I am enjoying it.  I'm writing it in <a href="http://jashkenas.github.com/coffee-script/">CoffeeScript</a>, which is pleasant enough, but it doesn't change the fact that javascript is lacking is basic language/library features like a Set object or hashes with non-string keys and so forth.  The other day I realized part of my good feelings about node are from my experience with the docs, which normally goes as follows.
+</p>
+<ul>
+  <li>Each project has a single authoritative home page
+    <ul><li>often the main github repo or a unique domain that just links to github</li></ul>
+  </li>
+  <li>The docs are usually a 1-pager that explains all you need to get started</li>
+  <li>The examples are clear enough</li>
+  <li>That's all it takes. You can get up and running with that.</li>
+</ul>
+<p>
+I really enjoy that aspect of this.  Case studies include <a href="http://documentcloud.github.com/underscore/">underscore</a>, <a href="http://documentcloud.github.com/backbone/">backbone</a>, <a href="https://github.com/visionmedia/jade">jade</a>, <a href="http://jashkenas.github.com/coffee-script/">coffeescript</a>, and <a href="http://expressjs.com/guide.html">express</a>.  Also, the docs are the right length (compared to rails).  They aren't one-off blog posts on how to do X, nor are they a book-length comprehensive tutorial that builds an app from scratch.  They are both full API references and guides coupled with enough tiny snippets to get you going.
+</p>
+<p>
+Now rails on the other hand, and this might be my own fault, seems to be problematic here.  For one, the gems you need often don't have enough documentation to get up and running on their github project.  You are forced out into the harsh unpleasant jungle of umpteen out of date, contradictory or incorrect blog posts.  One nice thing about having the main docs on github (in node land) is that all the info there is guaranteed to be current and the outdated stuff is not there (but it is still in the git history if you need it).  The problem with information rot on rails related blog posts and screencasts is really annoying.  Rails DOES have nice docs on the other end of the spectrum, the comprehensive gigantic tutorial, but for whatever reason these days I never read those end to end and I usually just get myself into trouble with impatient skimming.  If I'm going to spend hours and hours reading something, I probably still prefer to get a physical book than read a gigantic web based tutorial.
+</p>
+<p>
+This is just one taste of the different experience working with these two technologies.  I still think I'll  continue to view rails as basically the top web development framework out there (unless I try Django, maybe, but I learned rails first to force me to learn ruby), but there are definitely aspects of the rails ecosystem that rub me the wrong way.
+</p>
+<script type="text/javascript">
+(function() {
+
+  $(function() {
+    return $("header nav a").each(function(index, link) {
+      var $link, URI, href, parent, same;
+      $link = $(link);
+      href = $link.attr("href");
+      URI = document.location.pathname;
+      console.log(URI, href, URI.indexOf(href));
+      same = URI === href;
+      parent = URI.indexOf(href) >= 0 && href !== "/";
+      if (same || parent) {
+        return $link.addClass("current");
+      } else {
+        return $link.removeClass("current");
+      }
+    });
+  });
+
+}).call(this);
+</script></div><footer><div class="content"><nav><h1>Technology</h1><a href="/">Home</a><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav class="connect"><h1>Connect With Me</h1><a href="/problog/feed"><img src="/images/feed.png" height="24" alt="Subscribe to my Atom feed" title="Subscribe to my Atom Feed" class="icon">Subscribe
+</a><a href="http://www.linkedin.com/in/peterlyons1"><img src="/images/linkedin_icon.png" alt="LinkedIn" title="LinkedIn" class="icon">LinkedIn
+</a><a href="http://stackoverflow.com/users/266795/peter-lyons"><img src="/images/stackoverflow_icon.png" alt="stackoverflow" title="stackoverflow" class="icon">stackoverflow
+</a><a href="https://github.com/focusaurus"><img src="/images/github_icon.png" alt="github" title="github" class="icon">github
+</a><a href="https://twitter.com/#!/focusaurus"><img src="/images/twitter_icon.png" alt="twitter" title="twitter" class="icon">twitter
+</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border:0;width:88px;height:31px" src="/images/valid_css.png" alt="Valid CSS!"></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
+</a></p></div></footer></body></html>
