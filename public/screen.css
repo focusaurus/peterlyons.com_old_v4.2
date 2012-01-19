@@ -380,6 +380,12 @@ nav.blog form {
   font-family: "Archer-Medium-Pro";
   float: right;
 }
+#subscribe {
+  margin: 8px 0;
+}
+#subscribe img {
+  padding-left: 5px;
+}
 figcaption {
   font-size: 20px;
   font-size: 2rem;

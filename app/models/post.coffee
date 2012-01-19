@@ -2,6 +2,7 @@ _ = require "underscore"
 fs = require "fs"
 path = require "path"
 asyncjs = require "asyncjs"
+markdown = require("markdown-js").makeHtml
 
 leadZero = (value) -> if value > 9 then "#{value}" else "0#{value}"
 
@@ -57,7 +58,10 @@ class Post
       file.name = path.basename file.path
       next()
     .readFile("utf8").each (file, next) ->
-      self.content = file.data
+      if self.format == "md"
+        self.content = markdown file.data
+      else
+        self.content = file.data
       console.log "Loaded", self.name, self.content.slice 0, 10
       next()
     .end (error) ->
