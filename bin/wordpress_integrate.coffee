@@ -20,6 +20,7 @@ templatePath = __dirname + "/../app/templates/layout.jade"
 locals =
   body: "TEST1"
   config: config
+  post: false
   specURIs: []
   testCSS: []
   wordpress: true

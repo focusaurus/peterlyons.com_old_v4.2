@@ -21,14 +21,18 @@ app.register ".html",
     (locals) -> html
 app.set "view engine", "jade"
 app.set "view options",
- layout: "layout.jade"
- locals:
-   config: config
-   specURIs: []
-   testCSS: []
-   title: ''
-   wordpress: false
+  layout: "layout.jade"
 app.set "views", __dirname + "/templates"
+
+specURIs = []
+specURIs.start = false
+app.helpers
+  config: config
+  post: false
+  specURIs: specURIs
+  testCSS: []
+  title: ''
+  wordpress: false
 
 #Load in the controllers
 ["pages", "galleries", "photos", "blog"].map (controllerName) ->

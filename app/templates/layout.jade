@@ -23,10 +23,13 @@ html(lang="en")
     link(rel="stylesheet", href="/css/overcast/jquery-ui.css")
     script(src="/js/jquery.js")
     script(src="/js/jquery-ui.js")
+    if specURIs.length > 0
+      link(rel="stylesheet", href="/lib/jasmine/jasmine.css")
+      script(src="/lib/jasmine/jasmine.js")
+      script(src="/lib/jasmine/jasmine-html.js")
+      script(src="/application/LayoutSpec.js")
     each URI in specURIs
       script(src=URI)
-    each URI2 in testCSS
-      link(rel="stylesheet", href=URI2)
     if specURIs.start
       script
         $(document).ready(function() {
@@ -64,6 +67,8 @@ html(lang="en")
           |  </form>
           | <a href="<?php echo site_url('feed') ?>">
           | <img src="<?php echo esc_url( includes_url( 'images/rss.png' ) ); ?>" /></a>
+      if post
+        h1= post.title
       !{body}
       :coffeescript
         $ ->

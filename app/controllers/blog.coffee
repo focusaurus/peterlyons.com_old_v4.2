@@ -12,21 +12,16 @@ cache =
   posts: []
 
 class PostPage extends pages.Page
-  constructor: (@post, @locals={}, @specs=[]) ->
-    @title = @post.title
-
-  render: (res) ->
-    console.log "rendering post", util.inspect(@post)
-    options = @makeOptions res.req
-    res.render @post.viewPath(), options
+  constructor: (@post, @locals={}) ->
+    @view = @post.viewPath()
+    @locals.title = @post.title
+    @locals.post = @post
 
 class BlogIndex extends pages.Page
-  constructor: (@posts, @title='', @locals={}, @specs=[]) ->
-
-  render: (res) ->
-    options = @makeOptions res.req
-    options.locals.posts = @posts
-    res.render "blog_index", options
+  constructor: (@posts, title='', @locals={}, @specs=[]) ->
+    @view = "problog"
+    @locals.title = title
+    @locals.posts = @posts
 
 presentPost = (post) ->
   date = leadZero(post.publish_date.getMonth() + 1)
@@ -52,19 +47,17 @@ setup = (app) ->
     noExt = file.path.substr 0, file.path.lastIndexOf('.')
     post.load "#{noExt}.json", "problog", (error) ->
       return next(error) if error
-      console.log post.view, post.URI(), post.publish_date
-      app.get "/" + post.URI(), (req, res) ->
-        new PostPage(post.presented).render res
+      app.get "/" + post.URI(), (req) ->
+        new PostPage(post.presented).render req
       next()
       post.presented = presentPost(post)
   .end ->
     cache.posts = _.sortBy cache.posts, (post) ->
       post.publish_date
     .reverse()
-    console.log "real asyncjs walkfiles"
 
-  app.get "/problog", (req, res) ->
-    new BlogIndex(cache.posts, "Blog Index").render res
+  app.get "/problog", (req) ->
+    new BlogIndex(cache.posts, "Pete's Points").render req
 
   app.get "/problog/feed", (req, res) ->
     options =

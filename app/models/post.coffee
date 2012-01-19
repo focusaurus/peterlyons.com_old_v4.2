@@ -62,7 +62,6 @@ class Post
         self.content = markdown file.data
       else
         self.content = file.data
-      console.log "Loaded", self.name, self.content.slice 0, 10
       next()
     .end (error) ->
       callback error
