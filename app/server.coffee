@@ -4,10 +4,11 @@ markdown = require("markdown-js").makeHtml
 
 app = express.createServer()
 app.use express.bodyParser()
+app.use express.logger {format: ":method :url"}
 app.use app.router
 app.use express.compiler(src: __dirname + "/../public", enable: ["coffeescript"])
 app.use express.static(config.staticDir)
-if config.env.testing or config.env.development
+if config.tests
   #Note to self. Make sure compiler comes BEFORE static
   app.use express.compiler(src: __dirname + "/../spec/js", enable: ["coffeescript"])
   app.use express.static(__dirname + "/../spec/js")
@@ -39,10 +40,6 @@ app.helpers
   controller = require "./controllers/" + controllerName
   controller.setup app
 
-console.log "#{config.site} server starting on http://localhost:#{config.port}"
-if process.env.NODE_ENV in ["production", "staging"]
-  app.listen config.port, "127.0.0.1"
-else
-  app.use express.logger {format: ":method :url"}
-  #Listen on all IPs in dev/test (for testing from other machines)
-  app.listen config.port
+ip = if config.loopback then "127.0.0.1" else "0.0.0.0"
+console.log "Express serving on http://#{ip}:#{config.port} ( #{config.baseURL} )"
+app.listen config.port, ip
