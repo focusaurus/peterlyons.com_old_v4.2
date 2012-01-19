@@ -1,3 +1,4 @@
+blog = process.argv[2]
 asyncjs = require "asyncjs"
 fs = require "fs"
 mysql = require "mysql"
@@ -34,10 +35,10 @@ saveMetadata = (post, next) ->
     next error, post
 
 client = mysql.createClient
-  user: "problog"
+  user: blog
   password: "Strap...it3"
   port: 23306
-  database: "problog"
+  database: blog
 postQuery = "select * from wp_posts where post_status = 'publish' and post_type = 'post' order by post_date_gmt;"
 client.query postQuery, (error, results, fields) ->
   asyncjs.list(results).map(buildPost).each(savePost).each(saveMetadata).end (error) ->

@@ -1,8 +1,9 @@
 doctype xml
 feed(xmlns="http://www.w3.org/2005/Atom")
-  title Pete's Points
-  link(href=baseURL + "/problog/feed", rel="self")
-  link(href=baseURL + "/problog/feed")
+  title= title
+  - var URL = config.baseURL + "/" + URI + "/feed"
+  link(href=URL, rel="self")
+  link(href=URL)
   //- Note that W3C Validator does not allow whitespace within these tags
   //- but jade indents the closing tag, so we go raw dog
   != "<updated>" + posts[0].publish_date.toISOString() + "</updated>"
@@ -14,5 +15,5 @@ feed(xmlns="http://www.w3.org/2005/Atom")
       title= post.title
       link(href="http://peterlyons.com/" + post.URI())
       != "<updated>" + post.publish_date.toISOString() + "</updated>"
-      != "<id>" + baseURL + "/" + post.URI() + "</id>"
+      != "<id>" + config.baseURL + "/" + post.URI() + "</id>"
       content(type="html")= post.content || ""

@@ -8,8 +8,7 @@ path = require "path"
 util = require "util"
 
 {Post, leadZero} = require("../models/post")
-cache =
-  posts: []
+cache = {}
 
 class PostPage extends pages.Page
   constructor: (@post, @locals={}) ->
@@ -18,10 +17,29 @@ class PostPage extends pages.Page
     @locals.post = @post
 
 class BlogIndex extends pages.Page
-  constructor: (@posts, title='', @locals={}, @specs=[]) ->
-    @view = "problog"
+  constructor: (@view, title='', @locals={}, @specs=[]) ->
+    @URI = @view
     @locals.title = title
-    @locals.posts = @posts
+    @locals.URI = @URI
+
+  route: (app) =>
+    self = this
+    app.get "/#{@URI}", (req) ->
+      self.render req
+
+    app.get "/#{@URI}/feed", (req, res) ->
+      options =
+        layout: false
+        pretty: true
+        locals: self.locals
+      options.locals.posts = self.posts
+      res.header "Content-Type", "text/xml"
+      res.render "feed", options
+    for post in @posts
+      router = (post) ->
+        app.get "/" + post.URI(), (req) ->
+          new PostPage(post.presented).render req
+      router post
 
 presentPost = (post) ->
   date = leadZero(post.publish_date.getMonth() + 1)
@@ -34,38 +52,38 @@ presentPost = (post) ->
   presented.date = post.publish_date.toString "MMM dd, yyyy"
   presented
 
-setup = (app) ->
-  asyncjs.walkfiles(path.normalize(__dirname + "/../posts"), null, asyncjs.PREORDER)
+loadBlog = (app, URI, callback) ->
+  cache[URI] = []
+  asyncjs.walkfiles(path.normalize(__dirname + "/../posts/" + URI), null, asyncjs.PREORDER)
   .stat()
   .each (file, next) ->
     return next() if file.stat.isDirectory()
     return next() if not /\.(md|html)$/.test file.name
     post = new Post
-    cache.posts.push post
+    cache[URI].push post
     post.base = path.resolve(path.join(__dirname, "../posts"))
     #TODO fix up
     noExt = file.path.substr 0, file.path.lastIndexOf('.')
-    post.load "#{noExt}.json", "problog", (error) ->
+    post.load "#{noExt}.json", URI, (error) ->
       return next(error) if error
-      app.get "/" + post.URI(), (req) ->
-        new PostPage(post.presented).render req
-      next()
       post.presented = presentPost(post)
-  .end ->
-    cache.posts = _.sortBy cache.posts, (post) ->
+      next()
+  .end (error) ->
+    cache[URI] = _.sortBy cache[URI], (post) ->
       post.publish_date
     .reverse()
+    callback error, cache[URI]
 
-  app.get "/problog", (req) ->
-    new BlogIndex(cache.posts, "Pete's Points").render req
-
-  app.get "/problog/feed", (req, res) ->
-    options =
-      layout: false
-      pretty: true
-      locals:
-        posts: cache.posts
-        baseURL: config.baseURL
-    res.header "Content-Type", "text/xml"
-    res.render "feed", options
+setup = (app) ->
+  problog = new BlogIndex("problog", "Pete's Points")
+  persblog = new BlogIndex("persblog", "The Stretch of Vitality")
+  asyncjs.list([problog, persblog]).each (blog, next) ->
+    loadBlog app, blog.URI, (error,  posts) ->
+      blog.posts = blog.locals.posts = posts
+      next error
+  .each (blog, next) ->
+    blog.route app
+    next()
+  .end (error) ->
+    #no-op
 module.exports = {setup}
