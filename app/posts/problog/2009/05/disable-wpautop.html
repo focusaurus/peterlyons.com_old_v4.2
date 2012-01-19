@@ -1,0 +1,19 @@
+<p>
+So, when creating a <a href="http://wordpress.org">WordPress</a> blog, even if you are editing in HTML mode, WordPress includes a feature called "wpautop" that will replace any pair of line feed characters in your post markup with a &lt;p&gt; tag.  This is helpful I think in general  for people who blog mostly paragraphs with some links and images.  However, if you blog with more complex markup, this can invalidate your HTML.  I run my HTML through the <a href="http://validator.w3.org">W3C HTML Validator</a> to check it and wpautop can cause validation to fail.  I hunted around online for an easy way to disable this and didn't see one, so I made the changes described below.
+</p>
+<p>
+One thing to keep in mind is that if you HAVE been relying on wpautop and you have not been including your own explicit &lt;p&gt; tags, disabling wpautop will cause all your paragraphs to run together and thus your layout will be broken.  To prepare for this, pre-edit all your posts so they have the paragraph tags and remove extra blank lines from them.  You can check how they look in that state since when there are no blank lines wpautop won't do anything.  Once they look good like that, you can disable wpautop.
+</p>
+<p>
+In your WordPress installation, edit the file <code>wp-includes/formatting.php</code>.  Search for "function wpautop" and insert the following two lines at the beginning of the function to disable it.
+</p>
+<div class="code">
+<pre>
+function wpautop($pee, $br = 1) {
+        //plyons disabling this. 20090516
+        return $pee;
+</pre>
+</div>
+<p>
+Of course, this change will be undone when you upgrade to a newer WordPress release, so it's just a convenient hack.  Once you have your posts with proper paragraph tags and no extra line feeds, wpautop should not change your markup and therefore you shouldn't have a problem when it is re-enabled after a WordPress upgrade.
+</p>
