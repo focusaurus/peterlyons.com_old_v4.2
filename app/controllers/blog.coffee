@@ -1,4 +1,5 @@
 _ = require "underscore"
+config = require "../../config"
 date = require "../../date"
 fs = require "fs"
 asyncjs = require "asyncjs"
@@ -71,7 +72,7 @@ setup = (app) ->
       pretty: true
       locals:
         posts: cache.posts
-        site: "http://peterlyons.com" #TODO soft code this
+        baseURL: config.baseURL
     res.header "Content-Type", "text/xml"
     res.render "feed", options
 module.exports = {setup}
