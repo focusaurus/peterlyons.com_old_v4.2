@@ -1,6 +1,8 @@
 config = require "../config"
+errors = require "./errors"
 express = require "express"
 markdown = require("markdown-js").makeHtml
+path = require "path"
 
 app = express.createServer()
 app.use express.bodyParser()
@@ -12,6 +14,7 @@ if config.tests
   #Note to self. Make sure compiler comes BEFORE static
   app.use express.compiler(src: __dirname + "/../spec/js", enable: ["coffeescript"])
   app.use express.static(__dirname + "/../spec/js")
+
 
 app.register ".md",
   compile: (md, options) ->
@@ -34,6 +37,17 @@ app.helpers
   testCSS: []
   title: ''
   wordpress: false
+
+app.error (error, req, res, next) ->
+  console.log error
+  if error instanceof errors.NotFound
+    res.render path.join(__dirname, "..", config.staticDir, "error404.html"), {layout: false}
+  else
+    next error
+
+#Last in the chain means 404 for you
+app.use (req, res, next) ->
+  next new errors.NotFound
 
 #Load in the controllers
 ["pages", "galleries", "photos", "blog"].map (controllerName) ->
