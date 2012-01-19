@@ -32,7 +32,7 @@ DEVURL="http://localhost:9400"
 PRODURL="http://${SITE}"
 REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com.git"
 BRANCH="master"
-NODE_VERSION="0.4.3"
+NODE_VERSION="0.6.7"
 PROJECT_DIR=~/projects/peterlyons.com
 OVERLAY="${PROJECT_DIR}/overlay"
 PUBLIC="${PROJECT_DIR}/public"
@@ -65,7 +65,7 @@ os:prereqs() { #TASK: sudo
     fi
     apt-get update
     cat <<EOF | grep -v "#" | sort | xargs apt-get --assume-yes install
-#Needed to download node and npm
+#Needed to download node
 curl
 #Needed to build node.js gem
 g++
@@ -78,14 +78,14 @@ make
 #For monitoring
 monit
 #For Wordpress blog
-mysql-server
-mysql-client
+#mysql-server
+#mysql-client
 #We use perl in the tasks.sh script for quick command line file editing
 perl
 #This is our web server
 nginx
 #For Wordpress blog
-php5-cgi
+#php5-cgi
 EOF
 }
 
@@ -250,25 +250,24 @@ app:clone() {
 }
 
 app:prereqs() {
-    cd "${PROJECT_DIR}"
-    [ -d tmp ] || mkdir tmp
-    cd tmp
+    set -e
+    cdpd
+    [ -d var/tmp ] || mkdir var/tmp
+    cd var/tmp
     echo "Installing node.js version ${NODE_VERSION}"
+    #For older 0.4.x node versions
+    #curl --silent --remote-name \
+    #    "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
+    #For newer 0.6.x versions
     curl --silent --remote-name \
-        "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
+        "http://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz"
     tar xzf node-v${NODE_VERSION}.tar.gz
     cd node-v${NODE_VERSION}
-    ./configure  --prefix=~/node && make && make install && make && make install
+    ./configure  --prefix=../../../node && make install
     cd ..
     rm -rf node-*
-    cd ..
-    echo "Installing npm"
-    #Yes, I know this is a security risk.  I accept the risk. Life is short.
-    curl http://npmjs.org/install.sh | sh || exit 4
-    echo "Installing npm packages"
+    cdpd
     npm install
-    echo "Here are the installed npm packages"
-    npm ls
 }
 
 app:deploy() {
