@@ -272,14 +272,13 @@ header {
   border-bottom: 3px solid #434137;
   padding-bottom: 8px;
   margin-bottom: 8px;
+  margin-top: 8px;
 }
 header h1 {
   font-family: "AWConquerorInline-Regular", sans-serif;
   font-size: 40px;
   font-size: 4rem;
-  float: left;
   line-height: 100%;
-  padding: 0;
   text-transform: uppercase;
 }
 header img {
@@ -298,7 +297,8 @@ header nav a {
   font-weight: normal;
 }
 header nav a,
-a.button {
+a.button,
+#reverse {
   background-color: #434137;
   color: #fcfaf1;
   margin: 5px;
@@ -372,6 +372,12 @@ img.icon {
   border-top: 1px solid #367c84;
   margin-top: 8px;
   padding-top: 8px;
+}
+p.reverse {
+  margin: 30px 0;
+}
+#reverse {
+  margin: 0;
 }
 nav.blog form {
   display: inline-block;

@@ -6,7 +6,10 @@
         $("div.phase").each (index, div) ->
           $(div).remove()
           phases.unshift $(div)
-        parent.append phase for phase in phases
+        #Make a single change to the live DOM to avoid flickers
+        tempNode = $ "<div>"
+        tempNode.append phase for phase in phases
+        parent.append tempNode.html()
 :markdown
   I have a **[traditional resume availabe in PDF format](resume.pdf)** for those
   looking for the lo-fi version.
@@ -14,7 +17,7 @@
   This page will chronicle my career in a more narrative and rich format than a
   standard resume can offer.
 
-  <a id="reverse" href="#">Click to switch between chronological and reverse chronological order.</a>
+  <p class="reverse"><a id="reverse" href="#">Click to switch between chronological and reverse chronological order.</a></p>
 
 .phase
   :markdown
