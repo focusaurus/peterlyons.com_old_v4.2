@@ -69,7 +69,12 @@ html(lang="en")
         $ ->
           $("header nav a").each (index, link) ->
             $link = $(link)
-            if $link.attr("href") == document.location.pathname
+            href = $link.attr "href"
+            URI = document.location.pathname
+            console.log URI, href, URI.indexOf(href)
+            same = URI is href
+            parent = URI.indexOf(href) >= 0 and href isnt "/"
+            if same or parent
               $link.addClass "current"
             else
               $link.removeClass "current"
