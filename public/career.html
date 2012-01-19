@@ -3,19 +3,19 @@
 
   $(function() {
     return $("#reverse").click(function() {
-      var parent, phase, phases, _i, _len, _results;
+      var parent, phase, phases, tempNode, _i, _len;
       phases = [];
       parent = $("div.phase").parent();
       $("div.phase").each(function(index, div) {
         $(div).remove();
         return phases.unshift($(div));
       });
-      _results = [];
+      tempNode = $("<div>");
       for (_i = 0, _len = phases.length; _i < _len; _i++) {
         phase = phases[_i];
-        _results.push(parent.append(phase));
+        tempNode.append(phase);
       }
-      return _results;
+      return parent.append(tempNode.html());
     });
   });
 
@@ -26,7 +26,7 @@ looking for the lo-fi version.</p>
 <p>This page will chronicle my career in a more narrative and rich format than a
 standard resume can offer.</p>
 
-<p><a id="reverse" href="#">Click to switch between chronological and reverse chronological order.</a></p><div class="phase"><h1>Phase 4: Web Developer and Start-Up Junkie</h1>
+<p class="reverse"><a id="reverse" href="#">Click to switch between chronological and reverse chronological order.</a></p><div class="phase"><h1>Phase 4: Web Developer and Start-Up Junkie</h1>
 
 <p>After 6.5 years working on enterprise software, in January 2011 I quit my
 job with HP to work on building web applications and start-up businesses.</p>

@@ -343,13 +343,28 @@ app:build_static() {
             exit ${EXIT_CODE}
         fi
     done
-    echo "wordpress PHP integrated files:"
-    echo "-----"
+    cdpd
+    cd app/posts
+    for JSON in $(find . -type f -name \*.json)
+    do
+        URI="${JSON%.*}"
+        URI=$(echo "${URI}" |cut -d . -f2-)
+        echo "Saving ${URI} to ${PUBLIC}${URI}.html"
+        URL="${DEVURL}${URI}"
+        curl --silent "${URL}" --output \
+            "${PUBLIC}${URI}.html" || EXIT_CODE=$?
+        if [ ${EXIT_CODE} -ne 0 ]; then
+            echo "FAILED to retrieve ${URL}"
+            exit ${EXIT_CODE}
+        fi
+    done
+    #echo "wordpress PHP integrated files:"
+    #echo "-----"
     #curl --silent "${DEVURL}/home?wordpress=1" | \
     #    sed '/WORDPRESS HEADER BOILERPLATE/q' | sed '$d' > \
     #    "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
-    cdpd
-    coffee bin/wordpress_integrate.coffee
+    #cdpd
+    #coffee bin/wordpress_integrate.coffee
 }
 
 app:prod_release() {
