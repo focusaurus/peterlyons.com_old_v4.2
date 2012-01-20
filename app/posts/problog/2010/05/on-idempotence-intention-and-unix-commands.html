@@ -1,0 +1,43 @@
+<p>
+<a href="http://en.wikipedia.org/wiki/Idempotence#In_computing">Idempotence</a> means that running a command or function several times produces the same result as running it only once.  This is an very important design principle that is a blessing when used appropriately and a scourge when not used where warranted.
+</p>
+<p>
+For analogy, imagine you ask a housemate (or butler if that's how you roll) to empty the dishwasher.  They dutifully go over there, open the dishwasher door, and find it's already empty.  How do they react?  Do they come back to you shouting in confusion "You fool! How can I empty the dishwasher if there's nothing in it! Oh woe is me. What am I to do?"?  Or do they just think to themselves "score!" and go on a coffee break, leaving you to go about your business trusting that the dishwasher is now empty?
+</p>
+<p>
+Another analogy is from the military's notion of "management by intent" wherein a commander might order his troops to "have camp fully operational by noon" as opposed to dictating specific tactics that must be taken in order to achieve the intended outcome. This way, the troops can rely on their own abilities to achieve the intent and are empowered to respond to changing or unexpected circumstances independently.
+</p>
+<p>
+Now, when it comes to computer programs, UNIX has a mixed bag of utilities that understand this and some that don't.
+</p>
+<div class="code">
+<pre>
+mkdir /tmp/2;echo $?;mkdir /tmp/2;echo $?
+0
+mkdir: cannot create directory `/tmp/2': File exists
+1
+
+rm /tmp/foo;echo $?;rm /tmp/foo;echo $?
+0
+rm: cannot remove `/tmp/foo': No such file or directory
+1
+
+</pre>
+</div>
+<p>
+So the bad examples include <code>mkdir, rmdir, rm, ln, and perhaps kill (debatable)</code>. Think about how much simpler using a command line and writing shell scripts would be if these were idempotent and instead of panicking in horror when the user does not know the current state of the filesystem, just allowed the user to describe the desired end state.  I would love to have idempotent and recursive by default commands like <code>mkdir -p</code> or <code>rm -rf</code> in combination with a transactional filesystem with built in undo capabilities.
+</p>
+<p>
+Good idempotent examples include <code>touch, tar, zip, cp, chmod</code>.
+</p>
+<p>
+So the point about design and usability here is <b>it's good to ask oneself "What is the user's intent here?"</b>, and try to do everything in your power to work in concert with that intention.  A strong and painful negative example from my career has to do with the fact that the Solaris <code>patchadd</code> program is not idempotent and it doesn't return exit codes according to the user's intent.  So when I run <code>patchadd 123456-01</code>, really my intention is "I want this system to be OK with regard to patch 123456-01".  <code>patchadd</code> will return a non-zero exit code if the patch is already installed or the patch is not applicable to the server or if a newer revision is already installed.  As a user of <code>patchadd</code>, I don't care.  It's all success to me, and nor do I want to be bothered with implementation details within patchadd such as not installing a patch if a newer revision is already installed. I think many shell scripts would be a lot smaller and clearer and simpler without always having to wrap <code>mkdir</code> in an <code>if [ ! -d /blah/dir ]</code> clause to avoid spurious error output.
+</p>
+<p>
+A few other links on this topic:
+</p>
+<ul>
+<li><a href="http://devhawk.net/2007/11/09/The+Importance+Of+Idempotence.aspx">The Importance of Idempotence (devhawk)</a></li>
+<li><a href="http://www.allapplabs.com/glossary/idempotent.htm">Java Glossary entry on Idempotent</a>. I like this quote "Elevator call buttons are also idempotent, though many people think they are not."</li>
+<li><a href="http://stackoverflow.com/questions/1077412/what-is-an-idempotent-operation">Stack Overflow: What is an idempotent operation?</a></li>
+</ul>

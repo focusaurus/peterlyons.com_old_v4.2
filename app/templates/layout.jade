@@ -2,31 +2,35 @@
 html(lang="en")
   head
     meta(charset="utf-8")
-    - if (wordpress)
+    if wordpress
         | <title><?php bloginfo("name"); ?> <?php if ( is_single() ) { ?> &raquo; Blog Archive <?php } ?> <?php wp_title(); ?> | Peter Lyons </title>
         | <link rel="stylesheet" href="<?php bloginfo("template_url"); ?>/print.css" type="text/css" media="print" />
         | <link rel="alternate" type="application/rss+xml" title="<?php bloginfo("name"); ?> RSS Feed" href="<?php bloginfo("rss2_url"); ?>" />
         | <link rel="pingback" href="<?php bloginfo("pingback_url"); ?>" />
         | <?php if ( is_singular() ) wp_enqueue_script( "comment-reply" ); ?>
         | <?php wp_head(); ?>
-    - else
-      - if (title)
+    else
+      if title
         title #{title} | Peter Lyons
-      - else
+      else
         title Peter Lyons
-    meta(name="keywords", content="peter lyons, pete lyons, web development, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears")
-    meta(name:"author", content="Peter Lyons")
-    meta(name="description", content="The web site for Peter Lyons, Web Developer and Musician")
-    meta(name="copyright", content="2001, Peter Lyons")
-    link(rel="stylesheet", href="/screen.css", type="text/css")
-    link(rel="stylesheet", href="/css/overcast/jquery-ui.css", type="text/css")
-    script(type="text/javascript", src="/js/jquery.js")
-    script(type="text/javascript", src="/js/jquery-ui.js")
-    - each URI in specURIs
-      script(type="text/javascript", src=URI)
-    - each URI in testCSS
-      link(rel="stylesheet", href=URI, type="text/css")
-    - if (specURIs.start)
+    meta(name="keywords", content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock")
+    meta(name="author", content="Peter Lyons")
+    meta(name="description", content="Pete Lyons, node.js coder for hire")
+    //-This seems to make it way too big on mobile
+    //-meta(name="viewport", content="width=device-width")
+    link(rel="stylesheet", href="/screen.css")
+    link(rel="stylesheet", href="/css/overcast/jquery-ui.css")
+    script(src="/js/jquery.js")
+    script(src="/js/jquery-ui.js")
+    if specURIs.length > 0
+      link(rel="stylesheet", href="/lib/jasmine/jasmine.css")
+      script(src="/lib/jasmine/jasmine.js")
+      script(src="/lib/jasmine/jasmine-html.js")
+      script(src="/application/LayoutSpec.js")
+    each URI in specURIs
+      script(src=URI)
+    if specURIs.start
       script
         $(document).ready(function() {
           jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
@@ -39,66 +43,59 @@ html(lang="en")
     link(href="/favicon.ico", type="image/x-icon", rel="shortcut icon")
     link(rel="openid.server", href="http://www.livejournal.com/openid/server.bml")
     link(rel="openid.delegate", href="http://focusaurus.livejournal.com/")
-    link(href='http://fonts.googleapis.com/css?family=Inconsolata', rel='stylesheet', type='text/css')
+    link(href="http://fonts.googleapis.com/css?family=Inconsolata", rel="stylesheet")
+    link(href="http://fonts.googleapis.com/css?family=Six+Caps", rel="stylesheet")
+    link(href="http://fonts.googleapis.com/css?family=Oldenburg", rel="stylesheet")
   body
-    #header
-      a(href="/")
-        img(src="/images/peter_lyons_logo.png", alt="Peter Lyons", class="logo")
+    .content
+      header
+        img(src="/images/peter_lyons_logo_icon.png", alt="Peter Lyons Logo")
+        h1
+          a(href="/") Peter Lyons
+        if !wordpress
+          nav
+            a(href="/") Home
+            a(href="/problog") Blog
+            a(href="/practices") Practices
+            a(href="/stacks") Stacks
+            a(href="/career") Career
 
-    #site_nav
-      .technology
-        .gray Technology
-        img.keyboard_icon(src="/images/keyboard_icon_alt.png", alt="")
-        .nav_links
-          a(href="/problog") Blog
-          br
-          a(href="/career.html") Career
-          br
-          = "Projects"
-          br
-          span.indent
-            a(href="http://othenticate.com") Othenticate
-          br
-          span.indent
-            a(href="/linkzie.html") Linkzie
-          br
-          span.indent
-            a(href="/smartears.html") SmartEars
-          br
-          span.indent
-            a(href="/bigclock.html") BigClock
-          br
-          a(href="/leveling_up.html") Leveling Up
-          br
-          a(href="/code_conventions.html") Code Conventions
-          br
-          a(href="/web_prog.html") Web Programming
+      if wordpress
+        nav.blog
+          | <form method="get" id="searchform" action="/problog/">
+          |  <input type="text" size="20" name="s" id="s" value="Search..." onblur="if(this.value=='') this.value='Search...';" onfocus="if(this.value=='Search...') this.value='';">
+          |  </form>
+          | <a href="<?php echo site_url('feed') ?>">
+          | <img src="<?php echo esc_url( includes_url( 'images/rss.png' ) ); ?>" /></a>
+      if post
+        h1= post.title
+      !{body}
+      if post
+        #disqus_thread
+        != '<script>var disqus_shortname = "peterlyons-' + post.blog + '";</script>'
+        script
+          /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+          var disqus_developer = true;
 
-      .music
-        .gray Music
-        img.sax_icon(src="/images/sax_icon.png", alt="")
-        .nav_links
-          a(href="/bands.html") Bands
-          br
-          a(href="/oberlin.html") Oberlin
-          br
-          a(href="/favorites.html") Favorites
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        noscript Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      :coffeescript
+        $ ->
+          $("header nav a").each (index, link) ->
+            $link = $(link)
+            href = $link.attr "href"
+            URI = document.location.pathname
+            console.log URI, href, URI.indexOf(href)
+            same = URI is href
+            parent = URI.indexOf(href) >= 0 and href isnt "/"
+            if same or parent
+              $link.addClass "current"
+            else
+              $link.removeClass "current"
+    include includes/footer
 
-      .personal
-        .gray Personal
-        img.peter_icon(src="/images/peter_icon.png", alt="")
-        .nav_links
-          a(href="/persblog") Blog
-          br
-          a(href=config.appURI + "/photos") Photos
-          br
-          a(href="http://www.flickr.com/photos/88096431@N00/") Flickr Photo Stream
-      - if (wordpress)
-        | <?php get_sidebar(); ?>
-    #main_content
-      - if (wordpress)
-        //- CAREFUL. The following line has an essential trailing white space
-        | 
-        //WORDPRESS HEADER BOILERPLATE. DELETE FROM HERE DOWN.
-      - else
-        !{body}
