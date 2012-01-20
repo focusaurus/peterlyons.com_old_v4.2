@@ -81,7 +81,7 @@ monit
 #mysql-server
 #mysql-client
 #We use perl in the tasks.sh script for quick command line file editing
-perl
+#perl
 #This is our web server
 nginx
 #For Wordpress blog
@@ -99,13 +99,13 @@ link() {
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
-    link "/etc/monit/conf.d/wordpress_${SITE}.monitrc"
+    #link "/etc/monit/conf.d/wordpress_${SITE}.monitrc"
     link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
     link "/etc/monit/conf.d/node_${SITE}.monitrc"
-    link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
+    #link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
     link "/etc/init/node_peterlyons.conf"
-    link "/etc/init/wordpress_peterlyons.conf"
-    cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
+    #link "/etc/init/wordpress_peterlyons.conf"
+    #cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
     cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
     initctl reload-configuration
     /etc/init.d/nginx reload
@@ -259,6 +259,7 @@ app:prereqs() {
     #curl --silent --remote-name \
     #    "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
     #For newer 0.6.x versions
+    set -x
     curl --silent --remote-name \
         "http://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz"
     tar xzf node-v${NODE_VERSION}.tar.gz
