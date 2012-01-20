@@ -21,11 +21,6 @@ server {
         rewrite ^(.+)/$ $1;
         index index.html home.html;
         try_files $uri $uri.html $uri/ @app;
-        # this serves static files that exist without running other rewrite tests
-        if (-f $request_filename) {
-            expires 30d;
-            break;
-        }
     }
 
     location @app {
