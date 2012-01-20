@@ -1,49 +1,33 @@
+upstream node {
+  # fail_timeout=0 means we always retry an upstream even if it failed
+  # to return a good HTTP response
+  server localhost:9400 fail_timeout=0;
+}
+
 server {
     listen 80 default;
     #This matches peterlyons.com and *.peterlyons.com
     server_name .peterlyons.com;
     #This is essential so we can use the same configuration in production and staging
     server_name_in_redirect off;
-    access_log /var/log/nginx/peterlyons.com.access.log;
-    error_log /var/log/nginx/peterlyons.com.error.log;
+    access_log /home/plyons/projects/peterlyons.com/var/log/nginx.access.log;
+    error_log /home/plyons/projects/peterlyons.com/var/log/nginx.error.log;
+    error_page 404 /error404.html;
+    error_page 502 /error502.html;
 
     location / {
         root /home/plyons/projects/peterlyons.com/public;
-        index index.php index.html home.html;
-        # this serves static files that exist without running other rewrite tests
-        if (-f $request_filename) {
-            expires 30d;
-            break;
-        }
-        # this sends all non-existing file or directory requests to index.php
-        #rewrite...last is safe to use here
-        #http://wiki.nginx.org/IfIsEvil
-        if (!-e $request_filename) {
-            rewrite ^/persblog(.+)$ /persblog/index.php?q=$1 last;
-            rewrite ^/problog(.+)$ /problog/index.php?q=$1 last;
-        }
+        #Trailing slashes are verboten
+        rewrite ^(.+)/$ $1;
+        index index.html home.html;
+        try_files $uri $uri.html $uri/ @app;
     }
 
-    # deny access to .htaccess files, if Apache's document root
-    # concurs with nginx's one
-    location ~ /\.ht {
-        deny all;
-    }
-
-    location /app/ {
-        rewrite /app(.*) $1 break;
-        proxy_pass http://localhost:9400;
-    }
-
-    error_page 404 /error404.html;
-
-    error_page 502 /error502.html;
-
-    # pass the PHP scripts to FastCGI server
-    location ~ \.php$ {
-        include /etc/nginx/fastcgi_params;
-        fastcgi_pass 127.0.0.1:9200;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME /home/plyons/projects/peterlyons.com/public$fastcgi_script_name;  # same path as above
+    location @app {
+      rewrite /app(.*) $1 break;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
+      proxy_pass http://node;
     }
 }

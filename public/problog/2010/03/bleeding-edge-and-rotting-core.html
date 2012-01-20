@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Bleeding Edge and Rotting Core | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"><meta name="author" content="Peter Lyons"><meta name="description" content="Pete Lyons, node.js coder for hire"><link rel="stylesheet" href="/screen.css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css"><script src="/js/jquery.js"></script><script src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><h1>Bleeding Edge and Rotting Core</h1><p>
+I just wanted to post some thoughts on the topic of selecting software components with regard to the maturity thereof.  I think overall the programmer community is by default gung-ho about the bleeding edge.  We like the shiny new toys with the bells and whistles.  Once something's been around enough to have its weaknesses well understsood, we find it very frustrating to have to continue to work with it.  I'm not going to offer any specific recommendations, just some things to keep in mind.  The general gist though is that it takes some hard-earned pragmatism and real production experience to understand the value of using older releases of components.
+</p>
+<p>
+First, let's define some terms.  We're familiar with what is known as the bleeding edge.  The new hotness. The stuff straight off the presses instilled with the glimmering light of state of the art knowledge.  There's probably always been a lot of this, but there seems to have been a flurry in the past five years of so of interest in ruby, rails, erlang, clojure, scala, dozens of python app and web frameworks, etc.  On the other hand, we have the old guard, which I'd like to call the rotting core.  Generally we shy away from this, but there are times when it is absolutely the correct choice in certain situations.
+</p>
+<p>
+So, let's look at some pros and cons.
+</p>
+<p>
+Bleeding edge pros:
+</p>
+<ul>
+    <li>The freshest and (usually) best designs and thinking are made available</li>
+    <li>Almost always more succinct and expressive</li>
+    <li>Often more coherent, clean, and consistent</li>
+    <li>Embodies improvements based on lessons learned from past failings and shortcomings</li>
+    <li>Development tools and processes are sometimes more productive</li>
+</ul>
+<p>
+Bleeding edge cons:
+</p>
+<ul>
+    <li>Development tools are usually immature and inferior
+        <ul>
+        <li>IDE support is likely to lag behind</li>
+        <li>Debugger may lag behind as may remote graphical debugging</li>
+        <li>Performance profilers might not be there</li>
+        </ul>
+    </li>
+    <li>Deployment issues may not have been well addressed yet</li>
+    <li>Updates will come more frequently causing churn</li>
+    <li>Software has not had as broad testing in production and is therefore likely to have more "surprises". Sometimes these can be showstoppers.</li>
+    <li>Community size will be smaller</li>
+    <li>Depth of knowledge in the community will be shallower</li>
+    <li>Standard library may be undergoing more flux</li>
+</ul>
+ 
+Rotting core pros:
+<ul>
+    <li>Stable, known quantity. It may have warts and bugs, but at least we're aware of most of them by now</li>
+    <li>Development tools generally have solid support including remote graphical debugging, mature performance profilers, etc</li>
+    <li>Community size will be larger</li>
+    <li>Community depth of knowledge will be much deeper</li>
+    <li>Updates are rare and only for occasional major issues or security patches</li>
+    <li>standard library will be well known and stable</li>
+</ul>
+Rotting core cons:
+<ul>
+    <li>Less exciting to developers.  Yesterday's designs and paradigms.</li>
+    <li>Often tedious compared to the bleeding edge</li>
+    <li>Support issues. Standard answer may always be "update to the latest version"</li>
+</ul>
+<p>
+And now, let's back this up with some examples and anecdotes.  I think when it comes to rotting core technologies, you have both the "oldie but a goodie" category and the "oldie and a baddie" one.  Currently my project has a component written against the now ancient Python 1.5.2 runtime, and we have hundreds of thousands of copies of that component installed at customer sites.  It is running on something around seventy different OSes.  Now, at the time when that component was originally written, this was close to the bleeding edge.  We've still not entirely upgraded it because it's an oldie and a goodie.  We've patched it a bunch and run it under huge loads and huge scales. We know what it can do, and we know what it can't do.  We even had famous python educator Mark Lutz (Programming Python) come in to train us and give us quizzical looks when we explain that half of what he is saying doesn't apply to us since it wasn't available in python 1.5.2.  Over the years, I've come to see the merits of this and even though its frustrating, the business reality is that every year that stuff continues to run without issue is bettering the return on the initial R&D investment.  It ain't broke, so we're not in a hurry to fix it.
+</p>
+<p>
+Of course, on the other side, you've got things like Java 1.2, which I also worked with.  Python has come a long way since 1.5.2, but really it's still basically the same deal, and the design was good from the start. Java has probably come even farther, but the design was a mess from the beginning and they've since seen the error of their ways and made some great improvements.  I would put that one in the "oldie but a baddie" category and do what it takes to upgrade.
+</p>
+<p>
+I remember chatting with a stranger on a plane after we each noticed that we were both programmers and were both actively programming on the plane. This was a few years ago and Ruby was still pretty much bleeding edge.  He looked at me with desperation and asked me if I knew anything about debugging deadlocks, threading issues, and core dumps since his production ruby app was regularly hitting issues and his team was basically at a point where they didn't have the knowledge or tools to solve them, and it was jeopardizing their whole project.  Sadly I couldn't offer any help, but I could certainly sympathize.
+</p>
+<p>
+I also have a friend who used to work at a DNS registry run by someone very much of the "rotting core" philosophy.  They ran Solaris 8 and ancient versions of lots of core C/unix utilities (bind et al), and to actually run versions that old took significant effort on their part, but it made sense for that project. They are running a piece of the Internet backbone. It's not bleeding edge stuff.  It just needs stability, stability, stability, and those are the tools they needed to meet their business goals.
+</p>
+<p>
+So next time you join a new project and start to reflexively freak out when they explain their software stack, supress your urge for a minute and get some information about the choices they have made and the reasoning and circumstances that got them where they are.  You might be surprised at the difficult but pragmmatic choices that were made and hopefully you can admire and appreciate the character of those who made them.
+</p>
+<p>
+And finally, think about the value of being able to look across a broad set of available components and correctly determine where components are in a "sweet spot" of their lifecycle, ripe to be chosen and deployed at length.  That is a deep wisdom that is a long time coming.
+</p>
+
+<div id="disqus_thread"></div><script>var disqus_shortname = "peterlyons-problog";</script><script>/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_developer = true;
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><script type="text/javascript">
+(function() {
+
+  $(function() {
+    return $("header nav a").each(function(index, link) {
+      var $link, URI, href, parent, same;
+      $link = $(link);
+      href = $link.attr("href");
+      URI = document.location.pathname;
+      console.log(URI, href, URI.indexOf(href));
+      same = URI === href;
+      parent = URI.indexOf(href) >= 0 && href !== "/";
+      if (same || parent) {
+        return $link.addClass("current");
+      } else {
+        return $link.removeClass("current");
+      }
+    });
+  });
+
+}).call(this);
+</script></div><footer><div class="content"><nav><h1>Technology</h1><a href="/">Home</a><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav class="connect"><h1>Connect With Me</h1><a href="/problog/feed"><img src="/images/feed.png" height="24" alt="Subscribe to my Atom feed" title="Subscribe to my Atom Feed" class="icon">Subscribe
+</a><a href="http://www.linkedin.com/in/peterlyons1"><img src="/images/linkedin_icon.png" alt="LinkedIn" title="LinkedIn" class="icon">LinkedIn
+</a><a href="http://stackoverflow.com/users/266795/peter-lyons"><img src="/images/stackoverflow_icon.png" alt="stackoverflow" title="stackoverflow" class="icon">stackoverflow
+</a><a href="https://github.com/focusaurus"><img src="/images/github_icon.png" alt="github" title="github" class="icon">github
+</a><a href="https://twitter.com/#!/focusaurus"><img src="/images/twitter_icon.png" alt="twitter" title="twitter" class="icon">twitter
+</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border:0;width:88px;height:31px" src="/images/valid_css.png" alt="Valid CSS!"></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
+</a></p></div></footer></body></html>

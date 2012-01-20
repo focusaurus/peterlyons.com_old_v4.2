@@ -1,7 +1,5 @@
-*~
-*.pyc
-*.sublime-*
-tmp
+var/log/*
+node
 node_modules
 public/js/*.js
 spec/js/**/*.js

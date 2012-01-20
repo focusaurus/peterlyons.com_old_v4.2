@@ -1,0 +1,3 @@
+So it's been almost 8 months since I quit my job at HP.  I prefer being retired and hope to return to that disposition as soon as possible. But, alas, next week I return to the world of wage-earners.  It took a long time and a lot of flip-flopping to decide between two opportunities, but I've decided to join a Boulder based development shop called [Dojo4](http://dojo4.com).  I was also considered a Boulder TechStars startup, but ultimately decided I'm not ready to dive into a startup right now.
+
+Hung out with Julia last night.  We tried the new rooftop bar at the Rex in downtown Louisville.  Nice locale.  Menu has variety but otherwise follows the Applebees/TGI Friday model.  Today I went to the farmer's market and then hiked Rabbit Mountain.

@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Tips for MongoDB Migrations in Rails | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"><meta name="author" content="Peter Lyons"><meta name="description" content="Pete Lyons, node.js coder for hire"><link rel="stylesheet" href="/screen.css"><link rel="stylesheet" href="/css/overcast/jquery-ui.css"><script src="/js/jquery.js"></script><script src="/js/jquery-ui.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><h1>Tips for MongoDB Migrations in Rails</h1><p>I wanted to share a quick and easy method for testing Rails migrations when using the MongoDB database.  The flexibility of mongo and ruby makes this pretty straightforward. In this example, we'll be renaming a field in our example "books" collection from "isbn" to "book_number". This is a pretty common type of migration and once you get the hang of this simple case, more complex migrations follow the same pattern. First, lets generate our timestamped migration script boilerplate.</p>
+
+<pre><code>rails generate migration rename_isbn_to_book_number
+</code></pre>
+
+<p>Then we'll edit the file that generated under <code>db/migrate</code>.  We'll split our code up into several sections as follows.</p>
+
+<ol>
+<li>Some class constants shared by all methods</li>
+<li>The <code>self.up</code> method that does the forward migration</li>
+<li>A helper method to set up some sample data to test forward migration</li>
+<li>The <code>self.down</code> method that does the rollback</li>
+<li>A helper method to set up some sample data (if needed) to test rollback</li>
+</ol>
+
+<p>First, just define some constants that our methods will use.  We store the mongo update options hash <code>MultiUpdate</code> for convenience since most migration update operations want upsert false (don't create any new documents), multi true (update all matching documents), and safe true.</p>
+
+<p>Then we also define a constant for the collection name.  For the real migration, the collection is "books", but for testing, we'll create a new collection called "test<em>books</em>migration" as we develop our code.</p>
+
+<pre><code>class RenameIsbnToBookNumber &lt; Mongoid::Migration
+  MultiUpdate = {:upsert =&gt; false, :multi =&gt; true, :safe=&gt;true}
+  Collection = db.collection("books") #Final production code
+  Collection = db.collection("test_books_migration") #Just for testing on the console
+  def up
+  end
+
+  def down
+  end
+end
+</code></pre>
+
+<p>OK, that's our initial boilerplate.  The next step is to take a backup of our development database if there's any data in there we don't want to accidentally wreck.  Then we start coding a little helper method to populate our test collection with fake documents resembling what we expect to see in production, but only focusing on the fields relevant to the migration. Add this method to your migration class.</p>
+
+<pre><code>def mock_data_for_testing_up
+  3.times {|number| Collection.insert({"isbn" =&gt; "#{number}"})}
+end
+
+def show_collection
+  Collection.find({}).each {|_| puts _}
+end
+</code></pre>
+
+<p>This will create 3 dummy documents we can use for testing.  We are putting this code in a method so it's easy to re-run as we tweak and test our migration code.  For complex migrations, many rounds of tweaking to get all the edge cases might be needed.</p>
+
+<p>We can now fire up a rails console and run this code by copying and pasting the 2 class constants and the mock<em>data</em>for<em>testing</em>up method into the console and then running mock<em>data</em>for<em>testing</em>up</p>
+
+<pre><code>$ bundle exec rails console
+Loading development environment (Rails 3.1.1)
+irb(main):001:0&gt; #Paste the following into the console
+MultiUpdate = {:upsert =&gt; false, :multi =&gt; true, :safe=&gt;true}
+Collection = db.collection("test_books_migration") #Just for testing on the console
+def mock_data_for_testing_up
+  3.times {|number| Collection.insert({"isbn" =&gt; "#{number}"})}
+  Collection.find({}).each {|_| puts _}
+end
+def show_collection
+  Collection.find({}).each {|_| puts _}
+end
+irb(main):008:0&gt; mock_data_for_testing_up
+mock_data_for_testing_up
+MONGODB app_development['test_books_migration'].insert([{"isbn"=&gt;"0", :_id=&gt;BSON::ObjectId('4ef5f43b2a4397a5d7000001')}])
+MONGODB app_development['test_books_migration'].insert([{"isbn"=&gt;"1", :_id=&gt;BSON::ObjectId('4ef5f43b2a4397a5d7000002')}])
+MONGODB app_development['test_books_migration'].insert([{"isbn"=&gt;"2", :_id=&gt;BSON::ObjectId('4ef5f43b2a4397a5d7000003')}])
+irb(main):009:0&gt; show_collection
+MONGODB app_development['test_books_migration'].find({})
+{"_id"=&gt;BSON::ObjectId('4ef5f3812a4397a5bd000001'), "isbn"=&gt;"0"}
+{"_id"=&gt;BSON::ObjectId('4ef5f3812a4397a5bd000002'), "isbn"=&gt;"1"}
+{"_id"=&gt;BSON::ObjectId('4ef5f3812a4397a5bd000003'), "isbn"=&gt;"2"}
+=&gt; nil
+</code></pre>
+
+<p>So now we have a separate, well-understood test collection ready to test our simple migration.  Let's code up our <code>up</code> method. To do our migration.</p>
+
+<pre><code>def up
+  #We want to rename the book.isbn field to book.book_number
+  Collection.find({"isbn" =&gt; {"$exists" =&gt; 1}}).each do |book|
+    update_op = {
+      "$unset" =&gt; {"isbn" =&gt; 1},
+      "$set" =&gt; {"book_number" =&gt; book["isbn"]}
+    }
+  Collection.update({"_id" =&gt; book["_id"]}, update_op, MultiUpdate)
+end
+</code></pre>
+
+<p>We can paste that into the console and run it to test our migration.  We can verify the results with <code>show_colletion</code>.  If we want to test other records for the rollback, we can create a <code>mock_data_for_testing_down</code> method.</p>
+
+<p>This should give you a really quick way to experiment and get your migration code working.  Mongo has some advanced query and modify capabilities that can do amazing things, and an easy way to do some trial and error is handy.  If you make a mess of your test data, you can use <code>Collection.drop</code> to get a clean slate. Here's the final migration code for reference. <strong>Don't forget</strong> to remove the test collection constant and drop the test collection from your database when your ready to start running your code for real with <code>rake db:migrate</code>.</p>
+
+<pre><code>class RenameIsbnToBookNumber &lt; Mongoid::Migration
+  MultiUpdate = {:upsert =&gt; false, :multi =&gt; true, :safe=&gt;true}
+  Collection = db.collection("books") #Final production code
+
+  def up
+    #We want to rename the book.isbn field to book.book_number
+    Collection.find({"isbn" =&gt; {"$exists" =&gt; 1}}).each do |book|
+      update_op = {
+        "$unset" =&gt; {"isbn" =&gt; 1},
+        "$set" =&gt; {"book_number" =&gt; book["isbn"]}
+      }
+      Collection.update({"_id" =&gt; book["_id"]}, update_op, MultiUpdate)
+    end
+  end
+
+  def down
+    #We want to rename the book.book_number field to book.isbn
+    Collection.find({"book_number" =&gt; {"$exists" =&gt; 1}}).each do |book|
+      update_op = {
+        "$unset" =&gt; {"book_number" =&gt; 1},
+        "$set" =&gt; {"isbn" =&gt; book["book_number"]}
+      }
+      Collection.update({"_id" =&gt; book["_id"]}, update_op, MultiUpdate)
+    end
+  end
+
+  #These methods are not called by the migration.  Just for manual testing
+  #by copy/pasting into the console
+  #To test (by copy/pasting from here to the console)
+  #1. Set the MultiUpdate constant. Adjust "Collection" to be a test collection
+  #2. Copy/paste the 2 methods below
+  #2. Run mock_data_for_testing_up
+  #3. Run the body of self.up
+  #3b. Optionally run the body of self.up again to make sure it is idempotent
+  def mock_data_for_testing_up
+    3.times {|number| Collection.insert({"isbn" =&gt; "#{number}"})}
+  end
+
+  def show_collection
+    Collection.find({}).each {|_| puts _}
+  end
+end
+</code></pre>
+<div id="disqus_thread"></div><script>var disqus_shortname = "peterlyons-problog";</script><script>/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_developer = true;
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><script type="text/javascript">
+(function() {
+
+  $(function() {
+    return $("header nav a").each(function(index, link) {
+      var $link, URI, href, parent, same;
+      $link = $(link);
+      href = $link.attr("href");
+      URI = document.location.pathname;
+      console.log(URI, href, URI.indexOf(href));
+      same = URI === href;
+      parent = URI.indexOf(href) >= 0 && href !== "/";
+      if (same || parent) {
+        return $link.addClass("current");
+      } else {
+        return $link.removeClass("current");
+      }
+    });
+  });
+
+}).call(this);
+</script></div><footer><div class="content"><nav><h1>Technology</h1><a href="/">Home</a><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav class="connect"><h1>Connect With Me</h1><a href="/problog/feed"><img src="/images/feed.png" height="24" alt="Subscribe to my Atom feed" title="Subscribe to my Atom Feed" class="icon">Subscribe
+</a><a href="http://www.linkedin.com/in/peterlyons1"><img src="/images/linkedin_icon.png" alt="LinkedIn" title="LinkedIn" class="icon">LinkedIn
+</a><a href="http://stackoverflow.com/users/266795/peter-lyons"><img src="/images/stackoverflow_icon.png" alt="stackoverflow" title="stackoverflow" class="icon">stackoverflow
+</a><a href="https://github.com/focusaurus"><img src="/images/github_icon.png" alt="github" title="github" class="icon">github
+</a><a href="https://twitter.com/#!/focusaurus"><img src="/images/twitter_icon.png" alt="twitter" title="twitter" class="icon">twitter
+</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border:0;width:88px;height:31px" src="/images/valid_css.png" alt="Valid CSS!"></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
+</a></p></div></footer></body></html>
