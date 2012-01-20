@@ -327,6 +327,9 @@ img.icon {
 .respond {
   position: fixed;
 }
+#disqus_thread li {
+  list-style-image: none;
+}
 .highlight {
   color: #b55e1a;
 }
