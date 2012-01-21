@@ -25,6 +25,7 @@
     "node-inspector": "*",
     "jasbin": "1.0.x",
     "jasmine-node": "1.0.x",
-    "mysql": "0.9.x"
+    "mysql": "0.9.x",
+    "commander": "0.5.x"
   }
 }

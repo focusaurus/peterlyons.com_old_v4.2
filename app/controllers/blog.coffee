@@ -48,7 +48,6 @@ presentPost = (post) ->
   presented = {}
   presented = _.extend presented, post
   presented.title = presented.title.trim()
-  presented.name = presented.name.trim()
   presented.date = post.publish_date.toString "MMM dd, yyyy"
   presented
 
