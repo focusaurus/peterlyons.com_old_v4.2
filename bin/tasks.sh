@@ -32,7 +32,7 @@ DEVURL="http://localhost:9400"
 PRODURL="http://${SITE}"
 REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com.git"
 BRANCH="master"
-NODE_VERSION="0.4.3"
+NODE_VERSION="0.6.7"
 PROJECT_DIR=~/projects/peterlyons.com
 OVERLAY="${PROJECT_DIR}/overlay"
 PUBLIC="${PROJECT_DIR}/public"
@@ -65,7 +65,7 @@ os:prereqs() { #TASK: sudo
     fi
     apt-get update
     cat <<EOF | grep -v "#" | sort | xargs apt-get --assume-yes install
-#Needed to download node and npm
+#Needed to download node
 curl
 #Needed to build node.js gem
 g++
@@ -78,14 +78,14 @@ make
 #For monitoring
 monit
 #For Wordpress blog
-mysql-server
-mysql-client
+#mysql-server
+#mysql-client
 #We use perl in the tasks.sh script for quick command line file editing
-perl
+#perl
 #This is our web server
 nginx
 #For Wordpress blog
-php5-cgi
+#php5-cgi
 EOF
 }
 
@@ -99,13 +99,13 @@ link() {
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
-    link "/etc/monit/conf.d/wordpress_${SITE}.monitrc"
+    #link "/etc/monit/conf.d/wordpress_${SITE}.monitrc"
     link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
     link "/etc/monit/conf.d/node_${SITE}.monitrc"
-    link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
+    #link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
     link "/etc/init/node_peterlyons.conf"
-    link "/etc/init/wordpress_peterlyons.conf"
-    cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
+    #link "/etc/init/wordpress_peterlyons.conf"
+    #cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
     cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
     initctl reload-configuration
     /etc/init.d/nginx reload
@@ -226,7 +226,11 @@ list_templates() {
     #We skip layout because it's just the layout and photos because
     #it's a dynamic page
     ls app/templates/*.{jade,md} | xargs -n 1 basename | sed -e s/\.jade// \
-        -e /layout/d -e /photos/d -e /admin_galleries/d -e s/\.md//
+        -e /layout/d \
+        -e /photos/d \
+        -e /admin_galleries/d \
+        -e /feed/d \
+        -e s/\.md//
 }
 
 
@@ -246,25 +250,25 @@ app:clone() {
 }
 
 app:prereqs() {
-    cd "${PROJECT_DIR}"
-    [ -d tmp ] || mkdir tmp
-    cd tmp
+    set -e
+    cdpd
+    [ -d var/tmp ] || mkdir var/tmp
+    cd var/tmp
     echo "Installing node.js version ${NODE_VERSION}"
+    #For older 0.4.x node versions
+    #curl --silent --remote-name \
+    #    "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
+    #For newer 0.6.x versions
+    set -x
     curl --silent --remote-name \
-        "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
+        "http://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz"
     tar xzf node-v${NODE_VERSION}.tar.gz
     cd node-v${NODE_VERSION}
-    ./configure  --prefix=~/node && make && make install && make && make install
+    ./configure  --prefix=../../../node && make install
     cd ..
     rm -rf node-*
-    cd ..
-    echo "Installing npm"
-    #Yes, I know this is a security risk.  I accept the risk. Life is short.
-    curl http://npmjs.org/install.sh | sh || exit 4
-    echo "Installing npm packages"
+    cdpd
     npm install
-    echo "Here are the installed npm packages"
-    npm ls
 }
 
 app:deploy() {
@@ -273,7 +277,12 @@ app:deploy() {
     git fetch origin --tags
     git checkout --track -b "${1-${BRANCH}}" || git checkout "${1-${BRANCH}}"
     git pull origin "${1-${BRANCH}}"
-    sudo restart node_peterlyons
+    sudo initctl reload-configuration
+    if sudo status node_peterlyons; then
+        sudo restart node_peterlyons
+    else
+        sudo start node_peterlyons
+    fi
 }
 
 app:test() {
@@ -302,14 +311,11 @@ app:test() {
 
 app:dev_start() {
     cdpd
-    kill_stale
-    env PATH=~/node/bin:./node_modules/.bin NODE_ENV=${1-development} ./node_modules/.bin/supervisor -p app/server.coffee &
-    echo "$!" > "${PID_FILE}"
-    echo "new node process started with pid $(cat ${PID_FILE})"
-    if [ $(uname) == "Darwin" ]; then
+    while true
+    do
+        coffee app/server.coffee
         sleep 1
-        #open -a "Firefox" "http://localhost:$(./node_modules/.bin/coffee bin/get_port.coffee)${1}"
-    fi
+    done
 }
 
 app:dev_stop() {
@@ -325,11 +331,11 @@ app:debug() {
 
 app:build_static() {
     echo "Generating HTML for static templated pages from ${DEVURL}..."
-    for URI in $(list_templates) leveling_up
+    for URI in $(list_templates)
     do
-        URL="${DEVURL}/${URI}"
+        local URL="${DEVURL}/${URI}"
         echo -n "${URI}, "
-        EXIT_CODE=0
+        local EXIT_CODE=0
         curl --silent "${URL}" --output \
             "${PUBLIC}/${URI}.html" || EXIT_CODE=$?
         if [ ${EXIT_CODE} -ne 0 ]; then
@@ -337,10 +343,32 @@ app:build_static() {
             exit ${EXIT_CODE}
         fi
     done
-    echo "header_boilerplate.php"
-    curl --silent "${DEVURL}/home?wordpress=1" | \
-        sed '/WORDPRESS HEADER BOILERPLATE/d' > \
-        "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
+    cdpd
+    cd app/posts
+    for JSON in $(find . -type f -name \*.json)
+    do
+        local URI="${JSON%.*}"
+        local URI=$(echo "${URI}" |cut -d . -f2-)
+        echo "Saving ${URI} to ${PUBLIC}${URI}.html"
+        local DIR=$(dirname "${URI}")
+        local DIR="${PUBLIC}${DIR}"
+        [ -e "${DIR}" ] || mkdir -p "${DIR}"
+        local URL="${DEVURL}${URI}"
+        local EXIT_CODE=0
+        curl --silent "${URL}" --output \
+            "${PUBLIC}${URI}.html" || EXIT_CODE=$?
+        if [ ${EXIT_CODE} -ne 0 ]; then
+            echo "FAILED to retrieve ${URL}"
+            exit ${EXIT_CODE}
+        fi
+    done
+    #echo "wordpress PHP integrated files:"
+    #echo "-----"
+    #curl --silent "${DEVURL}/home?wordpress=1" | \
+    #    sed '/WORDPRESS HEADER BOILERPLATE/q' | sed '$d' > \
+    #    "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
+    #cdpd
+    #coffee bin/wordpress_integrate.coffee
 }
 
 app:prod_release() {
@@ -370,6 +398,7 @@ app:prod_release() {
     git push origin develop
     git checkout master
     git push origin master
+    git push origin master --tags
     git checkout develop #Not good form to leave master checked out
     echo "Ready to go. Type     ./bin/tasks.sh production app:deploy     to push to production"
 }
@@ -419,6 +448,11 @@ app:validate() {
     else
         echo "SUCCESS: All documents successfully validated"
     fi
+}
+
+app:watch() {
+    cdpd
+    stylus -w -o public app/assets/css/screen.styl
 }
 
 if ! expr "${1}" : '.*:' > /dev/null; then

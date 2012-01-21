@@ -2,7 +2,7 @@
 
 After this class you will know a lot more about LAMP and POST and I don't mean this.
 
-<img src="/images/2011/lamp_post.jpg" alt="Lamp Post" width="200px"/>
+<img src="/images/2011/lamp_post.jpg" alt="Lamp Post" width="200"/>
 
 ##Class Materials
 
@@ -21,6 +21,7 @@ Please bring to the class:
 * Browsers and servers
 * URLs, Documents, HTML, Hyperlinks
 * HTTP, CSS, Javascript
+  * See [CSS Zen Garden](http://www.csszengarden.com/) for dramatic examples of the same HTML with vastly different CSS
 
 ## Web "Sites" Part 1
 * HTML
@@ -66,7 +67,12 @@ Please bring to the class:
     <head>
       <meta charset="utf-8" />
       <title>HTML5 boilerplate—all you really need…</title>
-      <link rel="stylesheet" type="text/css" href="screen.css" />
+      <style type="text/css"  />
+        p {
+          font-color: red;
+          font-size: 3em;
+        }
+      </style>
       <!--[if IE]>
         <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
       <![endif]-->
@@ -75,14 +81,11 @@ Please bring to the class:
     <body id="home">
 
       <h1>HTML5 boilerplate</h1>
+      <p>This is a big red paragraph</p>
 
     </body>
     </html>
 
-    p {
-      font-color: red;
-      font-size: 3em;
-    }
 
 ## Web "Sites" Part 2
 * Flash

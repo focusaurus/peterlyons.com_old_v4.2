@@ -1,0 +1,26 @@
+footer
+  .content
+    nav
+      h1 Technology
+      a(href="/problog") Blog
+      a(href="/leveling_up") Leveling Up
+      a(href="/practices") Practices
+      a(href="/code_conventions") Code Conventions
+      a(href="/stacks") Stacks
+      a(href="/career") Career
+    nav
+      h1 Projects
+      a(href="/linkzie") Linkzie
+      a(href="http://othenticate.com") Othenticate
+      a(href="/smartears") SmartEars
+      a(href="/bigclock") BigClock
+    nav
+      h1 Music
+      a(href="/bands") Bands
+      a(href="/oberlin") Oberlin
+      a(href="/favorites") Favorites
+    nav
+      h1 Personal
+      a(href="/persblog") Blog
+      a(href="http://www.flickr.com/photos/88096431@N00/") Flickr Photo Stream
+      a(href=config.appURI + "/photos") Photos (Summer 2011 and earlier)

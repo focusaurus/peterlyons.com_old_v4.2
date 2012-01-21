@@ -30,7 +30,7 @@ def main():
         value = value.replace('"', "")
         value = string.Template(value).safe_substitute(conf)
         conf[key] = value
-    
+
     URIs = ["/", "/problog", "/persblog", "/app/photos"]
     if os.path.isdir("/Users"):
         conf["WORK"] = conf["WORK"].replace("/home", "/Users")
@@ -40,7 +40,7 @@ def main():
         if pageName in ("main", "photos"):
             continue
         URIs.append("/%s.html" % pageName)
-        
+
     for URI in URIs:
         validate(conf["PRODURL"] + URI)
 

@@ -1,11 +1,15 @@
 :coffeescript
-  window.reversePhases = ->
-    phases = []
-    parent = $('div.phase').parent()
-    $('div.phase').each (index, div)->
-      $(div).remove()
-      phases.unshift $(div)
-    parent.append phase for phase in phases
+  $ ->
+   $("#reverse").click ->
+        phases = []
+        parent = $("div.phase").parent()
+        $("div.phase").each (index, div) ->
+          $(div).remove()
+          phases.unshift $(div)
+        #Make a single change to the live DOM to avoid flickers
+        tempNode = $ "<div>"
+        tempNode.append phase for phase in phases
+        parent.append tempNode.html()
 :markdown
   I have a **[traditional resume availabe in PDF format](resume.pdf)** for those
   looking for the lo-fi version.
@@ -13,7 +17,7 @@
   This page will chronicle my career in a more narrative and rich format than a
   standard resume can offer.
 
-  <a href="javascript:reversePhases();"> Click to switch between chronological and reverse chronological order.</a>
+  <p class="reverse"><a id="reverse" href="#">Click to switch between chronological and reverse chronological order.</a></p>
 
 .phase
   :markdown
@@ -21,9 +25,42 @@
 
     After 6.5 years working on enterprise software, in January 2011 I quit my
     job with HP to work on building web applications and start-up businesses.
-    You can check out a little pet project I build with Ruby on Rails and jQuery
-    over at <a target="_blank" href="https://linkzie.com">linkzie.com: A Simple
-    Bookmark Manager</a>.
+
+    Dates: January 2011-Present
+
+    ##dojo4 Project Summary
+
+    I work with [dojo4](http://dojo4.com) building Ruby on Rails web applications
+
+    ##Technologies Employed
+    * Ruby on Rails
+        * Rails 3.1 with asset pipeline
+    * MongoDB
+    * Mongoid ODM
+
+    ##Key Skills Learned
+
+    * MongoDB schemaless design. Data migrations and advanced queries with mongodb.
+    * Use of presenter and conductor patterns
+
+    ##Linkzie Project Summary
+
+    You can check out a little pet project I built with Ruby on Rails and jQuery over at <a target="_blank" href="https://linkzie.com">linkzie.com: A Simple Bookmark Manager</a>. I built Linkzie start to finish based on a simple script I built to manage my bookmarks.  I did all the design, development, deployment, and maintenance.  This was my project to get up to date with modern web development techniques.  It is a single page application with heavy javascript interactions on the client side and a lightweight JSON/REST API back end.
+
+    ##Technologies Employed
+
+    * Ruby on Rails
+    * CoffeeScript (I &hearts; CoffeeScript)
+    * JavaScript
+    * jQuery
+    * jQuery UI
+    * Jasmine
+    * PostgreSQL
+    * REST
+
+    ##Key Skills Learned
+
+    * Modern web development tools and techniques
 
 .phase
   :markdown

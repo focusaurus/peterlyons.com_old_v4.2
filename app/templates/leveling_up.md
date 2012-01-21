@@ -62,9 +62,8 @@ Worried about your job going overseas? Again, make yourself valuable to the busi
 
 Software developers are paid a very wide range of salaries. The high end of base salary is easily five times the entry-level salary. Steve McConnell, author of Code Complete and an advocate of the 10x productivity notion, has [this interesting blog post on compensation](http://forums.construx.com/blogs/stevemcc/archive/2011/01/22/10x-productivity-myths-where-s-the-10x-difference-in-compensation.aspx).
 
-<a name="pillar1"></a>
 
-# Pillar #1: Technical Competence
+<h1 id="pillar1">Pillar #1: Technical Competence</h1>
 
 Surely technical competence and the ability to do your job better than your peers is fundamental to career advancement, right? Well, this may come as a surprise to you, but technical competence is NOT the most important factor. [Pillar #2, Communication](#pillar2), is by far the most important factor in how quickly you can advance your career. I'm discussing technical competence first only out of conceptual simplicity and to get these basic points covered so we can then focus on the second and third pillars, which are where all the magic lies.
 
@@ -141,7 +140,7 @@ There are almost no scenarios where basic (well, intermediate really) familiarit
 
 ## TCP/IP
 
-Get and read a good book on networking with TCP/IP. The canonical work is [TCP/IP Illustrated](http://www.amazon.com/TCP-Illustrated-Vol-Addison-Wesley-Professional/dp/0201633469). I also found the training material for a Cisco Certified Network Associate (CCNA) to be fantastic. I used Todd Lammle's [CCNA Study Guide](http://www.amazon.com/CCNA-Cisco-Certified-Network-Associate/dp/0782141676), which comes with network simulation software so you can cable up switches and routers, edit their configurations, and see if things work properly. 
+Get and read a good book on networking with TCP/IP. The canonical work is [TCP/IP Illustrated](http://www.amazon.com/TCP-Illustrated-Vol-Addison-Wesley-Professional/dp/0201633469). I also found the training material for a Cisco Certified Network Associate (CCNA) to be fantastic. I used Todd Lammle's [CCNA Study Guide](http://www.amazon.com/CCNA-Cisco-Certified-Network-Associate/dp/0782141676), which comes with network simulation software so you can cable up switches and routers, edit their configurations, and see if things work properly.
 A solid understanding of TCP/IP information is incredibly important. This is pretty much the only single technical topic where every last bit of knowledge depth I have gained has paid dividends in the real world. It's very easy in technical topics to go overboard with knowledge and skill in most areas: for instance, how useful is my knowledge of the low-level details of how x86 PCs format and address hard drives? For practical applications, this information is essentially useless. However, TCP/IP is different. It's everywhere and you can get real benefits from gaining a deeper than average understanding.
 
 Here are the key points you should understand
@@ -178,9 +177,7 @@ In many large organizations, expert specialists are hired into different groups 
 
 Periodically step back and take an analytical look at the state of the company. Are the processes and tools working effictively?  What are the pain points and problems you might be able to improve. Find something that is not working and take on a small side project to get it fixed. When doing this, it is best to follow through on your own initiative as opposed to asking for permission beforehand. For example, in the early days of Opsware we had no good collaboration tool beyond email. Our consultants were discovering complex processes that we needed to share with each other effectively. Email is not a good tool for this. So one of our consultants took it upon himself to install and configure a MoinMoin wiki we could use to collaborate on technical documents and projects. He had it up and running before he even mentioned it to management. The wiki quickly became one of the company's most valuable IT assets and completely mission critical. This is still true seven years later. Many times this type of project  doesn't require that much work. Perhaps a weekend of research and configuration and little or no coding. However, this can have a large long-term positive impact on the business, which will get noticed and appreciated by attentive management.
 
-<a name="pillar2"></a>
-
-# Pillar #2: Professional Communication
+<h1 id="pillar2">Pillar #2: Professional Communication</h1>
 
 I made communication the second pillar so that we could quickly get the technical stuff out of the way before diving into the heart of the issue. Really, communication is what it is all about. This is what distinguishes the developers that go from entry-level to top-level posts in five years instead of twenty years (or never). So here's the magic of this guide. Communication is the single biggest factor in your success, and it's also the easiest to improve in leaps and bounds. Pay close attention to the information here: it has the potential to gain you tens of thousands of extra dollars in salary and benefits on an accelerated schedule. As we go over the various tactics for improving communication, you will see that they are straightforward and not at all difficult.
 
@@ -218,13 +215,13 @@ Here's an example of my response to an annoyed user at my college. This was from
     shouldn't you just buy more lines rather than attempt to dictate the
     importance of one application over another (such as surfing the web over AIM
     or RealPlayer)?
-    
+
     John Doe
 
 Here is the reply I sent.
 
     John,
-    
+
     CIT is aware of the many problems we are having with our network this
     year and we are working hard to keep all network services usable while we
     wait for more bandwidth to be installed. We are in the process of
@@ -238,7 +235,7 @@ Here is the reply I sent.
     software virtually crippled the network in the fall.
 
     Hang in there,
-    
+
     Peter Lyons
     Help Desk Consultant
 
@@ -256,17 +253,17 @@ Every time your name gets specifically mentioned amongst management in a positiv
 When you have resolved a high-profile issue, you will want to send out a status email to let the interested parties know that the issue is resolved (and that it was resolved by you). It's very important that you deliver this information in two distinct sections. First, write a very brief non-technical executive summary of what the problem was and how it was solved. Do not use any technical jargon in this section. Next, in a clearly differentiated section, you may offer a further level of technical detail. Here's an example from my career.
 
     John,
-    
+
     Last night we discovered an issue preventing transaction processing in the
     Ohio facility. We were able to investigate and resolve the issue within 90
     minutes. The transaction processor was caught up to schedule again by
     4:30am. We have added a monitoring script to provide early warning should
     the situation occur. Technical details are below.
-    
+
     Pete
-    
+
     Technical Details:
-    
+
     The /var file system on tp904.oh.example.com filled up. This caused the
     transaction processor to exit. We freed up space by moving archived log
     files to the SAN storage. We ran an integrity check on the transaction files
@@ -274,7 +271,7 @@ When you have resolved a high-profile issue, you will want to send out a status 
     processor and verified that it was able to process all transactions and get
     caught up. We added an OpenView alert script for all transaction hosts to
     warn if /var becomes more than 85% full.
-    
+
 #### Sample #2 of two-part email format
 
 <img src="/images/2011/root_cause_email_redacted.png" alt="Example root cause analysis email" />
@@ -303,11 +300,9 @@ You might think the previous points about using corporate speak and being profes
 
 When a company is paying you a salary, you need to be aware that you always represent that company even in your after-work private life. It isn't OK to hit the bar with your buddies and loudly badmouth your employer. These things get overheard and repeated, especially given the omnipresence of numerous communication devices. Before you've finished your rant about how your employer's expense policies are ridiculous, it could have been tweeted by someone who has overheard you. If you really must vent to someone, do it privately in your own home to your spouse or significant other, and limit it to that. Ignoring this advice is an easy (and stupid) way to get immediately put at the bottom of the list for a promotion. Also, never assume that because someone is a stranger or works in an entirely different industry that you can badmouth your employer to them and no harm will come of it. It's a small world and now everyone is highly connected via Facebook and LinkedIn. Word travels fast.
 
-<a name="pillar3"></a>
+<h1 id="pillar3">Pillar #3: Getting Credit for What You Do</h1>
 
-# Pillar #3: Getting Credit for What You Do
-
-This is another piece of advice that is so easy to implement that you wouldn't think that it can make you tens of thousands of extra dollars, but it can and it has. So listen up: it's a sad state of affairs but the truth is you can appear as significantly more productive (and therefore more valuable) than your peers even if you are doing equivalent or even inferior work. How can that be? It's easy. No one except you is properly motivated to track your own work and productivity, and most people by default do a lousy job of it if they even make an attempt. 
+This is another piece of advice that is so easy to implement that you wouldn't think that it can make you tens of thousands of extra dollars, but it can and it has. So listen up: it's a sad state of affairs but the truth is you can appear as significantly more productive (and therefore more valuable) than your peers even if you are doing equivalent or even inferior work. How can that be? It's easy. No one except you is properly motivated to track your own work and productivity, and most people by default do a lousy job of it if they even make an attempt.
 It's a trivial job to keep track of what you do, get credit for it, and look like an absolute rock star. There are plenty of bright and productive developers out there who operate in a state of perpetual deadline panic and never keep track of what they are doing. Thus when performance reviews roll around, they struggle to put together three or four bullet points to describe the major deliverables they worked on over the past year. In addition, while many people do work that is not strictly part of their job description such as helping train new employees, they write it off as "one-off" work because it is not properly tracked; however, over time it tends to actually add up to a significant amount of time and effort.
 
 Here's a simple technique to ensure everything you do for your company is tracked, which allows you to get credit for it and be properly rewarded. The basic points are:
@@ -324,7 +319,7 @@ Don't skip this one. This is a simple technique that can make a huge difference.
 
     Tue Nov 08 14:20:00 EST 2005
     -curriour IMAP has a short shell script that goes with it
-    
+
     Tue Nov 08 14:23:06 EST 2005
     -when a shadowbot starts, it looks in /var/lc/crypto/shadowbotname/onefile.srv (public/private key pair for that comp
     onent)
@@ -332,24 +327,24 @@ Don't skip this one. This is a simple technique that can make a huge difference.
     -it will also load one or more .crt files
     -shadowbot also has client side validation
     -the client's certificate must have been signed by one of the .crt file's CA
-    
+
     Tue Nov 08 14:30:01 EST 2005
     -certmaster code that the client should be validating the server it is commented out
     -look up the bug on this SAMPL00016632
-    
+
     Tue Nov 08 14:52:22 EST 2005
     -jay thinks spin.cogbot.crypto.validity.period can be customized in the spin.args
     (14:54:16) jay: spin.cogbot.crypto_validity_period
-    
+
     Tue Nov 08 14:55:17 EST 2005
     -wow, this is settable in the OCC
-    
+
     Tue Nov 08 17:14:09 EST 2005
     -great email from Jay
     First of all, try looking on your system (in the openssl dirs) for  CA.pl. That's where I ripped most of this from:
-    
+
     You can make the root CA like this:
-    
+
     mkdir rootCA
     cd root CA
     mkdir demoCA
@@ -358,44 +353,44 @@ Don't skip this one. This is a simple technique that can make a huge difference.
     mkdir demoCA/newcerts
     mkdir demoCA/private
     touch demoCA/index.txt
-    
+
     printf "US\nNC\nCary\nOpsware Inc\nEngineering\nroot-ca\n\n" | \
     openssl req -new -nodes -x509 \
     -keyout demoCA/private/root-ca.key \
     -out demoCA/root-ca.crt
-    
+
     openssl x509 -in demoCA/root-ca.crt -noout -next_serial -out demoCA/ serial
-    
+
     You make a CSR for your agent CA like this:
-    
+
     printf "US\nNC\nCary\nOpsware Inc\nEngineering\nagent-ca\n\n\n\n" | \
     openssl req -new -nodes -keyout agent-ca.key -out agent-ca.csr
-    
+
     ...<SNIP>....
     Tue Jan 03 13:51:45 EST 2006
     -TASK: XXXX Delegated Administration
     -WIKI SUMMARY: Call with John Doe on twist calls for Delegated Admin
-    
+
     Tue Jan 03 14:35:56 EST 2006
     -converted the LDAP SSL certificate to pem format thusly:
     openssl x509 -inform DER -outform PEM -in /cust/proserve/B1LDAP-DEV.DER.cer -out /cust/proserve/B1LDAP-DEV.pem
-    
+
     Tue Jan 03 14:38:27 EST 2006
     -OK, great. Got UserFacade.createExternalUser() working.
-    
+
     Tue Jan 03 16:05:55 EST 2006
     -WIKI SUMMARY: XXXX ISMTool call with Product Management
     -TASK: XXXX CE
     -WIKI SUMMARY: XXXX Date Status call
-    
+
     Tue Jan 03 17:27:39 EST 2006
     U035792 is bala's EID
-    
+
     Tue Jan 03 17:49:09 EST 2006
     -admin role in aaa is ID 1710777
-    
+
     SQL> select user_id, username from aaa.aaa_user where username='admin';
-    
+
        USER_ID
     ----------
     USERNAME
@@ -438,12 +433,12 @@ For years I used a simple section at the top of my journal file to manage my sho
     [+]This is a task I have already completed
     [.]This is a task I have started but not completed
     []This is a task I intend to complete today
-    
+
     ---------------------------------
     |TODO SOON|
     ---------------------------------
     []These tasks should be done in the next few days
-    
+
     ---------------------------------
     |TODO LATER|
     ---------------------------------
@@ -474,7 +469,7 @@ A quick note here on pulling an all-nighter. All-nighters are not good. Generall
 
 ## Performance Evaluations
 
-Larger companies typically have formalized review processes every six or twelve months. These form the basis of salary and promotion decisions. Nailing your performance review is absolutely critical to getting those raises and promotions as soon as possible. Sadly, many people treat reviews as a nuisance of a bureaucratic red tape process, to be slogged through like so many TPS reports. And sadly for them, they miss a big opportunity. But gladly for you, with the advice in this guide, you will ace your reviews and go home with a bigger pay check. 
+Larger companies typically have formalized review processes every six or twelve months. These form the basis of salary and promotion decisions. Nailing your performance review is absolutely critical to getting those raises and promotions as soon as possible. Sadly, many people treat reviews as a nuisance of a bureaucratic red tape process, to be slogged through like so many TPS reports. And sadly for them, they miss a big opportunity. But gladly for you, with the advice in this guide, you will ace your reviews and go home with a bigger pay check.
 Don't make the mistake of writing this process off. It's important and the level of effort you put into your part of it can easily make the difference between getting a $4,000 raise and getting a $24,000 raise. With that in mind, plan to spend at least half a day, if not more, working exclusively on preparing material for your performance review. When that time comes around, this is priority number one. Any other urgent issues and emails can wait. This is how you get paid, so allocate the time and get it right.
 
 You want to prepare a document (again HTML email is strongly encouraged here) that you will send to your managers. This document should summarize your accomplishments and business impact since the previous performance review, or since your hire date if this is your first review. This document should include the following:
@@ -493,7 +488,7 @@ You want to prepare a document (again HTML email is strongly encouraged here) th
 * How YOU want to have things be in the future
     * This is crucial. This is your chance to state your desires and intentions.
     * Just come right out with it. If you want to be a team lead within the next 3 months, say so. If you want to work from home on Fridays, this is the place to state that.
-    
+
 During the review your manager will likely have a basic agenda already set. There will be a slot on this agenda for you to review your work from the previous period and talk about your goals for your career. This is your chance to shine. Review your document verbally, adding additional details and color as needed.
 
 There will be one or more standard forms that need to be filled in. Don't let the format of your company's standard document constrain you. Create your own document using the format above or some variation that expresses exactly what you want and exactly how you want to achieve it. You can then take the raw content from your custom document and copy/paste it into your company's standard document as needed. For reference, [here is a sample PDF form of a typical annual performance review template](https://service.govdelivery.com/service/edition.html?edition_id=5534).
@@ -513,15 +508,13 @@ You should personally archive your performance review materials and have your ow
 * Clearly articulate your short- and long-term career and lifestyle goals.
 * Be a negotiator. Sometimes a manager's ability to increase your salary is strictly limited by policy. Ask instead for more vacation, more flexible working conditions, or any other non-monetary benefit you feel you have earned.
 
-
 ## Notes on Changing Companies
 
 Most successful careers involve working for at least several different companies.  Just a few quick tips here.  Plan on changing companies as appropriate just maybe one or two times when the opportunity feels very compelling and the improved benefits are significant.  Be aware that frequent moving from company to company can be a major red flag to hiring departments that you are disloyal.  So just be aware of that as you are considering your options and think about the big picture.  Expectations vary by industry and company size here as well.  When the time is right, changing companies can get you a big salary increase ahead of schedule.  Of course, this is all part of "the game".  At the end of the day, you want to be enjoying your work and feeling fulfilled and inspired, and that matters more than the money.  These decisions are tough.  Consult your friends and family.  Don't get trapped in a rut in a bad job for a long time, and don't get in the habit of quitting every ten months.  Find that good middle ground that feels right for you.
 
-
 # About the Author
 
-Peter Lyons has worked as a software developer and technology consultant since 2001. His career is detailed [on his web site at http://peterlyons.com/career.html](http://peterlyons.com/career.html). He has worked at small (30 or fewer employees), medium (500 employees), and large (10s or 100s of thousands of employees) companies and consulted at many Fortune 500 businesses. As he learnt the skills described in this article, he was able to advance his career rapidly. Of course, if he had known at the beginning what he knows now, things might have advanced even more quickly.
+Peter Lyons has worked as a software developer and technology consultant since 2001. His career is detailed [his career page](/career). He has worked at small (30 or fewer employees), medium (500 employees), and large (10s or 100s of thousands of employees) companies and consulted at many Fortune 500 businesses. As he learnt the skills described in this article, he was able to advance his career rapidly. Of course, if he had known at the beginning what he knows now, things might have advanced even more quickly.
 
 ## Exhibit A: Salary Chart
 
@@ -532,4 +525,3 @@ If you are uncertain about the veracity or value of the tips in this article, I 
 # Comments
 
 Please share your responses to this article on my [blog post for this article](/problog/2011/05/leveling-up).
-

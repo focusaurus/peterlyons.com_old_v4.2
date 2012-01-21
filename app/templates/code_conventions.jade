@@ -1,4 +1,5 @@
 :markdown
+  # Code conventions
   This page will document conventions I use when writing computer code.
   Hopefully folks will find them helpful. I will try to explain the reasoning
   behind each convention clearly. I have found the rationale omitted from many
@@ -206,6 +207,19 @@
 
     * I exclusively use double quotes and curly braces when referencing variables: `"${MY_VAR}"`. This can avoid bugs when the value has embedded spaces. In certain circumstances you will need to omit the double quotes to get the correct behavior, but this will usually behave properly and handle values with spaces properly. (Make One Choice)
     * I use `UPPER_CASE_WITH_UNDERSCORES` for all variable names because that seems to be the clear convention.
+
+  # Ruby Conventions
+
+    * Prefer double quotes for most strings. Ruby allows either, but we should just pick one that we use primarily. Double quotes makes switching between java/c/python/ruby/coffeescript easier and allows embedding apostrophes, which is probably slightly more common than needing to embed double quotes. Interpolation is also supported. If your string literal needs to contain double quotes, use single quotes.
+    * Prefer string interpolation to building up strings with operators
+
+  # CoffeeScript Conventions
+
+    * Prefer double quotes for most strings. CoffeeScript allows either, but we should just pick one that we use primarily. Double quotes makes switching between java/c/python/ruby/coffeescript easier and allows embedding apostrophes, which is probably slightly more common than needing to embed double quotes. If your string literal needs to contain double quotes, use single quotes.  Since CoffeeScript is compiled to javascript, there's no performance implication, but even in Ruby, it doesn't seem to matter.
+    * Prefer string interpolation to building up strings with operators
+    * Make liberal use of array literals with one item per line and no commas
+    * Omit parentheses for function definitions that take no arguments
+    * I personally don't like a space after a function argument list like this: <code>someFunc = (one, two) -&gt;</code>, but Jeremy Ashkenas seems to like it, so go with it.
 
   # Comments
 

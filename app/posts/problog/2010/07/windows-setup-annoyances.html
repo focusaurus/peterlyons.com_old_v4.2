@@ -1,0 +1,25 @@
+<p>
+So I do a lot of work with automated unattended intallations of Operating Systems, including Windows.  Here's some of my primary complaints about the new Windows setup program in Windows Server 2008.
+</p>
+<ol>
+<li>No good way to validate the unnatend.xml file.  Now Microsoft does provide tools to help generate these files, and hopefully any file you generate with those (graphical, Windows-only) tools should be at least well-formed and semantically valid.  However, there's no way to do a deeper validation that a given XML file is compatible with a particular target machine.
+</li>
+<li>
+The unattend.xml encodes the processor architecture all over the place for no reason.  I have to do a search and replace of <code>processorArchitecture="x86"</code> with <code>processorArchitecture="amd64"</code> in every <code>component</code> tag.  There's pretty much zero information in most unattend.xml files that's CPU architecture specific anyway.  This is a real nuisance.  I should be able to use the exact same file on x86 and amd64 without issues.
+</li>
+<li>
+Setup doesn't do the simple but important hardware compatibility validation that would make users' lives easier. For example, neither winpe nor windows setup with complain if the target system has insufficient RAM.  WinPE will just behave very oddly and things won't work.  There's no checking for sufficient disk space ahead of time or that the disk layout is feasible.  There's no checking for suitable network or storage drivers.  When you don't have viable storage drivers, you just reboot out of WinPE into a lovely Blue Screen of Death <code>0x7b</code> stop error. Hurray!  Similarly, no one at MS seems to care if you don't have a working NIC driver.  The OS has the word "Server" in it.  You need a network driver or your OS is in a useless void.
+</li>
+<li>
+The fact that windows setup reboots into an environment with zero networking and zero third party applications allowed is just a mind-boggling recipe for end user frustration.  We have to resort to brute time out calculation to even know whether the Windows install worked or not.  We can't provide a good user experience to people looking to do UNATTENDED installs.
+</li>
+<li>
+Another one in the "we have no idea what unattended means" even though our configuration file is called "unattend.xml" department: STOP PRESENTING GUI DIALOGS.  There are many issues that unattend.xml supposedly allows a <code>showGui="never"</code> but in my experience they either have no effect (GUI displays and halts the install anyway) or they just flat out break the install.  Microsoft just doesn't "get it" here.  Any automated install isn't a fully attended graphical install rejiggered to try not to pop up a GUI.  It's an entirely different use case.  Get it through your thick skull: NO ONE IS LOOKING AT THE CONSOLE. THESE ARE SERVERS. THE INSTALL IS BEING DRIVER AUTOMATICALLY BY SOFTWARE. NEVER EVER SHOW A GUI.
+</li>
+<li>
+Same category of cluelessness. Windows setup doesn't return a non-zero exit code on failure. Duh.  I'm aware of some other mechanisms like <code>setupcomplete.cmd</code> that MS claims to provide for this, but from what I can tell after several attempts, they simply don't work.
+</li>
+<li>
+The log files and error messages are just a mess.  And I'm not even talking about obscure edge case failures.  Simple things like an invalid product key or computer name can create weird mysterious failures and behavior.
+</li>
+</ol>
