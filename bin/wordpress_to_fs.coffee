@@ -30,7 +30,7 @@ savePost = (post, next) ->
 
 saveMetadata = (post, next) ->
   filePath = path.join post.base, post.metadataPath()
-  fs.writeFile filePath, JSON.stringify(post.metadata()), "utf8", (error) ->
+  fs.writeFile filePath, JSON.stringify(post.metadata()) + "\n", "utf8", (error) ->
     console.log "Saved metadata at", filePath
     next error, post
 

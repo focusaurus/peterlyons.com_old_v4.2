@@ -252,14 +252,13 @@ app:clone() {
 app:prereqs() {
     set -e
     cdpd
-    [ -d var/tmp ] || mkdir var/tmp
+    [ -d var/tmp ] || mkdir -p var/tmp
     cd var/tmp
     echo "Installing node.js version ${NODE_VERSION}"
     #For older 0.4.x node versions
     #curl --silent --remote-name \
     #    "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
     #For newer 0.6.x versions
-    set -x
     curl --silent --remote-name \
         "http://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz"
     tar xzf node-v${NODE_VERSION}.tar.gz
