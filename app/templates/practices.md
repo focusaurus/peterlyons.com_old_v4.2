@@ -78,6 +78,6 @@ See also my [code conventions](/code_conventions)
 * Clear development, staging, production environments from day one
 * Staging means production minus users
 * Should be able to rebuild entire app infrastructure with code and docs in the main source code repository
-* Git Flow branch management structure
-* Semantic Versioning
-* Modified 12-Factor principles
+* [Git Flow](http://nvie.com/posts/a-successful-git-branching-model/) branch management structure
+* [Semantic Versioning](http://semver.org/)
+* Modified [12-Factor](http://www.12factor.net/) principles
