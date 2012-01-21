@@ -5,8 +5,13 @@ asyncjs = require "asyncjs"
 markdown = require("markdown-js").makeHtml
 
 leadZero = (value) -> if value > 9 then "#{value}" else "0#{value}"
+slug = (phrase="") ->
+  phrase.replace(/\s/g, "-").replace(/'/g, "").replace(/\./g, "-").toLowerCase()
 
 class Post
+  constructor: (@blog, @title, @publish_date, @format) ->
+    @name = slug(@title)
+
   metadata: =>
     publish_date: @publish_date
     name: @name
@@ -65,4 +70,5 @@ class Post
       next()
     .end (error) ->
       callback error
+
 module.exports = {Post, leadZero}

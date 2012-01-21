@@ -81,7 +81,7 @@ monit
 #mysql-server
 #mysql-client
 #We use perl in the tasks.sh script for quick command line file editing
-#perl
+perl
 #This is our web server
 nginx
 #For Wordpress blog
@@ -252,14 +252,13 @@ app:clone() {
 app:prereqs() {
     set -e
     cdpd
-    [ -d var/tmp ] || mkdir var/tmp
+    [ -d var/tmp ] || mkdir -p var/tmp
     cd var/tmp
     echo "Installing node.js version ${NODE_VERSION}"
     #For older 0.4.x node versions
     #curl --silent --remote-name \
     #    "http://nodejs.org/dist/node-v${NODE_VERSION}.tar.gz"
     #For newer 0.6.x versions
-    set -x
     curl --silent --remote-name \
         "http://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz"
     tar xzf node-v${NODE_VERSION}.tar.gz
@@ -398,6 +397,7 @@ app:prod_release() {
     git push origin develop
     git checkout master
     git push origin master
+    git push origin master --tags
     git checkout develop #Not good form to leave master checked out
     echo "Ready to go. Type     ./bin/tasks.sh production app:deploy     to push to production"
 }
@@ -452,6 +452,14 @@ app:validate() {
 app:watch() {
     cdpd
     stylus -w -o public app/assets/css/screen.styl
+}
+
+app:html_to_md() {
+    local HTML="${1}"
+    local MD=$(echo "${1}" | sed -e 's/\.html$/.md/')
+    local JSON=$(echo "${1}" | sed -e 's/\.html$/.json/')
+    git mv "${HTML}" "${MD}"
+    perl -pi -e 's/"html"/"md"/' "${JSON}"
 }
 
 if ! expr "${1}" : '.*:' > /dev/null; then
