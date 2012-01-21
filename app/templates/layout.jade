@@ -71,6 +71,7 @@ html(lang="en")
         h1= post.title
       !{body}
       if post
+        a.button(href="/" + post.blog) back to blog index
         #disqus_thread
         != '<script>var disqus_shortname = "peterlyons-' + post.blog + '";</script>'
         script

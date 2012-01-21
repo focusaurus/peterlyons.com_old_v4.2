@@ -24,6 +24,7 @@ code,
 del,
 dfn,
 em,
+font,
 img,
 ins,
 kbd,
@@ -121,7 +122,8 @@ a {
   font-weight: bold;
   text-decoration: none;
 }
-a.button {
+a.button,
+button {
   display: inline-block;
   font-weight: bold;
   margin: 5px 0;

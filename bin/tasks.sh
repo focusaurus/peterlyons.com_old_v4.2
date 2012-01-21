@@ -81,7 +81,7 @@ monit
 #mysql-server
 #mysql-client
 #We use perl in the tasks.sh script for quick command line file editing
-#perl
+perl
 #This is our web server
 nginx
 #For Wordpress blog
@@ -452,6 +452,14 @@ app:validate() {
 app:watch() {
     cdpd
     stylus -w -o public app/assets/css/screen.styl
+}
+
+app:html_to_md() {
+    local HTML="${1}"
+    local MD=$(echo "${1}" | sed -e 's/\.html$/.md/')
+    local JSON=$(echo "${1}" | sed -e 's/\.html$/.json/')
+    git mv "${HTML}" "${MD}"
+    perl -pi -e 's/"html"/"md"/' "${JSON}"
 }
 
 if ! expr "${1}" : '.*:' > /dev/null; then
