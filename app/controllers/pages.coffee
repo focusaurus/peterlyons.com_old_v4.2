@@ -11,6 +11,7 @@ class Page
       @locals.title = @locals.title + " | Peter Lyons"
     test = req.param "test"
     if test
+      @locals.test = true
       @locals.specURIs = @specs
       @locals.specURIs.start = (test is "start")
     req.res.render @view, {locals: @locals}
