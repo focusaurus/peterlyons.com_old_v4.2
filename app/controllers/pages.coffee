@@ -10,6 +10,7 @@ class Page
     if @locals.title? and @locals.title.indexOf("Peter Lyons") < 0
       @locals.title = @locals.title + " | Peter Lyons"
     test = req.param "test"
+    @locals.test = false
     if test
       @locals.test = true
       @locals.specURIs = @specs
