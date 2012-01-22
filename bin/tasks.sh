@@ -285,27 +285,22 @@ app:deploy() {
 }
 
 app:test() {
-  cdpd
-  for spec in spec/js/unit/*Spec.coffee
-  do
-    echo "${spec}"
-    local exitCode=0
-    ./node_modules/.bin/jasbin "${spec}" || exitCode=$?
-    if [ $exitCode -ne 0 ]; then
-      echo "${spec} FAILED. Stopping tests."
-      exit $exitCode
+    cdpd
+    local EXIT_CODE=0
+    mocha test/**/*.coffee || EXIT_CODE=$?
+    if [ ${EXIT_CODE} -ne 0 ]; then
+      exit $EXIT_CODE
     fi
-  done
-  ./node_modules/.bin/coffee -c bin
-  exitCode=0
-  phantomjs ./bin/phantom_tests.js || exitCode=$?
-  rm ./bin/phantom_tests.js
-  if [ $exitCode -eq 0 ]; then
+    ./node_modules/.bin/coffee -c bin
+    EXIT_CODE=0
+    phantomjs ./bin/phantom_tests.js || EXIT_CODE=$?
+    rm ./bin/phantom_tests.js
+    if [ $EXIT_CODE -eq 0 ]; then
       echo "YAY"
-  else
+    else
       echo "BOO"
-      exit $exitCode
-  fi
+      exit $EXIT_CODE
+    fi
 }
 
 app:dev_start() {
