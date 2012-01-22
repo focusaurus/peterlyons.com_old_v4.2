@@ -25,6 +25,9 @@
     "node-inspector": "*",
     "commander": "0.5.x",
     "mocha": "0.10.x",
-    "should": "0.5.x"
+    "should": "0.5.x",
+    "chai": "0.1.x",
+    "superagent": "0.2.x",
+    "jsdom": "0.2.x"
   }
 }

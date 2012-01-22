@@ -287,7 +287,7 @@ app:deploy() {
 app:test() {
     cdpd
     local EXIT_CODE=0
-    mocha test/**/*.coffee || EXIT_CODE=$?
+    mocha test/unit/*.coffee || EXIT_CODE=$?
     if [ ${EXIT_CODE} -ne 0 ]; then
       exit $EXIT_CODE
     fi
