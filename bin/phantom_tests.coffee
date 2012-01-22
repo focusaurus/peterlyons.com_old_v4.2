@@ -26,7 +26,7 @@ runJasmine = ->
     else if result.failedCount == 0
       label = 'passed'
     else
-      label = 'FAILED' 
+      label = 'FAILED'
       marker = '*'
     return "#{marker}#{indent}#{description}: #{label} " + \
       "(#{result.passedCount} pass/#{result.failedCount} fail)\n"
@@ -95,7 +95,9 @@ pagesToTest.map (URI) ->
   actions.push new Test(baseURL + URI + '?test=1', jasmineWrapper)
 
 window.interact page, actions, verbose, ->
-  if failureCount == 0
+  if failureCount is NaN
+    failureCount = 0
+  if failureCount is 0
     console.log "all tests passed"
   else
     console.log "*** #{failureCount} TESTS FAILED ***"

@@ -34,5 +34,5 @@ switch process.env.NODE_ENV
     exports.baseURL = "http://#{exports.site}"
     exports.loopback = true
     exports.photos.serveDirect = false
-  when "development", "test"
+  else
     exports.tests = true
