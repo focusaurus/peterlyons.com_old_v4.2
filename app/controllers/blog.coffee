@@ -11,7 +11,7 @@ util = require "util"
 cache = {}
 
 class PostPage extends pages.Page
-  constructor: (@post, @locals={}) ->
+  constructor: (@post, @locals={}, @specs=[]) ->
     @view = @post.viewPath()
     @locals.title = @post.title
     @locals.post = @post

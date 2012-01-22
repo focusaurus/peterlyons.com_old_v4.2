@@ -7,10 +7,13 @@ class Page
       @view = "#{@view}.jade"
 
   render: (req) =>
-    test = false #req.param "test"
+    if @locals.title? and @locals.title.indexOf("Peter Lyons") < 0
+      @locals.title = @locals.title + " | Peter Lyons"
+    test = req.param "test"
     if test
+      @locals.test = true
       @locals.specURIs = @specs
-      @locals.specURIs.start = test is start
+      @locals.specURIs.start = (test is "start")
     req.res.render @view, {locals: @locals}
 
 pages = []
@@ -32,7 +35,7 @@ page "leveling_up.md", "Leveling Up: Career Advancement for Software Developers"
 page "web_prog.md", "Web Programming Concepts for Non-Programmers"
 page "practices.md", "Practices and Values"
 page "stacks.md", "Technology Stacks"
-homePage = new Page 'home', pages[0].locals.title, {}, pages[0].specs
+homePage = new Page 'home', {title: pages[0].locals.title}, pages[0].specs
 homePage.URI = ''
 pages.push homePage
 
