@@ -6,10 +6,7 @@ gallery = require '../models/gallery'
 defaultLocals =
   config: config
   title: ''
-  partials: []
-  wordpress: false
-  specURIs: []
-  testCSS: []
+  test: false
 
 exports.getGalleries = (callback) ->
   fs.readFile config.photos.galleryDataPath, (error, data) ->

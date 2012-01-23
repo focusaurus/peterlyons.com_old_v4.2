@@ -1,5 +1,7 @@
-request = require "superagent"
 config = require "../../config"
+request = require "superagent"
+expect = require("chai").expect
+
 describe 'smoke tests for most pages on the site', ->
 
   testConfigs = [
@@ -22,6 +24,7 @@ describe 'smoke tests for most pages on the site', ->
     ["/problog", /Pete's Points/]
     ["/persblog", /travel/]
     ["/app/photos", /Gallery/]
+    #BUGBUG debug this#["/app/photos?gallery=jacksonville_2008&photo=012_matthew_the_kitten", /Matthew/]
     ["/problog/2009/03/announcing-petes-points", /professional/]
     ["/persblog/2007/10/petes-travel-adventure-2007-begins-friday-october-5th", /Alitalia/]
   ]
@@ -30,30 +33,7 @@ describe 'smoke tests for most pages on the site', ->
     makeTest = (test) ->
       it "#{test[0]} should match #{test[1]}", (done) ->
         request.get config.baseURL + test[0], (res) ->
-          res.status.should.equal 200
-          res.text.should.match test[1]
+          expect(res.status).to.equal 200
+          expect(res.text).match test[1]
           done()
     makeTest test
-
-describe "in-page test integration", ->
-  it "should include the test libraries and init code", (done) ->
-    request.get config.baseURL + "?test=start", (res) ->
-      res.status.should.equal 200
-      #res.text.should.match /mocha\.js/
-      #res.text.should.match /mocha\.css/
-      #res.text.should.match /chai\.js/
-      done()
-
-describe "the main layout", ->
-  text = null
-  before (done) ->
-    request.get config.baseURL, (res) ->
-      text = res.text
-      done()
-  it "should have the google fonts", (done) ->
-    text.should.match /fonts\.googleapis\.com/
-    done()
-
-  it "should have the footer", (done) ->
-    text.should.match /<footer>/i
-    done()
