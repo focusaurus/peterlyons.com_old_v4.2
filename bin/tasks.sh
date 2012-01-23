@@ -291,6 +291,10 @@ app:test() {
     if [ ${EXIT_CODE} -ne 0 ]; then
       exit $EXIT_CODE
     fi
+    mocha test/application/SmokeTests.coffee || EXIT_CODE=$?
+    if [ ${EXIT_CODE} -ne 0 ]; then
+      exit $EXIT_CODE
+    fi
     ./node_modules/.bin/coffee -c bin
     EXIT_CODE=0
     phantomjs ./bin/phantom_tests.js || EXIT_CODE=$?

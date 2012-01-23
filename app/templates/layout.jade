@@ -16,16 +16,17 @@ html(lang="en")
       link(rel="stylesheet", href="/lib/mocha/mocha.css")
       script(src="/lib/mocha/mocha.js")
       script(src="/lib/chai.js")
-      script
+      :coffeescript
         chai.should()
         mocha.setup("bdd")
+        $ ->
+          $("body .content").prepend("<div id='mocha'></div>")
       script(src="/application/LayoutSpec.js")
     each URI in specURIs
       script(src=URI)
     if specURIs.start
       :coffeescript
         $ ->
-          $("body .content").prepend("<div id='mocha'></div>")
           mocha.run()
     link(href="/favicon.ico", type="image/x-icon", rel="icon")
     link(href="/favicon.ico", type="image/x-icon", rel="shortcut icon")
@@ -70,7 +71,6 @@ html(lang="en")
             $link = $(link)
             href = $link.attr "href"
             URI = document.location.pathname
-            console.log URI, href, URI.indexOf(href)
             same = URI is href
             parent = URI.indexOf(href) >= 0 and href isnt "/"
             if same or parent
