@@ -1,16 +1,17 @@
 {
   "name": "peterlyons.com",
   "description": "The Node/Express Web App that powers the peterlyons.com web site",
-  "version": "4.0.6",
+  "version": "4.0.7",
   "homepage": "http://peterlyons.com",
   "repository": "ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com",
   "author": "Peter Lyons <pete@peterlyons.com> (http://peterlyons.com)",
   "main": "app/server.coffee",
   "engines": {
-    "node": "*"
+    "node": "0.6.x"
   },
   "files": [],
   "dependencies": {
+    "JSONPath": "0.8.x",
     "async": "0.1.x",
     "asyncjs": "0.0.x",
     "coffee-script": "1.2.x",
