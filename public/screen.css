@@ -24,7 +24,6 @@ code,
 del,
 dfn,
 em,
-font,
 img,
 ins,
 kbd,
@@ -107,11 +106,11 @@ http://snook.ca/archives/html_and_css/font-size-with-rem
 */
 @font-face {
   font-family: "AWConquerorInline-Regular";
-  src: url("/fonts/AWConquerorInline-Regular.otf") format("opentype");
+  src: url("/fonts/AWConquerorInline-Regular.eot?#iefix") format('embedded-opentype'), url("/fonts/AWConquerorInline-Regular.otf") format("opentype");
 }
 @font-face {
   font-family: "Archer-Light-Pro";
-  src: url("/fonts/Archer-Light-Pro.otf") format("opentype");
+  src: url("/fonts/Archer-Light-Pro.eot?#iefix") format("embedded-opentype"), url("/fonts/Archer-Light-Pro.otf") format("opentype");
 }
 @font-face {
   font-family: "Archer-Medium-Pro";

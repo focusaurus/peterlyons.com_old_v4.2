@@ -1,5 +1,5 @@
 class Page
-  constructor: (@view, @locals={}, @specs=[]) ->
+  constructor: (@view, @locals={}) ->
     if @view.indexOf(".") >= 0
       @URI = @view.split(".")[0]
     else
@@ -13,14 +13,14 @@ class Page
     @locals.test = false
     if test
       @locals.test = true
-      @locals.specURIs = @specs
+      @locals.specURIs = [] #TODO cruft
       @locals.specURIs.start = (test is "start")
     req.res.render @view, {locals: @locals}
 
 pages = []
-page = (URI, title, specs) ->
-  pages.push new Page(URI, {title}, specs)
-page 'home', 'Peter Lyons: node.js coder for hire', ['/application/HomePageSpec.js']
+page = (URI, title) ->
+  pages.push new Page(URI, {title})
+page 'home', 'Peter Lyons: node.js coder for hire'
 page 'bands', 'My Bands'
 page 'bigclock', 'BigClock: a full screen desktop clock in java'
 page 'career', 'My Career'
@@ -32,11 +32,11 @@ page 'code_conventions', 'Code Conventions'
 page 'favorites', 'Favorite Musicians'
 page 'error404', 'Not Found'
 page 'error502', 'Oops'
-page "leveling_up.md", "Leveling Up: Career Advancement for Software Developers", ['/application/LevelingUpSpec.js']
+page "leveling_up.md", "Leveling Up: Career Advancement for Software Developers"
 page "web_prog.md", "Web Programming Concepts for Non-Programmers"
 page "practices.md", "Practices and Values"
 page "stacks.md", "Technology Stacks"
-homePage = new Page 'home', {title: pages[0].locals.title}, pages[0].specs
+homePage = new Page 'home', {title: pages[0].locals.title}
 homePage.URI = ''
 pages.push homePage
 

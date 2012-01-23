@@ -11,13 +11,13 @@ util = require "util"
 cache = {}
 
 class PostPage extends pages.Page
-  constructor: (@post, @locals={}, @specs=[]) ->
+  constructor: (@post, @locals={}) ->
     @view = @post.viewPath()
     @locals.title = @post.title
     @locals.post = @post
 
 class BlogIndex extends pages.Page
-  constructor: (@view, title='', @locals={}, @specs=[]) ->
+  constructor: (@view, title='', @locals={}) ->
     @URI = @view
     @locals.title = title
     @locals.URI = @URI

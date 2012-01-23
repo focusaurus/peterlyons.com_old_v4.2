@@ -291,7 +291,7 @@ app:test() {
     if [ ${EXIT_CODE} -ne 0 ]; then
       exit $EXIT_CODE
     fi
-    mocha test/application/SmokeTests.coffee || EXIT_CODE=$?
+    mocha test/application/*.coffee || EXIT_CODE=$?
     if [ ${EXIT_CODE} -ne 0 ]; then
       exit $EXIT_CODE
     fi
@@ -379,11 +379,12 @@ app:prod_release() {
     git checkout develop
     git pull origin develop
     app:test
-    echo "Current version is $(cat version.txt)"
+    cdpd
+    echo "Current version is $(./bin/version.coffee)"
     echo -n "New version: "
     read NEW_VERSION
     git checkout -b "release-${NEW_VERSION}" develop
-    echo "${NEW_VERSION}" > version.txt
+    ./bin/version.coffee "${NEW_VERSION}"
     git commit -a -m "Bumped version number to ${NEW_VERSION}"
     echo "ABOUT TO MERGE INTO MASTER. CTRL-C now to abort. ENTER to proceed."
     read DONTCARE

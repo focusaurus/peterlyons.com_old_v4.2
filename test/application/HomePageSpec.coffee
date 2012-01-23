@@ -1,4 +1,15 @@
-describe 'the home page', ->
+config = require "../../config"
+expect = require("chai").expect
+jsdom = require "jsdom"
+
+describe "the home page", ->
+  $ = null
+
+  before (done) ->
+    jsdom.env config.baseURL, [config.jqueryURL], (error, jsWindow) ->
+      $ = jsWindow.$
+      done()
 
   it 'should have the intro material', ->
-    $('title').text().should.equal 'Peter Lyons: node.js coder for hire'
+    for selector in ["section#intro", "section#chops", "section#writing"]
+      expect($(selector)).not.to.be.empty
