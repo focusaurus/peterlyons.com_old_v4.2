@@ -1,8 +1,25 @@
-describe 'Pages using the main layout', ->
+config = require "../../config"
+expect = require("chai").expect
+jsdom = require "jsdom"
+_ = require "underscore"
 
-  it "should have the basic layout HTML", ->
-    $('header').should.not.be.empty
-    $('title').text().indexOf('Peter Lyons').should.be.above -1
-    $('header img').should.not.be.empty
-    $('header nav a').should.not.be.empty
-    $('body .content').should.not.be.empty
+describe "the main layout", ->
+  $ = null
+
+  before (done) ->
+    jsdom.env config.baseURL, [config.jqueryURL], (error, jsWindow) ->
+      $ = jsWindow.$
+      done()
+
+  it "should have the google fonts",->
+    hrefs = $("link[rel=stylesheet]").map (index, elem) -> $(elem).attr("href")
+    found = _.some hrefs, (href) ->
+      href.indexOf("fonts.googleapis.com") >= 0
+    expect(found)
+
+  it "should have the key structural elements", ->
+    for selector in ["header nav a", "header img", "body .content", "footer"]
+      expect($(selector)).not.to.be.empty
+
+  it "should have the normal title", ->
+    $("title").text().should.equal "Peter Lyons: node.js coder for hire"
