@@ -1,6 +1,6 @@
 _ = require "underscore"
 config = require "../../config"
-date = require "../../date"
+date = require "../../lib/date"
 fs = require "fs"
 asyncjs = require "asyncjs"
 pages = require "./pages"
