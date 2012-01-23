@@ -249,7 +249,7 @@ app:prereqs() {
     npm install
 }
 
-app:deploy() {
+task:deploy() {
     cdpd
     echo "Deploying branch ${1-${BRANCH}}"
     git fetch origin --tags
@@ -345,7 +345,7 @@ task:release() {
     eval $(ssh-agent -s) && ssh-add
     git checkout develop
     git pull origin develop
-    app:test
+    task:test
     cdpd
     echo "Current version is $(./bin/jsonpath.coffee version)"
     echo -n "New version: "
@@ -367,7 +367,7 @@ task:release() {
     git push origin master
     git push origin master --tags
     git checkout develop #Not good form to leave master checked out
-    echo "Ready to go. Type     ./bin/tasks.sh production app:deploy     to push to production"
+    echo "Ready to go. Type     ./bin/tasks.sh production deploy     to push to production"
 }
 
 task:validate() {
@@ -450,7 +450,7 @@ case "${1}" in
 esac
 
 case "${OP}" in
-    db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch)
+    db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch|deploy)
         #Op looks valid-ish
         if ! expr "${OP}" : '.*:' > /dev/null; then
             OP="task:${OP}"
