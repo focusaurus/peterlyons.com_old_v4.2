@@ -14,7 +14,7 @@ countFailure = (count) ->
 
 runJasmine = ->
   window.result = done: false, output: ['\n']
-  if not jasmine?
+  if not mocha?
     console.log 'The app server looks to NOT BE RUNNING. START IT.'
     window.result.done = true
     return
@@ -44,7 +44,7 @@ runJasmine = ->
     output.push status(results, 'All Jasmine Tests')
     window.result.failedCount = results.failedCount
     window.result.done = true
-  jasmine.getEnv().execute()
+  mocha.run()
 
 jasmineWrapper = (page, next) ->
   page.evaluate runJasmine
