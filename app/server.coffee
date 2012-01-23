@@ -12,8 +12,8 @@ app.use express.compiler(src: __dirname + "/../public", enable: ["coffeescript"]
 app.use express.static(config.staticDir)
 if config.tests
   #Note to self. Make sure compiler comes BEFORE static
-  app.use express.compiler(src: __dirname + "/../spec/js", enable: ["coffeescript"])
-  app.use express.static(__dirname + "/../spec/js")
+  app.use express.compiler(src: __dirname + "/../test", enable: ["coffeescript"])
+  app.use express.static(__dirname + "/../test")
 
 
 app.register ".md",

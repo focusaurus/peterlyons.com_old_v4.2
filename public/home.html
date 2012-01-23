@@ -38,7 +38,6 @@ and <a href="http://learnboost.github.com/stylus/">Stylus</a>.</p><a href="stack
       $link = $(link);
       href = $link.attr("href");
       URI = document.location.pathname;
-      console.log(URI, href, URI.indexOf(href));
       same = URI === href;
       parent = URI.indexOf(href) >= 0 && href !== "/";
       if (same || parent) {
