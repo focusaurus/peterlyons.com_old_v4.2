@@ -22,7 +22,6 @@
 #Then on the host run "sudo service node_peterlyons.com start" to start the app
 
 TASK_SCRIPT="${0}"
-export PATH=~/node/bin:$PATH
 
 ########## Define Environments ##########
 SITE="peterlyons.com"
@@ -99,13 +98,9 @@ link() {
 os:init_scripts() { #TASK: sudo
     [ -e /etc/nginx/sites-enabled/default ] && rm /etc/nginx/sites-enabled/default
     link "/etc/nginx/sites-enabled/${SITE}"
-    #link "/etc/monit/conf.d/wordpress_${SITE}.monitrc"
     link "/etc/monit/conf.d/nginx_${SITE}.monitrc"
     link "/etc/monit/conf.d/node_${SITE}.monitrc"
-    #link "/etc/monit/conf.d/mysql_${SITE}.monitrc"
     link "/etc/init/node_peterlyons.conf"
-    #link "/etc/init/wordpress_peterlyons.conf"
-    #cp "${OVERLAY}/etc/mysql/my.cnf" /etc/mysql/my.cnf
     cp "${OVERLAY}/etc/monit/monitrc" /etc/monit/monitrc
     initctl reload-configuration
     /etc/init.d/nginx reload
@@ -201,22 +196,6 @@ web:start() {
 ########## App (Node.js) Section ##########
 
 #Helper functions
-kill_stale() {
-    PID_FILE="${DIR}/tmp/server.pid"
-    PID_DIR="$(dirname ${PID_FILE})"
-    if [ ! -d "${PID_DIR}" ]; then
-        mkdir "${PID_DIR}"
-    fi
-    if [ -f "${PID_FILE}" ]; then
-        PID=$(cat "${PID_FILE}")
-        if ps -p "${PID}" > /dev/null; then
-            echo "killing old node server process $(cat ${PID_FILE})"
-            kill "${PID}"
-            rm "${PID_FILE}"
-        fi
-    fi
-}
-
 cdpd() {
     cd "${PROJECT_DIR}"
 }
@@ -284,7 +263,7 @@ app:deploy() {
     fi
 }
 
-app:test() {
+task:test() {
     cdpd
     local EXIT_CODE=0
     mocha test/unit/*.coffee || EXIT_CODE=$?
@@ -308,8 +287,9 @@ app:test() {
     fi
 }
 
-app:dev_start() {
+task:start() {
     cdpd
+    echo "Starting app server in a loop. CTRL-C once to restart. CTRL-C twice fast to kill."
     while true
     do
         coffee app/server.coffee
@@ -317,18 +297,12 @@ app:dev_start() {
     done
 }
 
-app:dev_stop() {
-    cdpd
-    kill_stale
-}
-
-app:debug() {
+task:debug() {
   cdpd
-  kill_stale
   ./node_modules/.bin/coffee --nodejs --debug app/server.coffee
 }
 
-app:build_static() {
+task:static() {
     echo "Generating HTML for static templated pages from ${DEVURL}..."
     for URI in $(list_templates)
     do
@@ -361,17 +335,10 @@ app:build_static() {
             exit ${EXIT_CODE}
         fi
     done
-    #echo "wordpress PHP integrated files:"
-    #echo "-----"
-    #curl --silent "${DEVURL}/home?wordpress=1" | \
-    #    sed '/WORDPRESS HEADER BOILERPLATE/q' | sed '$d' > \
-    #    "${PUBLIC}/persblog/wp-content/themes/fluid-blue/header_boilerplate.php"
-    #cdpd
-    #coffee bin/wordpress_integrate.coffee
 }
 
-app:prod_release() {
-    echo "Hey did you remember to run ./bin/tasks.sh app:build_static?"
+task:release() {
+    echo "Hey did you remember to run ./bin/tasks.sh static?"
     echo "CTRL-C if you forgot. Go do it. ENTER to proceed."
     read DONTCARE
     echo "Performing a production peterlyons.com release"
@@ -380,7 +347,7 @@ app:prod_release() {
     git pull origin develop
     app:test
     cdpd
-    echo "Current version is $(./bin/version.coffee)"
+    echo "Current version is $(./bin/jsonpath.coffee version)"
     echo -n "New version: "
     read NEW_VERSION
     git checkout -b "release-${NEW_VERSION}" develop
@@ -403,7 +370,7 @@ app:prod_release() {
     echo "Ready to go. Type     ./bin/tasks.sh production app:deploy     to push to production"
 }
 
-app:validate() {
+task:validate() {
     echo "Validating HTML: "
     local ERRORS=0
     local TMP=photos_tmp
@@ -450,7 +417,7 @@ app:validate() {
     fi
 }
 
-app:watch() {
+task:watch() {
     cdpd
     stylus -w -o public app/assets/css/screen.styl
 }
@@ -463,28 +430,31 @@ app:html_to_md() {
     perl -pi -e 's/"html"/"md"/' "${JSON}"
 }
 
-if ! expr "${1}" : '.*:' > /dev/null; then
-    ENV_NAME="${1}"
-    shift
-    OP="${1}"
-    shift
-    case "${ENV_NAME}" in
-        staging)
-            HOSTS="${STAGING_HOSTS}"
-        ;;
-
-        production)
-            HOSTS="${PRODUCTION_HOSTS}"
-        ;;
-    esac
-else
-    OP="${1}"
-    shift
-fi
+case "${1}" in
+    staging)
+        HOSTS="${STAGING_HOSTS}"
+    ;;
+    production)
+        HOSTS="${PRODUCTION_HOSTS}"
+    ;;
+esac
+case "${1}" in
+    staging|production)
+        ENV_NAME="${1}"
+        shift
+        OP="${1}"
+    ;;
+    *)
+        OP="${1}"
+    ;;
+esac
 
 case "${OP}" in
-    app:*|db:*|os:*|test:*|user:*|web:*)
+    db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch)
         #Op looks valid-ish
+        if ! expr "${OP}" : '.*:' > /dev/null; then
+            OP="task:${OP}"
+        fi
     ;;
     *)
         echo "ERROR: unknown task ${OP}" 1>&2

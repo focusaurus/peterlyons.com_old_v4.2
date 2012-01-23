@@ -7,10 +7,11 @@
   "author": "Peter Lyons <pete@peterlyons.com> (http://peterlyons.com)",
   "main": "app/server.coffee",
   "engines": {
-    "node": "*"
+    "node": "0.6.x"
   },
   "files": [],
   "dependencies": {
+    "JSONPath": "0.8.x",
     "async": "0.1.x",
     "asyncjs": "0.0.x",
     "coffee-script": "1.2.x",
