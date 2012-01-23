@@ -12,23 +12,22 @@ html(lang="en")
     link(rel="stylesheet", href="/css/overcast/jquery-ui.css")
     script(src="/js/jquery.js")
     script(src="/js/jquery-ui.js")
-    if specURIs.length > 0
-      link(rel="stylesheet", href="/lib/jasmine/jasmine.css")
-      script(src="/lib/jasmine/jasmine.js")
-      script(src="/lib/jasmine/jasmine-html.js")
-      script(src="/lib/jasmine-jquery.js")
+    if test
+      link(rel="stylesheet", href="/lib/mocha/mocha.css")
+      script(src="/lib/mocha/mocha.js")
+      script(src="/lib/chai.js")
+      :coffeescript
+        chai.should()
+        mocha.setup("bdd")
+        $ ->
+          $("body .content").prepend("<div id='mocha'></div>")
       script(src="/application/LayoutSpec.js")
     each URI in specURIs
       script(src=URI)
     if specURIs.start
-      script
-        $(document).ready(function() {
-          jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-          //Silence the verbose "waiting" messages
-          jasmine.TrivialReporter.prototype.log = function(){};
-          jasmine.getEnv().execute();
-        });
-
+      :coffeescript
+        $ ->
+          mocha.run()
     link(href="/favicon.ico", type="image/x-icon", rel="icon")
     link(href="/favicon.ico", type="image/x-icon", rel="shortcut icon")
     link(rel="openid.server", href="http://www.livejournal.com/openid/server.bml")
@@ -42,21 +41,12 @@ html(lang="en")
         img(src="/images/peter_lyons_logo_icon.png", alt="Peter Lyons Logo")
         h1
           a(href="/") Peter Lyons
-        if !wordpress
-          nav
-            a(href="/") Home
-            a(href="/problog") Blog
-            a(href="/practices") Practices
-            a(href="/stacks") Stacks
-            a(href="/career") Career
-
-      if wordpress
-        nav.blog
-          | <form method="get" id="searchform" action="/problog/">
-          |  <input type="text" size="20" name="s" id="s" value="Search..." onblur="if(this.value=='') this.value='Search...';" onfocus="if(this.value=='Search...') this.value='';">
-          |  </form>
-          | <a href="<?php echo site_url('feed') ?>">
-          | <img src="<?php echo esc_url( includes_url( 'images/rss.png' ) ); ?>" /></a>
+        nav
+          a(href="/") Home
+          a(href="/problog") Blog
+          a(href="/practices") Practices
+          a(href="/stacks") Stacks
+          a(href="/career") Career
       if post
         h1= post.title
       !{body}
@@ -81,7 +71,6 @@ html(lang="en")
             $link = $(link)
             href = $link.attr "href"
             URI = document.location.pathname
-            console.log URI, href, URI.indexOf(href)
             same = URI is href
             parent = URI.indexOf(href) >= 0 and href isnt "/"
             if same or parent
@@ -89,4 +78,3 @@ html(lang="en")
             else
               $link.removeClass "current"
     include includes/footer
-
