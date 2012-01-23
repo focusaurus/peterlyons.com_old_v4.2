@@ -10,7 +10,6 @@ It&#39;s not very funny. If you feel like looking at a funny 404 page, try
       $link = $(link);
       href = $link.attr("href");
       URI = document.location.pathname;
-      console.log(URI, href, URI.indexOf(href));
       same = URI === href;
       parent = URI.indexOf(href) >= 0 && href !== "/";
       if (same || parent) {
