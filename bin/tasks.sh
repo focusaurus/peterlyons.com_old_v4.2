@@ -456,6 +456,15 @@ case "${OP}" in
             OP="task:${OP}"
         fi
     ;;
+    deploy)
+        for HOST in ${HOSTS}
+        do
+            echo "Running task ${OP} on ${HOST} as ${SUDO-$USER}"
+            scp "${TASK_SCRIPT}" "${HOST}:/tmp"
+            ssh -q -t "${HOST}" "${SUDO}" bash  \
+            "/tmp/$(basename ${TASK_SCRIPT})" "deploy" "${@}"
+        done
+    ;;
     *)
         echo "ERROR: unknown task ${OP}" 1>&2
         exit 1
