@@ -1,4 +1,5 @@
 #!/usr/bin/env coffee
+child_process = require "child_process"
 commander = require "commander"
 fs = require "fs"
 path = require "path"
@@ -20,3 +21,4 @@ path.exists post.viewPath(), (exists) ->
   if not exists
     fs.writeFile post.viewPath(), "\n", "utf8", (error) ->
       throw error if error
+  child_process.exec "subl #{post.viewPath()}", ->
