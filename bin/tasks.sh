@@ -450,7 +450,7 @@ case "${1}" in
 esac
 
 case "${OP}" in
-    db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch|deploy)
+    db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch)
         #Op looks valid-ish
         if ! expr "${OP}" : '.*:' > /dev/null; then
             OP="task:${OP}"
@@ -459,10 +459,10 @@ case "${OP}" in
     deploy)
         for HOST in ${HOSTS}
         do
-            echo "Running task ${OP} on ${HOST} as ${SUDO-$USER}"
+            echo "Running task deploy on ${HOST} as ${SUDO-$USER}"
             scp "${TASK_SCRIPT}" "${HOST}:/tmp"
             ssh -q -t "${HOST}" "${SUDO}" bash  \
-            "/tmp/$(basename ${TASK_SCRIPT})" "deploy" "${@}"
+            "/tmp/$(basename ${TASK_SCRIPT})" "deploy"
         done
     ;;
     *)
