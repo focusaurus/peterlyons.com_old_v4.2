@@ -1,3 +1,6 @@
+path = require "path"
+middleware = require "./middleware"
+
 class Page
   constructor: (@view, @locals={}) ->
     if @view.indexOf(".") >= 0
@@ -41,11 +44,15 @@ homePage.URI = ''
 pages.push homePage
 
 route = (app, page) ->
-  app.get '/' + page.URI, (req) ->
+  app.get "/" + page.URI, (req) ->
     page.render req
 
 setup = (app) ->
   #Route all the simple static pages
   route app, page for page in pages
 
+  mw = (req, res, next) ->
+    res.viewPath = path.join __dirname, "..", "posts", "persblog", "2012", "01", "san-francisco-walkabout.md"
+    next()
+  app.get "/middleware", mw, middleware.markdownToHTML, middleware.layout, middleware.domify, middleware.flickr, middleware.undomify, middleware.send
 module.exports = {setup, Page}
