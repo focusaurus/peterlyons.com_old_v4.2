@@ -1,0 +1,6 @@
+#!/bin/sh -e
+cd ~/projects/peterlyons.com
+[ -d var/log ] || mkdir -p var/log
+echo "post-received git hook ran at $(date)" >> var/log/post-receive.log
+git checkout master
+git pull ../peterlyons.com.git master
