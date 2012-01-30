@@ -254,7 +254,7 @@ task:deploy() {
     git fetch origin --tags
     git checkout --track -b "${1-${BRANCH}}" || git checkout "${1-${BRANCH}}"
     git pull origin "${1-${BRANCH}}"
-    ./node/bin/npm install
+    PATH=./node/bin ./node/bin/npm install
     sudo initctl reload-configuration
     if sudo status node_peterlyons; then
         sudo restart node_peterlyons
