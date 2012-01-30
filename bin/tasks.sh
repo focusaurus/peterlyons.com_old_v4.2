@@ -254,9 +254,11 @@ task:deploy() {
     git fetch origin --tags
     git checkout --track -b "${1-${BRANCH}}" || git checkout "${1-${BRANCH}}"
     git pull origin "${1-${BRANCH}}"
+    export PATH=$(pwd)/node/bin:$PATH
+    ./node/bin/npm install
     sudo initctl reload-configuration
     if sudo status node_peterlyons; then
-        sudo restart node_peterlyons
+        sudo stop node_peterlyons; sudo start node_peterlyons;
     else
         sudo start node_peterlyons
     fi
@@ -459,7 +461,7 @@ fi
 if [ -z "${HOSTS}" ]; then
     #local mode
     case "${OP}" in
-        db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch|deploy)
+        db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch|deploy|validate)
             #Op looks valid-ish
             if ! expr "${OP}" : '.*:' > /dev/null; then
                 OP="task:${OP}"
