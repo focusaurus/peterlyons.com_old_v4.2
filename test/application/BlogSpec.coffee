@@ -19,3 +19,16 @@ describe "a blog post page", ->
 
   it "should have disqus comments", ->
     expect($("#disqus_thread")).not.to.be.empty
+
+describe "a blog index page", ->
+  $ = null
+
+  before (done) ->
+    jsdom.env config.baseURL + "/problog", [config.jqueryURL], (error, jsWindow) ->
+      $ = jsWindow.$
+      done()
+
+  it "should have nicely formatted dates", ->
+    expect($("li.post span.date")).not.to.be.empty
+    date = $("li.post span.date").last().html()
+    expect(date).to.match /Mar 14, 2009/

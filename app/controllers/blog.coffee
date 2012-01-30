@@ -1,5 +1,6 @@
 _ = require "underscore"
 asyncjs = require "asyncjs"
+date = require "../../lib/date" #Do not remove. Monkey patches Date
 fs = require "fs"
 markdown = require("markdown-js").makeHtml
 middleware = require "./middleware"
