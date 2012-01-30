@@ -29,15 +29,10 @@ app.set "view options",
   layout: "layout.jade"
 app.set "views", __dirname + "/templates"
 
-specURIs = []
-specURIs.start = false
 app.helpers
   config: config
   post: false
-  specURIs: specURIs
-  testCSS: []
   title: ''
-  wordpress: false
 
 app.error (error, req, res, next) ->
   console.log error
@@ -56,7 +51,5 @@ app.use (req, res, next) ->
   controller.setup app
 
 ip = if config.loopback then "127.0.0.1" else "0.0.0.0"
-console.log 2, process.env.PATH
-console.log process.env.NODE_ENV
-console.log "Express serving on http://#{ip}:#{config.port} baseURRL: #{config.baseURL}, env: #{process.env.NODE_ENV}"
+console.log "Express serving on http://#{ip}:#{config.port} baseURL: #{config.baseURL}, env: #{process.env.NODE_ENV}"
 app.listen config.port, ip
