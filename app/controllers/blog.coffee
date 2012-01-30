@@ -1,14 +1,34 @@
 _ = require "underscore"
+asyncjs = require "asyncjs"
 config = require "../../config"
 date = require "../../lib/date"
 fs = require "fs"
-asyncjs = require "asyncjs"
+middleware = require "./middleware"
 pages = require "./pages"
 path = require "path"
 util = require "util"
 
 {Post, leadZero} = require("../models/post")
 cache = {}
+
+loadPost = (req, res, next) ->
+  blog = req.params[0]
+  post = new Post
+  post.base = path.join(__dirname, "..", "posts")
+  post.load path.join(post.base, req.path + ".json"), blog, (error) ->
+    return next(error) if error
+    res.viewPath = post.viewPath()
+    next()
+
+postMiddleware = [
+  loadPost
+  middleware.markdownToHTML
+  middleware.layout
+  middleware.domify
+  middleware.flickr
+  middleware.undomify
+  middleware.send
+]
 
 class PostPage extends pages.Page
   constructor: (@post, @locals={}) ->
@@ -35,11 +55,16 @@ class BlogIndex extends pages.Page
       options.locals.posts = self.posts
       res.header "Content-Type", "text/xml"
       res.render "feed", options
-    for post in @posts
-      router = (post) ->
-        app.get "/" + post.URI(), (req) ->
-          new PostPage(post.presented).render req
-      router post
+
+    app.get new RegExp("/(#{@URI})/\\d{4}/\\d{2}/\\w+"), postMiddleware
+
+    # app.get new RegExp("/#{@URI}/\\d{4}/\\d{2}/\\w+"), (req, res, next) ->
+    #   post = new Post
+    #   post.base = path.join(__dirname, "..", "posts")
+    #   post.load path.join(post.base, req.path + ".json"), self.URI, (error) ->
+    #     return next(error) if error
+    #     page = new PostPage post
+    #     page.render req
 
 presentPost = (post) ->
   date = leadZero(post.publish_date.getMonth() + 1)

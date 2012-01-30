@@ -26,8 +26,8 @@ exports.layout = (req, res, next) ->
     locals =
       config: config
       post: false
-      title: ''
-      body: res.html
+      title: ""
+      body: res.html or ""
     res.html = layoutFunc locals
     next error
 
