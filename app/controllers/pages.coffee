@@ -1,5 +1,4 @@
 path = require "path"
-middleware = require "./middleware"
 
 class Page
   constructor: (@view, @locals={}) ->
@@ -12,12 +11,6 @@ class Page
   render: (req) =>
     if @locals.title? and @locals.title.indexOf("Peter Lyons") < 0
       @locals.title = @locals.title + " | Peter Lyons"
-    test = req.param "test"
-    @locals.test = false
-    if test
-      @locals.test = true
-      @locals.specURIs = [] #TODO cruft
-      @locals.specURIs.start = (test is "start")
     req.res.render @view, {locals: @locals}
 
 pages = []
@@ -51,8 +44,4 @@ setup = (app) ->
   #Route all the simple static pages
   route app, page for page in pages
 
-  mw = (req, res, next) ->
-    res.viewPath = path.join __dirname, "..", "posts", "persblog", "2012", "01", "san-francisco-walkabout.md"
-    next()
-  app.get "/middleware", mw, middleware.markdownToHTML, middleware.layout, middleware.domify, middleware.flickr, middleware.undomify, middleware.send
 module.exports = {setup, Page}

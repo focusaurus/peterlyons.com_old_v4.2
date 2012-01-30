@@ -29,15 +29,10 @@ app.set "view options",
   layout: "layout.jade"
 app.set "views", __dirname + "/templates"
 
-specURIs = []
-specURIs.start = false
 app.helpers
   config: config
   post: false
-  specURIs: specURIs
-  testCSS: []
   title: ''
-  wordpress: false
 
 app.error (error, req, res, next) ->
   console.log error
