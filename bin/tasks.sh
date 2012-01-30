@@ -263,6 +263,13 @@ task:deploy() {
     fi
 }
 
+check_fail() {
+    if [ $1 -ne 0 ]; then
+      echo "BOO"
+      exit $1
+    fi
+}
+
 task:test() {
     cdpd
     local EXIT_CODE=0
@@ -271,20 +278,14 @@ task:test() {
       exit $EXIT_CODE
     fi
     mocha test/application/*.coffee || EXIT_CODE=$?
-    if [ ${EXIT_CODE} -ne 0 ]; then
-      exit $EXIT_CODE
-    fi
-    rm test/application/*.js
-    ./node_modules/.bin/coffee -c bin
-    EXIT_CODE=0
+    check_fail $EXIT_CODE
+    #rm test/application/*.js
+    #./node_modules/.bin/coffee -c bin
+    #EXIT_CODE=0
     #BUGBUG#phantomjs ./bin/phantom_tests.js || EXIT_CODE=$?
-    rm ./bin/phantom_tests.js
-    if [ $EXIT_CODE -eq 0 ]; then
-      echo "YAY"
-    else
-      echo "BOO"
-      exit $EXIT_CODE
-    fi
+    #rm ./bin/phantom_tests.js
+    check_fail $EXIT_CODE
+    echo "YAY"
 }
 
 task:start() {
@@ -450,7 +451,7 @@ case "${1}" in
 esac
 
 case "${OP}" in
-    db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch|deploy)
+    db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch)
         #Op looks valid-ish
         if ! expr "${OP}" : '.*:' > /dev/null; then
             OP="task:${OP}"
@@ -459,10 +460,10 @@ case "${OP}" in
     deploy)
         for HOST in ${HOSTS}
         do
-            echo "Running task ${OP} on ${HOST} as ${SUDO-$USER}"
+            echo "Running task deploy on ${HOST} as ${SUDO-$USER}"
             scp "${TASK_SCRIPT}" "${HOST}:/tmp"
             ssh -q -t "${HOST}" "${SUDO}" bash  \
-            "/tmp/$(basename ${TASK_SCRIPT})" "deploy" "${@}"
+            "/tmp/$(basename ${TASK_SCRIPT})" "deploy"
         done
     ;;
     *)

@@ -1,3 +1,5 @@
+path = require "path"
+
 class Page
   constructor: (@view, @locals={}) ->
     if @view.indexOf(".") >= 0
@@ -9,12 +11,6 @@ class Page
   render: (req) =>
     if @locals.title? and @locals.title.indexOf("Peter Lyons") < 0
       @locals.title = @locals.title + " | Peter Lyons"
-    test = req.param "test"
-    @locals.test = false
-    if test
-      @locals.test = true
-      @locals.specURIs = [] #TODO cruft
-      @locals.specURIs.start = (test is "start")
     req.res.render @view, {locals: @locals}
 
 pages = []
@@ -41,7 +37,7 @@ homePage.URI = ''
 pages.push homePage
 
 route = (app, page) ->
-  app.get '/' + page.URI, (req) ->
+  app.get "/" + page.URI, (req) ->
     page.render req
 
 setup = (app) ->
