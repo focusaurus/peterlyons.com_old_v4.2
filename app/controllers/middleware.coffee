@@ -23,13 +23,18 @@ exports.layout = (req, res, next) ->
 exports.domify = (req, res, next) ->
   jsdom.env res.html, [jqueryPath], (error, dom) ->
     res.dom = dom
+    dom.toMarkup = ->
+      #Remove the local jquery script reference added by jsdom
+      #Once this pull request is merged and released we can do this:
+      #https://github.com/tmpvar/jsdom/pull/392#issuecomment-3747364
+      #@window.$("script.jsdom").remove()
+      #But for now we need to do this, which is brittle
+      @window.$("script").last().remove()
+      @window.document.doctype + @window.document.innerHTML
     next error
 
 exports.undomify = (req, res, next) ->
-  #Remove the local jquery script reference added by jsdom
-  #Note this is pretty brittle
-  res.dom.window.$("script").last().remove()
-  res.html = res.dom.window.document.innerHTML
+  res.html = res.dom.toMarkup()
   next()
 
 exports.send = (req, res) ->

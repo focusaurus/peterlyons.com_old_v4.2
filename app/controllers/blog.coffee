@@ -123,7 +123,6 @@ loadBlog = (app, URI, callback) ->
       postLinks[post.URI()] =
         next: if index > 0 then posts[index - 1] else null
         previous: if index < posts.length then posts[index + 1] else null
-    console.log "BUGBUG postlinks:", util.inspect postLinks
     callback error, posts
 
 setup = (app) ->
