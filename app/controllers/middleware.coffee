@@ -15,8 +15,6 @@ exports.layout = (req, res, next) ->
     layoutFunc = jade.compile jadeText, {filename: layoutPath}
     locals =
       config: config
-      #TODO decouple this from blog posts
-      post: res.post or false
       title: ""
       body: res.html or ""
     res.html = layoutFunc locals
@@ -28,6 +26,9 @@ exports.domify = (req, res, next) ->
     next error
 
 exports.undomify = (req, res, next) ->
+  #Remove the local jquery script reference added by jsdom
+  #Note this is pretty brittle
+  res.dom.window.$("script").last().remove()
   res.html = res.dom.window.document.innerHTML
   next()
 
