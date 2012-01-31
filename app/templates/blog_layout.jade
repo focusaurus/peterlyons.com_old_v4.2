@@ -32,7 +32,7 @@ section#comments.hidden
   noscript Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 :coffeescript
   toggleComments = (event) ->
-    event.preventDefault()
+    event?.preventDefault()
     hidden = $("#comments").toggleClass("hidden").hasClass("hidden")
     $("#toggleComments").text(if hidden then "Show Comments" else "Hide Comments")
 
