@@ -1,4 +1,5 @@
 var/log/*
+var/*.xml
 node
 node_modules
 spec/js/**/*.js

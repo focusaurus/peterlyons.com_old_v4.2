@@ -32,6 +32,10 @@ markdownToHTML = (req, res, next) ->
     res.html = markdown markdownText
     next error
 
+article = (req, res, next) ->
+  res.html = "<article>\n#{res.html}\n</article>"
+  next()
+
 postTitle = (req, res, next) ->
   $ = res.dom.window.$
   $("title").text(res.post.title + " | Peter Lyons")
@@ -42,6 +46,7 @@ postMiddleware = [
   loadPost
   html
   markdownToHTML
+  article
   middleware.layout
   middleware.domify
   postTitle

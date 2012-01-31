@@ -382,6 +382,11 @@ p.reverse {
 #reverse {
   margin: 0;
 }
+article img,
+article iframe {
+  display: block;
+  margin: 30px 0;
+}
 nav.blog form {
   display: inline-block;
 }
