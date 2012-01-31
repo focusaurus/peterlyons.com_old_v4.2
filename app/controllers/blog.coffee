@@ -2,12 +2,16 @@ _ = require "underscore"
 asyncjs = require "asyncjs"
 date = require "../../lib/date" #Do not remove. Monkey patches Date
 fs = require "fs"
+jade = require "jade"
 markdown = require("markdown-js").makeHtml
 middleware = require "./middleware"
 pages = require "./pages"
 path = require "path"
+util = require "util"
 
 {Post, leadZero} = require("../models/post")
+
+postLinks = {}
 
 ########## middleware ##########
 loadPost = (req, res, next) ->
@@ -17,6 +21,10 @@ loadPost = (req, res, next) ->
   post.load path.join(post.base, req.path + ".json"), blog, (error) ->
     return next(error) if error
     res.post = post
+    post.presented = presentPost post
+    links = postLinks[post.URI()]
+    post.previous = links.previous
+    post.next = links.next
     res.viewPath = post.viewPath()
     next()
 
@@ -32,16 +40,25 @@ markdownToHTML = (req, res, next) ->
     res.html = markdown markdownText
     next error
 
+blogArticle = (req, res, next) ->
+  post = res.post
+  footerPath = path.join __dirname, "..", "templates", "blog_layout.jade"
+  fs.readFile footerPath, "utf8", (error, jadeText) ->
+    return next error if error
+    footerFunc = jade.compile jadeText
+    res.html = footerFunc {post, body: res.html}
+    next()
+
 postTitle = (req, res, next) ->
   $ = res.dom.window.$
   $("title").text(res.post.title + " | Peter Lyons")
-  $("header").after("<h1>#{res.post.title}</h1>")
   next()
 
 postMiddleware = [
   loadPost
   html
   markdownToHTML
+  blogArticle
   middleware.layout
   middleware.domify
   postTitle
@@ -102,6 +119,10 @@ loadBlog = (app, URI, callback) ->
     posts = _.sortBy posts, (post) ->
       post.publish_date
     .reverse()
+    for post, index in posts
+      postLinks[post.URI()] =
+        next: if index > 0 then posts[index - 1] else null
+        previous: if index < posts.length then posts[index + 1] else null
     callback error, posts
 
 setup = (app) ->

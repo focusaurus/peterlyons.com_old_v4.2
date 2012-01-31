@@ -19,6 +19,11 @@ wrapper(site-width=60%)
 titlefont(size=1)
   font-family "AWConquerorInline-Regular", sans-serif
   fontsize size
+
+datefont(size=1)
+  font-family "Archer-Medium-Pro", serif
+  fontsize size
+
 /*
 "
 I am not dealing with font size insanity. Here is the deal.
@@ -246,10 +251,6 @@ img.icon
 .respond
   position fixed
 
-#disqus_thread
-  li
-    list-style-image none
-
 ////////// Home page //////////
 .highlight
   color dark1
@@ -299,20 +300,33 @@ p.reverse
     margin 0
 
 ////////// Blog //////////
-nav.blog
-  form
-    display inline-block
+article
+  margin pad4 0
+  img, iframe
+    display block
+    margin pad4 0
+  .date
+    datefont 1
+    float right
+
+nav.post li
+  list-style-image url("/images/bullet_gt_1.png")
+
 .date
-  font-family "Archer-Medium-Pro"
+  datefont 0
   float right
+
+.hidden
+  display none
+
+#disqus_thread
+  li
+    list-style-image none
+
 #subscribe
   margin pad3 0
   img
     padding-left pad2
-// li.post
-//   padding-left pad2
-//   &:nth-child(even)
-//     background light2
 
 ////////// Photos //////////
 figcaption

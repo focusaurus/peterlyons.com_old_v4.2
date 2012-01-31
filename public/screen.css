@@ -327,9 +327,6 @@ img.icon {
 .respond {
   position: fixed;
 }
-#disqus_thread li {
-  list-style-image: none;
-}
 .highlight {
   color: #b55e1a;
 }
@@ -382,12 +379,34 @@ p.reverse {
 #reverse {
   margin: 0;
 }
-nav.blog form {
-  display: inline-block;
+article {
+  margin: 30px 0;
+}
+article img,
+article iframe {
+  display: block;
+  margin: 30px 0;
+}
+article .date {
+  font-family: "Archer-Medium-Pro", serif;
+  font-size: 16px;
+  font-size: 1.6rem;
+  float: right;
+}
+nav.post li {
+  list-style-image: url("/images/bullet_gt_1.png");
 }
 .date {
-  font-family: "Archer-Medium-Pro";
+  font-family: "Archer-Medium-Pro", serif;
+  font-size: 12px;
+  font-size: 1.2rem;
   float: right;
+}
+.hidden {
+  display: none;
+}
+#disqus_thread li {
+  list-style-image: none;
 }
 #subscribe {
   margin: 8px 0;
