@@ -76,7 +76,7 @@ var disqus_developer = 1;
 
   toggleComments = function(event) {
     var hidden;
-    event.preventDefault();
+    if (event != null) event.preventDefault();
     hidden = $("#comments").toggleClass("hidden").hasClass("hidden");
     return $("#toggleComments").text(hidden ? "Show Comments" : "Hide Comments");
   };
