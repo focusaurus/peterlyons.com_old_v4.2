@@ -63,6 +63,7 @@ postMiddleware = [
   middleware.domify
   postTitle
   middleware.flickr
+  middleware.youtube
   middleware.undomify
   middleware.send
 ]
