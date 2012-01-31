@@ -378,7 +378,7 @@ task:validate() {
         EXT=".html"
         echo "Validating the PRODUCTION site"
     fi
-    for URI in $(list_templates) app/photos
+    for URI in $(list_templates) app/photos admin/galleries problog/feed persblog/feed problog/2009/03/announcing-petes-points persblog/2007/10/petes-travel-adventure-2007-begins-friday-october-5th
     do
         printf '  %-25s' "${URI}: "
         local TMP_HTML="/tmp/tmp_html.$$.html"

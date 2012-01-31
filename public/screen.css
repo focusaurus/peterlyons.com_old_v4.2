@@ -327,9 +327,6 @@ img.icon {
 .respond {
   position: fixed;
 }
-#disqus_thread li {
-  list-style-image: none;
-}
 .highlight {
   color: #b55e1a;
 }
@@ -382,6 +379,9 @@ p.reverse {
 #reverse {
   margin: 0;
 }
+article {
+  margin: 30px 0;
+}
 article img,
 article iframe {
   display: block;
@@ -393,11 +393,20 @@ article .date {
   font-size: 1.6rem;
   float: right;
 }
+nav.post li {
+  list-style-image: url("/images/bullet_gt_1.png");
+}
 .date {
   font-family: "Archer-Medium-Pro", serif;
   font-size: 12px;
   font-size: 1.2rem;
   float: right;
+}
+.hidden {
+  display: none;
+}
+#disqus_thread li {
+  list-style-image: none;
 }
 #subscribe {
   margin: 8px 0;

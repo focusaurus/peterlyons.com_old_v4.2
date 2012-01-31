@@ -251,10 +251,6 @@ img.icon
 .respond
   position fixed
 
-#disqus_thread
-  li
-    list-style-image none
-
 ////////// Home page //////////
 .highlight
   color dark1
@@ -305,6 +301,7 @@ p.reverse
 
 ////////// Blog //////////
 article
+  margin pad4 0
   img, iframe
     display block
     margin pad4 0
@@ -312,9 +309,19 @@ article
     datefont 1
     float right
 
+nav.post li
+  list-style-image url("/images/bullet_gt_1.png")
+
 .date
   datefont 0
   float right
+
+.hidden
+  display none
+
+#disqus_thread
+  li
+    list-style-image none
 
 #subscribe
   margin pad3 0
