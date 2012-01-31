@@ -291,12 +291,7 @@ task:test() {
 
 task:start() {
     cdpd
-    echo "Starting app server in a loop. CTRL-C once to restart. CTRL-C twice fast to kill."
-    while true
-    do
-        coffee app/server.coffee
-        sleep 1
-    done
+    nodemon app/server.coffee
 }
 
 task:debug() {
