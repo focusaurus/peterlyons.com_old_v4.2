@@ -17,6 +17,7 @@ loadPost = (req, res, next) ->
   post.load path.join(post.base, req.path + ".json"), blog, (error) ->
     return next(error) if error
     res.post = post
+    post.presented = presentPost post
     res.viewPath = post.viewPath()
     next()
 
@@ -33,7 +34,11 @@ markdownToHTML = (req, res, next) ->
     next error
 
 blogArticle = (req, res, next) ->
-  res.html = "<article>\n<h1>#{res.post.title}</h1>\n#{res.html}\n</article>"
+  res.html = "<article>
+  <span class='date'>#{res.post.presented.date}</span>
+  <h1>#{res.post.title}</h1>
+  #{res.html}
+  </article>"
   next()
 
 postTitle = (req, res, next) ->
