@@ -382,11 +382,21 @@ p.reverse {
 #reverse {
   margin: 0;
 }
-nav.blog form {
-  display: inline-block;
+article img,
+article iframe {
+  display: block;
+  margin: 30px 0;
+}
+article .date {
+  font-family: "Archer-Medium-Pro", serif;
+  font-size: 16px;
+  font-size: 1.6rem;
+  float: right;
 }
 .date {
-  font-family: "Archer-Medium-Pro";
+  font-family: "Archer-Medium-Pro", serif;
+  font-size: 12px;
+  font-size: 1.2rem;
   float: right;
 }
 #subscribe {

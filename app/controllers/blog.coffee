@@ -17,6 +17,7 @@ loadPost = (req, res, next) ->
   post.load path.join(post.base, req.path + ".json"), blog, (error) ->
     return next(error) if error
     res.post = post
+    post.presented = presentPost post
     res.viewPath = post.viewPath()
     next()
 
@@ -32,16 +33,24 @@ markdownToHTML = (req, res, next) ->
     res.html = markdown markdownText
     next error
 
+blogArticle = (req, res, next) ->
+  res.html = "<article>
+  <span class='date'>#{res.post.presented.date}</span>
+  <h1>#{res.post.title}</h1>
+  #{res.html}
+  </article>"
+  next()
+
 postTitle = (req, res, next) ->
   $ = res.dom.window.$
   $("title").text(res.post.title + " | Peter Lyons")
-  $("header").after("<h1>#{res.post.title}</h1>")
   next()
 
 postMiddleware = [
   loadPost
   html
   markdownToHTML
+  blogArticle
   middleware.layout
   middleware.domify
   postTitle

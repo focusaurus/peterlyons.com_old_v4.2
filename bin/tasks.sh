@@ -424,7 +424,7 @@ task:watch() {
     stylus -w -o public app/assets/css/screen.styl
 }
 
-app:html_to_md() {
+task:html_to_md() {
     local HTML="${1}"
     local MD=$(echo "${1}" | sed -e 's/\.html$/.md/')
     local JSON=$(echo "${1}" | sed -e 's/\.html$/.json/')
@@ -461,7 +461,7 @@ fi
 if [ -z "${HOSTS}" ]; then
     #local mode
     case "${OP}" in
-        db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch|deploy|validate)
+        db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch|deploy|validate|html_to_md)
             #Op looks valid-ish
             if ! expr "${OP}" : '.*:' > /dev/null; then
                 OP="task:${OP}"
