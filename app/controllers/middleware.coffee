@@ -9,6 +9,8 @@ jqueryPath = path.join __dirname, "..", "..", "public", "js", "jquery.js"
 flickrshowTemplate = """<object width="500" height="375">
   <param name="flashvars" value="offsite=true&lang=en-us&{URLs}&jump_to="></param> <param name="movie" value="http://www.flickr.com/apps/slideshow/show.swf?v=109615"></param> <param name="allowFullScreen" value="true"></param><embed type="application/x-shockwave-flash" src="http://www.flickr.com/apps/slideshow/show.swf?v=109615" allowFullScreen="true" flashvars="offsite=true&lang=en-us&{URLs}&jump_to=" width="500" height="375"></embed></object>"""
 
+youtubeTemplate = "<iframe width='420' height='315' src='{URL}' frameborder='0' allowfullscreen></iframe>"
+
 exports.layout = (req, res, next) ->
   layoutPath = path.join __dirname, "..", "templates", "layout.jade"
   fs.readFile layoutPath, "utf8", (error, jadeText) ->
@@ -46,4 +48,12 @@ exports.flickr = (req, res, next) ->
     $elem = $(elem)
     URLs = $elem.attr "href"
     $elem.replaceWith(flickrshowTemplate.replace /\{URLs\}/g, URLs)
+  next()
+
+exports.youtube = (req, res, next) ->
+  $ = res.dom.window.$
+  $("youtube").each (index, elem) ->
+    $elem = $(elem)
+    URL = $elem.attr "href"
+    $elem.replaceWith(youtubeTemplate.replace /\{URL\}/, URL)
   next()

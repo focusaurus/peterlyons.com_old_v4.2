@@ -39,7 +39,7 @@ app.error (error, req, res, next) ->
   if error instanceof errors.NotFound
     res.render path.join(__dirname, "..", config.staticDir, "error404.html"), {layout: false}
   else
-    next error
+    res.render path.join(__dirname, "..", config.staticDir, "error502.html"), {layout: false}
 
 #Last in the chain means 404 for you
 app.use (req, res, next) ->
