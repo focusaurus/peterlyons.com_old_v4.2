@@ -75,15 +75,10 @@ libssl-dev
 make
 #For monitoring
 monit
-#For Wordpress blog
-#mysql-server
-#mysql-client
 #We use perl in the tasks.sh script for quick command line file editing
 perl
 #This is our web server
 nginx
-#For Wordpress blog
-#php5-cgi
 EOF
 }
 
