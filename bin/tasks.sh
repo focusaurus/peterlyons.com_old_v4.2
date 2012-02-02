@@ -30,7 +30,6 @@ STAGING_HOSTS="staging.${SITE}"
 DEVURL="http://localhost:9400"
 PRODURL="http://${SITE}"
 REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com.git"
-BRANCH="master"
 NODE_VERSION="0.6.7"
 PROJECT_DIR=~/projects/peterlyons.com
 OVERLAY="${PROJECT_DIR}/overlay"
@@ -255,9 +254,11 @@ task:deploy() {
     git fetch origin --tags
     git checkout --track -b "${1-${BRANCH}}" || git checkout "${1-${BRANCH}}"
     git pull origin "${1-${BRANCH}}"
+    export PATH=$(pwd)/node/bin:$PATH
+    ./node/bin/npm install
     sudo initctl reload-configuration
     if sudo status node_peterlyons; then
-        sudo restart node_peterlyons
+        sudo stop node_peterlyons; sudo start node_peterlyons;
     else
         sudo start node_peterlyons
     fi
@@ -290,12 +291,7 @@ task:test() {
 
 task:start() {
     cdpd
-    echo "Starting app server in a loop. CTRL-C once to restart. CTRL-C twice fast to kill."
-    while true
-    do
-        coffee app/server.coffee
-        sleep 1
-    done
+    nodemon app/server.coffee
 }
 
 task:debug() {
@@ -382,7 +378,7 @@ task:validate() {
         EXT=".html"
         echo "Validating the PRODUCTION site"
     fi
-    for URI in $(list_templates) app/photos
+    for URI in $(list_templates) app/photos admin/galleries problog/feed persblog/feed problog/2009/03/announcing-petes-points persblog/2007/10/petes-travel-adventure-2007-begins-friday-october-5th
     do
         printf '  %-25s' "${URI}: "
         local TMP_HTML="/tmp/tmp_html.$$.html"
@@ -423,7 +419,7 @@ task:watch() {
     stylus -w -o public app/assets/css/screen.styl
 }
 
-app:html_to_md() {
+task:html_to_md() {
     local HTML="${1}"
     local MD=$(echo "${1}" | sed -e 's/\.html$/.md/')
     local JSON=$(echo "${1}" | sed -e 's/\.html$/.json/')
@@ -444,31 +440,11 @@ case "${1}" in
         ENV_NAME="${1}"
         shift
         OP="${1}"
+        shift
     ;;
     *)
         OP="${1}"
-    ;;
-esac
-
-case "${OP}" in
-    db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch)
-        #Op looks valid-ish
-        if ! expr "${OP}" : '.*:' > /dev/null; then
-            OP="task:${OP}"
-        fi
-    ;;
-    deploy)
-        for HOST in ${HOSTS}
-        do
-            echo "Running task deploy on ${HOST} as ${SUDO-$USER}"
-            scp "${TASK_SCRIPT}" "${HOST}:/tmp"
-            ssh -q -t "${HOST}" "${SUDO}" bash  \
-            "/tmp/$(basename ${TASK_SCRIPT})" "deploy"
-        done
-    ;;
-    *)
-        echo "ERROR: unknown task ${OP}" 1>&2
-        exit 1
+        shift
     ;;
 esac
 
@@ -477,8 +453,20 @@ if egrep "^${OP}\(\).*#TASK: sudo" "${TASK_SCRIPT}" > /dev/null; then
     SUDO=sudo
 fi
 
-if [ -z "${ENV_NAME}" ]; then
+if [ -z "${HOSTS}" ]; then
     #local mode
+    case "${OP}" in
+        db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch|deploy|validate|html_to_md)
+            #Op looks valid-ish
+            if ! expr "${OP}" : '.*:' > /dev/null; then
+                OP="task:${OP}"
+            fi
+        ;;
+        *)
+            echo "ERROR: unknown task ${OP}" 1>&2
+            exit 1
+        ;;
+    esac
     eval "${OP}" "${@}"
 else
     #remote mode

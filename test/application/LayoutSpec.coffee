@@ -22,4 +22,4 @@ describe "the main layout", ->
       expect($(selector)).not.to.be.empty
 
   it "should have the normal title", ->
-    $("title").text().should.equal "Peter Lyons: node.js coder for hire"
+    expect($("title").text()).to.eql "Peter Lyons: node.js coder for hire"

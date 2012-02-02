@@ -1,6 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Announcing Pete's Points | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"><meta name="author" content="Peter Lyons"><meta name="description" content="Peter Lyons: node.js coder for hire"><link rel="stylesheet" href="/screen.css"><script src="/js/jquery.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><h1>Announcing Pete's Points</h1>I have decided to start a "professional" blog.  I use the word "professional" only in the sense of "not personal".  I will post about software engineering, computers, consumer electronics, and music technology primarily.  You may want to read this  <a href="/problog/about/">description of what this blog is all about</a>.  I hope you enjoy it and look forward to any conversations this generates.
-<a href="/problog" class="button">back to blog index</a><div id="disqus_thread"></div><script>var disqus_shortname = "peterlyons-problog";</script><script>/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-var disqus_developer = true;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Announcing Pete's Points | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"><meta name="author" content="Peter Lyons"><meta name="description" content="Peter Lyons: node.js coder for hire"><link rel="stylesheet" href="/screen.css"><script src="/js/jquery.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><article><span class="date">Mar 14, 2009</span><h1>Announcing Pete's Points</h1>I have decided to start a "professional" blog.  I use the word "professional" only in the sense of "not personal".  I will post about software engineering, computers, consumer electronics, and music technology primarily.  You may want to read this  <a href="/problog/about/">description of what this blog is all about</a>.  I hope you enjoy it and look forward to any conversations this generates.
+</article><hr><nav class="post"><a href="/problog" class="button">back to blog index</a><ul><li>Next post &nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/problog/2009/03/music-subscription-and-rhapsody">Music subscription and Rhapsody</a></li><li><a id="toggleComments" href="#">Show Comments</a></li></ul></nav><section id="comments" class="hidden"><div id="disqus_thread"></div><script>var disqus_shortname = "peterlyons-problog";</script><script>/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_developer = 1;
 
 /* * * DON'T EDIT BELOW THIS LINE * * */
 (function() {
@@ -8,7 +9,32 @@ var disqus_developer = true;
     dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 })();
-</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><script type="text/javascript">
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></section><script type="text/javascript">
+(function() {
+  var toggleComments;
+
+  toggleComments = function(event) {
+    var hidden;
+    if (event != null) event.preventDefault();
+    hidden = $("#comments").toggleClass("hidden").hasClass("hidden");
+    return $("#toggleComments").text(hidden ? "Show Comments" : "Hide Comments");
+  };
+
+  window.disqus_config = function() {
+    return this.callbacks.afterRender.push(function() {
+      var num;
+      num = $("#dsq-num-posts").text();
+      if (num > 0 && $("#comments").hasClass("hidden")) return toggleComments();
+    });
+  };
+
+  $(function() {
+    return $("a#toggleComments").on("click", toggleComments);
+  });
+
+}).call(this);
+</script>
+<script type="text/javascript">
 (function() {
 
   $(function() {
@@ -33,5 +59,5 @@ var disqus_developer = true;
 </a><a href="http://stackoverflow.com/users/266795/peter-lyons"><img src="/images/stackoverflow_icon.png" alt="stackoverflow" title="stackoverflow" class="icon">stackoverflow
 </a><a href="https://github.com/focusaurus"><img src="/images/github_icon.png" alt="github" title="github" class="icon">github
 </a><a href="https://twitter.com/#!/focusaurus"><img src="/images/twitter_icon.png" alt="twitter" title="twitter" class="icon">twitter
-</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border:0;width:88px;height:31px" src="/images/valid_css.png" alt="Valid CSS!"></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
+</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border: 0; width: 88px; height: 31px;" src="/images/valid_css.png" alt="Valid CSS!"></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
 </a></p></div></footer></body></html>
