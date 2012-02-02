@@ -1,6 +1,7 @@
 _ = require "underscore"
 asyncjs = require "asyncjs"
 date = require "../../lib/date" #Do not remove. Monkey patches Date
+errors = require "../errors"
 fs = require "fs"
 jade = require "jade"
 markdown = require("markdown-js").makeHtml
@@ -19,6 +20,8 @@ loadPost = (req, res, next) ->
   post = new Post
   post.base = path.join(__dirname, "..", "posts")
   post.load path.join(post.base, req.path + ".json"), blog, (error) ->
+    if error?.code is "ENOENT"
+      return next new errors.NotFound
     return next(error) if error
     res.post = post
     post.presented = presentPost post
