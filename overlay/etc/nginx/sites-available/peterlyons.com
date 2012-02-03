@@ -10,6 +10,7 @@ server {
     server_name .peterlyons.com;
     #This is essential so we can use the same configuration in production and staging
     server_name_in_redirect off;
+    charset utf-8;
     access_log /home/plyons/projects/peterlyons.com/var/log/nginx.access.log;
     error_log /home/plyons/projects/peterlyons.com/var/log/nginx.error.log;
     error_page 404 /error404.html;
