@@ -257,6 +257,7 @@ task:deploy() {
     else
         sudo start node_peterlyons
     fi
+    sudo service nginx reload
 }
 
 check_fail() {

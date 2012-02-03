@@ -2,9 +2,9 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>The Stretch of Vitality | Peter Lyons
   </title>
-  <link href="http://localhost:9400/persblog/feed" rel="self">
+  <link href="http://peterlyons.com/persblog/feed" rel="self">
   </link>
-  <link href="http://localhost:9400/persblog/feed">
+  <link href="http://peterlyons.com/persblog/feed">
   </link><updated>2012-01-30T22:57:46.373Z</updated><id>http://peterlyons.com/problog/feed</id>
   <author>
     <name>Peter Lyons
