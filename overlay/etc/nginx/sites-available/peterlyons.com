@@ -18,7 +18,7 @@ server {
     location / {
         root /home/plyons/projects/peterlyons.com/public;
         #Trailing slashes are verboten
-        rewrite ^(.+)/$ $1;
+        rewrite ^(.+)/$ http://$host$1 permanent;
         index index.html home.html;
         try_files $uri $uri.html $uri/ @app;
     }
