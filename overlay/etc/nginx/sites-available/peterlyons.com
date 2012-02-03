@@ -20,7 +20,7 @@ server {
         #Trailing slashes are verboten
         rewrite ^(.+)/$ http://$host$1 permanent;
         index index.html home.html;
-        try_files $uri $uri.html $uri/ @app;
+        try_files $uri $uri.html $uri.xml $uri/ @app;
     }
 
     location @app {

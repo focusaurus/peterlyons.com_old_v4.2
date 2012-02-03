@@ -201,8 +201,8 @@ list_templates() {
     ls app/templates/*.{jade,md} | xargs -n 1 basename | sed -e s/\.jade// \
         -e /layout/d \
         -e /photos/d \
-        -e /admin_galleries/d \
         -e /feed/d \
+        -e /admin_galleries/d \
         -e s/\.md//
 }
 
@@ -296,7 +296,7 @@ task:debug() {
 
 task:static() {
     echo "Generating HTML for static templated pages from ${DEVURL}..."
-    for URI in $(list_templates)
+    for URI in $(list_templates) persblog/feed problog/feed
     do
         local URL="${DEVURL}/${URI}"
         echo -n "${URI}, "
@@ -308,6 +308,8 @@ task:static() {
             exit ${EXIT_CODE}
         fi
     done
+    mv "${PUBLIC}/problog/feed.html" "${PUBLIC}/problog/feed.xml"
+    mv "${PUBLIC}/persblog/feed.html" "${PUBLIC}/persblog/feed.xml"
     cdpd
     cd app/posts
     for JSON in $(find . -type f -name \*.json)

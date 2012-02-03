@@ -88,8 +88,29 @@ class BlogIndex extends pages.Page
         pretty: true
         locals: self.locals
       options.locals.posts = self.posts
-      res.header "Content-Type", "text/xml"
-      res.render "feed", options
+      asyncjs.list(self.posts).map (post, next) ->
+        fakeRes =
+          post: post
+          viewPath: post.viewPath()
+        next null, fakeRes
+      .each (fakeRes, next) ->
+        html req, fakeRes, next
+      .each (fakeRes, next) ->
+        markdownToHTML req, fakeRes, next
+      .each (fakeRes, next) ->
+        middleware.domify req, fakeRes, next
+      .each (fakeRes, next) ->
+        middleware.flickr req, fakeRes, next
+      .each (fakeRes, next) ->
+        middleware.youtube req, fakeRes, next
+      .each (fakeRes, next) ->
+        window = fakeRes.dom.window
+        window.$("script").last().remove()
+        fakeRes.post.content = fakeRes.html = window.$("body").html()
+        next()
+      .end (error, fakeRes) ->
+        res.header "Content-Type", "text/xml"
+        res.render "feed", options
 
     app.get new RegExp("/(#{@URI})/\\d{4}/\\d{2}/\\w+"), postMiddleware
 
