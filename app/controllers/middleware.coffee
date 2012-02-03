@@ -24,6 +24,7 @@ exports.layout = (req, res, next) ->
 
 exports.domify = (req, res, next) ->
   jsdom.env res.html, [jqueryPath], (error, dom) ->
+    return next error if error
     res.dom = dom
     dom.toMarkup = ->
       #Remove the local jquery script reference added by jsdom
