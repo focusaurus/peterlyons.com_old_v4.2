@@ -193,7 +193,7 @@ So I have been messing with [Spotify](http://spotify.com) today and trying to ex
     Missa Papae Marcelli,Giovanni da Palestrina
     Missa de Beata Virgine I,Giovanni da Palestrina
     Morning View,Incubus
-    M�lodies (Songs),Francis Poulenc
+    Melodies (Songs),Francis Poulenc
     Nancy Wilson & Cannonball Adderley,Nancy Wilson & Cannonball Adderley
     Parachutes,Coldplay
     Peng!,Stereolab
@@ -575,7 +575,7 @@ So I have been messing with [Spotify](http://spotify.com) today and trying to ex
     Paper Music,
     Piano Quintet In F Minor; Piano Quartet No. 3 In C Minor,Johannes Brahms
     Poulenc:  Works For Cello & Piano ,Francis Poulenc
-    R�yksopp's Night Out (live Ep),Royksopp
+    Royksopp's Night Out (live Ep),Royksopp
     Saxophone Colossus (EP),Sonny Rollins
     Songs Without Words (Soundtrack),Fred Hersch
     The Dresden Dolls,The Dresden Dolls
@@ -667,7 +667,7 @@ So I have been messing with [Spotify](http://spotify.com) today and trying to ex
     Back East,Joshua Redman
     Boccherini: Quintets for Flute, Violin, Viola, and 2 Violoncellos,Jean-Pierre Rampal
     Cellar Door (EP),Cellar Door
-    Debussy: Nocturnes; La Mer; Pr�lude � l'apr�s-midi d'un faune,
+    Debussy: Nocturnes; La Mer; Prelude a l'apres-midi d'un faune,
     Freak Show,The Residents
     From The Plantation To The Penitentiary,Wynton Marsalis
     Goodbye,Ulrich Schnauss
@@ -746,7 +746,7 @@ So I have been messing with [Spotify](http://spotify.com) today and trying to ex
     Crystal Castles,Crystal Castles
     D-Sides,Gorillaz
     Daniel Variations,Steve Reich
-    Debussy: M�lodies,Jos van Immerseel Sandrine Piau
+    Debussy: Melodies,Jos van Immerseel Sandrine Piau
     Drama,Bitter:Sweet
     Edgar Meyer,Edgar Meyer
     Fakebook,Yo La Tengo
@@ -784,7 +784,7 @@ So I have been messing with [Spotify](http://spotify.com) today and trying to ex
     An Evening With Joe Henderson, Al Foster, Charlie Haden,Joe Henderson
     Anticipation (Explicit),Lewis Black
     B-sides Demos & Remixes,Young M.C.
-    Bart�k: The 6 String Quartets,Emerson String Quartet
+    Bartok: The 6 String Quartets,Emerson String Quartet
     Chemical Chords,Stereolab
     Closer: The Best Of Sarah McLachlan (Bonus Tracks),Sarah McLachlan
     Dark Shades Of Blue,Xavier Rudd
@@ -835,7 +835,7 @@ So I have been messing with [Spotify](http://spotify.com) today and trying to ex
     Greatest Hits (Explicit),2Pac
     It's Blitz! (Exclusive,Bonus Tracks),Yeah Yeah Yeahs
     It's Not Me, It's You (Explicit),Lily Allen
-    Junior,R�yksopp
+    Junior,Royksopp
     Left for Dead In Seattle,Skerik
     Lungs,Florence & The Machine
     Metamorphosis (Edited),Papa Roach
@@ -899,4 +899,4 @@ So I have been messing with [Spotify](http://spotify.com) today and trying to ex
     Contraption Vol 1,Beats Antique
     Blind Threshold,Beats Antique
     Random Album Title,Deadmau5
-    Livin' A Trem� Life,Kermit Ruffins
+    Livin' A Treme Life,Kermit Ruffins
