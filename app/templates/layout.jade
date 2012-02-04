@@ -12,11 +12,17 @@ html(lang="en")
     script(src="/js/jquery.js")
     link(href="/favicon.ico", type="image/x-icon", rel="icon")
     link(href="/favicon.ico", type="image/x-icon", rel="shortcut icon")
-    link(rel="openid.server", href="http://www.livejournal.com/openid/server.bml")
+    link(rel="alternate", type="application/atom+xml",
+      href="/problog/feed", title="Pete's Points")
+    link(rel="openid.server",
+      href="http://www.livejournal.com/openid/server.bml")
     link(rel="openid.delegate", href="http://focusaurus.livejournal.com/")
-    link(href="http://fonts.googleapis.com/css?family=Inconsolata", rel="stylesheet")
-    link(href="http://fonts.googleapis.com/css?family=Six+Caps", rel="stylesheet")
-    link(href="http://fonts.googleapis.com/css?family=Oldenburg", rel="stylesheet")
+    link(href="http://fonts.googleapis.com/css?family=Inconsolata",
+      rel="stylesheet")
+    link(href="http://fonts.googleapis.com/css?family=Six+Caps",
+      rel="stylesheet")
+    link(href="http://fonts.googleapis.com/css?family=Oldenburg",
+      rel="stylesheet")
   body
     .content
       header
