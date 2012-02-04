@@ -21,7 +21,7 @@ loadPost = (req, res, next) ->
   post.base = path.join(__dirname, "..", "posts")
   post.load path.join(post.base, req.path + ".json"), blog, (error) ->
     if error?.code is "ENOENT"
-      return next new errors.NotFound
+      return next new errors.NotFound req.path
     return next(error) if error
     res.post = post
     post.presented = presentPost post

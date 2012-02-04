@@ -43,12 +43,13 @@ app.error (error, req, res, next) ->
 
 #Last in the chain means 404 for you
 app.use (req, res, next) ->
-  next new errors.NotFound
+  next new errors.NotFound req.path
 
 #Load in the controllers
 ["pages", "galleries", "photos", "blog"].map (controllerName) ->
   controller = require "./controllers/" + controllerName
   controller.setup app
+errors.setup app
 
 ip = if config.loopback then "127.0.0.1" else "0.0.0.0"
 console.log "Express serving on http://#{ip}:#{config.port} baseURL: #{config.baseURL}, env: #{process.env.NODE_ENV}"
