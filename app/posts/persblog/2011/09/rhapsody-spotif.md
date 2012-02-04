@@ -723,7 +723,7 @@ So I have been messing with [Spotify](http://spotify.com) today and trying to ex
     Mistico,Charlie Hunter Trio
     Old World Underground, Where Are You Now?,Metric
     Pop Up,Yelle
-    Poulenc: Musique de Chambre (Int�grale),
+    Poulenc: Musique de Chambre (Integrale),
     Reich: Drumming,
     Rhino,Albino
     River: The Joni Letters,Herbie Hancock

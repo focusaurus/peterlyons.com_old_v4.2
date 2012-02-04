@@ -5,6 +5,7 @@ exports.appURI = "/app"
 #Listen on all IPs in dev/test (for testing from other machines),
 #But loopback in staging/prod since nginx listens on the routed interface
 exports.loopback = false
+exports.errorPages = true
 exports.staticDir = "./public"
 exports.photos =
   photoURI: "/photos/"
@@ -29,6 +30,7 @@ switch process.env.NODE_ENV
     exports.baseURL = "http://#{exports.site}"
     exports.loopback = true
     exports.photos.serveDirect = false
+    exports.errorPages = false
   when "staging"
     exports.site = "staging.peterlyons.com"
     exports.baseURL = "http://#{exports.site}"
