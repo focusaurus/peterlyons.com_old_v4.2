@@ -6,7 +6,7 @@ markdown = require("markdown-js").makeHtml
 
 leadZero = (value) -> if value > 9 then "#{value}" else "0#{value}"
 slug = (phrase="") ->
-  phrase.replace(/\s/g, "-").replace(/'/g, "").replace(/\./g, "-").toLowerCase()
+  phrase.replace(/\s/g, "-").replace(/'/g, "").replace(/\./g, "-").replace(/--/g, "-").replace(/-$/, "").toLowerCase()
 
 class Post
   constructor: (@blog, @title, @publish_date, @format) ->
