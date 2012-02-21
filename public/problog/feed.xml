@@ -5,11 +5,21 @@
   <link href="http://peterlyons.com/problog/feed" rel="self">
   </link>
   <link href="http://peterlyons.com/problog/feed">
-  </link><updated>2012-01-31T00:06:04.787Z</updated><id>http://peterlyons.com/problog/feed</id>
+  </link><updated>2012-02-21T04:17:33.377Z</updated><id>http://peterlyons.com/problog/feed</id>
   <author>
     <name>Peter Lyons
     </name>
   </author>
+  <entry>
+    <title>Noding for Sococo
+    </title>
+    <link href="http://peterlyons.com/problog/2012/02/noding-for-sococo">
+    </link><updated>2012-02-21T04:17:33.377Z</updated><id>http://localhost:9400/problog/2012/02/noding-for-sococo</id>
+    <content type="html">&lt;p&gt;So I've taken a new full-time position as a Web Developer at &lt;a href=&quot;http://sococo.com&quot;&gt;Social Communications Company&lt;/a&gt;. We make a virtual office communication tool that combines an interactive office map with chat, voice, and meeting features. We are adding a new web client to complement the existing native clients for Mac OS and Windows, and using node.js and HTML5. As a long-time user (sufferer?) of those frustrating conference call phones you find sprinkled throughout corporate America, at my first remote stand-up meeting I could see why this is a much better tool. Aside from the fact that conference speaker phones suffer from audio quality that is bad more often than it is good, it really only works if the remote people recognize all the on-site people by voice. If you are meeting wih unfamiliar people, you have no clue who is saying what. It's a big barrier to clear communication and a point of frustration. Add to that the quiet talkers, people not speaking into the microphone, and people trying to slide the phone around the table (which creates a wall of noise for the remote listeners) and talk at the same time, and it's pretty much failville. I remember often wishing everyone would just go back to their cubes and dial in individually so at least I could hear them. With Sococo, everyone is at their desk with nicely isolated audio, and everyone is represented on screen. The avatars indicate who is speaking and are labeled with names so it's always clear who is talking. Since everyone is always online in the virtual office, it's a very low-friction environment for quick voice or text chats about topics as they come up between however many people are necessary. There's no long dial-in number and infuriating IVR to deal with. (IVR is Interactive Voice Response, the industry term for phone menus where a voice tells you to dial numbers to navigate through a series of menu choices).&lt;/p&gt;
+
+&lt;p&gt;I'm really excited to be doing node.js work professionally now. I was cleaning out my &lt;code&gt;~/Downloads&lt;/code&gt; folder last week and found I had downloaded node.js version 0.3.8 on Feb 4, 2011, so I've been working with node.js more than a year now and I find it a really fun environment in which to work. I think node.js is going to play an important role in the toolbox of web developers in the next few years, and I'm glad to be here on the early side of things.&lt;/p&gt;
+    </content>
+  </entry>
   <entry>
     <title>Node Summit
     </title>
