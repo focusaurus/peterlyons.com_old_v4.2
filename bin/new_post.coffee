@@ -15,7 +15,7 @@ commander
   .parse(process.argv);
 
 post = new Post commander.blog, commander.title, new Date(), commander.format
-post.name ||= commander.name
+post.name = commander.name || post.name
 post.base = path.join __dirname, "..", "app", "posts"
 metadata = JSON.stringify(post.metadata()) + "\n"
 asyncjs.files([path.join(post.base, post.metadataPath())])
