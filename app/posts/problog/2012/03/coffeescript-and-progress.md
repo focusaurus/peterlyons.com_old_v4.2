@@ -3,7 +3,7 @@ If you like [CoffeeScript](http://jashkenas.github.com/coffee-script), you shoul
 #Philosophical Rejection of Monoglotism
 
 * Availability of a multitude of highly varied programming languages is good
-    * Check out [Dart](http://dartr.com/), [Haxe](http://haxe.org/), [CoffeeScript](http://jashkenas.github.com/coffee-script), [GWT](http://code.google.com/webtoolkit/) for examples
+    * Check out [Dart](http://dartr.com/), [Haxe](http://haxe.org/), [CoffeeScript](http://jashkenas.github.com/coffee-script), [GWT](http://code.google.com/webtoolkit/), or [Caterwaul](http://caterwauljs.org/) for examples
 * The goal of a single programming language for the browser is a detrimental non-goal
 * Openness and freedom are important, as are standards and interoperability, but standards that don't evolve on an appropriate schedule are detrimental.
 

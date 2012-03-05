@@ -21,7 +21,7 @@
 
 &lt;ul&gt;
 &lt;li&gt;Availability of a multitude of highly varied programming languages is good
-&lt;ul&gt;&lt;li&gt;Check out &lt;a href=&quot;http://dartr.com/&quot;&gt;Dart&lt;/a&gt;, &lt;a href=&quot;http://haxe.org/&quot;&gt;Haxe&lt;/a&gt;, &lt;a href=&quot;http://jashkenas.github.com/coffee-script&quot;&gt;CoffeeScript&lt;/a&gt;, &lt;a href=&quot;http://code.google.com/webtoolkit/&quot;&gt;GWT&lt;/a&gt; for examples&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;ul&gt;&lt;li&gt;Check out &lt;a href=&quot;http://dartr.com/&quot;&gt;Dart&lt;/a&gt;, &lt;a href=&quot;http://haxe.org/&quot;&gt;Haxe&lt;/a&gt;, &lt;a href=&quot;http://jashkenas.github.com/coffee-script&quot;&gt;CoffeeScript&lt;/a&gt;, &lt;a href=&quot;http://code.google.com/webtoolkit/&quot;&gt;GWT&lt;/a&gt;, or &lt;a href=&quot;http://caterwauljs.org/&quot;&gt;Caterwaul&lt;/a&gt; for examples&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;The goal of a single programming language for the browser is a detrimental non-goal&lt;/li&gt;
 &lt;li&gt;Openness and freedom are important, as are standards and interoperability, but standards that don't evolve on an appropriate schedule are detrimental.&lt;/li&gt;
 &lt;/ul&gt;
