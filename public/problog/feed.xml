@@ -5,11 +5,126 @@
   <link href="http://peterlyons.com/problog/feed" rel="self">
   </link>
   <link href="http://peterlyons.com/problog/feed">
-  </link><updated>2012-02-21T04:17:33.377Z</updated><id>http://peterlyons.com/problog/feed</id>
+  </link><updated>2012-03-05T04:36:35.083Z</updated><id>http://peterlyons.com/problog/feed</id>
   <author>
     <name>Peter Lyons
     </name>
   </author>
+  <entry>
+    <title>CoffeeScript and Progress
+    </title>
+    <link href="http://peterlyons.com/problog/2012/03/coffeescript-and-progress">
+    </link><updated>2012-03-05T04:36:35.083Z</updated><id>http://localhost:9400/problog/2012/03/coffeescript-and-progress</id>
+    <content type="html">&lt;p&gt;If you like &lt;a href=&quot;http://jashkenas.github.com/coffee-script&quot;&gt;CoffeeScript&lt;/a&gt;, you should write applications in CoffeeScript. If you prefer JavaScript, you should write applications in JavaScript. In this post I want to address the common attitude I have found among JavaScript programmers that CoffeeScript is a priori somehow wrong or inferior or a bad choice. I'll briefly recount some of the technical reasons why I like and use CoffeeScript at the end of this post, but the focus is a rejection of the attitude above on philosophical grounds. To be clear, the position I'm taking issue with is the position that JavaScript is the one and only language we should be writing in for the browser and node.js.&lt;/p&gt;
+
+&lt;h1&gt;Philosophical Rejection of Monoglotism&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Availability of a multitude of highly varied programming languages is good
+&lt;ul&gt;&lt;li&gt;Check out &lt;a href=&quot;http://dartr.com/&quot;&gt;Dart&lt;/a&gt;, &lt;a href=&quot;http://haxe.org/&quot;&gt;Haxe&lt;/a&gt;, &lt;a href=&quot;http://jashkenas.github.com/coffee-script&quot;&gt;CoffeeScript&lt;/a&gt;, &lt;a href=&quot;http://code.google.com/webtoolkit/&quot;&gt;GWT&lt;/a&gt; for examples&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;The goal of a single programming language for the browser is a detrimental non-goal&lt;/li&gt;
+&lt;li&gt;Openness and freedom are important, as are standards and interoperability, but standards that don't evolve on an appropriate schedule are detrimental.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I brought up the topic of Google's Dart language at a local tech meetup when Dart was first announced. I asked people what their reaction was. The few who responded seemed to dislike it, not for any particular technical objection to the language or its features, but simply to its existence at all, which surprised me. This struck me as completely unexpected and strange. Why, I asked. &quot;JavaScript is a standard&quot; came back from one person. &quot;Why do you like it?&quot;, he asked. I said I didn't yet know much of anything about it, but I liked the creation of new programming languages for the browser as a basic idea. I said that choice of programming tools is a good thing, and JavaScript is clearly flawed in extremely well-understood ways. Why is there this relentless stranglehold on universal and eternal backward compatibility? What is the cost/benefit analysis that goes into that?&lt;/p&gt;
+
+&lt;p&gt;Software in general, including programming languages and tools, must continually advance, and the faster, the better. Addressing backward compatibility by slowing forward progress is a losing solution. Ye olde for loop, while venerable, has been surpassed. Let it go. I agree with &lt;a href=&quot;http://www.artima.com/weblogs/viewpost.jsp?thread=221903&quot;&gt;Bruce Eckel&lt;/a&gt; here in that once you have a stable version of a language, authors who &quot;don't want to deal with those changes&quot; should be able to just continue using that version while the current version of the language advances. If you wrote a JDK 1.2 application in 2000 or so and you still want to run it, just keep running it on JDK 1.2. Don't hold the entire java language back for the lifetime of this application which you are unwilling to maintain and advance along with the platform. Browsers should do the same thing with their javascript engines every 2 years or so. If you want to write a codebase once and not update it, ship it on custom hardware that does not include networking capability and call it a day. If you want to write software that works on the Internet, commit to a certain amount of ongoing maintenance. Even if we had perfect technical backward compatible support, the state of everything else: UX, UI, performance, data formats, protocols, continues to advance. Craigslist.org can get away with keeping the same UI for a decade because they make their own rules. Every other site needs to modernize.&lt;/p&gt;
+
+&lt;p&gt;I overheard a well-regarded server-side JavaScript programmer complain about CoffeeScript saying something along the lines of &quot;Why would you write a module in some language I don't know?&quot;. WTF? How would it sound if I said that about any other server side programming language? It would sound ridiculous, because it is.&lt;/p&gt;
+
+&lt;p&gt;This notion that the web is ever going to be some all-purpose panacea built upon a single markup language plus a single stylesheet language plus a single programming language is a false goal. Let it go. Embrace a variety of tools. The vast majority of web sites are not built from direct HTML files. HTML is generated by dozens of highly divergent programming languages across many paradigms with all combinations of trade-offs. So it should be for the application in the browser. It's not a problem on the server, and it's not going to be a problem in the browser.&lt;/p&gt;
+
+&lt;h1&gt;Rejection of FUD&lt;/h1&gt;
+
+&lt;p&gt;CoffeeScript is clearly a well-thought-through and beautiful language. It brilliantly removes the terrible parts of javascript and replaces verbose javascript boilerplate with elegant expressiveness. For example, the function keyword being replaced with the gorgeous arrow symbol &lt;code&gt;-&gt;&lt;/code&gt; and the introduction of list comprehensions. It is so small and concise that there are no glaring warts to be ironed out. If you like python or ruby, you will probably like CoffeeScript better than JavaScript. If you try it for 6 months and change your mind, compile it to javascript and use that as your no codebase. No harm, no foul.&lt;/p&gt;
+
+&lt;h1&gt;But but but...&lt;/h1&gt;
+
+&lt;p&gt;Debugging. I hear arguments that because the line numbers in the browser stack traces don't align with the line numbers in your .coffee files, debugging is harder in CoffeeScript than JavaScript. I don't find this a problem. I just don't. My variable and function names are preserved. I anchor to a function name and my functions don't get exceedingly long. I see that in the browser the error is a few lines down in the &quot;loadUserList&quot; function and I go look at the &quot;loadUserList&quot; function in CoffeeScript and find the problem without a lot of fuss. In my experience there's just no impact here. I don't really know why people bring this up so often. It's just a non-problem for me. We use multiple preprocessing techniques including concatenating JS files together. Line numbers just ain't never gonna map back to actual files in your editor. Get over it.&lt;/p&gt;
+
+&lt;h1&gt;In case you didn't know&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Multiline strings. OMFG yes, duh.&lt;/li&gt;
+&lt;li&gt;String interpolation. So nice. So nice.&lt;/li&gt;
+&lt;li&gt;Destructuring assignment. Coming to JavaScript circa 2019...&lt;/li&gt;
+&lt;li&gt;No 8-letter function keyword. These days we're building anonymous functions every 4 lines or so. Skinny arrow FTW!&lt;/li&gt;
+&lt;li&gt;Array literals with newlines and no commas. I'm not sure what the obsession with commas is, but people, we don't need them. I don't even think we need them in one-line lists. We have the mighty space character, which is how you eye parses code already! If we can do &lt;code&gt;[1, 2, 3, 4]&lt;/code&gt;, then why can't we just do &lt;code&gt;[1 2 3 4]&lt;/code&gt;?&lt;/li&gt;
+&lt;li&gt;Automatic IIFE wrapper. No var keyword. Default values for function parameters. Die boilerplate, die!&lt;/li&gt;
+&lt;li&gt;It's like skinny dipping, but for punctuation! Look at some Jasmine or Mocha BDD tests in JavaScript and then CoffeeScript. One looks like a garbled mess of crap with line after dedented line of &lt;code&gt;}); }); });&lt;/code&gt;, and one looks like poetry.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here's a sample BDD spec in CoffeeScript from &lt;a href=&quot;https://raw.github.com/gist/1379251/274de0e881eb736ebf04657c3c1955a00475836a/4_math_spec.coffee&quot;&gt;a gist on github&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;describe 'Math:', -&gt;
+  describe 'fib()', -&gt;
+    it 'should calculate the numbers correctly up to fib(16)', -&gt;
+      fib = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987]
+      expect(Math.fib(i)).toEqual fib[i] for i in [0..16]
+
+  describe 'uuid()', -&gt;
+    it 'should have the proper UUID format', -&gt;
+      expect(Math.uuid()).toMatch /[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{13}/
+
+    it 'should have always the numer 4 at position 14', -&gt;
+      expect(Math.uuid()).toMatch /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{13}/
+      expect(Math.uuid()).toMatch /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{13}/
+      expect(Math.uuid()).toMatch /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{13}/
+
+    it 'should generate a unique uuid for 1000 generated uuids at least', -&gt;
+      uuids = []
+      counter = 0
+
+      while counter &lt; 1000
+        uuids.push Math.uuid()
+        counter++
+
+      expect(uuids.length).toEqual _.uniq(uuids).length
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And here's a &lt;a href=&quot;https://raw.github.com/gist/1680082/7180717961b2938f00acedbff14b7192561ac2cc/gistfile1.js&quot;&gt;similar jasmine spec in JavaScript&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;describe(&quot;NotesView&quot;, function() {
+  beforeEach(function() {
+    var notes = new NotesCollection();
+    spyOn(notes, &quot;fetch&quot;);
+
+    var view = new NotesView({collection: notes});
+  });
+
+  describe(&quot;#initialize&quot;, function() {
+    it(&quot;should fetch the notes&quot;, function() {
+      expect(notes.fetch).toHaveBeenCalled();
+    });
+
+    describe(&quot;on notes fetch success&quot;, function() {
+      beforeEach(function() {
+        var request = mostRecentAjaxRequest();
+        request.response({
+          status: 200,
+          responseText: JSON.stringify([
+            {body: &quot;Blog post #1&quot;, id: &quot;1&quot;}
+          ])
+        });
+      });
+
+      it(&quot;should render the view&quot;, function() {
+        expect($(view.el).find(&quot;.post&quot;)).toHaveText(&quot;Blog post #1&quot;);
+      });
+    });
+  });
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Ouch, my eyes! All those closing punctuation groups!&lt;/p&gt;
+
+&lt;p&gt;Reduction of boilerplate and increasing expressiveness are what I want from a language. CoffeeScript delivers strongly in these areas. It compiles to JavaScript and works right now in all browsers and in node.js.&lt;/p&gt;
+
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;It's a polyglot world. Every app is going to use more than one programming language. Work toward making the programming languages we use better instead of trying to shame us into continuing to use languages as better alternatives are created. Shame on you. Move forward.&lt;/p&gt;
+    </content>
+  </entry>
   <entry>
     <title>Noding for Sococo
     </title>
