@@ -5,11 +5,31 @@
   <link href="http://peterlyons.com/persblog/feed" rel="self">
   </link>
   <link href="http://peterlyons.com/persblog/feed">
-  </link><updated>2012-03-18T17:17:54.177Z</updated><id>http://peterlyons.com/problog/feed</id>
+  </link><updated>2012-03-25T19:56:34.138Z</updated><id>http://peterlyons.com/problog/feed</id>
   <author>
     <name>Peter Lyons
     </name>
   </author>
+  <entry>
+    <title>Super Saturday
+    </title>
+    <link href="http://peterlyons.com/persblog/2012/03/super-saturday">
+    </link><updated>2012-03-25T19:56:34.138Z</updated><id>http://localhost:9400/persblog/2012/03/super-saturday</id>
+    <content type="html">&lt;p&gt;Wow, it's been a week cranking on all cylinders. It's great and I like it, but it sure is taxing. Monday I closed a new mortgage on my home at a lower interest yet. This will save me several hundred dollars each month, which is great. It was a long time coming though, I started discussing it with brokers back in December.&lt;/p&gt;
+
+&lt;p&gt;Tuesday I got my ticket for &lt;a href=&quot;http://apogaea.com&quot;&gt;Apogaea&lt;/a&gt;, the Colorado regional Burning Man festival. I've never been before, but it should be really fun. It's going to be great being just a few hours drive away and having June weather in the mountains as opposed to August weather in the desert. My friend Jasmine from aerials is doing a project called the Circus of Illumination. She's forming a new band to play live music to accompany the circus performers. Wednesday night we had the first rehearsal/audition. I think there was a total of 12 or 13 total people there. We played some folk tunes and tried to get to know each other a bit. It should be a fun project. My main to-do for today is to get some of the initial charts transposed for the different horns/clefs.&lt;/p&gt;
+
+&lt;p&gt;Thursday I biked into Boulder and tried out the &lt;a href=&quot;http://catsgym.com&quot;&gt;Colorado Athletic Training School (CATS)&lt;/a&gt; open workout. CATS is a gymnastics school primarily but they have open workout weeknights 8-10 pm. It's cheap ($5) and they have a whole bunch of equipment including a substantial bouldering wall, aerial fabrics, trampolines, rings, parallel bars, tumbling floor, crash pads, etc. There were a bunch of young kids finishing up classes and training for the first bit but after a while it was mostly adults left. There was a group practicing acroyoga, some guys working on parkour, some climbers, people practicing aerials off the trampoline, and a few of us working on the fabrics. I forgot to bring my climbing shoes, but this week I'll bring them for sure.&lt;/p&gt;
+
+&lt;p&gt;Friday I cooked two rotisserie chickens after work, which took quite a long time, and I watched the movie &quot;Drive&quot;, which I thought was underwhelming. Not sure what all the rave reviews are about.&lt;/p&gt;
+
+&lt;p&gt;Then began the epic Saturday. I woke up around 7:30 and set to work on household chores, mostly cleaning out some kitchen cabinets and the guest bedroom. I will be getting a roommate in April. Travis the guitar player from The Afronauts is going to rent the downstairs suite. I've also managed to rent out the upstairs guest bedroom a couple on times on &lt;a href=&quot;http://airbnb.com&quot;&gt;AirBnb&lt;/a&gt;. We'll see how it goes. I may need to revert to my isolated monk cave mode at some point, but for now it should be fun and will help with the mortgage. After a little of that I packed up my bike for the day, pedaled to King Soopers to return the Drive DVD to red box, and then across town to Brenda's to help her change the tubes in her bike tires. That took a while as Randy's full-size pump wouldn't fit on her tube's Shrader valves (I have no idea why) so we had to inflate her tires with a tiny portable hand pump. Once she was ready to roll I rolled off to Boulder. I met up with Elise downtown, skipped the 45 minute wait at Snooze, and ate a delicious brunch at Aji.&lt;/p&gt;
+
+&lt;p&gt;Then it was up to North Boulder for aerials workout, and then another 12 mile bike back to Louisville. I took a long disco nap, ate some yummy rotisserie chicken leftovers, and then headed up to Nederland to gig at the Pioneer Inn with The Afronauts. It was a fun gig and the small crowd seemed to enjoy it. We played until 1 am though. After the gig I chatted with my buddy Ben who drove up from Boulder for a while. So in the end I didn't get to bed until 2:30 am. I was TIRED. I had unbuttoned my shirt in the car so that I could go from car to bed faster when I got home. Totally wiped.&lt;/p&gt;
+
+&lt;p&gt;I slept late today, but am still feeling pretty drained. All that biking yesterday made this morning my new record low weight: 134.6 lbs. On that note, I also increased my personal best to 32 pull-ups last Wednesday. Today I'm hoping to work a bit on charts for the new Apogaea gypsy band and then try a new aerials school in Denver.&lt;/p&gt;
+    </content>
+  </entry>
   <entry>
     <title>Just Try It
     </title>
@@ -35,6 +55,7 @@
 &lt;li&gt;painting my fingernails&lt;/li&gt;
 &lt;li&gt;CoffeeScript, Backbone, Express, Jade, Stylus, etc&lt;/li&gt;
 &lt;li&gt;Sublime Text 2&lt;/li&gt;
+&lt;li&gt;static site generator for this blog&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;A good percentage of those have worked out pretty well. Not all, but most.&lt;/p&gt;
