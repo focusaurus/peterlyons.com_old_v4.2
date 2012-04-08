@@ -1,6 +1,6 @@
 config = require "../../config"
 fs = require "fs"
-jsdom = require "jsdom"
+cheerio = require "cheerio"
 jade = require "jade"
 path = require "path"
 
@@ -23,36 +23,26 @@ exports.layout = (req, res, next) ->
     next error
 
 exports.domify = (req, res, next) ->
-  jsdom.env res.html, [jqueryPath], (error, dom) ->
-    return next error if error
-    res.dom = dom
-    dom.toMarkup = ->
-      #Remove the local jquery script reference added by jsdom
-      #Once this pull request is merged and released we can do this:
-      #https://github.com/tmpvar/jsdom/pull/392#issuecomment-3747364
-      #@window.$("script.jsdom").remove()
-      #But for now we need to do this, which is brittle
-      @window.$("script").last().remove()
-      @window.document.doctype + @window.document.innerHTML
-    next error
+  res.$ = cheerio.load res.html
+  next()
 
 exports.undomify = (req, res, next) ->
-  res.html = res.dom.toMarkup()
+  res.html = res.$.html()
   next()
 
 exports.send = (req, res) ->
   res.send res.html
 
 exports.flickr = (req, res, next) ->
-  $ = res.dom.window.$
-  $("flickrshow").each (index, elem) ->
+  $ = res.$
+  res.$("flickrshow").each (index, elem) ->
     $elem = $(elem)
     URLs = $elem.attr "href"
     $elem.replaceWith(flickrshowTemplate.replace /\{URLs\}/g, URLs)
   next()
 
 exports.youtube = (req, res, next) ->
-  $ = res.dom.window.$
+  $ = res.$
   $("youtube").each (index, elem) ->
     $elem = $(elem)
     URL = $elem.attr "href"

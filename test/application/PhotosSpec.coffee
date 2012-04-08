@@ -1,13 +1,13 @@
 config = require "../../config"
 expect = require("chai").expect
-jsdom = require "jsdom"
+{loadPage} = require "../TestUtils"
 
 describe "the photos page", ->
   $ = null
 
   before (done) ->
-    jsdom.env config.baseURL + "/app/photos", [config.jqueryURL], (error, jsWindow) ->
-      $ = jsWindow.$
+    loadPage config.baseURL + "/app/photos", (dom) ->
+      $ = dom
       done()
 
   it "should have the photo surrounding structure", ->
