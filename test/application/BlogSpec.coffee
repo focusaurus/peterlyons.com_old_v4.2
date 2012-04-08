@@ -1,13 +1,14 @@
 config = require "../../config"
 expect = require("chai").expect
-jsdom = require "jsdom"
+{loadPage} = require "../TestUtils"
 
 describe "a blog post page", ->
   $ = null
 
   before (done) ->
-    jsdom.env config.baseURL + "/persblog/2012/01/san-francisco-walkabout", [config.jqueryURL], (error, jsWindow) ->
-      $ = jsWindow.$
+    URL = config.baseURL + "/persblog/2012/01/san-francisco-walkabout"
+    loadPage URL, (dom)->
+      $ = dom
       done()
 
   it "should have the post title", ->
@@ -17,6 +18,9 @@ describe "a blog post page", ->
     expect($("flickr")).to.be.empty
     expect($("object")).not.to.be.empty
 
+  it "should process a youtube tag", ->
+    expect($("flickr")).to.be.empty
+    expect($("object")).not.to.be.empty
   it "should have disqus comments", ->
     expect($("#disqus_thread")).not.to.be.empty
 
@@ -24,8 +28,8 @@ describe "a blog index page", ->
   $ = null
 
   before (done) ->
-    jsdom.env config.baseURL + "/problog", [config.jqueryURL], (error, jsWindow) ->
-      $ = jsWindow.$
+    loadPage config.baseURL + "/problog", (dom)->
+      $ = dom
       done()
 
   it "should have nicely formatted dates", ->

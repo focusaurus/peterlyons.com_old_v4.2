@@ -1,7 +1,6 @@
 config = require "../../config"
 request = require "superagent"
 expect = require("chai").expect
-jsdom = require "jsdom"
 
 describe 'smoke tests for most pages on the site', ->
 
@@ -38,12 +37,4 @@ describe 'smoke tests for most pages on the site', ->
           expect(res.status).to.equal 200
           expect(res.text).to.match regex
           done()
-    # makeTest = (URI, regex) ->
-    #   it "#{URI} should match #{regex}", (done) ->
-    #     jsdom.env config.baseURL + URI, [config.jqueryURL], (error, jsWindow) ->
-    #       console.log "BUGBUG1 error:", error
-    #       expect(error).not.to.be
-    #       console.log "BUGBUG2 html", jsWindow.window.document.innerHTML.slice(0, 20), regex
-    #       expect(jsWindow.window.doument.innerHTML).match regex
-    #       done()
     makeTest test...
