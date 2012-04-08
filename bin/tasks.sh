@@ -249,6 +249,8 @@ task:deploy() {
     git fetch origin --tags
     git checkout --track -b "${1-${BRANCH}}" || git checkout "${1-${BRANCH}}"
     git pull origin "${1-${BRANCH}}"
+    git submodule init
+    git submodule update
     export PATH=$(pwd)/node/bin:$PATH
     ./node/bin/npm install
     sudo initctl reload-configuration
