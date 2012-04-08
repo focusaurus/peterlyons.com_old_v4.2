@@ -194,6 +194,9 @@ html(lang="en")
           WHERE price > 100.00
           ORDER BY title;
     section
+      h2 3-Tier Web Application Architecture
+      | Browser &harr; Web Server &harr; Application Server &harr; Database Server
+    section
       h2 Example: PHP App Queries MySQL DB and generates HTML
       code
         pre.
@@ -228,7 +231,7 @@ html(lang="en")
               <th></th>
               <th></th>
             </tr>
-           
+
           <% @books.each do |book| %>
             <tr>
               <td><%= book.title %></td>
@@ -239,9 +242,9 @@ html(lang="en")
             </tr>
           <% end %>
           </table>
-           
+
           <br />
-           
+
           <%= link_to 'New book', new_book_path %>
     section
       h2 NoSQL Attributes
@@ -273,6 +276,19 @@ html(lang="en")
       h2 Exercise: Sharding and MapReduce
     section
       img(src="http://dbpedias.com/w/images/9/90/MongoDB.JPG", alt="SQL to NoSQL")
+    section
+      h2 Cloud Storage
+      ul
+        li Amazon S3 (filesystem)
+        li Amazon RDS (SQL DB)
+        li Amazon SimpleDB (Key/Value DB)
+        li Microsoft SQL Azure
+    section
+      h2 HTML5 LocalStorage
+      ul
+        li Small area of storage on a single web browser
+        li Addresses some of the pervisions of Cookies
+        li A SQL-type database was proposed but has since been canceled
     section
       h2 Application Programming Interfaces (APIs)
       ul
@@ -310,9 +326,15 @@ html(lang="en")
         li
           a(href="http://php.about.com/od/phpwithmysql/ss/mysql_php_3.htm") SQL Queries in PHP
         li
+          a(href="http://en.wikipedia.org/wiki/Multitier_architecture") Wikipedia: Multitier architecture
+        li
           a(href="http://nosql-database.org/") http://nosql-database.org/
         li
           a(href="http://dbpedias.com/wiki/NoSQL:Survey_of_Distributed_Databases") Survey of Distributed Databases
+        li
+          a(href="http://practicalcloudcomputing.com/post/16109041412/the-state-of-nosql-in-2012") State of NqSQL in 2012
+        li
+          a(href="http://diveintohtml5.info/storage.html") HTML5 Local Storage
         li
           a(href="http://en.wikipedia.org/wiki/Ajax_(programming)") Wikipedia: AJAX
     script(src="/deck.js/modernizr.custom.js")
