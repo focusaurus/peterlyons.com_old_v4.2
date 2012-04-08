@@ -1,0 +1,161 @@
+doctype 5
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    title How Data Powers the Web
+    link(href="/favicon.ico", type="image/x-icon", rel="icon")
+    link(href="/favicon.ico", type="image/x-icon", rel="shortcut icon")
+        <link rel="stylesheet" href="css/reset.css">
+    link(rel="stylesheet", href="/deck.js/core/deck.core.css")
+    link(rel="stylesheet", href="/deck.js/extensions/menu/deck.menu.css")
+    link(rel="stylesheet", href="/deck.js/extensions/menu/deck.hash.css")
+    link(rel="stylesheet", href="/deck.js/themes/style/web-2.0.css")
+    link(rel="stylesheet", href="/deck.js/themes/transition/vertical-slide.css")
+  body
+    section
+      h2 Data, Data, Everywhere
+      h3 How data powers the web
+      h4 Session #3 of Skillshare course: Web Programming Concepts for Non-Programmers
+    section
+      h2 Pieces of the Web
+      ul
+        li HTML/CSS markup
+        li Images
+        li Code
+        li Data
+    section
+      h2 Where can we store our data?
+      ul
+        li Bare filesystem, data embedded in HTML
+        li Bare filesystem, data in raw data files
+          ul
+            li Comma Separated Values (CSV)
+            li eXtensible Markup Language (XML)
+            li JavaScript Object Notation (JSON)
+        li Database
+          ul
+            li Relational
+            li NoSQL
+        li Cloud Storage
+        li The Browser (HTML5 Local Storage)
+    section
+      h2 What's a filesystem?
+      ul
+        li Organization system for data files based on a nested tree structure (hierarchy)
+    section
+      h2 Bare filesystem, data embedded in HTML
+      ul
+        li Simple HTML files served directly by a web server
+        li No application server, no database server
+    section
+      h2 Example
+      h3 Random College Biology Department Course Syllabi
+      code
+        pre.
+          courses/2011/fall/BIO-101.html
+          courses/2011/fall/BIO-120.html
+          courses/2011/fall/BIO-210.html
+          courses/2011/fall/BIO-319.html
+          courses/2011/spring/BIO-102.html
+          courses/2011/spring/BIO-220.html
+          courses/2012/fall/BIO-101.html
+          courses/2012/fall/BIO-150.html
+          courses/2012/spring/BIO-102.html
+          courses/2012/spring/BIO-314.html
+    section
+      h2 HTML + Data notes
+      ul
+        li techncally simple, reliable, & cheap to create
+        li only presents data in one way. No queries or different views.
+        li hard to maintain over time as data grows
+        li hard to make bulk changes
+    section
+      h2 Bare filesystem, data in separate files
+      code
+        pre.
+          courses.html
+          courses.csv
+      code
+        pre.
+          year,semester,code,professor,day,time,description
+          2011,fall,BIO-101,Jones,MWF,2:00,How Life Works
+          2011,fall,BIO-120,Baker,TTh,11:00,Single-Cell Organisms
+          2011,fall,BIO-210,Schnider,MWF,10:00,Mitosis
+          2011,fall,BIO-319,Yun,MTh,9:00,The Golgi Apparatus
+          2011,spring,BIO-102,Jones,MWF,2:00,How Life Works
+          2011,spring,BIO-220,Schnider,MWF,10:00,Protein
+          2012,fall,BIO-101,Jones,MWF,2:00,How Life Works
+          2012,fall,BIO-150,Yun,MThF,12:00,Pathogens
+          2012,spring,BIO-102,Baker,TTh,3:30,Stem Cells
+          2012,spring/BIO-314,Merriman,MWF,6:00,Advanced Labratory Technique
+    section
+      h2 Simple data files
+      ul
+        li Easier to change just the data or just the HTML presentation
+        li less duplication of HTML
+        li easier to add basic filters, queries, sorting
+    section
+      h2 Comma Separated Values (CSV) Format
+      ul
+        li Analogous to a spreadsheet
+        li one set of columns, many rows, same set of fields each row
+        li works well for many data sets
+        li cannot support complex nested structures and relationships
+    section
+      h2 XML Format
+      ul
+        li Wanted one standardized format used by many programs
+        li tired of each program having its own unique data file format
+        li very portable and compatible across programming languages, OSes
+        li wanted to be both computer-readable and human-readable
+        li Extremely widespread use
+    section
+      h2 Sample XML data
+      p Similar to HTML but very strict syntax and semantic elements and attributes
+      code
+        pre.
+          <course>
+            <code>BIO-101</code>
+            <semester>fall</semester>
+            <year>2011</year>
+            <professor>Jones</professor>
+            <day>MWF</day>
+            <time>2:00</time>
+            <description>How Life Works</description>
+          </course>
+    section
+      h2 JavaScript Object Notation (JSON) Format
+      ul
+        li XML became increasingly complex and cumbersome
+        li JSON took a simpler and more pragmatic approach
+        li Friendly for JavaScript developers
+        li Now in very widespread use, especially in APIs and web applications
+        li simple data types and structures
+    section
+      h2 Sample JSON Data
+      code
+        pre.
+          {
+            "code": "BIO-101",
+            "day": "MWF",
+            "description": "How Life Works",
+            "professor": "Jones",
+            "semester": "fall",
+            "time": "2:00",
+            "year": 2011
+          }
+    section
+      h2 Relational Databases
+      ul
+        li Database: Repository of a single set of related data
+        li Schema: defines how the data is structured
+        li A set of tables comprised of rows and fields
+        li
+    script(src="/deck.js/modernizr.custom.js")
+    script(src="/js/jquery.js")
+    script(src="/deck.js/core/deck.core.js")
+    script(src="/deck.js/extensions/menu/deck.menu.js")
+    script(src="/deck.js/extensions/hash/deck.hash.js")
+    :coffeescript
+      $ ->
+        $.deck(".slide")
