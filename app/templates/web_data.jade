@@ -150,7 +150,171 @@ html(lang="en")
         li Database: Repository of a single set of related data
         li Schema: defines how the data is structured
         li A set of tables comprised of rows and fields
+    section
+      h2 Relational Database Data Types
+      ul
+        li Rows & Columns
+        li Data types for columns: text, numbers, dates, boolean, sequences, etc
+        li Constraints: Primary Key, Foreign Key, Uniqueness
+        li indexes
+        li stored procedures
+    section
+      h2 ACID Transactions
+      ul
+        li Atomicity (all or nothing)
+        li Conistency (data is always valid and within constraints)
+        li Isolation (Transactions don't interfere with each other)
+        li Durability (data is always safe)
+    section
+      h2 Popular Relation Databases
+      ul
+        li MySQL
+        li PostgreSQL
+        li Oracle
+        li MS SQL Server
+        li IBM DB2
+        li Sybase
+        li MS Access
+    section
+      h2 Structured Query Language (SQL)
+      ul
+        li Usually pronounced "Sequel" or "S Q L"
+        li core set of official standards portable across RBDMSes
+        li Many DBs have proprietary extensions or variations
+        li Data Definition Language (create, drop, alter, etc)
+        li Data Manipulation Language (select, update, insert, delete, etc)
+        li Data Control Language (grant, revoke)
+        li Transaction Control Language (commit, rollback, etc)
+    section
+      h2 Example SQL Query
+      code
+        pre.
+          SELECT isbn, title, price, price * 0.06 AS sales_tax
+          FROM Book
+          WHERE price > 100.00
+          ORDER BY title;
+    section
+      h2 Example: PHP App Queries MySQL DB and generates HTML
+      code
+        pre.
+           <?php 
+           // Connects to your Database 
+           mysql_connect("your.hostaddress.com", "username", "password") or die(mysql_error()); 
+           mysql_select_db("Database_Name") or die(mysql_error()); 
+           $data = mysql_query("SELECT * FROM friends WHERE pet='Cat'") 
+           or die(mysql_error()); 
+           Print "<table border cellpadding=3>"; 
+           while($info = mysql_fetch_array( $data )) 
+           { 
+           Print "<tr>"; 
+           Print "<th>Name:</th> <td>".$info['name'] . "</td> "; 
+           Print "<th>Color:</th> <td>".$info['fav_color'] . "</td> "; 
+           Print "<th>Food:</th> <td>".$info['fav_food'] . "</td> "; 
+           Print "<th>Pet:</th> <td>".$info['pet'] . " </td></tr>"; 
+           } 
+           Print "</table>"; 
+           ?>
+    section
+      h2 Example: Ruby on Rails using ActiveRecord data to generate HTML
+      code
+        pre.
+          <h1>Listing Books</h1>
+           
+          <table>
+            <tr>
+              <th>Title</th>
+              <th>Summary</th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+           
+          <% @books.each do |book| %>
+            <tr>
+              <td><%= book.title %></td>
+              <td><%= book.content %></td>
+              <td><%= link_to 'Show', book %></td>
+              <td><%= link_to 'Edit', edit_book_path(book) %></td>
+              <td><%= link_to 'Remove', book, :confirm => 'Are you sure?', :method => :delete %></td>
+            </tr>
+          <% end %>
+          </table>
+           
+          <br />
+           
+          <%= link_to 'New book', new_book_path %>
+    section
+      h2 NoSQL Attributes
+      ul
+        li Schemaless
+        li Distributed (shared, elastic, expandable)
+        li BASE instead of ACID
+        li MapReduce, BigTable, Dynamo, CAP Theorem
+    section
+      h2 NoSQL Databases
+      a(href="http://dbpedias.com/wiki/NoSQL:Survey_of_Distributed_Databases#Overview_2") Survey of Distributed Databases
+    section
+      h2 BASE
+      ul
+        li Basically Available
+        li Soft state
+        li Eventually consistent
+      h2 CAP Theorem
+      ul
+        li Consistency
+        li Availability
+        li Partition Tolerance
+        li (Pick only 2!)
+    section
+      h2 Map Reduce
+      ul
+        li Map:  map([2, 7, 13, 24], double) yields [4, 14, 26, 48]
+        li Reduce: sum, average, min, max
+      h2 Exercise: Sharding and MapReduce
+    section
+      img(src="http://dbpedias.com/w/images/9/90/MongoDB.JPG", alt="SQL to NoSQL")
+    section
+      h2 Application Programming Interfaces (APIs)
+      ul
+        li Provide a means by which a third party program can interact with a service
+        li Exploding in popularity of late
+        li Examples: OAuth, Facebook Connect, Google Maps, Flickr, Twitter clients
+    section
+      h2 API Plumbing
+      ul
+        li HTTP is becoming the universal transport protocol
+        li messages formatted with URL Encoding, XML, or JSON
+        li AJAX: Asynchronous JavaScript and XML
+        ul
+          li JSON often used instead of XML but AJAX name predates JSON
+        li Provides independence from programming language
+    section
+      h2 References
+      ul
         li
+          a(href="http://en.wikipedia.org/wiki/File_system") Wikipedia: File system
+        li
+          a(href="http://javamazon.com/2011/11/04/csv-vs-xml-vs-json/") CSV vs. XML vs. JSON
+        li
+          a(href="http://www.json.org/xml.html") JSON: The Fat-free Alternative to XML
+        li
+          a(href="http://en.wikipedia.org/wiki/Relational_model") Wikipedia: The Relational Model
+        li
+          a(href="http://www.orafaq.com/faq/what_are_the_difference_between_ddl_dml_and_dcl_commands") SQL: DDL, DML, DCL
+        li
+          a(href="http://en.wikipedia.org/wiki/ACID") ACID transactions
+        li
+          a(href="http://www.itl.nist.gov/div897/ctg/dm/sql_examples.htm") SQL Examples
+        li
+          a(href="http://en.wikipedia.org/wiki/SQL") Wikipedia: SQL
+        li
+          a(href="http://php.about.com/od/phpwithmysql/ss/mysql_php_3.htm") SQL Queries in PHP
+        li
+          a(href="http://nosql-database.org/") http://nosql-database.org/
+        li
+          a(href="http://dbpedias.com/wiki/NoSQL:Survey_of_Distributed_Databases") Survey of Distributed Databases
+        li
+          a(href="http://en.wikipedia.org/wiki/Ajax_(programming)") Wikipedia: AJAX
     script(src="/deck.js/modernizr.custom.js")
     script(src="/js/jquery.js")
     script(src="/deck.js/core/deck.core.js")

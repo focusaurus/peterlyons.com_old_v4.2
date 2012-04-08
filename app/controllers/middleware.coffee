@@ -27,7 +27,7 @@ exports.domify = (req, res, next) ->
   next()
 
 exports.undomify = (req, res, next) ->
-  res.html = res.$.html()
+  res.html = res.$.html() + "\n"
   next()
 
 exports.send = (req, res) ->

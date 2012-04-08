@@ -56,7 +56,7 @@ setup = (app) ->
       $ = cheerio.load(templateFunction())
       $("body").addClass "deck-container"
       $("section").addClass "slide"
-      $("li").addClass "slide"
+      #$("li").addClass "slide"
       res.send $.html()
 
 module.exports = {setup, Page}
