@@ -1,18 +1,18 @@
 config = require "../../config"
 expect = require("chai").expect
-jsdom = require "jsdom"
 _ = require "underscore"
+{loadPage} = require "../TestUtils"
 
 describe "the main layout", ->
   $ = null
 
   before (done) ->
-    jsdom.env config.baseURL, [config.jqueryURL], (error, jsWindow) ->
-      $ = jsWindow.$
+    loadPage config.baseURL, (dom) ->
+      $ = dom
       done()
 
   it "should have the google fonts",->
-    hrefs = $("link[rel=stylesheet]").map (index, elem) -> $(elem).attr("href")
+    hrefs = _.map $("link[rel=stylesheet]"), (elem) -> $(elem).attr("href")
     found = _.some hrefs, (href) ->
       href.indexOf("fonts.googleapis.com") >= 0
     expect(found)
