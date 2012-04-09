@@ -17,3 +17,8 @@ describe "the Web Data Slide Deck", ->
   	html = $.html()
   	for phrase in ["Oracle", "SQL Server", "Dynamo"]
   		assert.isTrue(html.indexOf(phrase) >= 0)
+
+  it 'should include deck.js and the menu plugin', ->
+  	html = $.html()
+  	for phrase in ["deck.js", "deck.menu.js"]
+  		assert.isTrue(html.indexOf(phrase) >= 0)
