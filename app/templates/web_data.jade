@@ -50,8 +50,8 @@ html(lang="en")
     section
       h2 Example
       h3 Random College Biology Department Course Syllabi
-      code
-        pre.
+      pre
+        code.
           courses/2011/fall/BIO-101.html
           courses/2011/fall/BIO-120.html
           courses/2011/fall/BIO-210.html
@@ -71,12 +71,12 @@ html(lang="en")
         li hard to make bulk changes
     section
       h2 Bare filesystem, data in separate files
-      code
-        pre.
+      pre
+        code.
           courses.html
           courses.csv
-      code
-        pre.
+      pre
+        code.
           year,semester,code,professor,day,time,description
           2011,fall,BIO-101,Jones,MWF,2:00,How Life Works
           2011,fall,BIO-120,Baker,TTh,11:00,Single-Cell Organisms
@@ -112,17 +112,17 @@ html(lang="en")
     section
       h2 Sample XML data
       p Similar to HTML but very strict syntax and semantic elements and attributes
-      code
-        pre.
-          <course>
-            <code>BIO-101</code>
-            <semester>fall</semester>
-            <year>2011</year>
-            <professor>Jones</professor>
-            <day>MWF</day>
-            <time>2:00</time>
-            <description>How Life Works</description>
-          </course>
+      pre
+        code.
+          &lt;course&gt;
+            &lt;code&gt;BIO-101&lt;/code&gt;
+            &lt;semester&gt;fall&lt;/semester&gt;
+            &lt;year&gt;2011&lt;/year&gt;
+            &lt;professor&gt;Jones&lt;/professor&gt;
+            &lt;day&gt;MWF&lt;/day&gt;
+            &lt;time&gt;2:00&lt;/time&gt;
+            &lt;description&gt;How Life Works&lt;/description&gt;
+          &lt;/course&gt;
     section
       h2 JavaScript Object Notation (JSON) Format
       ul
@@ -133,8 +133,8 @@ html(lang="en")
         li simple data types and structures
     section
       h2 Sample JSON Data
-      code
-        pre.
+      pre
+        code.
           {
             "code": "BIO-101",
             "day": "MWF",
@@ -187,8 +187,8 @@ html(lang="en")
         li Transaction Control Language (commit, rollback, etc)
     section
       h2 Example SQL Query
-      code
-        pre.
+      pre
+        code.
           SELECT isbn, title, price, price * 0.06 AS sales_tax
           FROM Book
           WHERE price > 100.00
@@ -198,54 +198,54 @@ html(lang="en")
       | Browser &harr; Web Server &harr; Application Server &harr; Database Server
     section
       h2 Example: PHP App Queries MySQL DB and generates HTML
-      code
-        pre.
-           <?php 
-           // Connects to your Database 
-           mysql_connect("your.hostaddress.com", "username", "password") or die(mysql_error()); 
-           mysql_select_db("Database_Name") or die(mysql_error()); 
-           $data = mysql_query("SELECT * FROM friends WHERE pet='Cat'") 
-           or die(mysql_error()); 
-           Print "<table border cellpadding=3>"; 
-           while($info = mysql_fetch_array( $data )) 
-           { 
-           Print "<tr>"; 
-           Print "<th>Name:</th> <td>".$info['name'] . "</td> "; 
-           Print "<th>Color:</th> <td>".$info['fav_color'] . "</td> "; 
-           Print "<th>Food:</th> <td>".$info['fav_food'] . "</td> "; 
-           Print "<th>Pet:</th> <td>".$info['pet'] . " </td></tr>"; 
-           } 
-           Print "</table>"; 
-           ?>
+      pre
+        code.
+           &lt;?php
+           // Connects to your Database
+           mysql_connect("your.hostaddress.com", "username", "password") or die(mysql_error());
+           mysql_select_db("Database_Name") or die(mysql_error());
+           $data = mysql_query("SELECT * FROM friends WHERE pet='Cat'")
+           or die(mysql_error());
+           Print "&lt;table border cellpadding=3&gt;";
+           while($info = mysql_fetch_array( $data ))
+           {
+           Print "&lt;tr&gt;";
+           Print "&lt;th&gt;Name:&lt;/th&gt; &lt;td&gt;".$info['name'] . "&lt;/td&gt; ";
+           Print "&lt;th&gt;Color:&lt;/th&gt; &lt;td&gt;".$info['fav_color'] . "&lt;/td&gt; ";
+           Print "&lt;th&gt;Food:&lt;/th&gt; &lt;td&gt;".$info['fav_food'] . "&lt;/td&gt; ";
+           Print "&lt;th&gt;Pet:&lt;/th&gt; &lt;td&gt;".$info['pet'] . " &lt;/td&gt;&lt;/tr&gt;";
+           }
+           Print "&lt;/table&gt;";
+           ?&gt;
     section
       h2 Example: Ruby on Rails using ActiveRecord data to generate HTML
-      code
-        pre.
-          <h1>Listing Books</h1>
-           
-          <table>
-            <tr>
-              <th>Title</th>
-              <th>Summary</th>
-              <th></th>
-              <th></th>
-              <th></th>
-            </tr>
+      pre
+        code.
+          &lt;h1&gt;Listing Books&lt;/h1&gt;
 
-          <% @books.each do |book| %>
-            <tr>
-              <td><%= book.title %></td>
-              <td><%= book.content %></td>
-              <td><%= link_to 'Show', book %></td>
-              <td><%= link_to 'Edit', edit_book_path(book) %></td>
-              <td><%= link_to 'Remove', book, :confirm => 'Are you sure?', :method => :delete %></td>
-            </tr>
-          <% end %>
-          </table>
+          &lt;table&gt;
+            &lt;tr&gt;
+              &lt;th&gt;Title&lt;/th&gt;
+              &lt;th&gt;Summary&lt;/th&gt;
+              &lt;th&gt;&lt;/th&gt;
+              &lt;th&gt;&lt;/th&gt;
+              &lt;th&gt;&lt;/th&gt;
+            &lt;/tr&gt;
 
-          <br />
+          &lt;% @books.each do |book| %&gt;
+            &lt;tr&gt;
+              &lt;td&gt;&lt;%= book.title %&gt;&lt;/td&gt;
+              &lt;td&gt;&lt;%= book.content %&gt;&lt;/td&gt;
+              &lt;td&gt;&lt;%= link_to \&#039;Show\&#039;, book %&gt;&lt;/td&gt;
+              &lt;td&gt;&lt;%= link_to \&#039;Edit\&#039;, edit_book_path(book) %&gt;&lt;/td&gt;
+              &lt;td&gt;&lt;%= link_to \&#039;Remove\&#039;, book, :confirm =&gt; \&#039;Are you sure?\&#039;, :method =&gt; :delete %&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;% end %&gt;
+          &lt;/table&gt;
 
-          <%= link_to 'New book', new_book_path %>
+          &lt;br /&gt;
+
+          &lt;%= link_to \&#039;New book\&#039;, new_book_path %&gt;
     section
       h2 NoSQL Attributes
       ul
@@ -301,8 +301,8 @@ html(lang="en")
         li HTTP is becoming the universal transport protocol
         li messages formatted with URL Encoding, XML, or JSON
         li AJAX: Asynchronous JavaScript and XML
-        ul
-          li JSON often used instead of XML but AJAX name predates JSON
+          ul
+            li JSON often used instead of XML but AJAX name predates JSON
         li Provides independence from programming language
     section
       h2 References
