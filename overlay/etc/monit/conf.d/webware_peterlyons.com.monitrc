@@ -1,7 +1,0 @@
-#webware for python app server for peterlyons.com (photo gallery and basic templates)
-check process "webware_peterlyons.com"
-    with pidfile "/var/www/webware/peterlyons.com/appserver.pid"
-    start = "/usr/bin/service webware_peterlyons.com start"
-    stop = "/usr/bin/service webware_peterlyons.com stop"
-    if failed port 9100 protocol http then restart
-    if 5 restarts within 5 cycles then timeout

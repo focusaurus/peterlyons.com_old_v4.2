@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><title>How Data Powers the Web</title><link href="/favicon.ico" type="image/x-icon" rel="icon"/><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"/><link rel="stylesheet" href="/deck.js/core/deck.core.css"/><link rel="stylesheet" href="/deck.js/extensions/menu/deck.menu.css"/><link rel="stylesheet" href="/deck.js/extensions/menu/deck.hash.css"/><link rel="stylesheet" href="/deck.js/themes/style/web-2.0.css"/><link rel="stylesheet" href="/deck.js/themes/transition/vertical-slide.css"/></head><body class="deck-container"><section class="slide"><h2>Data, Data, Everywhere</h2><h3>How data powers the web</h3><h4>Session #3 of Skillshare course: Web Programming Concepts for Non-Programmers</h4></section><section class="slide"><h2>Pieces of the Web</h2><ul><li>HTML/CSS markup</li><li>Images</li><li>Code</li><li>Data</li></ul></section><section class="slide"><h2>Where can we store our data?</h2><ul><li>Bare filesystem, data embedded in HTML</li><li>Bare filesystem, data in raw data files<ul><li>Comma Separated Values (CSV)</li><li>eXtensible Markup Language (XML)</li><li>JavaScript Object Notation (JSON)</li></ul></li><li>Database<ul><li>Relational</li><li>NoSQL</li></ul></li><li>Cloud Storage</li><li>The Browser (HTML5 Local Storage)</li></ul></section><section class="slide"><h2>What's a filesystem?</h2><ul><li>Organization system for data files based on a nested tree structure (hierarchy)</li></ul></section><section class="slide"><h2>Bare filesystem, data embedded in HTML</h2><ul><li>Simple HTML files served directly by a web server</li><li>No application server, no database server</li></ul></section><section class="slide"><h2>Example</h2><h3>Random College Biology Department Course Syllabi</h3><pre><code>courses/2011/fall/BIO-101.html
+courses/2011/fall/BIO-120.html
+courses/2011/fall/BIO-210.html
+courses/2011/fall/BIO-319.html
+courses/2011/spring/BIO-102.html
+courses/2011/spring/BIO-220.html
+courses/2012/fall/BIO-101.html
+courses/2012/fall/BIO-150.html
+courses/2012/spring/BIO-102.html
+courses/2012/spring/BIO-314.html
+</code></pre></section><section class="slide"><h2>HTML + Data notes</h2><ul><li>techncally simple, reliable, & cheap to create</li><li>only presents data in one way. No queries or different views.</li><li>hard to maintain over time as data grows</li><li>hard to make bulk changes</li></ul></section><section class="slide"><h2>Bare filesystem, data in separate files</h2><pre><code>courses.html
+courses.csv
+</code></pre><pre><code>year,semester,code,professor,day,time,description
+2011,fall,BIO-101,Jones,MWF,2:00,How Life Works
+2011,fall,BIO-120,Baker,TTh,11:00,Single-Cell Organisms
+2011,fall,BIO-210,Schnider,MWF,10:00,Mitosis
+2011,fall,BIO-319,Yun,MTh,9:00,The Golgi Apparatus
+2011,spring,BIO-102,Jones,MWF,2:00,How Life Works
+2011,spring,BIO-220,Schnider,MWF,10:00,Protein
+2012,fall,BIO-101,Jones,MWF,2:00,How Life Works
+2012,fall,BIO-150,Yun,MThF,12:00,Pathogens
+2012,spring,BIO-102,Baker,TTh,3:30,Stem Cells
+2012,spring/BIO-314,Merriman,MWF,6:00,Advanced Labratory Technique
+</code></pre></section><section class="slide"><h2>Simple data files</h2><ul><li>Easier to change just the data or just the HTML presentation</li><li>less duplication of HTML</li><li>easier to add basic filters, queries, sorting</li></ul></section><section class="slide"><h2>Comma Separated Values (CSV) Format</h2><ul><li>Analogous to a spreadsheet</li><li>one set of columns, many rows, same set of fields each row</li><li>works well for many data sets</li><li>cannot support complex nested structures and relationships</li></ul></section><section class="slide"><h2>XML Format</h2><ul><li>Wanted one standardized format used by many programs</li><li>tired of each program having its own unique data file format</li><li>very portable and compatible across programming languages, OSes</li><li>wanted to be both computer-readable and human-readable</li><li>Extremely widespread use</li></ul></section><section class="slide"><h2>Sample XML data</h2><p>Similar to HTML but very strict syntax and semantic elements and attributes</p><pre><code>&lt;course&gt;
+  &lt;code&gt;BIO-101&lt;/code&gt;
+  &lt;semester&gt;fall&lt;/semester&gt;
+  &lt;year&gt;2011&lt;/year&gt;
+  &lt;professor&gt;Jones&lt;/professor&gt;
+  &lt;day&gt;MWF&lt;/day&gt;
+  &lt;time&gt;2:00&lt;/time&gt;
+  &lt;description&gt;How Life Works&lt;/description&gt;
+&lt;/course&gt;
+</code></pre></section><section class="slide"><h2>JavaScript Object Notation (JSON) Format</h2><ul><li>XML became increasingly complex and cumbersome</li><li>JSON took a simpler and more pragmatic approach</li><li>Friendly for JavaScript developers</li><li>Now in very widespread use, especially in APIs and web applications</li><li>simple data types and structures</li></ul></section><section class="slide"><h2>Sample JSON Data</h2><pre><code>{
+  "code": "BIO-101",
+  "day": "MWF",
+  "description": "How Life Works",
+  "professor": "Jones",
+  "semester": "fall",
+  "time": "2:00",
+  "year": 2011
+}
+</code></pre></section><section class="slide"><h2>Relational Databases</h2><ul><li>Database: Repository of a single set of related data</li><li>Schema: defines how the data is structured</li><li>A set of tables comprised of rows and fields</li></ul></section><section class="slide"><h2>Relational Database Data Types</h2><ul><li>Rows & Columns</li><li>Data types for columns: text, numbers, dates, boolean, sequences, etc</li><li>Constraints: Primary Key, Foreign Key, Uniqueness</li><li>indexes</li><li>stored procedures</li></ul></section><section class="slide"><h2>ACID Transactions</h2><ul><li>Atomicity (all or nothing)</li><li>Conistency (data is always valid and within constraints)</li><li>Isolation (Transactions don't interfere with each other)</li><li>Durability (data is always safe)</li></ul></section><section class="slide"><h2>Popular Relation Databases</h2><ul><li>MySQL</li><li>PostgreSQL</li><li>Oracle</li><li>MS SQL Server</li><li>IBM DB2</li><li>Sybase</li><li>MS Access</li></ul></section><section class="slide"><h2>Structured Query Language (SQL)</h2><ul><li>Usually pronounced "Sequel" or "S Q L"</li><li>core set of official standards portable across RBDMSes</li><li>Many DBs have proprietary extensions or variations</li><li>Data Definition Language (create, drop, alter, etc)</li><li>Data Manipulation Language (select, update, insert, delete, etc)</li><li>Data Control Language (grant, revoke)</li><li>Transaction Control Language (commit, rollback, etc)</li></ul></section><section class="slide"><h2>Example SQL Query</h2><pre><code>SELECT isbn, title, price, price * 0.06 AS sales_tax
+FROM Book
+WHERE price > 100.00
+ORDER BY title;
+</code></pre></section><section class="slide"><h2>3-Tier Web Application Architecture</h2>Browser &harr; Web Server &harr; Application Server &harr; Database Server
+</section><section class="slide"><h2>Example: PHP App Queries MySQL DB and generates HTML</h2><pre><code>&lt;?php
+// Connects to your Database
+mysql_connect("your.hostaddress.com", "username", "password") or die(mysql_error());
+mysql_select_db("Database_Name") or die(mysql_error());
+$data = mysql_query("SELECT * FROM friends WHERE pet='Cat'")
+or die(mysql_error());
+Print "&lt;table border cellpadding=3&gt;";
+while($info = mysql_fetch_array( $data ))
+{
+Print "&lt;tr&gt;";
+Print "&lt;th&gt;Name:&lt;/th&gt; &lt;td&gt;".$info['name'] . "&lt;/td&gt; ";
+Print "&lt;th&gt;Color:&lt;/th&gt; &lt;td&gt;".$info['fav_color'] . "&lt;/td&gt; ";
+Print "&lt;th&gt;Food:&lt;/th&gt; &lt;td&gt;".$info['fav_food'] . "&lt;/td&gt; ";
+Print "&lt;th&gt;Pet:&lt;/th&gt; &lt;td&gt;".$info['pet'] . " &lt;/td&gt;&lt;/tr&gt;";
+}
+Print "&lt;/table&gt;";
+?&gt;
+</code></pre></section><section class="slide"><h2>Example: Ruby on Rails using ActiveRecord data to generate HTML</h2><pre><code>&lt;h1&gt;Listing Books&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;Summary&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @books.each do |book| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= book.title %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= book.content %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to &#039;Show&#039;, book %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to &#039;Edit&#039;, edit_book_path(book) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to &#039;Remove&#039;, book, :confirm =&gt; &#039;Are you sure?&#039;, :method =&gt; :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to &#039;New book&#039;, new_book_path %&gt;
+</code></pre></section><section class="slide"><h2>NoSQL Attributes</h2><ul><li>Schemaless</li><li>Distributed (shared, elastic, expandable)</li><li>BASE instead of ACID</li><li>MapReduce, BigTable, Dynamo, CAP Theorem</li></ul></section><section class="slide"><h2>NoSQL Databases</h2><a href="http://dbpedias.com/wiki/NoSQL:Survey_of_Distributed_Databases#Overview_2">Survey of Distributed Databases</a></section><section class="slide"><h2>BASE</h2><ul><li>Basically Available</li><li>Soft state</li><li>Eventually consistent</li></ul><h2>CAP Theorem</h2><ul><li>Consistency</li><li>Availability</li><li>Partition Tolerance</li><li>(Pick only 2!)</li></ul></section><section class="slide"><h2>Map Reduce</h2><ul><li>Map:  map([2, 7, 13, 24], double) yields [4, 14, 26, 48]</li><li>Reduce: sum, average, min, max</li></ul><h2>Exercise: Sharding and MapReduce</h2></section><section class="slide"><img src="http://dbpedias.com/w/images/9/90/MongoDB.JPG" alt="SQL to NoSQL"/></section><section class="slide"><h2>Cloud Storage</h2><ul><li>Amazon S3 (filesystem)</li><li>Amazon RDS (SQL DB)</li><li>Amazon SimpleDB (Key/Value DB)</li><li>Microsoft SQL Azure</li></ul></section><section class="slide"><h2>HTML5 LocalStorage</h2><ul><li>Small area of storage on a single web browser</li><li>Addresses some of the pervisions of Cookies</li><li>A SQL-type database was proposed but has since been canceled</li></ul></section><section class="slide"><h2>Application Programming Interfaces (APIs)</h2><ul><li>Provide a means by which a third party program can interact with a service</li><li>Exploding in popularity of late</li><li>Examples: OAuth, Facebook Connect, Google Maps, Flickr, Twitter clients</li></ul></section><section class="slide"><h2>API Plumbing</h2><ul><li>HTTP is becoming the universal transport protocol</li><li>messages formatted with URL Encoding, XML, or JSON</li><li>AJAX: Asynchronous JavaScript and XML<ul><li>JSON often used instead of XML but AJAX name predates JSON</li></ul></li><li>Provides independence from programming language</li></ul></section><section class="slide"><h2>References</h2><ul><li><a href="http://en.wikipedia.org/wiki/File_system">Wikipedia: File system</a></li><li><a href="http://javamazon.com/2011/11/04/csv-vs-xml-vs-json/">CSV vs. XML vs. JSON</a></li><li><a href="http://www.json.org/xml.html">JSON: The Fat-free Alternative to XML</a></li><li><a href="http://en.wikipedia.org/wiki/Relational_model">Wikipedia: The Relational Model</a></li><li><a href="http://www.orafaq.com/faq/what_are_the_difference_between_ddl_dml_and_dcl_commands">SQL: DDL, DML, DCL</a></li><li><a href="http://en.wikipedia.org/wiki/ACID">ACID transactions</a></li><li><a href="http://www.itl.nist.gov/div897/ctg/dm/sql_examples.htm">SQL Examples</a></li><li><a href="http://en.wikipedia.org/wiki/SQL">Wikipedia: SQL</a></li><li><a href="http://php.about.com/od/phpwithmysql/ss/mysql_php_3.htm">SQL Queries in PHP</a></li><li><a href="http://en.wikipedia.org/wiki/Multitier_architecture">Wikipedia: Multitier architecture</a></li><li><a href="http://nosql-database.org/">http://nosql-database.org/</a></li><li><a href="http://dbpedias.com/wiki/NoSQL:Survey_of_Distributed_Databases">Survey of Distributed Databases</a></li><li><a href="http://practicalcloudcomputing.com/post/16109041412/the-state-of-nosql-in-2012">State of NqSQL in 2012</a></li><li><a href="http://diveintohtml5.info/storage.html">HTML5 Local Storage</a></li><li><a href="http://en.wikipedia.org/wiki/Ajax_(programming)">Wikipedia: AJAX</a></li></ul></section><script src="/deck.js/modernizr.custom.js"></script><script src="/js/jquery.js"></script><script src="/deck.js/core/deck.core.js"></script><script src="/deck.js/extensions/menu/deck.menu.js"></script><script src="/deck.js/extensions/hash/deck.hash.js"></script><script type="text/javascript">
+(function() {
+
+  $(function() {
+    return $.deck(".slide");
+  });
+
+}).call(this);
+</script></body></html>

@@ -1,13 +1,13 @@
 config = require "../../config"
 expect = require("chai").expect
-jsdom = require "jsdom"
+{loadPage} = require "../TestUtils"
 
 describe "the home page", ->
   $ = null
 
   before (done) ->
-    jsdom.env config.baseURL, [config.jqueryURL], (error, jsWindow) ->
-      $ = jsWindow.$
+    loadPage config.baseURL, (dom) ->
+      $ = dom
       done()
 
   it 'should have the intro material', ->

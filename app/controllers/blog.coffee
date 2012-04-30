@@ -53,8 +53,7 @@ blogArticle = (req, res, next) ->
     next()
 
 postTitle = (req, res, next) ->
-  $ = res.dom.window.$
-  $("title").text(res.post.title + " | Peter Lyons")
+  res.$("title").text(res.post.title + " | Peter Lyons")
   next()
 
 postMiddleware = [
@@ -104,9 +103,7 @@ class BlogIndex extends pages.Page
       .each (fakeRes, next) ->
         middleware.youtube req, fakeRes, next
       .each (fakeRes, next) ->
-        window = fakeRes.dom.window
-        window.$("script").last().remove()
-        fakeRes.post.content = fakeRes.html = window.$("body").html()
+        fakeRes.post.content = fakeRes.html = fakeRes.$("body").html()
         next()
       .end (error, fakeRes) ->
         res.header "Content-Type", "text/xml"
@@ -124,7 +121,7 @@ presentPost = (post) ->
   presented.date = post.publish_date.toString "MMM dd, yyyy"
   presented
 
-loadBlog = (app, URI, callback) ->
+loadBlog = (URI, callback) ->
   posts = []
   asyncjs.walkfiles(path.normalize(__dirname + "/../posts/" + URI), null, asyncjs.PREORDER)
   .stat()
@@ -154,7 +151,7 @@ setup = (app) ->
   problog = new BlogIndex("problog", "Pete's Points")
   persblog = new BlogIndex("persblog", "The Stretch of Vitality")
   asyncjs.list([problog, persblog]).each (blog, next) ->
-    loadBlog app, blog.URI, (error,  posts) ->
+    loadBlog blog.URI, (error,  posts) ->
       blog.posts = blog.locals.posts = posts
       next error
   .each (blog, next) ->

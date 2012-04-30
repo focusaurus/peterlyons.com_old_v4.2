@@ -1,0 +1,17 @@
+So last Sunday I went to Dardano's gymnastics school in Denver and took an aerials class with Liz. There were only 2 students in the class, so I got a lot of attention, but I guess it's always that way with aerials. Overall, it was pretty good and fits my schedule so I'll probably go back for a while.
+
+Monday I went on an OKCupid happy hour date and then tried to recuperate a little bit after that. Tuesday we had an Afronauts rehearsal pre-party for Mike's birthday. Mike was late, as always, but we had yummy beer, pizza, and Andrew made gluten-free brownies that Tober could enjoy. I drank two beers which is enough to get me a little drunk, and it was a fun rehearsal. It totally destroyed my diet, but I'll recover next week.
+
+Wednesday was the second rehearsal for the Circus of Illumination Apogaea band project that Jasmine is running. There were far fewer people there this time, but we got a bunch of good rehearsal done. I'm hoping to transcribe Dead Can Dance "The Ubiquitous Mr. Lovegrove" and play soprano sax on it as well as sing some or all of the vocals. Jasmine brought beer and munchies so it was another off-diet night this week. Turns out there were a lot of those.
+
+Thursday I was pretty darn exhausted after work so I took a nap and then biked into Boulder to hear Seun Kuti and Egypt 80 at the Boulder Theater. A Denver Afrobeat band we have gigged with called Atomga was opening up for them, which was pretty cool. It was great to hear and see authentic afrobeat up close.
+
+Friday was a pretty good day at work and then I went over to Community Cycles to shop for a road bike. They had one on craigslist that I was eying, but it was sold by the time I got there. So I ended up buying the smallest other road bike they had. I rode it to Boulder today and I think it shaved 5-10 minutes off my time. It's fun to ride, but will take a lot of adjustment to adapt to the brakes, which are awkward to squeeze and no where near as powerful as the disc brakes on my mountain bike.
+
+<a href="http://www.flickr.com/photos/88096431@N00/7031168149/" title="New wheels by Peter Lyons, on Flickr"><img src="http://farm8.staticflickr.com/7046/7031168149_08dda280fc.jpg" width="500" height="375" alt="New wheels"></a>
+
+After I bought the bike I went to Jasmine's for a Circus of Illumination planning dinner. Jasmine made delicious enchiladas and a delicious coconut/chocolate/strawberry dessert. Another off-diet moment.
+
+Today I got up early to start converting my commuter bike back into mountain bike mode. Oh I should mention that there are now 3 different styles of bike in my garage (mountain, road, BMX), which is a fine new Colorado badge. So I did some work on the mountain bike then headed off to Boulder on the new road bike. I went to Bill and Leslie's for a delicious brunch as it is Annie and Elise's birthday and Annie is in town. We had Leslie's delicious home made coffee cake and strawberry and pineapples and bagels with lox and cream cheese. Another off-diet meal, and another one planned for tomorrow. Hopefully some of these bike rides can prevent me from going way off the deep end.
+
+It's been a really busy week with very little unstructured time. I think I'm getting a little bit of the mild early spring allergies I sometimes get. Might go to a dance party in Denver tonight and a birthday BBQ tomorrow. Weather is gorgeous today with a high of 85 although it's only 72 now (1 pm) so that prediction is probably a bit high.

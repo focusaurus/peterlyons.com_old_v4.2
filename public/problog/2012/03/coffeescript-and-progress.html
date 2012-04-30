@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><title>CoffeeScript and Progress | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"/><meta name="author" content="Peter Lyons"/><meta name="description" content="Peter Lyons: node.js coder for hire"/><link rel="stylesheet" href="/screen.css"/><script src="/js/jquery.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"/><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"/><link rel="alternate" type="application/atom+xml" href="/problog/feed" title="Pete's Points"/><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"/><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"/><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"/><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"/><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"/></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"/><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><article><span class="date">Mar 04, 2012</span><h1>CoffeeScript and Progress</h1><p>If you like <a href="http://jashkenas.github.com/coffee-script">CoffeeScript</a>, you should write applications in CoffeeScript. If you prefer JavaScript, you should write applications in JavaScript. In this post I want to address the common attitude I have found among JavaScript programmers that CoffeeScript is a priori somehow wrong or inferior or a bad choice. I'll briefly recount some of the technical reasons why I like and use CoffeeScript at the end of this post, but the focus is a rejection of the attitude above on philosophical grounds. To be clear, the position I'm taking issue with is the position that JavaScript is the one and only language we should be writing in for the browser and node.js.</p><h1>Philosophical Rejection of Monoglotism</h1><ul><li>Availability of a multitude of highly varied programming languages is good
+<ul><li>Check out <a href="http://dartr.com/">Dart</a>, <a href="http://haxe.org/">Haxe</a>, <a href="http://jashkenas.github.com/coffee-script">CoffeeScript</a>, <a href="http://code.google.com/webtoolkit/">GWT</a>, or <a href="http://caterwauljs.org/">Caterwaul</a> for examples</li></ul></li><li>The goal of a single programming language for the browser is a detrimental non-goal</li><li>Openness and freedom are important, as are standards and interoperability, but standards that don't evolve on an appropriate schedule are detrimental.</li></ul><p>I brought up the topic of Google's Dart language at a local tech meetup when Dart was first announced. I asked people what their reaction was. The few who responded seemed to dislike it, not for any particular technical objection to the language or its features, but simply to its existence at all, which surprised me. This struck me as completely unexpected and strange. Why, I asked. "JavaScript is a standard" came back from one person. "Why do you like it?", he asked. I said I didn't yet know much of anything about it, but I liked the creation of new programming languages for the browser as a basic idea. I said that choice of programming tools is a good thing, and JavaScript is clearly flawed in extremely well-understood ways. Why is there this relentless stranglehold on universal and eternal backward compatibility? What is the cost/benefit analysis that goes into that?</p><p>Software in general, including programming languages and tools, must continually advance, and the faster, the better. Addressing backward compatibility by slowing forward progress is a losing solution. Ye olde for loop, while venerable, has been surpassed. Let it go. I agree with <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=221903">Bruce Eckel</a> here in that once you have a stable version of a language, authors who "don't want to deal with those changes" should be able to just continue using that version while the current version of the language advances. If you wrote a JDK 1.2 application in 2000 or so and you still want to run it, just keep running it on JDK 1.2. Don't hold the entire java language back for the lifetime of this application which you are unwilling to maintain and advance along with the platform. Browsers should do the same thing with their javascript engines every 2 years or so. If you want to write a codebase once and not update it, ship it on custom hardware that does not include networking capability and call it a day. If you want to write software that works on the Internet, commit to a certain amount of ongoing maintenance. Even if we had perfect technical backward compatible support, the state of everything else: UX, UI, performance, data formats, protocols, continues to advance. Craigslist.org can get away with keeping the same UI for a decade because they make their own rules. Every other site needs to modernize.</p><p>I overheard a well-regarded server-side JavaScript programmer complain about CoffeeScript saying something along the lines of "Why would you write a module in some language I don't know?". WTF? How would it sound if I said that about any other server side programming language? It would sound ridiculous, because it is.</p><p>This notion that the web is ever going to be some all-purpose panacea built upon a single markup language plus a single stylesheet language plus a single programming language is a false goal. Let it go. Embrace a variety of tools. The vast majority of web sites are not built from direct HTML files. HTML is generated by dozens of highly divergent programming languages across many paradigms with all combinations of trade-offs. So it should be for the application in the browser. It's not a problem on the server, and it's not going to be a problem in the browser.</p><h1>Rejection of FUD</h1><p>CoffeeScript is clearly a well-thought-through and beautiful language. It brilliantly removes the terrible parts of javascript and replaces verbose javascript boilerplate with elegant expressiveness. For example, the function keyword being replaced with the gorgeous arrow symbol <code>-&gt;</code> and the introduction of list comprehensions. It is so small and concise that there are no glaring warts to be ironed out. If you like python or ruby, you will probably like CoffeeScript better than JavaScript. If you try it for 6 months and change your mind, compile it to javascript and use that as your no codebase. No harm, no foul.</p><h1>But but but...</h1><p>Debugging. I hear arguments that because the line numbers in the browser stack traces don't align with the line numbers in your .coffee files, debugging is harder in CoffeeScript than JavaScript. I don't find this a problem. I just don't. My variable and function names are preserved. I anchor to a function name and my functions don't get exceedingly long. I see that in the browser the error is a few lines down in the "loadUserList" function and I go look at the "loadUserList" function in CoffeeScript and find the problem without a lot of fuss. In my experience there's just no impact here. I don't really know why people bring this up so often. It's just a non-problem for me. We use multiple preprocessing techniques including concatenating JS files together. Line numbers just ain't never gonna map back to actual files in your editor. Get over it.</p><h1>In case you didn't know</h1><ul><li>Multiline strings. OMFG yes, duh.</li><li>String interpolation. So nice. So nice.</li><li>Destructuring assignment. Coming to JavaScript circa 2019...</li><li>No 8-letter function keyword. These days we're building anonymous functions every 4 lines or so. Skinny arrow FTW!</li><li>Array literals with newlines and no commas. I'm not sure what the obsession with commas is, but people, we don't need them. I don't even think we need them in one-line lists. We have the mighty space character, which is how you eye parses code already! If we can do <code>[1, 2, 3, 4]</code>, then why can't we just do <code>[1 2 3 4]</code>?</li><li>Automatic IIFE wrapper. No var keyword. Default values for function parameters. Die boilerplate, die!</li><li>It's like skinny dipping, but for punctuation! Look at some Jasmine or Mocha BDD tests in JavaScript and then CoffeeScript. One looks like a garbled mess of crap with line after dedented line of <code>}); }); });</code>, and one looks like poetry.</li></ul><p>Here's a sample BDD spec in CoffeeScript from <a href="https://raw.github.com/gist/1379251/274de0e881eb736ebf04657c3c1955a00475836a/4_math_spec.coffee">a gist on github</a>.</p><pre><code>describe 'Math:', -&gt;
+  describe 'fib()', -&gt;
+    it 'should calculate the numbers correctly up to fib(16)', -&gt;
+      fib = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987]
+      expect(Math.fib(i)).toEqual fib[i] for i in [0..16]
+
+  describe 'uuid()', -&gt;
+    it 'should have the proper UUID format', -&gt;
+      expect(Math.uuid()).toMatch /[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{13}/
+
+    it 'should have always the numer 4 at position 14', -&gt;
+      expect(Math.uuid()).toMatch /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{13}/
+      expect(Math.uuid()).toMatch /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{13}/
+      expect(Math.uuid()).toMatch /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{13}/
+
+    it 'should generate a unique uuid for 1000 generated uuids at least', -&gt;
+      uuids = []
+      counter = 0
+
+      while counter &lt; 1000
+        uuids.push Math.uuid()
+        counter++
+
+      expect(uuids.length).toEqual _.uniq(uuids).length
+</code></pre><p>And here's a <a href="https://raw.github.com/gist/1680082/7180717961b2938f00acedbff14b7192561ac2cc/gistfile1.js">similar jasmine spec in JavaScript</a>.</p><pre><code>describe("NotesView", function() {
+  beforeEach(function() {
+    var notes = new NotesCollection();
+    spyOn(notes, "fetch");
+
+    var view = new NotesView({collection: notes});
+  });
+
+  describe("#initialize", function() {
+    it("should fetch the notes", function() {
+      expect(notes.fetch).toHaveBeenCalled();
+    });
+
+    describe("on notes fetch success", function() {
+      beforeEach(function() {
+        var request = mostRecentAjaxRequest();
+        request.response({
+          status: 200,
+          responseText: JSON.stringify([
+            {body: "Blog post #1", id: "1"}
+          ])
+        });
+      });
+
+      it("should render the view", function() {
+        expect($(view.el).find(".post")).toHaveText("Blog post #1");
+      });
+    });
+  });
+});
+</code></pre><p>Ouch, my eyes! All those closing punctuation groups!</p><p>Reduction of boilerplate and increasing expressiveness are what I want from a language. CoffeeScript delivers strongly in these areas. It compiles to JavaScript and works right now in all browsers and in node.js.</p><h1>Conclusion</h1><p>It's a polyglot world. Every app is going to use more than one programming language. Work toward making the programming languages we use better instead of trying to shame us into continuing to use languages as better alternatives are created. Shame on you. Move forward.</p></article><hr/><nav class="post"><a href="/problog" class="button">back to blog index</a><ul><li>Previous post
+<a href="/problog/2012/02/noding-for-sococo">Noding for Sococo</a></li><li><a id="toggleComments" href="#">Show Comments</a></li></ul></nav><section id="comments" class="hidden"><div id="disqus_thread"></div><script>var disqus_shortname = "peterlyons-problog";</script><script>/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_developer = 1;
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></section><script type="text/javascript">
+(function() {
+  var toggleComments;
+
+  toggleComments = function(event) {
+    var hidden;
+    if (event != null) event.preventDefault();
+    hidden = $("#comments").toggleClass("hidden").hasClass("hidden");
+    return $("#toggleComments").text(hidden ? "Show Comments" : "Hide Comments");
+  };
+
+  window.disqus_config = function() {
+    return this.callbacks.afterRender.push(function() {
+      var num;
+      num = $("#dsq-num-posts").text();
+      if (num > 0 && $("#comments").hasClass("hidden")) return toggleComments();
+    });
+  };
+
+  $(function() {
+    return $("a#toggleComments").on("click", toggleComments);
+  });
+
+}).call(this);
+</script><script type="text/javascript">
+(function() {
+
+  $(function() {
+    return $("header nav a").each(function(index, link) {
+      var $link, URI, href, parent, same;
+      $link = $(link);
+      href = $link.attr("href");
+      URI = document.location.pathname;
+      same = URI === href;
+      parent = URI.indexOf(href) >= 0 && href !== "/";
+      if (same || parent) {
+        return $link.addClass("current");
+      } else {
+        return $link.removeClass("current");
+      }
+    });
+  });
+
+}).call(this);
+</script></div><footer><div class="content"><nav><h1>Technology</h1><a href="/">Home</a><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav class="connect"><h1>Connect With Me</h1><a href="/problog/feed"><img src="/images/feed.png" height="24" alt="Subscribe to my Atom feed" title="Subscribe to my Atom Feed" class="icon"/>Subscribe
+</a><a href="http://www.linkedin.com/in/peterlyons1"><img src="/images/linkedin_icon.png" alt="LinkedIn" title="LinkedIn" class="icon"/>LinkedIn
+</a><a href="http://stackoverflow.com/users/266795/peter-lyons"><img src="/images/stackoverflow_icon.png" alt="stackoverflow" title="stackoverflow" class="icon"/>stackoverflow
+</a><a href="https://github.com/focusaurus"><img src="/images/github_icon.png" alt="github" title="github" class="icon"/>github
+</a><a href="https://twitter.com/#!/focusaurus"><img src="/images/twitter_icon.png" alt="twitter" title="twitter" class="icon"/>twitter
+</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"/></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border:0;width:88px;height:31px" src="/images/valid_css.png" alt="Valid CSS!"/></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"/></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
+</a></p></div></footer></body></html>

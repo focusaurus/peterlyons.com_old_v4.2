@@ -11,11 +11,11 @@ commander
   .option("-f, --format [format]", "Post file format [md]", "md")
   .option("-b, --blog [persblog]", "blog name [persblog]", "persblog")
   .option("-t, --title [title]", "Post title")
-  .option("-n, --name [name]", "Permalink URI (name)")
+  .option("-s, --slug [slug]", "Permalink URI (slug)")
   .parse(process.argv);
 
 post = new Post commander.blog, commander.title, new Date(), commander.format
-post.name ||= commander.name
+post.name = commander.slug || post.name
 post.base = path.join __dirname, "..", "app", "posts"
 metadata = JSON.stringify(post.metadata()) + "\n"
 asyncjs.files([path.join(post.base, post.metadataPath())])
