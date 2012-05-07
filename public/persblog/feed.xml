@@ -5,11 +5,19 @@
   <link href="http://peterlyons.com/persblog/feed" rel="self">
   </link>
   <link href="http://peterlyons.com/persblog/feed">
-  </link><updated>2012-04-01T01:14:59.653Z</updated><id>http://peterlyons.com/problog/feed</id>
+  </link><updated>2012-05-06T14:52:00.607Z</updated><id>http://peterlyons.com/problog/feed</id>
   <author>
     <name>Peter Lyons
     </name>
   </author>
+  <entry>
+    <title>Fruita Trip
+    </title>
+    <link href="http://peterlyons.com/persblog/2012/05/fruita">
+    </link><updated>2012-05-06T14:52:00.607Z</updated><id>http://localhost:9400/persblog/2012/05/fruita</id>
+    <content type="html">
+    </content>
+  </entry>
   <entry>
     <title>Circus of Illumination
     </title>
