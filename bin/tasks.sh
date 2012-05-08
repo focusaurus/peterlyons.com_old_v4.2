@@ -30,7 +30,7 @@ STAGING_HOSTS="staging.${SITE}"
 DEVURL="http://localhost:9400"
 PRODURL="http://${SITE}"
 REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com.git"
-NODE_VERSION="0.6.7"
+NODE_VERSION="0.6.17"
 PROJECT_DIR=~/projects/peterlyons.com
 OVERLAY="${PROJECT_DIR}/overlay"
 PUBLIC="${PROJECT_DIR}/public"
@@ -222,7 +222,7 @@ app:clone() {
     cd
 }
 
-app:prereqs() {
+task:prereqs() {
     set -e
     cdpd
     [ -d var/tmp ] || mkdir -p var/tmp
@@ -456,7 +456,7 @@ fi
 if [ -z "${HOSTS}" ]; then
     #local mode
     case "${OP}" in
-        db:*|os:*|test:*|user:*|web:*|test|release|debug|start|static|watch|deploy|validate|html_to_md)
+        db:*|os:*|test:*|user:*|web:*|prereqs|test|release|debug|start|static|watch|deploy|validate|html_to_md)
             #Op looks valid-ish
             if ! expr "${OP}" : '.*:' > /dev/null; then
                 OP="task:${OP}"

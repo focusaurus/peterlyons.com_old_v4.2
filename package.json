@@ -7,7 +7,7 @@
   "author": "Peter Lyons <pete@peterlyons.com> (http://peterlyons.com)",
   "main": "app/server.coffee",
   "engines": {
-    "node": "0.6.7"
+    "node": "0.6.17"
   },
   "files": [],
   "dependencies": {
