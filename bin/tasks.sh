@@ -289,7 +289,7 @@ task:test() {
 
 task:start() {
     cdpd
-    nodemon app/server.coffee
+    coffee app/server.coffee
 }
 
 task:debug() {
