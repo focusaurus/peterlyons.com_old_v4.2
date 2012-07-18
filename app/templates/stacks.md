@@ -13,7 +13,7 @@
 * Views: [Jade](https://github.com/visionmedia/jade)
 * CSS: [Stylus](http://learnboost.github.com/stylus/)
 * Tests: [mocha](http://visionmedia.github.com/mocha/)
-* Deployment: Home-grown CoffeeScript/SSH awesomeness or [Chef](http://www.opscode.com/chef/)
+* Deployment: [Fabric](http://fabfile.org), Home-grown CoffeeScript/SSH awesomeness or [Chef](http://www.opscode.com/chef/)
 * Control Flow: [async](https://github.com/caolan/async)
 
 ## Ruby on Rails Stack
@@ -24,7 +24,8 @@
 
 ## Browser
 
-* [jQuery](http://jquery.org/), [jQuery UI](http://jqueryui.com/)
+* [jQuery](http://jquery.org/)
+* [backbone.js](http://documentcloud.github.com/backbone/), [underscore.js](http://documentcloud.github.com/underscore/)
 
 ## Utility
 
