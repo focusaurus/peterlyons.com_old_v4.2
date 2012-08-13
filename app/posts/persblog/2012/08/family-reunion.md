@@ -1,3 +1,5 @@
+<flickrshow href="page_show_url=%2Fphotos%2F88096431%40N00%2Fsets%2F72157631042356708%2Fshow%2F&page_show_back_url=%2Fphotos%2F88096431%40N00%2Fsets%2F72157631042356708%2F&set_id=72157631042356708"/>
+
 Last Friday night I departed for our annual family reunion on my Mom's side of the family. I parked at the RTD McCaslin park and ride, got some dinner at Whole Foods, tried the self-serve froyo place in that shopping center, and caught the bus to DIA. I flew a red eye that landed in Newark at 5 AM. On the plane I coded my first NPM module: [writers-digest](https://github.com/focusaurus/writers-digest).
 
 After landing, I hung out and rested in the airport until my cousin Andrew arrived shortly after 8 AM. Uncle Pete picked us up and took us to their house while their three car loads of people assembled and finished packing. I drove with Ed and Emily along small state roads up through northwest New Jersey into Pennsylvania, stopping once for coffee and snacks. We had rented two condos in the Woodlock Springs resort. Dinner Saturday was lasange from Perotti's in Cranford. I ended up sleeping 12 hours Saturday night, I guess due to jet lag plus the red eye.
