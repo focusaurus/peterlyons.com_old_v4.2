@@ -103,7 +103,7 @@ class BlogIndex extends pages.Page
       .each (fakeRes, next) ->
         middleware.youtube req, fakeRes, next
       .each (fakeRes, next) ->
-        fakeRes.post.content = fakeRes.html = fakeRes.$("body").html()
+        fakeRes.post.content = fakeRes.html
         next()
       .end (error, fakeRes) ->
         res.header "Content-Type", "text/xml"
