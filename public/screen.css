@@ -315,6 +315,9 @@ a.current {
 html {
   font-size: 62.5%;
 }
+strong {
+  font-weight: bold;
+}
 img.icon {
   padding-right: 2px;
   vertical-align: middle;
