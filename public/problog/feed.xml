@@ -5,11 +5,69 @@
   <link href="http://peterlyons.com/problog/feed" rel="self">
   </link>
   <link href="http://peterlyons.com/problog/feed">
-  </link><updated>2012-03-05T04:36:35.083Z</updated><id>http://peterlyons.com/problog/feed</id>
+  </link><updated>2012-09-02T21:35:19.427Z</updated><id>http://peterlyons.com/problog/feed</id>
   <author>
     <name>Peter Lyons
     </name>
   </author>
+  <entry>
+    <title>Managing Per-Project Interpreters and the PATH
+    </title>
+    <link href="http://peterlyons.com/problog/2012/09/managing-per-project-interpreters-and-the-path">
+    </link><updated>2012-09-02T21:35:19.427Z</updated><id>http://localhost:9400/problog/2012/09/managing-per-project-interpreters-and-the-path</id>
+    <content type="html">&lt;p&gt;So let's talk about managing runtimes and interpreters for projects and applications. This post comes about after I have seen a vast jungle of non-solutions and dead ends out there for managing installations of interpreters such as Python, Ruby, node.js, etc. First, let's clear the air of a bunch of nonesense you may find out there that makes this problem confusing.&lt;/p&gt;
+
+&lt;h2&gt;Never use the interpreter provided by your operating system&lt;/h2&gt;
+
+&lt;p&gt;If you are building a web application or any other project that should by all rights be cross-platform and doesn't ship with OS, then you should have absolutely nothing to do with the interpreter that may be included with the OS. The OS interpreters are there for componets of the OS itself written in those languages. They have no business being used by third party projects and applications that run on top of the OS as opposed to being part of the OS. Forget about the Ruby that comes with OS X. Forget about the Python that comes with Ubuntu. Forget about the Debian packages for node.js (slightly different/better, but still, ignore them).&lt;/p&gt;
+
+&lt;p&gt;The reasoning behind this guideline is as follows.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Exact version&lt;/strong&gt;: Applications need exact and strict control of the version of interpreter their. You should be using the exact same version of your interpreter across all of your development, test, staging, and production environments. This will avoid problems which are easily-avoidable, so do it.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Modern version&lt;/strong&gt;: OSes tend to ship versions of these interpreters that are significantly behind the latest stable version. New applications should be written to work with the latest stable version and should keep up with ongoing releases, never getting more than 3 months behind.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Independence&lt;/strong&gt; Applications need independence from one another. If you have 3 Django projects on the same machine, each one needs to have the ability to use whatever interpreter &lt;strong&gt;version&lt;/strong&gt; it needs on its own independent &lt;strong&gt;schedule&lt;/strong&gt;. Due to this fact, that means the correct location for these interpretters is within your application's directory alongside your application code, which is why I advise you to ignore the node.js debian packages you may find out there because it installs into a shared location, which does not meet our goals here.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Keep the app-specific interpreter within the application install directory&lt;/h2&gt;
+
+&lt;p&gt;Again, don't let the OS's notion of shared interpreters in a shared location distract you from the right layout here. The app-specific interpreter installation belongs inside you project's installation directory.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;project_root/python&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;project_root/node&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;project_root/ruby&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Basically, the old school unix principles have gone stale on us. Years ago, sysadmins had rules for filesystem layout with different goals. For example, sysadmins wanted to be able to NFS mount a shared directory where binaries could live, be maintained in a single place, and be mounted and run by many additional servers. They wanted to do this to be efficient with disk space and to be able to make manual changes in one place and have them to affect immediately on an arbitrary number of servers that use the same NFS volume.&lt;/p&gt;
+
+&lt;p&gt;Now we use automated tools to manage deployments to clusters of independent servers, and disk space is cheap, so we want each server to have its own copy of what it needs to run with as few external dependencies as possible. We want to be able to do rolling deploys across a cluster or run 1/2 the cluster on the new code and half on the old code.  Disk space is cheap and plentiful, so if we have 5 or 10 apps running on the same staging server, we could not care less about a few megabytes of duplication to handle a bunch of python installations.&lt;/p&gt;
+
+&lt;h2&gt;Provide a single script to launch your application commands&lt;/h2&gt;
+
+&lt;p&gt;Encapsulate each version with a wrapper shell script that understands the project directory layout and manages your PATH appropriately. I tend to call this file &lt;code&gt;project_root/do&lt;/code&gt; but &lt;code&gt;project_root/bin/tasks.sh&lt;/code&gt; or similar are good locations for this. This script should handle your service operations like start, stop, reload, etc, as well as any one-off commands you make have like clearing a cache, regenering static files, and so forth.&lt;/p&gt;
+
+&lt;p&gt;Here's a snippet of my &lt;code&gt;project_root/do&lt;/code&gt; script which locates the correct installation of python and fabric and passes control to them.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/bin/sh -e
+cd $(dirname &quot;${0}&quot;)
+exec ./python/bin/fab &quot;${@}&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Thus I can run this script from any directory, or from an init/upstart script, with any PATH, and the application correctly handles its own required settings. The above is the bare bones and the crux of the separation of concerns in the design. Below I show longer snippets that handle installation of the prerequisites and other nice features.&lt;/p&gt;
+
+&lt;h2&gt;For local development, manage your PATH intelligently and automatically&lt;/h2&gt;
+
+&lt;h2&gt;(Bonus item) Keep variable files for data and logging under your project directory&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;project_root/var/log&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;project_root/var/data&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This is a mindset shift from traditional unix administration best practices. It's in my opinion a less complex and more application-centric design that makes better sense given our focus on applications that tend to be providing network services and generally are less tightly coupled to the underlying OS these days. Traditional unix administration (as documented in the &lt;a href=&quot;http://www.pathname.com/fhs/&quot;&gt;Filesystem Heirarchy Standard&lt;/a&gt;) has a strong and system-wide distinction that runtime variable data like data files and log files go under &lt;code&gt;/var&lt;/code&gt; and everything else except for &lt;code&gt;/home&lt;/code&gt; and '/tmp&lt;code&gt;is static data. Again, this no longer applies to modern applications. These rules had to do with preventing key filesystems from filling up, primarily. They wanted application data to be static and allocate a certain amount of space that had separate filesystem limits from the variable data, which they wanted organized centrally under&lt;/code&gt;/var` so they could manage log file growth and space disk space centrally. There were reasons for these designs at the time that made sense given the constraints and goals, but times have changed.&lt;/p&gt;
+    </content>
+  </entry>
   <entry>
     <title>CoffeeScript and Progress
     </title>
