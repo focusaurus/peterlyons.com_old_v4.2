@@ -1,10 +1,10 @@
 #!/usr/bin/env coffee
-asyncjs = require "asyncjs"
-
+path = require "path"
 child_process = require "child_process"
 commander = require "commander"
 fs = require "fs"
-path = require "path"
+mkdirp = require "mkdirp"
+
 Post = require("../app/models/post").Post
 commander
   .version("0.0.1")
@@ -17,10 +17,8 @@ commander
 post = new Post commander.blog, commander.title, new Date(), commander.format
 post.name = commander.slug || post.name
 post.base = path.join __dirname, "..", "app", "posts"
+metaPath = path.join post.base, post.metadataPath()
+mkdirp.sync path.dirname(metaPath)
 metadata = JSON.stringify(post.metadata()) + "\n"
-asyncjs.files([path.join(post.base, post.metadataPath())])
-.each (file, next) ->
-  asyncjs.makePath path.dirname(file.path), next
-.writeFile(metadata)
-.end (error) ->
-  child_process.exec "subl #{post.viewPath()}", ->
+fs.writeFileSync metaPath, metadata
+child_process.exec "subl #{post.viewPath()}", ->
