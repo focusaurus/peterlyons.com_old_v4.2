@@ -12,7 +12,7 @@
   "files": [],
   "dependencies": {
     "async": "0.1.15",
-    "asyncjs": "0.0.5",
+    "asyncjs": "0.0.9",
     "coffee-script": "1.2.0",
     "express": "2.5.6",
     "jade": "0.20.0",
