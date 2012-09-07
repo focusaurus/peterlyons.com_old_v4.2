@@ -1,3 +1,7 @@
+**UPDATE:** please see my new article on [Managing Per-project Interpreters and the PATH](/problog/2012/09/managing-per-project-interpreters-and-the-path) for a new and improved take on this topic.
+
+---
+
 So [npm](http://npmjs.org/) has this "-g" switch to install "global" packages that bundle command line executable scripts.  I've been on a strict project isolation kick lately after dealing with rbenv in the ruby world, and I just don't see any need for `npm -g`.  I want each project to have its own version of node, coffeescript, mocha, or whatever else I need.  Here's my principles for a harmonious multi-project system.
 
 ## 1. Install things under your project root

@@ -19,12 +19,12 @@
 
 &lt;h2&gt;Never use the interpreter provided by your operating system&lt;/h2&gt;
 
-&lt;p&gt;If you are building a web application or any other project that should by all rights be cross-platform and doesn't ship with OS, then you should have absolutely nothing to do with the interpreter that may be included with the OS. The OS interpreters are there for componets of the OS itself written in those languages. They have no business being used by third party projects and applications that run on top of the OS as opposed to being part of the OS. Forget about the Ruby that comes with OS X. Forget about the Python that comes with Ubuntu. Forget about the Debian packages for node.js (slightly different/better, but still, ignore them).&lt;/p&gt;
+&lt;p&gt;If you are building a web application or any other project that should by all rights be cross-platform and doesn't ship with OS, then you should have absolutely nothing to do with the interpreter that may be included with the OS. The OS interpreters are there for components of the OS itself written in those languages. They have no business being used by third party projects and applications that run on top of the OS as opposed to being part of the OS. Forget about the Ruby that comes with OS X. Forget about the Python that comes with Ubuntu. Forget about the Debian packages for node.js (slightly different/better, but still, ignore them).&lt;/p&gt;
 
 &lt;p&gt;The reasoning behind this guideline is as follows.&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Exact version&lt;/strong&gt;: Applications need exact and strict control of the version of interpreter their. You should be using the exact same version of your interpreter across all of your development, test, staging, and production environments. This will avoid problems which are easily-avoidable, so do it.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Exact version&lt;/strong&gt;: Applications need exact and strict control of the version of their interpreter. You should be using the exact same version of your interpreter across all of your development, test, staging, and production environments. This will avoid problems which are easily-avoidable, so do it.&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Modern version&lt;/strong&gt;: OSes tend to ship versions of these interpreters that are significantly behind the latest stable version. New applications should be written to work with the latest stable version and should keep up with ongoing releases, never getting more than 3 months behind.&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Independence&lt;/strong&gt; Applications need independence from one another. If you have 3 Django projects on the same machine, each one needs to have the ability to use whatever interpreter &lt;strong&gt;version&lt;/strong&gt; it needs on its own independent &lt;strong&gt;schedule&lt;/strong&gt;. Due to this fact, that means the correct location for these interpretters is within your application's directory alongside your application code, which is why I advise you to ignore the node.js debian packages you may find out there because it installs into a shared location, which does not meet our goals here.&lt;/li&gt;
 &lt;/ul&gt;
@@ -43,6 +43,35 @@
 
 &lt;p&gt;Now we use automated tools to manage deployments to clusters of independent servers, and disk space is cheap, so we want each server to have its own copy of what it needs to run with as few external dependencies as possible. We want to be able to do rolling deploys across a cluster or run 1/2 the cluster on the new code and half on the old code.  Disk space is cheap and plentiful, so if we have 5 or 10 apps running on the same staging server, we could not care less about a few megabytes of duplication to handle a bunch of python installations.&lt;/p&gt;
 
+&lt;h2&gt;Installing local versions of node.js&lt;/h2&gt;
+
+&lt;p&gt;Now that Joyent is shipping pre-compiled binaries, installing node interpreters in the manner described here is a snap. Here's an &lt;code&gt;install_node.sh&lt;/code&gt; script. Pass it the version you want and where you want it installed (works with node &gt;= 0.8).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+VERSION=${1-0.8.8}
+PREFIX=${2-node}
+PLATFORM=$(uname | tr A-Z a-z)
+ARCH=x64
+case $(uname -p) in
+    i686)
+        ARCH=x86
+    ;;
+esac
+if [ -e &quot;${PREFIX}&quot; ]; then
+    TS=$(date +%Y%m%d-%H%M%S)
+    echo &quot;WARNING: Moving existing file at ${PREFIX} to ${PREFIX}-previous-${TS}&quot; 1&gt;&amp;2
+    mv &quot;${PREFIX}&quot; &quot;${PREFIX}-previous-${TS}&quot;
+fi
+mkdir -p &quot;${PREFIX}&quot;
+curl --silent \
+  &quot;http://nodejs.org/dist/v${VERSION}/node-v${VERSION}-${PLATFORM}-${ARCH}.tar.gz&quot; \
+  | tar xzf - --strip-components=1 -C &quot;${PREFIX}&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Never use npm -g&lt;/h2&gt;
+
+&lt;p&gt;This is a follow up to my &lt;a href=&quot;/problog/2011/12/no-need-for-npm-g&quot;&gt;earlier blog post about avoiding npm -g&lt;/a&gt;, now improved and revised. For the most part, I believe &lt;a href=&quot;https://npmjs.org/&quot;&gt;npm&lt;/a&gt; to be the state-of-the-art package management system and to be superior to the messes available for python and ruby. However, the &lt;code&gt;-g&lt;/code&gt; switch, which installs commands &lt;code&gt;globally&lt;/code&gt;, should be avoided in favor of the system described here. You don't want to have to upgrade all your express.js apps at once, so give them each their own copy of the &lt;code&gt;express&lt;/code&gt; script.&lt;/p&gt;
+
 &lt;h2&gt;Provide a single script to launch your application commands&lt;/h2&gt;
 
 &lt;p&gt;Encapsulate each version with a wrapper shell script that understands the project directory layout and manages your PATH appropriately. I tend to call this file &lt;code&gt;project_root/do&lt;/code&gt; but &lt;code&gt;project_root/bin/tasks.sh&lt;/code&gt; or similar are good locations for this. This script should handle your service operations like start, stop, reload, etc, as well as any one-off commands you make have like clearing a cache, regenering static files, and so forth.&lt;/p&gt;
@@ -54,9 +83,92 @@ cd $(dirname &quot;${0}&quot;)
 exec ./python/bin/fab &quot;${@}&quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Thus I can run this script from any directory, or from an init/upstart script, with any PATH, and the application correctly handles its own required settings. The above is the bare bones and the crux of the separation of concerns in the design. Below I show longer snippets that handle installation of the prerequisites and other nice features.&lt;/p&gt;
+&lt;p&gt;Thus I can run this script from any directory, or from an init/upstart script, with any PATH, and the application correctly handles its own required settings. The above is the bare bones and the crux of the separation of concerns in the design. I normally have some other code in there to bootstrap the project's dependencies, but I'll save that topic for another blog post.&lt;/p&gt;
 
 &lt;h2&gt;For local development, manage your PATH intelligently and automatically&lt;/h2&gt;
+
+&lt;p&gt;As you work on many projects which contain their own interpreter installations, you don't want to always have to A) work from the project root directory and B) run commands like &lt;code&gt;./python/bin/python myapp.py&lt;/code&gt;. So here are some utilities that can intelligently manage your PATH similar to what is done by &lt;a href=&quot;https://github.com/sstephenson/rbenv&quot;&gt;rbenv&lt;/a&gt;, but not tied to ruby and based on you changing project directories.&lt;/p&gt;
+
+&lt;p&gt;First, here's how I set up my &lt;code&gt;PATH&lt;/code&gt; in my &lt;code&gt;~/.zshrc&lt;/code&gt; file (works equally well for bash or bourne shell). I've added extra explanatory comments inline.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#This helper function will add a directory to the PATH if it exists
+#This is a simple way to handle different machines, OSes, and configurations
+addPath() {
+    if [ -d &quot;${1}&quot; ]; then
+        if [ -z &quot;${PATH}&quot; ]; then
+            export PATH=&quot;${1}&quot;
+        else
+          export PATH=$PATH:&quot;${1}&quot;
+        fi
+    fi
+}
+
+setupPath() {
+    #Start with an empty PATH
+    PATH=
+    #Local pwd stuff
+    addPath &quot;${PWD}/script&quot;
+    addPath &quot;${PWD}/bin&quot;
+    #For node
+    addPath &quot;${PWD}/node_modules/.bin&quot;
+    addPath &quot;${PWD}/node/bin&quot;
+    #For python virtualenvs
+    addPath &quot;${PWD}/python/bin&quot;
+
+    #Personal home dir stuff
+    addPath ~/bin
+    #For rbenv
+    addPath ~/.rbenv/bin
+    addPath ~/.cabal/bin
+    #Homebrew
+    addPath ~/Library/Python/2.7/bin
+    addPath /usr/local/share/python
+    addPath /usr/local/bin
+    #XCode/Developer
+    addPath /Developer/usr/bin
+    #Normal system stuff
+    addPath /bin
+    addPath /usr/bin
+    addPath /sbin
+    addPath /usr/sbin
+    addPath /usr/X11/bin
+}
+#Run this during shell startup. Can be re-run as needed manually as well
+setupPath
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;OK, so that's how the &lt;code&gt;PATH&lt;/code&gt; gets built up, but we want to change the PATH as we move our current working directory between projects. For that we use a shell hook function. What this does is try to detect if we've changed into a project directory, and if so, rebuild the &lt;code&gt;PATH&lt;/code&gt;, which will put our project-specific directories early in the &lt;code&gt;PATH&lt;/code&gt; list, so when we type &lt;code&gt;node&lt;/code&gt; or &lt;code&gt;python&lt;/code&gt; or &lt;code&gt;coffee&lt;/code&gt;, etc, we get the project specific one under the project root. Because this adds absolute paths and only changes the &lt;code&gt;PATH&lt;/code&gt; when we &lt;code&gt;cd&lt;/code&gt; to a project root, we can cd to subdirectories within the project and still be running the correct project-specific interpreter. This does breakdown, however, if you cd directly into a project subdirectory without stopping in the project root. I don't hit that problem because I'm not in the habit of doing that, but YMMV. Here's the zsh version, which uses the &lt;a href=&quot;http://www.refining-linux.org/archives/42/ZSH-Gem-8-Hook-function-chpwd/&quot;&gt;chpwd&lt;/a&gt; hook function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if [ -n &quot;${ZSH_VERSION}&quot; ]; then
+    chpwd() {
+        [ -d .git -o \
+          -d  node_modules/.bin -o \
+          -d python/bin -o \
+          -d node/bin ] &amp;&amp; setupPath
+    }
+fi
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Bash users, &lt;a href=&quot;http://stackoverflow.com/questions/3276247/is-there-a-hook-in-bash-to-find-out-when-the-cwd-changes&quot;&gt;you're on your own&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here's an example of this at work.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;~-&gt; cd projects/peterlyons.com
+~/projects/peterlyons.com-&gt; which node
+/Users/plyons/projects/peterlyons.com/node/bin/node
+~/projects/peterlyons.com-&gt; cd ../craft
+~/projects/craft-&gt; which node
+/Users/plyons/projects/craft/node/bin/node
+~/projects/craft-&gt; cd ../othenticate.com
+~/projects/othenticate.com-&gt; which node
+/Users/plyons/projects/othenticate.com/node/bin/node
+~/projects/othenticate.com-&gt; cd ../m-cm/indivo_provision
+~/projects/m-cm/indivo_provision-&gt; which python
+/Users/plyons/projects/m-cm/indivo_provision/python/bin/python
+~/projects/m-cm/indivo_provision-&gt; cd ./conf
+~/projects/m-cm/indivo_provision/conf-&gt; which python
+/Users/plyons/projects/m-cm/indivo_provision/python/bin/python
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2&gt;(Bonus item) Keep variable files for data and logging under your project directory&lt;/h2&gt;
 
@@ -65,7 +177,7 @@ exec ./python/bin/fab &quot;${@}&quot;
 &lt;li&gt;&lt;code&gt;project_root/var/data&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;This is a mindset shift from traditional unix administration best practices. It's in my opinion a less complex and more application-centric design that makes better sense given our focus on applications that tend to be providing network services and generally are less tightly coupled to the underlying OS these days. Traditional unix administration (as documented in the &lt;a href=&quot;http://www.pathname.com/fhs/&quot;&gt;Filesystem Heirarchy Standard&lt;/a&gt;) has a strong and system-wide distinction that runtime variable data like data files and log files go under &lt;code&gt;/var&lt;/code&gt; and everything else except for &lt;code&gt;/home&lt;/code&gt; and '/tmp&lt;code&gt;is static data. Again, this no longer applies to modern applications. These rules had to do with preventing key filesystems from filling up, primarily. They wanted application data to be static and allocate a certain amount of space that had separate filesystem limits from the variable data, which they wanted organized centrally under&lt;/code&gt;/var` so they could manage log file growth and space disk space centrally. There were reasons for these designs at the time that made sense given the constraints and goals, but times have changed.&lt;/p&gt;
+&lt;p&gt;This is a mindset shift from traditional unix administration best practices. It's in my opinion a less complex and more application-centric design that makes better sense given our focus on applications that tend to be providing network services and generally are less tightly coupled to the underlying OS these days. Traditional unix administration (as documented in the &lt;a href=&quot;http://www.pathname.com/fhs/&quot;&gt;Filesystem Heirarchy Standard&lt;/a&gt;) has a strong and system-wide distinction that runtime variable data like data files and log files go under &lt;code&gt;/var&lt;/code&gt; and everything else except for &lt;code&gt;/home&lt;/code&gt; and &lt;code&gt;/tmp&lt;/code&gt; is static data. Again, this no longer applies to modern applications. These rules had to do with preventing key filesystems from filling up, primarily. They wanted application data to be static and allocate a certain amount of space that had separate filesystem limits from the variable data, which they wanted organized centrally under &lt;code&gt;/var&lt;/code&gt; so they could manage log file growth and space disk space centrally. There were reasons for these designs at the time that made sense given the constraints and goals, but times have changed.&lt;/p&gt;
     </content>
   </entry>
   <entry>
@@ -396,7 +508,11 @@ end
     </title>
     <link href="http://peterlyons.com/problog/2011/12/no-need-for-npm-g">
     </link><updated>2011-12-22T21:14:45.000Z</updated><id>http://localhost:9400/problog/2011/12/no-need-for-npm-g</id>
-    <content type="html">&lt;p&gt;So &lt;a href=&quot;http://npmjs.org/&quot;&gt;npm&lt;/a&gt; has this &quot;-g&quot; switch to install &quot;global&quot; packages that bundle command line executable scripts.  I've been on a strict project isolation kick lately after dealing with rbenv in the ruby world, and I just don't see any need for &lt;code&gt;npm -g&lt;/code&gt;.  I want each project to have its own version of node, coffeescript, mocha, or whatever else I need.  Here's my principles for a harmonious multi-project system.&lt;/p&gt;
+    <content type="html">&lt;p&gt;&lt;strong&gt;UPDATE:&lt;/strong&gt; please see my new article on &lt;a href=&quot;/problog/2012/09/managing-per-project-interpreters-and-the-path&quot;&gt;Managing Per-project Interpreters and the PATH&lt;/a&gt; for a new and improved take on this topic.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;So &lt;a href=&quot;http://npmjs.org/&quot;&gt;npm&lt;/a&gt; has this &quot;-g&quot; switch to install &quot;global&quot; packages that bundle command line executable scripts.  I've been on a strict project isolation kick lately after dealing with rbenv in the ruby world, and I just don't see any need for &lt;code&gt;npm -g&lt;/code&gt;.  I want each project to have its own version of node, coffeescript, mocha, or whatever else I need.  Here's my principles for a harmonious multi-project system.&lt;/p&gt;
 
 &lt;h2&gt;1. Install things under your project root&lt;/h2&gt;
 

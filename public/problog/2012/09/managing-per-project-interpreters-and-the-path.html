@@ -1,0 +1,150 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><title>Managing Per-Project Interpreters and the PATH | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"/><meta name="author" content="Peter Lyons"/><meta name="description" content="Peter Lyons: node.js coder for hire"/><link rel="stylesheet" href="/screen.css"/><script src="/js/jquery.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"/><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"/><link rel="alternate" type="application/atom+xml" href="/problog/feed" title="Pete's Points"/><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"/><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"/><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"/><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"/><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"/></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"/><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><article><span class="date">Sep 02, 2012</span><h1>Managing Per-Project Interpreters and the PATH</h1><p>So let's talk about managing runtimes and interpreters for projects and applications. This post comes about after I have seen a vast jungle of non-solutions and dead ends out there for managing installations of interpreters such as Python, Ruby, node.js, etc. First, let's clear the air of a bunch of nonesense you may find out there that makes this problem confusing.</p><h2>Never use the interpreter provided by your operating system</h2><p>If you are building a web application or any other project that should by all rights be cross-platform and doesn't ship with OS, then you should have absolutely nothing to do with the interpreter that may be included with the OS. The OS interpreters are there for components of the OS itself written in those languages. They have no business being used by third party projects and applications that run on top of the OS as opposed to being part of the OS. Forget about the Ruby that comes with OS X. Forget about the Python that comes with Ubuntu. Forget about the Debian packages for node.js (slightly different/better, but still, ignore them).</p><p>The reasoning behind this guideline is as follows.</p><ul><li><strong>Exact version</strong>: Applications need exact and strict control of the version of their interpreter. You should be using the exact same version of your interpreter across all of your development, test, staging, and production environments. This will avoid problems which are easily-avoidable, so do it.</li><li><strong>Modern version</strong>: OSes tend to ship versions of these interpreters that are significantly behind the latest stable version. New applications should be written to work with the latest stable version and should keep up with ongoing releases, never getting more than 3 months behind.</li><li><strong>Independence</strong> Applications need independence from one another. If you have 3 Django projects on the same machine, each one needs to have the ability to use whatever interpreter <strong>version</strong> it needs on its own independent <strong>schedule</strong>. Due to this fact, that means the correct location for these interpretters is within your application's directory alongside your application code, which is why I advise you to ignore the node.js debian packages you may find out there because it installs into a shared location, which does not meet our goals here.</li></ul><h2>Keep the app-specific interpreter within the application install directory</h2><p>Again, don't let the OS's notion of shared interpreters in a shared location distract you from the right layout here. The app-specific interpreter installation belongs inside you project's installation directory.</p><ul><li><code>project_root/python</code></li><li><code>project_root/node</code></li><li><code>project_root/ruby</code></li></ul><p>Basically, the old school unix principles have gone stale on us. Years ago, sysadmins had rules for filesystem layout with different goals. For example, sysadmins wanted to be able to NFS mount a shared directory where binaries could live, be maintained in a single place, and be mounted and run by many additional servers. They wanted to do this to be efficient with disk space and to be able to make manual changes in one place and have them to affect immediately on an arbitrary number of servers that use the same NFS volume.</p><p>Now we use automated tools to manage deployments to clusters of independent servers, and disk space is cheap, so we want each server to have its own copy of what it needs to run with as few external dependencies as possible. We want to be able to do rolling deploys across a cluster or run 1/2 the cluster on the new code and half on the old code.  Disk space is cheap and plentiful, so if we have 5 or 10 apps running on the same staging server, we could not care less about a few megabytes of duplication to handle a bunch of python installations.</p><h2>Installing local versions of node.js</h2><p>Now that Joyent is shipping pre-compiled binaries, installing node interpreters in the manner described here is a snap. Here's an <code>install_node.sh</code> script. Pass it the version you want and where you want it installed (works with node >= 0.8).</p><pre><code>#!/bin/sh
+VERSION=${1-0.8.8}
+PREFIX=${2-node}
+PLATFORM=$(uname | tr A-Z a-z)
+ARCH=x64
+case $(uname -p) in
+    i686)
+        ARCH=x86
+    ;;
+esac
+if [ -e "${PREFIX}" ]; then
+    TS=$(date +%Y%m%d-%H%M%S)
+    echo "WARNING: Moving existing file at ${PREFIX} to ${PREFIX}-previous-${TS}" 1&gt;&amp;2
+    mv "${PREFIX}" "${PREFIX}-previous-${TS}"
+fi
+mkdir -p "${PREFIX}"
+curl --silent \
+  "http://nodejs.org/dist/v${VERSION}/node-v${VERSION}-${PLATFORM}-${ARCH}.tar.gz" \
+  | tar xzf - --strip-components=1 -C "${PREFIX}"
+</code></pre><h2>Never use npm -g</h2><p>This is a follow up to my <a href="/problog/2011/12/no-need-for-npm-g">earlier blog post about avoiding npm -g</a>, now improved and revised. For the most part, I believe <a href="https://npmjs.org/">npm</a> to be the state-of-the-art package management system and to be superior to the messes available for python and ruby. However, the <code>-g</code> switch, which installs commands <code>globally</code>, should be avoided in favor of the system described here. You don't want to have to upgrade all your express.js apps at once, so give them each their own copy of the <code>express</code> script.</p><h2>Provide a single script to launch your application commands</h2><p>Encapsulate each version with a wrapper shell script that understands the project directory layout and manages your PATH appropriately. I tend to call this file <code>project_root/do</code> but <code>project_root/bin/tasks.sh</code> or similar are good locations for this. This script should handle your service operations like start, stop, reload, etc, as well as any one-off commands you make have like clearing a cache, regenering static files, and so forth.</p><p>Here's a snippet of my <code>project_root/do</code> script which locates the correct installation of python and fabric and passes control to them.</p><pre><code>#!/bin/sh -e
+cd $(dirname "${0}")
+exec ./python/bin/fab "${@}"
+</code></pre><p>Thus I can run this script from any directory, or from an init/upstart script, with any PATH, and the application correctly handles its own required settings. The above is the bare bones and the crux of the separation of concerns in the design. I normally have some other code in there to bootstrap the project's dependencies, but I'll save that topic for another blog post.</p><h2>For local development, manage your PATH intelligently and automatically</h2><p>As you work on many projects which contain their own interpreter installations, you don't want to always have to A) work from the project root directory and B) run commands like <code>./python/bin/python myapp.py</code>. So here are some utilities that can intelligently manage your PATH similar to what is done by <a href="https://github.com/sstephenson/rbenv">rbenv</a>, but not tied to ruby and based on you changing project directories.</p><p>First, here's how I set up my <code>PATH</code> in my <code>~/.zshrc</code> file (works equally well for bash or bourne shell). I've added extra explanatory comments inline.</p><pre><code>#This helper function will add a directory to the PATH if it exists
+#This is a simple way to handle different machines, OSes, and configurations
+addPath() {
+    if [ -d "${1}" ]; then
+        if [ -z "${PATH}" ]; then
+            export PATH="${1}"
+        else
+          export PATH=$PATH:"${1}"
+        fi
+    fi
+}
+
+setupPath() {
+    #Start with an empty PATH
+    PATH=
+    #Local pwd stuff
+    addPath "${PWD}/script"
+    addPath "${PWD}/bin"
+    #For node
+    addPath "${PWD}/node_modules/.bin"
+    addPath "${PWD}/node/bin"
+    #For python virtualenvs
+    addPath "${PWD}/python/bin"
+
+    #Personal home dir stuff
+    addPath ~/bin
+    #For rbenv
+    addPath ~/.rbenv/bin
+    addPath ~/.cabal/bin
+    #Homebrew
+    addPath ~/Library/Python/2.7/bin
+    addPath /usr/local/share/python
+    addPath /usr/local/bin
+    #XCode/Developer
+    addPath /Developer/usr/bin
+    #Normal system stuff
+    addPath /bin
+    addPath /usr/bin
+    addPath /sbin
+    addPath /usr/sbin
+    addPath /usr/X11/bin
+}
+#Run this during shell startup. Can be re-run as needed manually as well
+setupPath
+</code></pre><p>OK, so that's how the <code>PATH</code> gets built up, but we want to change the PATH as we move our current working directory between projects. For that we use a shell hook function. What this does is try to detect if we've changed into a project directory, and if so, rebuild the <code>PATH</code>, which will put our project-specific directories early in the <code>PATH</code> list, so when we type <code>node</code> or <code>python</code> or <code>coffee</code>, etc, we get the project specific one under the project root. Because this adds absolute paths and only changes the <code>PATH</code> when we <code>cd</code> to a project root, we can cd to subdirectories within the project and still be running the correct project-specific interpreter. This does breakdown, however, if you cd directly into a project subdirectory without stopping in the project root. I don't hit that problem because I'm not in the habit of doing that, but YMMV. Here's the zsh version, which uses the <a href="http://www.refining-linux.org/archives/42/ZSH-Gem-8-Hook-function-chpwd/">chpwd</a> hook function.</p><pre><code>if [ -n "${ZSH_VERSION}" ]; then
+    chpwd() {
+        [ -d .git -o \
+          -d  node_modules/.bin -o \
+          -d python/bin -o \
+          -d node/bin ] &amp;&amp; setupPath
+    }
+fi
+</code></pre><p>Bash users, <a href="http://stackoverflow.com/questions/3276247/is-there-a-hook-in-bash-to-find-out-when-the-cwd-changes">you're on your own</a>.</p><p>Here's an example of this at work.</p><pre><code>~-&gt; cd projects/peterlyons.com
+~/projects/peterlyons.com-&gt; which node
+/Users/plyons/projects/peterlyons.com/node/bin/node
+~/projects/peterlyons.com-&gt; cd ../craft
+~/projects/craft-&gt; which node
+/Users/plyons/projects/craft/node/bin/node
+~/projects/craft-&gt; cd ../othenticate.com
+~/projects/othenticate.com-&gt; which node
+/Users/plyons/projects/othenticate.com/node/bin/node
+~/projects/othenticate.com-&gt; cd ../m-cm/indivo_provision
+~/projects/m-cm/indivo_provision-&gt; which python
+/Users/plyons/projects/m-cm/indivo_provision/python/bin/python
+~/projects/m-cm/indivo_provision-&gt; cd ./conf
+~/projects/m-cm/indivo_provision/conf-&gt; which python
+/Users/plyons/projects/m-cm/indivo_provision/python/bin/python
+</code></pre><h2>(Bonus item) Keep variable files for data and logging under your project directory</h2><ul><li><code>project_root/var/log</code></li><li><code>project_root/var/data</code></li></ul><p>This is a mindset shift from traditional unix administration best practices. It's in my opinion a less complex and more application-centric design that makes better sense given our focus on applications that tend to be providing network services and generally are less tightly coupled to the underlying OS these days. Traditional unix administration (as documented in the <a href="http://www.pathname.com/fhs/">Filesystem Heirarchy Standard</a>) has a strong and system-wide distinction that runtime variable data like data files and log files go under <code>/var</code> and everything else except for <code>/home</code> and <code>/tmp</code> is static data. Again, this no longer applies to modern applications. These rules had to do with preventing key filesystems from filling up, primarily. They wanted application data to be static and allocate a certain amount of space that had separate filesystem limits from the variable data, which they wanted organized centrally under <code>/var</code> so they could manage log file growth and space disk space centrally. There were reasons for these designs at the time that made sense given the constraints and goals, but times have changed.</p></article><hr/><nav class="post"><a href="/problog" class="button">back to blog index</a><ul><li>Previous post
+<a href="/problog/2012/03/coffeescript-and-progress">CoffeeScript and Progress</a></li><li><a id="toggleComments" href="#">Show Comments</a></li></ul></nav><section id="comments" class="hidden"><div id="disqus_thread"></div><script>var disqus_shortname = "peterlyons-problog";</script><script>/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_developer = 1;
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></section><script type="text/javascript">
+(function() {
+  var toggleComments;
+
+  toggleComments = function(event) {
+    var hidden;
+    if (event != null) event.preventDefault();
+    hidden = $("#comments").toggleClass("hidden").hasClass("hidden");
+    return $("#toggleComments").text(hidden ? "Show Comments" : "Hide Comments");
+  };
+
+  window.disqus_config = function() {
+    return this.callbacks.afterRender.push(function() {
+      var num;
+      num = $("#dsq-num-posts").text();
+      if (num > 0 && $("#comments").hasClass("hidden")) return toggleComments();
+    });
+  };
+
+  $(function() {
+    return $("a#toggleComments").on("click", toggleComments);
+  });
+
+}).call(this);
+</script><script type="text/javascript">
+(function() {
+
+  $(function() {
+    return $("header nav a").each(function(index, link) {
+      var $link, URI, href, parent, same;
+      $link = $(link);
+      href = $link.attr("href");
+      URI = document.location.pathname;
+      same = URI === href;
+      parent = URI.indexOf(href) >= 0 && href !== "/";
+      if (same || parent) {
+        return $link.addClass("current");
+      } else {
+        return $link.removeClass("current");
+      }
+    });
+  });
+
+}).call(this);
+</script></div><footer><div class="content"><nav><h1>Technology</h1><a href="/">Home</a><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav class="connect"><h1>Connect With Me</h1><a href="/problog/feed"><img src="/images/feed.png" height="24" alt="Subscribe to my Atom feed" title="Subscribe to my Atom Feed" class="icon"/>Subscribe
+</a><a href="http://www.linkedin.com/in/peterlyons1"><img src="/images/linkedin_icon.png" alt="LinkedIn" title="LinkedIn" class="icon"/>LinkedIn
+</a><a href="http://stackoverflow.com/users/266795/peter-lyons"><img src="/images/stackoverflow_icon.png" alt="stackoverflow" title="stackoverflow" class="icon"/>stackoverflow
+</a><a href="https://github.com/focusaurus"><img src="/images/github_icon.png" alt="github" title="github" class="icon"/>github
+</a><a href="https://twitter.com/#!/focusaurus"><img src="/images/twitter_icon.png" alt="twitter" title="twitter" class="icon"/>twitter
+</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"/></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border:0;width:88px;height:31px" src="/images/valid_css.png" alt="Valid CSS!"/></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"/></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
+</a></p></div></footer></body></html>
