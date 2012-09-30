@@ -1,7 +1,7 @@
 upstream node {
   # fail_timeout=0 means we always retry an upstream even if it failed
   # to return a good HTTP response
-  server localhost:9400 fail_timeout=0;
+  server localhost:9000 fail_timeout=0;
 }
 
 server {
