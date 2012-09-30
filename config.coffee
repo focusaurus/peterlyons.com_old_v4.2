@@ -1,5 +1,5 @@
 exports.site = "localhost"
-exports.port = 9400
+exports.port = 9000
 exports.baseURL = "http://#{exports.site}:#{exports.port}"
 exports.appURI = "/app"
 #Listen on all IPs in dev/test (for testing from other machines),
