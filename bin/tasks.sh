@@ -65,7 +65,7 @@ os:prereqs() { #TASK: sudo
     cat <<EOF | grep -v "#" | sort | xargs apt-get --assume-yes install
 #Needed to download node
 curl
-#Needed to build node.js gem
+#Needed to build node.js
 g++
 #Source Code Management
 git-core
