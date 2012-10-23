@@ -27,7 +27,7 @@ TASK_SCRIPT="${0}"
 SITE="peterlyons.com"
 PRODUCTION_HOSTS="${SITE}"
 STAGING_HOSTS="staging.${SITE}"
-DEVURL="http://localhost:9400"
+DEVURL="http://localhost:9000"
 PRODURL="http://${SITE}"
 REPO_URL="ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com.git"
 NODE_VERSION="0.6.17"
@@ -65,7 +65,7 @@ os:prereqs() { #TASK: sudo
     cat <<EOF | grep -v "#" | sort | xargs apt-get --assume-yes install
 #Needed to download node
 curl
-#Needed to build node.js gem
+#Needed to build node.js
 g++
 #Source Code Management
 git-core

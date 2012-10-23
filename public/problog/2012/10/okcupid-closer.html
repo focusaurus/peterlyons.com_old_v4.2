@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><title>Find closer OKCupid matches with this bookmarklet | Peter Lyons</title><meta name="keywords" content="peter lyons, pete lyons, web development, node.js, ruby on rails, afronauts, boulder, colorado, turtle dove, startups, music, sax, saxophone, saxophonist, sunny daze, confunktion junction, oberlin, smartears, smart ears, big clock"/><meta name="author" content="Peter Lyons"/><meta name="description" content="Peter Lyons: node.js coder for hire"/><link rel="stylesheet" href="/screen.css"/><script src="/js/jquery.js"></script><link href="/favicon.ico" type="image/x-icon" rel="icon"/><link href="/favicon.ico" type="image/x-icon" rel="shortcut icon"/><link rel="alternate" type="application/atom+xml" href="/problog/feed" title="Pete's Points"/><link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"/><link rel="openid.delegate" href="http://focusaurus.livejournal.com/"/><link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet"/><link href="http://fonts.googleapis.com/css?family=Six+Caps" rel="stylesheet"/><link href="http://fonts.googleapis.com/css?family=Oldenburg" rel="stylesheet"/></head><body><div class="content"><header><img src="/images/peter_lyons_logo_icon.png" alt="Peter Lyons Logo"/><h1><a href="/">Peter Lyons</a></h1><nav><a href="/">Home</a><a href="/problog">Blog</a><a href="/practices">Practices</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav></header><article><span class="date">Oct 22, 2012</span><h1>Find closer OKCupid matches with this bookmarklet</h1><p>I have written a little bookmarklet that will allow you to filter your <a href="http://okcupid.com">OKCupid</a> matches by a smaller geographic region. By default, their search filters allow no smaller than a 25-mile radius. Drag the bookmarklet link below onto your bookmarks toolbar, then click it when you are on the OKC search page, and voilà, you will have the options for 5 and 10-mile searches. 10-mile radius will be selected, so just click "search" and you will have your results.</p><p><a href="javascript:(function(){var%20opt5=document.createElement('option');opt5.value=5;opt5.text='5%20miles';var%20opt10=document.createElement('option');opt10.value=10;opt10.text='10%20miles';var%20radius=document.getElementById('radius');radius.insertBefore(opt10,radius.firstChild);radius.insertBefore(opt5,radius.firstChild);opt10.selected=true;var%20label=document.getElementById('location_interface_button_text');label.textContent=label.textContent.replace(/\d+/,'10');})();">OKCupid Closer Matches</a></p><p>Some notes:</p><ul><li><strong>If you have no idea WTF a bookmarklet is or how to use one, read <a href="http://support.mozilla.org/en-US/kb/bookmarklets-perform-common-web-page-tasks">this</a></strong></li><li>I live close to both Boulder and Denver Colorado. These are two quite different worlds, but they are both within 25 miles of my town. Since Denver's population is 10x the size of Boulder's, most of my search results are Denver residents, when I'm really only insterested in folks within biking distance.</li><li>After you click search, the default search form will re-appear and it will look like your search has a 25 mile radius. Never fear, the query string has <code>filter3=10</code>, which is what is required, and based on my results, yes, the OKC servers do seem to actually respect this query string parameter even if the value is not offered in the search form.</li><li>You need to re-click the bookmarklet for each new search. Sorry. Send feature requests to OKCupid until they add this permanently. Technically I could make this into a Chrome extension and have it always work, so I may do that at some point.</li><li>Thanks to <a href="http://chris.zarate.org/bookmarkleter">Chris Zarate's handy Bookmarkleter utility</a></li><li>And for you web dev nerds out there, I even wrote this with (gasp!) <a href="http://vanilla-js.com/">Vanilla JS</a></li></ul></article><hr/><nav class="post"><a href="/problog" class="button">back to blog index</a><ul><li>Previous post
+<a href="/problog/2012/09/great-support-from-herman-miller">Great Support from Herman Miller</a></li><li><a id="toggleComments" href="#">Show Comments</a></li></ul></nav><section id="comments" class="hidden"><div id="disqus_thread"></div><script>var disqus_shortname = "peterlyons-problog";</script><script>/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_developer = 1;
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></section><script type="text/javascript">
+(function() {
+  var toggleComments;
+
+  toggleComments = function(event) {
+    var hidden;
+    if (event != null) event.preventDefault();
+    hidden = $("#comments").toggleClass("hidden").hasClass("hidden");
+    return $("#toggleComments").text(hidden ? "Show Comments" : "Hide Comments");
+  };
+
+  window.disqus_config = function() {
+    return this.callbacks.afterRender.push(function() {
+      var num;
+      num = $("#dsq-num-posts").text();
+      if (num > 0 && $("#comments").hasClass("hidden")) return toggleComments();
+    });
+  };
+
+  $(function() {
+    return $("a#toggleComments").on("click", toggleComments);
+  });
+
+}).call(this);
+</script><script type="text/javascript">
+(function() {
+
+  $(function() {
+    return $("header nav a").each(function(index, link) {
+      var $link, URI, href, parent, same;
+      $link = $(link);
+      href = $link.attr("href");
+      URI = document.location.pathname;
+      same = URI === href;
+      parent = URI.indexOf(href) >= 0 && href !== "/";
+      if (same || parent) {
+        return $link.addClass("current");
+      } else {
+        return $link.removeClass("current");
+      }
+    });
+  });
+
+}).call(this);
+</script></div><footer><div class="content"><nav><h1>Technology</h1><a href="/">Home</a><a href="/problog">Blog</a><a href="/leveling_up">Leveling Up</a><a href="/practices">Practices</a><a href="/code_conventions">Code Conventions</a><a href="/stacks">Stacks</a><a href="/career">Career</a></nav><nav><h1>Projects</h1><a href="/linkzie">Linkzie</a><a href="http://othenticate.com">Othenticate</a><a href="/smartears">SmartEars</a><a href="/bigclock">BigClock</a></nav><nav class="connect"><h1>Connect With Me</h1><a href="/problog/feed"><img src="/images/feed.png" height="24" alt="Subscribe to my Atom feed" title="Subscribe to my Atom Feed" class="icon"/>Subscribe
+</a><a href="http://www.linkedin.com/in/peterlyons1"><img src="/images/linkedin_icon.png" alt="LinkedIn" title="LinkedIn" class="icon"/>LinkedIn
+</a><a href="http://stackoverflow.com/users/266795/peter-lyons"><img src="/images/stackoverflow_icon.png" alt="stackoverflow" title="stackoverflow" class="icon"/>stackoverflow
+</a><a href="https://github.com/focusaurus"><img src="/images/github_icon.png" alt="github" title="github" class="icon"/>github
+</a><a href="https://twitter.com/#!/focusaurus"><img src="/images/twitter_icon.png" alt="twitter" title="twitter" class="icon"/>twitter
+</a></nav></div></footer><footer class="license"><div class="content"><nav><h1>Music</h1><a href="/bands">Bands</a><a href="/oberlin">Oberlin</a><a href="/favorites">Favorites</a></nav><nav><h1>Personal</h1><a href="/persblog">Read my blog</a><a href="/persblog/feed">Subscribe to my blog</a><a href="https://www.facebook.com/focusaurus">facebook</a><a href="http://www.flickr.com/photos/88096431@N00/">Flickr Photos</a><a href="/app/photos">Photos (before Fall '11)</a></nav><div></div><a href="http://www.w3.org/" target="_blank"><img src="/images/html5.png" alt="HTML 5"/></a><a href="http://jigsaw.w3.org/css-validator/" target="_blank"><img style="border:0;width:88px;height:31px" src="/images/valid_css.png" alt="Valid CSS!"/></a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"/></a><p>This work is licensed under a<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">&nbsp;Creative Commons Attribution-ShareAlike 3.0 Unported License.
+</a></p></div></footer></body></html>
