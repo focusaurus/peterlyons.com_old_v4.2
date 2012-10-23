@@ -5,16 +5,37 @@
   <link href="http://peterlyons.com/problog/feed" rel="self">
   </link>
   <link href="http://peterlyons.com/problog/feed">
-  </link><updated>2012-09-27T16:48:31.202Z</updated><id>http://peterlyons.com/problog/feed</id>
+  </link><updated>2012-10-23T03:15:05.735Z</updated><id>http://peterlyons.com/problog/feed</id>
   <author>
     <name>Peter Lyons
     </name>
   </author>
   <entry>
+    <title>Find closer OKCupid matches with this bookmarklet
+    </title>
+    <link href="http://peterlyons.com/problog/2012/10/okcupid-closer">
+    </link><updated>2012-10-23T03:15:05.735Z</updated><id>http://localhost:9000/problog/2012/10/okcupid-closer</id>
+    <content type="html">&lt;p&gt;I have written a little bookmarklet that will allow you to filter your &lt;a href=&quot;http://okcupid.com&quot;&gt;OKCupid&lt;/a&gt; matches by a smaller geographic region. By default, their search filters allow no smaller than a 25-mile radius. Drag the bookmarklet link below onto your bookmarks toolbar, then click it when you are on the OKC search page, and voilà, you will have the options for 5 and 10-mile searches. 10-mile radius will be selected, so just click &quot;search&quot; and you will have your results.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;javascript:(function(){var%20opt5=document.createElement('option');opt5.value=5;opt5.text='5%20miles';var%20opt10=document.createElement('option');opt10.value=10;opt10.text='10%20miles';var%20radius=document.getElementById('radius');radius.insertBefore(opt10,radius.firstChild);radius.insertBefore(opt5,radius.firstChild);opt10.selected=true;var%20label=document.getElementById('location_interface_button_text');label.textContent=label.textContent.replace(/\d+/,'10');})();&quot;&gt;OKCupid Closer Matches&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Some notes:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;If you have no idea WTF a bookmarklet is or how to use one, read &lt;a href=&quot;http://support.mozilla.org/en-US/kb/bookmarklets-perform-common-web-page-tasks&quot;&gt;this&lt;/a&gt;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;I live close to both Boulder and Denver Colorado. These are two quite different worlds, but they are both within 25 miles of my town. Since Denver's population is 10x the size of Boulder's, most of my search results are Denver residents, when I'm really only insterested in folks within biking distance.&lt;/li&gt;
+&lt;li&gt;After you click search, the default search form will re-appear and it will look like your search has a 25 mile radius. Never fear, the query string has &lt;code&gt;filter3=10&lt;/code&gt;, which is what is required, and based on my results, yes, the OKC servers do seem to actually respect this query string parameter even if the value is not offered in the search form.&lt;/li&gt;
+&lt;li&gt;You need to re-click the bookmarklet for each new search. Sorry. Send feature requests to OKCupid until they add this permanently. Technically I could make this into a Chrome extension and have it always work, so I may do that at some point.&lt;/li&gt;
+&lt;li&gt;Thanks to &lt;a href=&quot;http://chris.zarate.org/bookmarkleter&quot;&gt;Chris Zarate's handy Bookmarkleter utility&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;And for you web dev nerds out there, I even wrote this with (gasp!) &lt;a href=&quot;http://vanilla-js.com/&quot;&gt;Vanilla JS&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+    </content>
+  </entry>
+  <entry>
     <title>Great Support from Herman Miller
     </title>
     <link href="http://peterlyons.com/problog/2012/09/great-support-from-herman-miller">
-    </link><updated>2012-09-27T16:48:31.202Z</updated><id>http://localhost:9400/problog/2012/09/great-support-from-herman-miller</id>
+    </link><updated>2012-09-27T16:48:31.202Z</updated><id>http://localhost:9000/problog/2012/09/great-support-from-herman-miller</id>
     <content type="html">&lt;p&gt;So I use one of the famous &lt;a href=&quot;http://www.hermanmiller.com/&quot;&gt;Herman Miller&lt;/a&gt; &lt;a href=&quot;http://en.wikipedia.org/wiki/Aeron_chair&quot;&gt;Aeron chairs&lt;/a&gt; in my home office. I love it primarily because the mesh seat prevents &lt;a href=&quot;http://www.urbandictionary.com/define.php?term=swampass&quot;&gt;swampass&lt;/a&gt;, but of course overall it is a highly ergonomic chair, nicely adjustable, rugged, and holds its value well. My specific chair was made in 2000 and I bought it used on craigslist for $250 in 2009. Today exactly the 12-year warranty finally expires. About two weeks ago it suddenly broke. A thin rod broke free of its clamp and started protruding from the bottom such that the casters wouldn't hit the ground anymore. I was worried that I would need to replace the chair, but given my trend toward more DIY and frugality, I called up Herman Miller support to see what they would say. Staff was out at training that day so I left a voice mail and called again Monday. I spoke with a woman who had heard my voice mail and had me on her list to call back. I told her what my chair was doing and she shipped me out a repair kit for the main problem as well as a set of repair kits to fix the arms, which wouldn't hold their adjusted height. These arrived a bit later with hand-drawn instructions on how to do the repair. The diagrams weren't entirely clear (earth to furniture industry: we have these things called photographs. Stop sending out line drawing pencil art instructions.), but after some futzing I was able to properly repair the main hydraulic rod as well as the arms. I managed to bust the tilt adjuster in the process of putting my chair on its side many times, though. The back was now stuck dead vertical. I called support again. The rep's business card and direct phone number were including in the package of repair kits. She instructed me to stand on the back legs of the chair and lift the chair back up to unlock it. Now my Aeron is back to working condition, and it didn't cost me a time. Herman Miller shipped the repair kits free and the support consultation was free. That's great service!&lt;/p&gt;
     </content>
   </entry>
@@ -22,7 +43,7 @@
     <title>Managing Per-Project Interpreters and the PATH
     </title>
     <link href="http://peterlyons.com/problog/2012/09/managing-per-project-interpreters-and-the-path">
-    </link><updated>2012-09-02T21:35:19.427Z</updated><id>http://localhost:9400/problog/2012/09/managing-per-project-interpreters-and-the-path</id>
+    </link><updated>2012-09-02T21:35:19.427Z</updated><id>http://localhost:9000/problog/2012/09/managing-per-project-interpreters-and-the-path</id>
     <content type="html">&lt;p&gt;So let's talk about managing runtimes and interpreters for projects and applications. This post comes about after I have seen a vast jungle of non-solutions and dead ends out there for managing installations of interpreters such as Python, Ruby, node.js, etc. First, let's clear the air of a bunch of nonesense you may find out there that makes this problem confusing.&lt;/p&gt;
 
 &lt;h2&gt;Never use the interpreter provided by your operating system&lt;/h2&gt;
@@ -192,7 +213,7 @@ fi
     <title>CoffeeScript and Progress
     </title>
     <link href="http://peterlyons.com/problog/2012/03/coffeescript-and-progress">
-    </link><updated>2012-03-05T04:36:35.083Z</updated><id>http://localhost:9400/problog/2012/03/coffeescript-and-progress</id>
+    </link><updated>2012-03-05T04:36:35.083Z</updated><id>http://localhost:9000/problog/2012/03/coffeescript-and-progress</id>
     <content type="html">&lt;p&gt;If you like &lt;a href=&quot;http://jashkenas.github.com/coffee-script&quot;&gt;CoffeeScript&lt;/a&gt;, you should write applications in CoffeeScript. If you prefer JavaScript, you should write applications in JavaScript. In this post I want to address the common attitude I have found among JavaScript programmers that CoffeeScript is a priori somehow wrong or inferior or a bad choice. I'll briefly recount some of the technical reasons why I like and use CoffeeScript at the end of this post, but the focus is a rejection of the attitude above on philosophical grounds. To be clear, the position I'm taking issue with is the position that JavaScript is the one and only language we should be writing in for the browser and node.js.&lt;/p&gt;
 
 &lt;h1&gt;Philosophical Rejection of Monoglotism&lt;/h1&gt;
@@ -307,7 +328,7 @@ fi
     <title>Noding for Sococo
     </title>
     <link href="http://peterlyons.com/problog/2012/02/noding-for-sococo">
-    </link><updated>2012-02-21T04:17:33.377Z</updated><id>http://localhost:9400/problog/2012/02/noding-for-sococo</id>
+    </link><updated>2012-02-21T04:17:33.377Z</updated><id>http://localhost:9000/problog/2012/02/noding-for-sococo</id>
     <content type="html">&lt;p&gt;So I've taken a new full-time position as a Web Developer at &lt;a href=&quot;http://sococo.com&quot;&gt;Social Communications Company&lt;/a&gt;. We make a virtual office communication tool that combines an interactive office map with chat, voice, and meeting features. We are adding a new web client to complement the existing native clients for Mac OS and Windows, and using node.js and HTML5. As a long-time user (sufferer?) of those frustrating conference call phones you find sprinkled throughout corporate America, at my first remote stand-up meeting I could see why this is a much better tool. Aside from the fact that conference speaker phones suffer from audio quality that is bad more often than it is good, it really only works if the remote people recognize all the on-site people by voice. If you are meeting wih unfamiliar people, you have no clue who is saying what. It's a big barrier to clear communication and a point of frustration. Add to that the quiet talkers, people not speaking into the microphone, and people trying to slide the phone around the table (which creates a wall of noise for the remote listeners) and talk at the same time, and it's pretty much failville. I remember often wishing everyone would just go back to their cubes and dial in individually so at least I could hear them. With Sococo, everyone is at their desk with nicely isolated audio, and everyone is represented on screen. The avatars indicate who is speaking and are labeled with names so it's always clear who is talking. Since everyone is always online in the virtual office, it's a very low-friction environment for quick voice or text chats about topics as they come up between however many people are necessary. There's no long dial-in number and infuriating IVR to deal with. (IVR is Interactive Voice Response, the industry term for phone menus where a voice tells you to dial numbers to navigate through a series of menu choices).&lt;/p&gt;
 
 &lt;p&gt;I'm really excited to be doing node.js work professionally now. I was cleaning out my &lt;code&gt;~/Downloads&lt;/code&gt; folder last week and found I had downloaded node.js version 0.3.8 on Feb 4, 2011, so I've been working with node.js more than a year now and I find it a really fun environment in which to work. I think node.js is going to play an important role in the toolbox of web developers in the next few years, and I'm glad to be here on the early side of things.&lt;/p&gt;
@@ -317,7 +338,7 @@ fi
     <title>Node Summit
     </title>
     <link href="http://peterlyons.com/problog/2012/01/node-summit">
-    </link><updated>2012-01-31T00:06:04.787Z</updated><id>http://localhost:9400/problog/2012/01/node-summit</id>
+    </link><updated>2012-01-31T00:06:04.787Z</updated><id>http://localhost:9000/problog/2012/01/node-summit</id>
     <content type="html">&lt;p&gt;So I flew out to San Francisco last week for the &lt;a href=&quot;http://nodesummit.com/&quot;&gt;Node Summit&lt;/a&gt; conference. I wasn't sure exactly what to expect. The first event was the &lt;a href=&quot;http://nodeup.com&quot;&gt;NodeUp&lt;/a&gt; live pod cast at the Bottom of the Hill bar. I was in the Mission immediately prior to that and it was a long walk (after 5.5 hours of walking) to get there. The crowd seemed to be almost all developers and it was surprisingly international. I got to meet some folks I admire from the Internet like &lt;a href=&quot;http://metaduck.com/&quot;&gt;Pedro Teixeira&lt;/a&gt;. Tim Caswell and TJ Holowaychuck (my current programming hero) were both there and Ryan Dahl eventually arrived as well. I learned an interesting thing about myself: even if you take a bar and fill it up with ubernerds, I still feel uncomfortable and count the minutes until I can make a quiet exit.&lt;/p&gt;
 
 &lt;p&gt;Tuesday morning I caught a shuttle from a hotel near my room to the event, which was a really nice service to have (although I guess I would have happily walked as well). The conference was a lot bigger and more extravagant than I was anticipating. Many large companies were represented including Microsoft, Ebay, Yahoo, LinkedIn, Sabre, Visa, Google, and more. The discussion panels were pretty hit or miss (mostly miss I guess), with a few being really interesting. I did a lot of networking and hopefully some of these connections will prove valuable in the near future. I went to both of the &lt;a href=&quot;http://nodejitsu.com&quot;&gt;Nodejitsu&lt;/a&gt; workshops, which were packed beyond capacity.&lt;/p&gt;
@@ -331,7 +352,7 @@ fi
     <title>Build a Consumer App With Node.js
     </title>
     <link href="http://peterlyons.com/problog/2012/01/build-a-consumer-app-with-node-js">
-    </link><updated>2012-01-21T17:57:09.771Z</updated><id>http://localhost:9400/problog/2012/01/build-a-consumer-app-with-node-js</id>
+    </link><updated>2012-01-21T17:57:09.771Z</updated><id>http://localhost:9000/problog/2012/01/build-a-consumer-app-with-node-js</id>
     <content type="html">&lt;p&gt;It's time to start &lt;a href=&quot;http://venturebeat.com/2012/01/07/building-consumer-apps-with-node/&quot;&gt;building consumer apps with node&lt;/a&gt;&lt;/p&gt;
     </content>
   </entry>
@@ -339,7 +360,7 @@ fi
     <title>Troubleshooting responsive layout with :after
     </title>
     <link href="http://peterlyons.com/problog/2012/01/troubleshooting-media-querie">
-    </link><updated>2012-01-11T00:34:06.000Z</updated><id>http://localhost:9400/problog/2012/01/troubleshooting-media-querie</id>
+    </link><updated>2012-01-11T00:34:06.000Z</updated><id>http://localhost:9000/problog/2012/01/troubleshooting-media-querie</id>
     <content type="html">&lt;p&gt;So I'm working on a new design for my site and using the super-great &lt;a href=&quot;http://learnboost.github.com/stylus/&quot;&gt;stylus&lt;/a&gt; CSS preprocessor along with &lt;a href=&quot;https://gist.github.com/1549029&quot;&gt;this great gist for simple responsive layout&lt;/a&gt; (again with stylus and the &lt;a href=&quot;https://github.com/visionmedia/nib&quot;&gt;nib&lt;/a&gt; library).&lt;/p&gt;
 
 &lt;p&gt;Well, I wanted to see which of my CSS3 media queries were in effect.  Here's a simple way to do it with the :before selector.&lt;/p&gt;
@@ -377,7 +398,7 @@ fi
     <title>Tips for MongoDB Migrations in Rails
     </title>
     <link href="http://peterlyons.com/problog/2011/12/mongodb-migrations">
-    </link><updated>2011-12-27T07:04:50.000Z</updated><id>http://localhost:9400/problog/2011/12/mongodb-migrations</id>
+    </link><updated>2011-12-27T07:04:50.000Z</updated><id>http://localhost:9000/problog/2011/12/mongodb-migrations</id>
     <content type="html">&lt;p&gt;I wanted to share a quick and easy method for testing Rails migrations when using the MongoDB database.  The flexibility of mongo and ruby makes this pretty straightforward. In this example, we'll be renaming a field in our example &quot;books&quot; collection from &quot;isbn&quot; to &quot;book_number&quot;. This is a pretty common type of migration and once you get the hang of this simple case, more complex migrations follow the same pattern. First, lets generate our timestamped migration script boilerplate.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;rails generate migration rename_isbn_to_book_number
@@ -515,7 +536,7 @@ end
     <title>No Need for npm -g
     </title>
     <link href="http://peterlyons.com/problog/2011/12/no-need-for-npm-g">
-    </link><updated>2011-12-22T21:14:45.000Z</updated><id>http://localhost:9400/problog/2011/12/no-need-for-npm-g</id>
+    </link><updated>2011-12-22T21:14:45.000Z</updated><id>http://localhost:9000/problog/2011/12/no-need-for-npm-g</id>
     <content type="html">&lt;p&gt;&lt;strong&gt;UPDATE:&lt;/strong&gt; please see my new article on &lt;a href=&quot;/problog/2012/09/managing-per-project-interpreters-and-the-path&quot;&gt;Managing Per-project Interpreters and the PATH&lt;/a&gt; for a new and improved take on this topic.&lt;/p&gt;
 
 &lt;hr /&gt;
@@ -579,7 +600,7 @@ export PATH
     <title>The destiny of complex languages
     </title>
     <link href="http://peterlyons.com/problog/2011/12/complex-language">
-    </link><updated>2011-12-04T01:33:01.000Z</updated><id>http://localhost:9400/problog/2011/12/complex-language</id>
+    </link><updated>2011-12-04T01:33:01.000Z</updated><id>http://localhost:9000/problog/2011/12/complex-language</id>
     <content type="html">&lt;p&gt;I had an interesting thought about programming languages and complexity yesterday.  I think of languages like Python and CoffeeScript (and even C &lt;sup&gt;&lt;a href=&quot;#endnote1&quot;&gt;1&lt;/a&gt;&lt;/sup&gt; aim to be small and consistent as a language.  Things like Perl and Ruby are much more complex.  I have been studying both Ruby and CoffeeScript for a while  (I think about a year for Ruby and maybe 6 months for CoffeeScript guessing from unreliable memory), and I feel like my JavaScript/CoffeeScript knowledge is solid and with Ruby I'm mired in intermediate status. However, the fact is I write lots of code in each of these languages.  So what does that indicate?&lt;/p&gt;
 
 &lt;p&gt;It seems to me that the more complex your language, the larger portion of the total extant codebase written in that language will have been authored by programmers that do not completely understand the language.  I would venture that if you took all existing Perl code, about 80% of it was written by programmers or sysadmins with cursory knowledge of the language.  And within the Perl community, finding truly competent programmers with solid mastery of the language is definitely the exception, not the rule.  I think the combination of ruby's largeness and complexity coupled with the huge popularity of rails means the same is true for Ruby.  But I don't think there's anything about Perl or Ruby that makes it this way other than just it's the nature of having complexity in your language.&lt;/p&gt;
@@ -599,7 +620,7 @@ export PATH
     <title>Hands off my window title!
     </title>
     <link href="http://peterlyons.com/problog/2011/11/hands-off-my-window-title">
-    </link><updated>2011-11-29T12:23:46.000Z</updated><id>http://localhost:9400/problog/2011/11/hands-off-my-window-title</id>
+    </link><updated>2011-11-29T12:23:46.000Z</updated><id>http://localhost:9000/problog/2011/11/hands-off-my-window-title</id>
     <content type="html">&lt;p&gt;So I recently ssh'ed into a shiny new Ubuntu 11.10 server on EC2 and noticed some new things.  Firstly, Ubuntu seems to have enabled the &lt;a href=&quot;https://help.ubuntu.com/11.10/serverguide/C/byobu.html&quot;&gt;byobu&lt;/a&gt; terminal multiplexer configuration by default.  This looks potentially handy, but just like &lt;a href=&quot;https://github.com/robbyrussell/oh-my-zsh&quot;&gt;Oh my zsh&lt;/a&gt; I don't feel motivated to futz with it just now.  It's easy to disable byobu with just a quick &lt;code&gt;byobu-disable&lt;/code&gt;, which will, somewhat surprisingly, fully exit your shell, log you out and close your ssh session.  But next time you'll get a normal shell instead of a byobu/screen session.&lt;/p&gt;
 
 &lt;p&gt;Now one thing I noticed and finally got motivated with to &quot;research&quot; (and by that I mean ask smarter people on twitter) and fix was that when I connected via ssh, the window title in my iTerm2 tab was dynamically changed from what I had carefully set it to (&quot;asset pipeline&quot;) to the supremely unhelpful &quot;ubuntu@ip-10-11-12-13&quot;.  In some non-cloud situations where the server has a meaningful hostname, this might be handy, but distinguishing dozens of servers by their internal EC2 IP is not appealing to me.  Initial research suggested my &lt;code&gt;PROMPT&lt;/code&gt; or &lt;code&gt;PROMPT_COMMAND&lt;/code&gt; environment variables, but neither was set.  I read through &lt;a href=&quot;http://www.ibm.com/developerworks/linux/library/l-tip-prompt/&quot;&gt;this DeveloperWorks article&lt;/a&gt; and found the responsible code in the &lt;code&gt;~/.bashrc&lt;/code&gt; file.  Here's the offending excerpt.&lt;/p&gt;
@@ -621,7 +642,7 @@ esac
     <title>Linkzie gets a stack upgrade
     </title>
     <link href="http://peterlyons.com/problog/2011/11/linkzie-gets-a-stack-upgrade">
-    </link><updated>2011-11-24T08:17:08.000Z</updated><id>http://localhost:9400/problog/2011/11/linkzie-gets-a-stack-upgrade</id>
+    </link><updated>2011-11-24T08:17:08.000Z</updated><id>http://localhost:9000/problog/2011/11/linkzie-gets-a-stack-upgrade</id>
     <content type="html">&lt;p&gt;So &lt;a href=&quot;https://linkzie.com&quot;&gt;Linkzie&lt;/a&gt; has had a nice series of updates to the underlying software that runs it.  It's now pretty much bleeding edge latest and greatest.&lt;/p&gt;
 
 &lt;ul&gt;
@@ -644,7 +665,7 @@ esac
     <title>Thoughts on launching and scaling quickly
     </title>
     <link href="http://peterlyons.com/problog/2011/10/thoughts-on-launching-and-scaling-quickly">
-    </link><updated>2011-10-24T22:10:40.000Z</updated><id>http://localhost:9400/problog/2011/10/thoughts-on-launching-and-scaling-quickly</id>
+    </link><updated>2011-10-24T22:10:40.000Z</updated><id>http://localhost:9000/problog/2011/10/thoughts-on-launching-and-scaling-quickly</id>
     <content type="html">&lt;p&gt;I have &lt;a href=&quot;http://dojo4.com/blog/thoughts-on-launching-and-scaling-quickly&quot;&gt;new blog post&lt;/a&gt; over on the &lt;a href=&quot;http://dojo4.com&quot;&gt;Dojo4&lt;/a&gt; web site.&lt;/p&gt;
     </content>
   </entry>
@@ -652,7 +673,7 @@ esac
     <title>New Linkzie Release: Nice UI improvements
     </title>
     <link href="http://peterlyons.com/problog/2011/07/linkzie-ui-improvements">
-    </link><updated>2011-07-30T21:09:10.000Z</updated><id>http://localhost:9400/problog/2011/07/linkzie-ui-improvements</id>
+    </link><updated>2011-07-30T21:09:10.000Z</updated><id>http://localhost:9000/problog/2011/07/linkzie-ui-improvements</id>
     <content type="html">&lt;p&gt;I just pushed out a new release of &lt;a href=&quot;&quot;&gt;https://linkzie.com&lt;/a&gt;.  There is no longer any need to have an &quot;Organize your links&quot; button.  You can always organize you categories by dragging them around by their name.  You can always organize your links by dragging them by a little crosshairs icon that is displayed to the right of each link when you mouse over it.  The commands to edit or delete items are now in a little pop-up context menu to the right of each link and they are more intuitive to use.&lt;/p&gt;
 
 &lt;p&gt;I think this UI makes Linkzie very easy to use and the code is much simpler now and the UI should respond more snappily.  Try it out and let me know what you think!&lt;/p&gt;
@@ -662,7 +683,7 @@ esac
     <title>Web Framework Woes
     </title>
     <link href="http://peterlyons.com/problog/2011/07/web-framework-woes">
-    </link><updated>2011-07-05T23:10:46.000Z</updated><id>http://localhost:9400/problog/2011/07/web-framework-woes</id>
+    </link><updated>2011-07-05T23:10:46.000Z</updated><id>http://localhost:9000/problog/2011/07/web-framework-woes</id>
     <content type="html">&lt;p&gt;
 So my attitude for most of this year has been one of reserving judgement in favor of direct experience.  As part of this, I have been trying all the latest &quot;Kool-Aid&quot; web development technologies even if at first glance they didn't sit right with me.  So I started building the &lt;a href=&quot;http://othenticate.com&quot;&gt;Othenticate&lt;/a&gt; infrastructure on a shiny stack of mongodb, node.js, express, mongoose, jade, and stylus.  For the most part, I love this stack.  However, after I while I have come to the conclusion that for a micropreneur project such as mine, traditional RDBMS (PostgreSQL) is going to be more appropriate than dealing with the trade-offs that NoSQL is making.  I won't need to scale to millions of objects, and I want ACID, a schema, and mature tools at the data layer.  So I've decided I want to use PostgreSQL instead of MongoDB.  However, along with this came the realization that it seems that there is no mature Object-Relational Mapper (ORM) on the node stack for PostgreSQL.  There also does not seem to be a mature schema migration framework.  Basically all of the other elements of the node stack are fantastic to work with, but these two might just be deal breakers for me.
 &lt;/p&gt;
@@ -732,7 +753,7 @@ So I've started to give serious consideration to Django.  I do like python quite
     <title>Linkzie 0.7.1 released
     </title>
     <link href="http://peterlyons.com/problog/2011/07/linkzie-0-7-1-released">
-    </link><updated>2011-07-05T07:04:28.000Z</updated><id>http://localhost:9400/problog/2011/07/linkzie-0-7-1-released</id>
+    </link><updated>2011-07-05T07:04:28.000Z</updated><id>http://localhost:9000/problog/2011/07/linkzie-0-7-1-released</id>
     <content type="html">&lt;p&gt;
 So after a fairly lengthy period of inattention to my &lt;a href=&quot;https://linkzie.com&quot;&gt;Linkzie&lt;/a&gt; bookmark manager, I got frustrated on my current project and turned my focus to Linkzie today for some updates.  There's a new menu bar shamelessly stolen from the new google bar.  A brand new &quot;beach house&quot; color theme has been applied.  The &quot;organize&quot; UI has been changed significantly.  Lots of other minor UX tweaks have been made. For example, you can now click anywhere on the entire row for a link as opposed to before where you had to click on the actual link text itself. Perhaps the biggest improvement is session expiration detection.  Since linkzie is designed to sit open in a browser tab for long periods of time, it was possible for a user's server side session to expire with the window open.  The UI would let them attempt to make changes, only to fail with a login required situation when trying to save their changes.  This resulted in lost work and an error message popping up.  Now linkzie will poll the server periodically which will likely just keep your session alive longer, but if it does expire, the UI is updated to reflect that.  You can still use your links, but all editing operations are disabled and you are notified to sign in again if you need to make any edits.
 &lt;/p&gt;
@@ -743,7 +764,7 @@ So after a fairly lengthy period of inattention to my &lt;a href=&quot;https://l
     <title>Commander: Utility Automation
     </title>
     <link href="http://peterlyons.com/problog/2011/07/commander">
-    </link><updated>2011-07-02T04:24:54.000Z</updated><id>http://localhost:9400/problog/2011/07/commander</id>
+    </link><updated>2011-07-02T04:24:54.000Z</updated><id>http://localhost:9000/problog/2011/07/commander</id>
     <content type="html">&lt;p&gt;
 Check out my new little automation utility belt app for the keyboard-centric power users.  It is hosted on a &lt;a href=&quot;https://github.com/focusaurus/commander&quot;&gt;github project here&lt;/a&gt;.
 &lt;/p&gt;
@@ -753,7 +774,7 @@ Check out my new little automation utility belt app for the keyboard-centric pow
     <title>MicroConf
     </title>
     <link href="http://peterlyons.com/problog/2011/06/microconf">
-    </link><updated>2011-06-05T09:11:46.000Z</updated><id>http://localhost:9400/problog/2011/06/microconf</id>
+    </link><updated>2011-06-05T09:11:46.000Z</updated><id>http://localhost:9000/problog/2011/06/microconf</id>
     <content type="html">&lt;p&gt;
 Just a quick note that I'm off to &lt;a href=&quot;http://www.microconf.com&quot;&gt;MicroConf&lt;/a&gt; in Las Vegas tomorrow.  A buddy of mine from Denver Hack Nite is also going.  It should be a really fun time and hopefully I'll learn a lot.  I've been coding away like a madman (an excruciating 4-6 hours a day!) preparing a little proof-of-concept for the startup idea I'm working on.  Can't wait to have it scutinized and hopefully not completely blasted to bits.  I'll be blogging and &lt;a href=&quot;https://twitter.com/#!/focusaurus&quot;&gt;tweeting&lt;/a&gt; if there's anything interesting and I'm not too busy concentrating.
 &lt;/p&gt;
@@ -763,7 +784,7 @@ Just a quick note that I'm off to &lt;a href=&quot;http://www.microconf.com&quot
     <title>Leveling Up: Career Advancement for Software Developers
     </title>
     <link href="http://peterlyons.com/problog/2011/05/leveling-up">
-    </link><updated>2011-05-06T00:56:18.000Z</updated><id>http://localhost:9400/problog/2011/05/leveling-up</id>
+    </link><updated>2011-05-06T00:56:18.000Z</updated><id>http://localhost:9000/problog/2011/05/leveling-up</id>
     <content type="html">&lt;p&gt;
 I have written a piece to help software developers accelerate their career.  It lives on its own page, &lt;a href=&quot;/leveling_up&quot;&gt;over here&lt;/a&gt;, but please share your comments on this blog post. There are some other comments &lt;a href=&quot;http://news.ycombinator.com/item?id=2518519&quot;&gt;on Hacker News&lt;/a&gt; as well.
 &lt;/p&gt;
@@ -774,7 +795,7 @@ I have written a piece to help software developers accelerate their career.  It 
     <title>Great Design: Fat Brain Toys Order Confirmation
     </title>
     <link href="http://peterlyons.com/problog/2011/05/great-design-fat-brain-toys-order-confirmation">
-    </link><updated>2011-05-02T23:04:19.000Z</updated><id>http://localhost:9400/problog/2011/05/great-design-fat-brain-toys-order-confirmation</id>
+    </link><updated>2011-05-02T23:04:19.000Z</updated><id>http://localhost:9000/problog/2011/05/great-design-fat-brain-toys-order-confirmation</id>
     <content type="html">&lt;p&gt;
 &lt;a href=&quot;http://www.fatbraintoys.com/&quot;&gt;Fat Brain Toys&lt;/a&gt; has the best-looking order confirmation page I have seen. Click the image for a larger version.
 &lt;/p&gt;
@@ -785,7 +806,7 @@ I have written a piece to help software developers accelerate their career.  It 
     <title>Good node.js things are happenning
     </title>
     <link href="http://peterlyons.com/problog/2011/04/good-node-js-things">
-    </link><updated>2011-04-13T10:38:39.000Z</updated><id>http://localhost:9400/problog/2011/04/good-node-js-things</id>
+    </link><updated>2011-04-13T10:38:39.000Z</updated><id>http://localhost:9000/problog/2011/04/good-node-js-things</id>
     <content type="html">&lt;p&gt;
 I hope to post some details on this soon, but just a note that my ongoing node.js hacking is turning up some real gems.  I migrated my application level tests from Zombie to Phantom with great results.  phantom.js is pretty rad.  Also got remote graphical debugging in the browser working and learned how to properly drop in a REPL for quick and dirty investigations, which is cool.  Maybe on Thursday I'll have time to post some of the details, but at this point my node.js stack is pretty fierce.
 &lt;/p&gt;
@@ -795,7 +816,7 @@ I hope to post some details on this soon, but just a note that my ongoing node.j
     <title>Node docs vs. Rails docs
     </title>
     <link href="http://peterlyons.com/problog/2011/04/node-docs-vs-rails-docs">
-    </link><updated>2011-04-05T21:15:51.000Z</updated><id>http://localhost:9400/problog/2011/04/node-docs-vs-rails-docs</id>
+    </link><updated>2011-04-05T21:15:51.000Z</updated><id>http://localhost:9000/problog/2011/04/node-docs-vs-rails-docs</id>
     <content type="html">&lt;p&gt;
 I've been working with &lt;a href=&quot;http://nodejs.org&quot;&gt;Node.js&lt;/a&gt; a lot recently and enjoying it.  However, I'm not sure entirely WHY I am enjoying it.  I'm writing it in &lt;a href=&quot;http://jashkenas.github.com/coffee-script/&quot;&gt;CoffeeScript&lt;/a&gt;, which is pleasant enough, but it doesn't change the fact that javascript is lacking is basic language/library features like a Set object or hashes with non-string keys and so forth.  The other day I realized part of my good feelings about node are from my experience with the docs, which normally goes as follows.
 &lt;/p&gt;
@@ -822,7 +843,7 @@ This is just one taste of the different experience working with these two techno
     <title>Baby steps in node.js
     </title>
     <link href="http://peterlyons.com/problog/2011/03/baby-steps-in-node-js">
-    </link><updated>2011-03-24T00:51:22.000Z</updated><id>http://localhost:9400/problog/2011/03/baby-steps-in-node-js</id>
+    </link><updated>2011-03-24T00:51:22.000Z</updated><id>http://localhost:9000/problog/2011/03/baby-steps-in-node-js</id>
     <content type="html">&lt;p&gt;
 So I've been working on some toy projects in &lt;a href=&quot;http://nodejs.org/&quot;&gt;node.js&lt;/a&gt; for a few weeks.  Node is pretty hot in the tech media these days (see &lt;a href=&quot;http://www.theregister.co.uk/2011/03/01/the_rise_and_rise_of_node_dot_js/&quot;&gt;this article&lt;/a&gt;, among many others), and I've been having fun learning it and opening my brain to the world of async and callbacks.  This post will just note a handful of the interesting things I've found thus far.
 &lt;/p&gt;
@@ -881,7 +902,7 @@ Overall my attitude about the node.js ecosystem is highly optimistic.  I hope in
     <title>Show HN: My bookmarking app
     </title>
     <link href="http://peterlyons.com/problog/2011/03/show-hn-my-bookmarking-app">
-    </link><updated>2011-03-17T10:21:11.000Z</updated><id>http://localhost:9400/problog/2011/03/show-hn-my-bookmarking-app</id>
+    </link><updated>2011-03-17T10:21:11.000Z</updated><id>http://localhost:9000/problog/2011/03/show-hn-my-bookmarking-app</id>
     <content type="html">&lt;p&gt;
 So the &lt;a href=&quot;http://ycombinator.com/newsguidelines.html&quot;&gt;Hacker News Guidelines&lt;/a&gt; tell me when submitting something I should write a blog post about it and link to that.  OK, here it is.  I'd like to get feedback from the HN community about my simple but effective bookmarking web application: &lt;a href=&quot;https://linkzie.com&quot;&gt;Linkzie&lt;/a&gt;.  I built it mostly during nights/weekends while holding down a day job doing enterprise software.  I know there are a lot of apps out there for this problem, especially in the recent months following the delicious.com leaked &quot;sunset&quot; presentation.  I missed that boat to announce the app, but anyway here it is.  I think the interface is very clean and straightforward and the functionality is simple.  There's nothing here that can't be explained in a handful of words.  You put in your URLs, it lets you lay them out on one big page.  There's drag and drop organization and in-place editing.  You can try the app using sample data right on the home page without needing to sign in (click no the &quot;Next&quot; link in the tour to see the edit mode).
 &lt;/p&gt;
@@ -894,7 +915,7 @@ The app was written mostly as an &quot;organic&quot; project since I have been m
     <title>My Lifestyle Business Hero
     </title>
     <link href="http://peterlyons.com/problog/2011/03/music-teachers-helper">
-    </link><updated>2011-03-10T23:56:12.000Z</updated><id>http://localhost:9400/problog/2011/03/music-teachers-helper</id>
+    </link><updated>2011-03-10T23:56:12.000Z</updated><id>http://localhost:9000/problog/2011/03/music-teachers-helper</id>
     <content type="html">&lt;p&gt;
 Brandon Pierce of &lt;a href=&quot;http://musicteachershelper.com&quot;&gt;Music Teacher's Helper&lt;/a&gt; has what looks to me like the ultimate lifestyle business.  &lt;a href=&quot;http://www.fourhourworkweek.com/blog/2011/03/04/engineering-a-%E2%80%9Cmuse%E2%80%9D-%E2%80%93-volume-3-case-studies-of-successful-cash-flow-businesses/&quot;&gt;check out the case study on Tim Ferriss's blog&lt;/a&gt;.
 &lt;/p&gt;
@@ -904,7 +925,7 @@ Brandon Pierce of &lt;a href=&quot;http://musicteachershelper.com&quot;&gt;Music
     <title>Startup Weekend Boulder: Bridge My Path
     </title>
     <link href="http://peterlyons.com/problog/2011/02/swboulder-bridgemypath">
-    </link><updated>2011-03-01T03:20:21.000Z</updated><id>http://localhost:9400/problog/2011/02/swboulder-bridgemypath</id>
+    </link><updated>2011-03-01T03:20:21.000Z</updated><id>http://localhost:9000/problog/2011/02/swboulder-bridgemypath</id>
     <content type="html">&lt;p&gt;
 I spent all weekend at &lt;a href=&quot;http://boulder.startupweekend.org/&quot;&gt;Startup Weekend Boulder&lt;/a&gt;.  This is an event where people pitch their business ideas, vote on the top ideas, and then form teams and try to get the ideas from zero to launch in 54 intense hours.  It was my first time participating in Startup Weekend.  Overall, it was a really fun experience and I met a lot of really smart and fun people.  Friday was pitch night where somewhere just shy of 40 people gave 1-minute pitches.  There was good variety here from already established projects to things conceived just moments earlier.  There were gaming ideas, social networking ideas, education, finance, retail, even a medical marijuana related business and an infrared steak griller.  I pitched one of the ideas I have sitting around on my big long &lt;a href=&quot;https://workflowy.com&quot;&gt;WorkFlowy&lt;/a&gt; business idea lists: ThreeShopper, a curated shopping site to end the paradox of choice and narrow things down to exactly three choices.  My idea got zero votes. :-)  I think there were around 60 total attendees including folks from Nova Scotia and South Africa.
 &lt;/p&gt;
@@ -926,7 +947,7 @@ Again, this was a really fun and valuable event.  In general I like high-commitm
     <title>Linkzie gets a bookmarklet
     </title>
     <link href="http://peterlyons.com/problog/2011/02/linkzie-gets-a-bookmarklet">
-    </link><updated>2011-02-20T10:17:43.000Z</updated><id>http://localhost:9400/problog/2011/02/linkzie-gets-a-bookmarklet</id>
+    </link><updated>2011-02-20T10:17:43.000Z</updated><id>http://localhost:9000/problog/2011/02/linkzie-gets-a-bookmarklet</id>
     <content type="html">&lt;p&gt;
 I have added a bookmarklet feature to &lt;a href=&quot;https://linkzie.com&quot;&gt;Linkzie&lt;/a&gt;.  In the &quot;organize your links&quot; area you will see a little link there you can drag to your browser's bookmarks bar.  Then if you are looking at a web page and want to save it into Linkzie, just click the bookmarklet.  You will be able to set the name and category for the link and then be taken right back to the original page you were looking at.  This should make it easier to get lots of links into Linkzie.  Enjoy!
 &lt;/p&gt;
@@ -936,7 +957,7 @@ I have added a bookmarklet feature to &lt;a href=&quot;https://linkzie.com&quot;
     <title>House of Genius
     </title>
     <link href="http://peterlyons.com/problog/2011/02/house-of-genius">
-    </link><updated>2011-02-19T02:16:31.000Z</updated><id>http://localhost:9400/problog/2011/02/house-of-genius</id>
+    </link><updated>2011-02-19T02:16:31.000Z</updated><id>http://localhost:9000/problog/2011/02/house-of-genius</id>
     <content type="html">&lt;p&gt;
 I got to participate in a cool new brainstorming event called &lt;a href=&quot;http://houseofgenius.org&quot;&gt;House of Genius&lt;/a&gt; last night.  I won't say too much about it since the founders seem to prefer if the participants don't know exactly what to expect.  But it was populated by a great group of smart and interesting people from many different age groups and backgrounds.  It was in a super-swank enormous apartment downtown and was overall very unusual, engaging, and fun.  It's funny, last week's Denver Hack Nite meetup was also in an inappropriately-fancy mansion.  Maybe all my tech meetups will gradually start shifting from coffee shops and garages to luxury homes with helipads....
 &lt;/p&gt;
@@ -946,7 +967,7 @@ I got to participate in a cool new brainstorming event called &lt;a href=&quot;h
     <title>Going all in on Google Calendar and Android
     </title>
     <link href="http://peterlyons.com/problog/2011/02/google-calendar">
-    </link><updated>2011-02-18T22:00:53.000Z</updated><id>http://localhost:9400/problog/2011/02/google-calendar</id>
+    </link><updated>2011-02-18T22:00:53.000Z</updated><id>http://localhost:9000/problog/2011/02/google-calendar</id>
     <content type="html">&lt;p&gt;
 So I bought an &lt;a href=&quot;http://www.virginmobileusa.com/cell-phones/lg-optimus-v-phone.jsp&quot;&gt;LG Optimus V&lt;/a&gt; Android phone this weekend.  I said if I finished the redesigns for peterlyons.com and linkzie.com I would treat myself.  I've been a fairly die-hard PalmOS fan since the early days of the PalmPilot Personal.  I think I got my first palm while still in high school probably in 1997 or so. I learned the Palm Graffiti input method.  I soaked it right up. I continued on with a Kyocera cell phone/PDA based on PalmOS which I loved passionately and then onto the Treo for work and finally the Centro which I bought in March 2008 and have been using for the past 3 years. Throughout this whole time I maintained the same contact database and calendar.  I had phone numbers in there of high school friends from before 10-digit dialing with area code was required.  I had 4-digit on-campus extensions for random people I met in college filed under their first name only.  It was amusing to go and look through the archives.  I was pretty anal-retentive about putting everything in there.   Guy who conducted my Region Band in high school: in there.  That girl who cut my hair for $5 one time in college: in there.  The number for the King 101 CS lab: in there. The same goes for Calendar.  I think during one of the numerous computer data migrations I did over the years, I abandoned the early years of calendar data, but I still have data going back to as early as September 1999.  I can tell you that I had a saxophone quartet rehearsal at 6:30pm on Wednesday September 22, 1999.  Some 7000+ calendar records have all been migrated into my google calendar. And now they're all synced to my phone. w00t!
 &lt;/p&gt;
@@ -972,7 +993,7 @@ Any other Optimus-V users out there?  Let me hear from ya!
     <title>New web designs
     </title>
     <link href="http://peterlyons.com/problog/2011/02/new-web-designs">
-    </link><updated>2011-02-16T02:35:08.000Z</updated><id>http://localhost:9400/problog/2011/02/new-web-designs</id>
+    </link><updated>2011-02-16T02:35:08.000Z</updated><id>http://localhost:9000/problog/2011/02/new-web-designs</id>
     <content type="html">&lt;p&gt;
 As you may notice, the &lt;a href=&quot;/&quot;&gt;peterlyons.com&lt;/a&gt; site has been redesigned.  I worked with &lt;a href=&quot;http://stephaniehenderson.com&quot;&gt;Stephanie Henderson&lt;/a&gt; to get a new look now that I am an independent professional.  I'm pleased with the results, and the blogs are more seamlessly integrated now.
 &lt;/p&gt;
@@ -985,7 +1006,7 @@ I have also released a new version of &lt;a href=&quot;https://linkzie.com&quot;
     <title>Going all in on gmail
     </title>
     <link href="http://peterlyons.com/problog/2011/02/going-all-in-on-gmail">
-    </link><updated>2011-02-10T13:13:50.000Z</updated><id>http://localhost:9400/problog/2011/02/going-all-in-on-gmail</id>
+    </link><updated>2011-02-10T13:13:50.000Z</updated><id>http://localhost:9000/problog/2011/02/going-all-in-on-gmail</id>
     <content type="html">&lt;p&gt;
 So somewhere in college around 2000 I started running my own IMAP mail server and storing my own mail.  Around 2007 I got tired of fighting the spam battle and switched to gmail.  I migrated some of my current messages into gmail using IMAP, but I didn't want to dump everything in there.  Today I realized I no longer have convenient access to those messages sitting in mbox format files on the linux laptop I rarely use anymore, so I hooked Thunderbird up to gmail and dragged my mail archives into gmail.  That was about 12,000 messages between 2000 and 2007.  Now it's all in one happy, searchable, spam-free place.  As long as Google doesn't spontaneously disappear gmail, I should be in good shape.
 &lt;/p&gt;
@@ -995,7 +1016,7 @@ So somewhere in college around 2000 I started running my own IMAP mail server an
     <title>node.js and command line jQuery
     </title>
     <link href="http://peterlyons.com/problog/2011/02/node-js-and-command-line-jquery">
-    </link><updated>2011-02-09T03:41:10.000Z</updated><id>http://localhost:9400/problog/2011/02/node-js-and-command-line-jquery</id>
+    </link><updated>2011-02-09T03:41:10.000Z</updated><id>http://localhost:9000/problog/2011/02/node-js-and-command-line-jquery</id>
     <content type="html">&lt;p&gt;
 node.js combined with the &lt;a href=&quot;https://github.com/visionmedia/query&quot;&gt;new query utility&lt;/a&gt; which makes jQuery-like functionality available from the command line.  This type of thing used to take a 30-line script. Brilliant!
 &lt;/p&gt;
@@ -1022,7 +1043,7 @@ Government investigation: No evidence Toyota electronic throttles malfunctioned
     <title>The Perfect Exercise Headphones
     </title>
     <link href="http://peterlyons.com/problog/2011/02/exercise-headphones">
-    </link><updated>2011-02-07T07:00:11.000Z</updated><id>http://localhost:9400/problog/2011/02/exercise-headphones</id>
+    </link><updated>2011-02-07T07:00:11.000Z</updated><id>http://localhost:9000/problog/2011/02/exercise-headphones</id>
     <content type="html">&lt;p&gt;
 I believe I have now found a pair of headphones to wear while exercising and traveling that is optimal.  I've gone through a lot of headphones over the years as I'm sure many of you have.  I've tried both the extreme low end of the price spectrum (less than $10) and the costs-more-than-your-mp3-player range (I owned some $180 Shure E2C earbuds back when they were $180 instead of $90).  Of course I have learned some lessons the hard way. The following list starts out with weightier arguments and then decays into personal preference
 &lt;/p&gt;
@@ -1047,7 +1068,7 @@ So to this end I think the &lt;a href=&quot;http://www.amazon.com/MEElectronics-
     <title>And the bots show up
     </title>
     <link href="http://peterlyons.com/problog/2011/02/and-the-bots-show-up">
-    </link><updated>2011-02-06T02:00:35.000Z</updated><id>http://localhost:9400/problog/2011/02/and-the-bots-show-up</id>
+    </link><updated>2011-02-06T02:00:35.000Z</updated><id>http://localhost:9000/problog/2011/02/and-the-bots-show-up</id>
     <content type="html">&lt;p&gt;
 I set up a staging server for a web app I'm working on yesterday.  This morning I find this in my rails log.
 &lt;/p&gt;
@@ -1071,7 +1092,7 @@ Thus the shotgun bot scanning has commenced.  It's funny how organic and viral (
     <title>dayJob.quit()
     </title>
     <link href="http://peterlyons.com/problog/2011/01/dayjob-quit">
-    </link><updated>2011-01-28T00:01:39.000Z</updated><id>http://localhost:9400/problog/2011/01/dayjob-quit</id>
+    </link><updated>2011-01-28T00:01:39.000Z</updated><id>http://localhost:9000/problog/2011/01/dayjob-quit</id>
     <content type="html">&lt;p&gt;
 I've quit my job writing data center automation software for HP.  I'm striking out on my own doing independent web application development.  I'll be building some information products and then hopefully a subscription based web application targeted at a small niche audience.  I had been working on the same product for 6.5 years and I am ready to switch gears from the world of enterprise software to consumer-facing web applications.
 &lt;/p&gt;
@@ -1084,7 +1105,7 @@ I've been learning ruby, rails, and jquery in my free time for the past six mont
     <title>Wiki migration from MoinMoin to gitit
     </title>
     <link href="http://peterlyons.com/problog/2011/01/moinmoin_to_giti">
-    </link><updated>2011-01-10T05:08:29.000Z</updated><id>http://localhost:9400/problog/2011/01/moinmoin_to_giti</id>
+    </link><updated>2011-01-10T05:08:29.000Z</updated><id>http://localhost:9000/problog/2011/01/moinmoin_to_giti</id>
     <content type="html">&lt;p&gt;
 So I've been hosting my own &lt;a href=&quot;http://moinmo.in/&quot;&gt;MoinMoin&lt;/a&gt; wiki for a while.  I use it pretty heavily to manage my own little projects, packing lists, and whatnot.  I used MoinMoin initially because it is written in python and we were using it at work.  It has served me reasonably well, but I decide to shut it down and migrate all my data over to &lt;a href=&quot;http://gitit.johnmacfarlane.net/&quot;&gt;gitit&lt;/a&gt; instead.
 &lt;/p&gt;
@@ -1119,7 +1140,7 @@ The cool part about this migration was I was able to for the most part script it
     <title>Unit tests are like Ewoks
     </title>
     <link href="http://peterlyons.com/problog/2010/12/unit-tests-are-like-ewoks">
-    </link><updated>2010-12-02T03:24:43.000Z</updated><id>http://localhost:9400/problog/2010/12/unit-tests-are-like-ewoks</id>
+    </link><updated>2010-12-02T03:24:43.000Z</updated><id>http://localhost:9000/problog/2010/12/unit-tests-are-like-ewoks</id>
     <content type="html">&lt;p&gt;Unit tests are like Ewoks.  They are your friends. They will help you.  They will help you fight formidable enemies.  They are cute and cuddly and adorable.&lt;/p&gt;
     </content>
   </entry>
@@ -1127,7 +1148,7 @@ The cool part about this migration was I was able to for the most part script it
     <title>Managing complexity and chaos
     </title>
     <link href="http://peterlyons.com/problog/2010/11/managing-complexity-and-chaos">
-    </link><updated>2010-11-23T04:02:23.000Z</updated><id>http://localhost:9400/problog/2010/11/managing-complexity-and-chaos</id>
+    </link><updated>2010-11-23T04:02:23.000Z</updated><id>http://localhost:9000/problog/2010/11/managing-complexity-and-chaos</id>
     <content type="html">&lt;p&gt;
 I read somewhere (sorry I've forgotten where by now) that as an engineering, our #1 omnipresent mandate is &quot;manage complexity&quot;.  I interpret &quot;manage&quot; to mean &quot;reduce&quot; or &quot;prevent&quot; or &quot;minimize&quot; or &quot;mitigate&quot; in this context.  When I read this, it resonated very strongly with me.
 &lt;/p&gt;
@@ -1140,7 +1161,7 @@ I was recently asked for feedback on one of the managers I work with and I thoug
     <title>OS X and CD burning non-smartness
     </title>
     <link href="http://peterlyons.com/problog/2010/10/os-x-and-cd-burning-non-smartness">
-    </link><updated>2010-10-19T19:46:59.000Z</updated><id>http://localhost:9400/problog/2010/10/os-x-and-cd-burning-non-smartness</id>
+    </link><updated>2010-10-19T19:46:59.000Z</updated><id>http://localhost:9000/problog/2010/10/os-x-and-cd-burning-non-smartness</id>
     <content type="html">&lt;p&gt;
 So since making the linux to Mac transition, I have this mindset of things on the Mac are supposed to &quot;just work&quot; and be fantastic and marvelous and flawless.  This preconception was shattered again when I tried to burn some CDs recently.  I downloaded and ISO and tried to burn it with Finder.  In Ubuntu, if you try to burn a single .iso file to disc, it prompts you that you probably want to just make a disc from that CD image, and thus does the right thing.  Not so on the Mac. It happily spit out a data disc containing a single .iso file. Duh.  Then I went to burn a music CD using some .wav files a friend sent.  Again, on Ubuntu, if you ask it to burn a CD of just .wav music files, it suggests that you burn an audio CD automatically.  Mac, nope. Data CD with .wav files.  Facepalm.  In case you're curious, yes I did figure out that you need to use Disk Utility on the Mac to burn the .iso file and iTunes for the music CD.  I thought this was supposed to be seamless?
 &lt;/p&gt;
@@ -1150,7 +1171,7 @@ So since making the linux to Mac transition, I have this mindset of things on th
     <title>jQuery and Ball World
     </title>
     <link href="http://peterlyons.com/problog/2010/10/jquery-and-ball-world">
-    </link><updated>2010-10-14T07:54:43.000Z</updated><id>http://localhost:9400/problog/2010/10/jquery-and-ball-world</id>
+    </link><updated>2010-10-14T07:54:43.000Z</updated><id>http://localhost:9000/problog/2010/10/jquery-and-ball-world</id>
     <content type="html">&lt;p&gt;
 So in my first computer science course, one of the earliest labs with &lt;a href=&quot;http://www.bandgap.cs.rice.edu/personal/adrice_swong/public/default.aspx&quot;&gt;Stephen Wong&lt;/a&gt; was called Ball World.  Professor Wong had set up some fill-in-the-blanks java code for us that brought up a basic frame.  We wrote code to add some ball sprites and we had to define their velocity and have code to detect collisions and compute new velocities after balls collided with each other or the boundaries.  I still remember the first time you get everything fired up and see two balls collide and bounce off each other realistically.  Keep in mind this is somewhere pretty earlier in my first semester ever programming.  It was pretty powerful and pretty exciting.
 &lt;/p&gt;
@@ -1163,7 +1184,7 @@ Now here I am with ten years or so professional programming experience.  I'm tea
     <title>Home LAN fails and wins
     </title>
     <link href="http://peterlyons.com/problog/2010/10/home-lan-fails-and-wins">
-    </link><updated>2010-10-11T04:16:55.000Z</updated><id>http://localhost:9400/problog/2010/10/home-lan-fails-and-wins</id>
+    </link><updated>2010-10-11T04:16:55.000Z</updated><id>http://localhost:9000/problog/2010/10/home-lan-fails-and-wins</id>
     <content type="html">&lt;p&gt;
 So my trusty Linksys wireless router up and died on me a few months ago.  Of course, in a geek's world, lack of Wifi at home is a stop-the-line emergency, so of course I just immediately drove to a local brick and mortar store to get a replacement.  I bought a Belkin as it was the cheapest.  It seems to not have the ability to remember MAC to IP mappings for any significant length of time, which meant all my laptops and VMs were constantly changing IPs.  I even ended up writing a little script to update &lt;code&gt;/etc/issue&lt;/code&gt; on my VMs so I could see their current IP without needing to log in.  Well, after a while I was finally frustrated with this enough to go see if the &lt;a href=&quot;http://www.dd-wrt.com&quot;&gt;DD-WRT&lt;/a&gt; replacement firmware was available.  It wasn't, so I thought I'd get a different model so I could enjoy the DHCP with static IP mappings goodness.  I clicked my handy bookmark for local craigslist and bam, there's a guy in my town selling a Buffalo WHR-G126 for $25 with the latest dd-wrt already installed.  w00t!  After a conversation over a few emails, calls, and texts, we rendezvoused in town just an hour or so later and completed our transaction.
 &lt;/p&gt;
@@ -1202,7 +1223,7 @@ Now this has a lot of assumptions (one NIC called eth0, etc) and is in no way a 
     <title>Cease and desist your password restrictions
     </title>
     <link href="http://peterlyons.com/problog/2010/09/password-restrictions">
-    </link><updated>2010-09-09T22:45:38.000Z</updated><id>http://localhost:9400/problog/2010/09/password-restrictions</id>
+    </link><updated>2010-09-09T22:45:38.000Z</updated><id>http://localhost:9000/problog/2010/09/password-restrictions</id>
     <content type="html">&lt;p&gt;
 I just tried to create an account at Bed Bath and Beyond.  They said my password could only contain letters and numbers.  Many sites impose various restrictions on the password, including
 &lt;/p&gt;
@@ -1234,7 +1255,7 @@ References
     <title>A response to &quot;Handling Bugs in an Agile Context&quot;
     </title>
     <link href="http://peterlyons.com/problog/2010/09/agile-bugs">
-    </link><updated>2010-09-08T21:07:27.000Z</updated><id>http://localhost:9400/problog/2010/09/agile-bugs</id>
+    </link><updated>2010-09-08T21:07:27.000Z</updated><id>http://localhost:9000/problog/2010/09/agile-bugs</id>
     <content type="html">&lt;p&gt;
 &lt;a href=&quot;http://testobsessed.com/2009/03/13/handling-bugs-in-an-agile-context/&quot;&gt;Handling Bugs in an Agile Context&lt;/a&gt; is a blog post I came across via &lt;a href=&quot;http://news.ycombinator.com&quot;&gt;Hacker News&lt;/a&gt; this morning.  As is often my experience when reading material on Agile from my perspective of an enterprise software developer, the experience was one of frustration and disbelief.
 &lt;/p&gt;
@@ -1320,7 +1341,7 @@ Anyway, that concludes my response to this blog post.  The general theme I see i
     <title>Sonos pricing insanity continued
     </title>
     <link href="http://peterlyons.com/problog/2010/09/sonos-pricing-insanity">
-    </link><updated>2010-09-07T07:17:01.000Z</updated><id>http://localhost:9400/problog/2010/09/sonos-pricing-insanity</id>
+    </link><updated>2010-09-07T07:17:01.000Z</updated><id>http://localhost:9000/problog/2010/09/sonos-pricing-insanity</id>
     <content type="html">&lt;p&gt;
 So I'm a fan of &lt;a href=&quot;http://www.sonos.com&quot;&gt;Sonos&lt;/a&gt; music systems, but they've always been expensive.  Almost prohibitively so.  But now I can either spend &lt;a href=&quot;http://sonos.com/products/controllers/cr200/default.aspx?rdr=true&amp;LangType=1033&quot;&gt;$349&lt;/a&gt; for an additional controller that controls my sonos and does precisely fuck-all else, or I can buy an iPod Touch on &lt;a href=&quot;http://boulder.craigslist.org&quot;&gt;craigslist&lt;/a&gt; for $125 and then download the free Sonos controller application, plus do all the other iPod Touch stuff.  I'm not sure who Sonos thinks is going to buy this thing anymore other than the utterly rich and utterly clueless.
 &lt;/p&gt;
@@ -1330,7 +1351,7 @@ So I'm a fan of &lt;a href=&quot;http://www.sonos.com&quot;&gt;Sonos&lt;/a&gt; m
     <title>No one really cares about web accessibility anyway...
     </title>
     <link href="http://peterlyons.com/problog/2010/09/web_accessibility">
-    </link><updated>2010-09-07T05:12:19.000Z</updated><id>http://localhost:9400/problog/2010/09/web_accessibility</id>
+    </link><updated>2010-09-07T05:12:19.000Z</updated><id>http://localhost:9000/problog/2010/09/web_accessibility</id>
     <content type="html">&lt;p&gt;
 So if a picture is worth a thousand words, shouldn't it be:
 &lt;/p&gt;
@@ -1350,7 +1371,7 @@ So if a picture is worth a thousand words, shouldn't it be:
     <title>No squids for me, Bruce
     </title>
     <link href="http://peterlyons.com/problog/2010/09/no-squids-for-me-bruce">
-    </link><updated>2010-09-05T05:16:30.000Z</updated><id>http://localhost:9400/problog/2010/09/no-squids-for-me-bruce</id>
+    </link><updated>2010-09-05T05:16:30.000Z</updated><id>http://localhost:9000/problog/2010/09/no-squids-for-me-bruce</id>
     <content type="html">&lt;p&gt;
 &lt;a href=&quot;http://www.schneier.com/&quot;&gt;Bruce Schneier&lt;/a&gt; is a leading author in the technology security and cryptography fields.  He is exceedingly rational and pragmatic.  I consider his insights on dealing with terrorism to be bar none the best available.  His blog often has great insights.  However, for reasons I can't understand, he always posts a random post on Fridays about squids.  Yes, the sea creature.  I don't know why, but it stopped being cute long ago.
 &lt;/p&gt;
@@ -1363,7 +1384,7 @@ To that end, I've created a &lt;a href=&quot;http://pipes.yahoo.com/peterlyons/s
     <title>UNIX is broken
     </title>
     <link href="http://peterlyons.com/problog/2010/09/unix-is-broken">
-    </link><updated>2010-09-04T19:40:03.000Z</updated><id>http://localhost:9400/problog/2010/09/unix-is-broken</id>
+    </link><updated>2010-09-04T19:40:03.000Z</updated><id>http://localhost:9000/problog/2010/09/unix-is-broken</id>
     <content type="html">&lt;p&gt;
 Reading &lt;a href=&quot;http://factor-language.blogspot.com/2010/09/two-things-every-unix-developer-should.html&quot;&gt;this blog post&lt;/a&gt; just makes me cringe.  This is why I  am so persistently hesitant to bother with C and low level systems programming.  They are broken. They are impossible to get right.  If even after numerous decades, the &lt;em&gt;cat&lt;/em&gt; program still has bugs in basic system interaction, it's not the programmers, it's the system. Thanks, but no. I'll code in a high level language that lets me focus on delivering functionality to my users, not performing sacrificial rituals to the Gods of K&amp;R, signal processing, and bitmasks.
 &lt;/p&gt;
@@ -1382,7 +1403,7 @@ Incidentally, that post is written by &lt;a href=&quot;http://factorcode.org/sla
     <title>On flash eating my key browser keyboard commands
     </title>
     <link href="http://peterlyons.com/problog/2010/08/on-flash-eating-my-key-browser-keyboard-commands">
-    </link><updated>2010-08-30T19:48:19.000Z</updated><id>http://localhost:9400/problog/2010/08/on-flash-eating-my-key-browser-keyboard-commands</id>
+    </link><updated>2010-08-30T19:48:19.000Z</updated><id>http://localhost:9000/problog/2010/08/on-flash-eating-my-key-browser-keyboard-commands</id>
     <content type="html">&lt;p&gt;
 Dear Universe,
 &lt;/p&gt;
@@ -1401,7 +1422,7 @@ Pete
     <title>How to Install Ubuntu 10.04 over a LAN
     </title>
     <link href="http://peterlyons.com/problog/2010/07/install-ubuntu-lan">
-    </link><updated>2010-07-17T04:40:24.000Z</updated><id>http://localhost:9400/problog/2010/07/install-ubuntu-lan</id>
+    </link><updated>2010-07-17T04:40:24.000Z</updated><id>http://localhost:9000/problog/2010/07/install-ubuntu-lan</id>
     <content type="html">&lt;h1&gt;Overview and Requirements&lt;/h1&gt;
 &lt;p&gt;
 So I've volunteered to help &lt;a href=&quot;http://www.bococo.org/&quot;&gt;Boulder Community Computers&lt;/a&gt; set up some automated Ubuntu OS installations over their local area network.  Being as this is a large part of what I do professionally, this is something easy for me to do that should help them be more efficient.  Their network layout is going to look something like this I think:
@@ -1621,7 +1642,7 @@ Thanks to the authors of the above reference web pages and Nick Flores for colla
     <title>Windows Server 2008 Setup Annoyances
     </title>
     <link href="http://peterlyons.com/problog/2010/07/windows-setup-annoyances">
-    </link><updated>2010-07-10T07:12:54.000Z</updated><id>http://localhost:9400/problog/2010/07/windows-setup-annoyances</id>
+    </link><updated>2010-07-10T07:12:54.000Z</updated><id>http://localhost:9000/problog/2010/07/windows-setup-annoyances</id>
     <content type="html">&lt;p&gt;
 So I do a lot of work with automated unattended intallations of Operating Systems, including Windows.  Here's some of my primary complaints about the new Windows setup program in Windows Server 2008.
 &lt;/p&gt;
@@ -1653,7 +1674,7 @@ The log files and error messages are just a mess.  And I'm not even talking abou
     <title>Remove your SCM system from your job postings
     </title>
     <link href="http://peterlyons.com/problog/2010/07/no-scm-in-job-postings">
-    </link><updated>2010-07-07T04:54:58.000Z</updated><id>http://localhost:9400/problog/2010/07/no-scm-in-job-postings</id>
+    </link><updated>2010-07-07T04:54:58.000Z</updated><id>http://localhost:9000/problog/2010/07/no-scm-in-job-postings</id>
     <content type="html">&lt;p&gt;
 Most job postings will list one or more source code management (SCM) tools in their laundry list of required skills and buzzwords.  This seems to both be unnecessary and also to miss the point. As an employer, your concern shouldn't be whether or not your candidate is intimately familiar with subversion, git, perforce, starteam, mercurial, CVS, sourcesafe, or whatever system your code happens to reside within at this point in time.  Why not?  Because it just doesn't matter and it doesn't help you distinguish good candidates from bad. This in my mind seems akin to asking potential postal employees &quot;Do you have experience driving from the right hand side of a boxy little truck?&quot;.  It's just not something that's going to be a stumbling block.  If you can drive, you'll get the hang of the postal delivery truck soon enough.  It's the same with SCM.  If you have worked successfully on a few sizeable projects in one or two of them, you'll be fine.  I've never heard this story: &quot;Oh yeah, we hired this woman Sandra and she wrote this fantastic code for us, but she just could not figure out how to commit it to subversion, so we had to let her go.&quot;  It's just not going to be the issue.  Well, what is going to be the issue?
 &lt;/p&gt;
@@ -1672,7 +1693,7 @@ So the summary: don't bother listing a specific SCM as a requirement in your job
     <title>On Idempotence, intention, and unix commands
     </title>
     <link href="http://peterlyons.com/problog/2010/05/on-idempotence-intention-and-unix-commands">
-    </link><updated>2010-05-21T09:42:05.000Z</updated><id>http://localhost:9400/problog/2010/05/on-idempotence-intention-and-unix-commands</id>
+    </link><updated>2010-05-21T09:42:05.000Z</updated><id>http://localhost:9000/problog/2010/05/on-idempotence-intention-and-unix-commands</id>
     <content type="html">&lt;p&gt;
 &lt;a href=&quot;http://en.wikipedia.org/wiki/Idempotence#In_computing&quot;&gt;Idempotence&lt;/a&gt; means that running a command or function several times produces the same result as running it only once.  This is an very important design principle that is a blessing when used appropriately and a scourge when not used where warranted.
 &lt;/p&gt;
@@ -1722,7 +1743,7 @@ A few other links on this topic:
     <title>Bleeding Edge and Rotting Core
     </title>
     <link href="http://peterlyons.com/problog/2010/03/bleeding-edge-and-rotting-core">
-    </link><updated>2010-03-19T08:53:53.000Z</updated><id>http://localhost:9400/problog/2010/03/bleeding-edge-and-rotting-core</id>
+    </link><updated>2010-03-19T08:53:53.000Z</updated><id>http://localhost:9000/problog/2010/03/bleeding-edge-and-rotting-core</id>
     <content type="html">&lt;p&gt;
 I just wanted to post some thoughts on the topic of selecting software components with regard to the maturity thereof.  I think overall the programmer community is by default gung-ho about the bleeding edge.  We like the shiny new toys with the bells and whistles.  Once something's been around enough to have its weaknesses well understsood, we find it very frustrating to have to continue to work with it.  I'm not going to offer any specific recommendations, just some things to keep in mind.  The general gist though is that it takes some hard-earned pragmatism and real production experience to understand the value of using older releases of components.
 &lt;/p&gt;
@@ -1801,7 +1822,7 @@ And finally, think about the value of being able to look across a broad set of a
     <title>MoinMoin Columns Macro
     </title>
     <link href="http://peterlyons.com/problog/2010/03/moinmoin-columns">
-    </link><updated>2010-03-08T00:43:31.000Z</updated><id>http://localhost:9400/problog/2010/03/moinmoin-columns</id>
+    </link><updated>2010-03-08T00:43:31.000Z</updated><id>http://localhost:9000/problog/2010/03/moinmoin-columns</id>
     <content type="html">&lt;p&gt;
 I just updated the &quot;Columns&quot; macro for the &lt;a href=&quot;http://moinmo.in/&quot;&gt;MoinMoin&lt;/a&gt; wiki.  This allows you to lay out a wiki page in two to ten columns.  This makes it easier to get lots of info on one page in certain situations and I've used it to great benefit on my personal wiki where I organize my stuff.
 &lt;/p&gt;
@@ -1818,7 +1839,7 @@ Here's what it looks like with four columns:
     <title>Optional Syntax Should Be Illegal
     </title>
     <link href="http://peterlyons.com/problog/2010/02/optional-syntax-should-be-illegal">
-    </link><updated>2010-02-14T03:33:31.000Z</updated><id>http://localhost:9400/problog/2010/02/optional-syntax-should-be-illegal</id>
+    </link><updated>2010-02-14T03:33:31.000Z</updated><id>http://localhost:9000/problog/2010/02/optional-syntax-should-be-illegal</id>
     <content type="html">&lt;p&gt;
 Why in the world do some programming languages include optional syntax?  To a true type A engineer, this is incomprehensible and unacceptable.  For example, in Adobe's ActionScript, statements may optionally be terminated with a semicolon.  Usually this is not required, except in a few situations you need it.  Evil.  The statement that our number one job as software engineers is to manage complexitity really resonates with me, and willy nilly allowing of optional syntax just destroys consistency, predictability, and simplicity for no reason whatsoever.  Optional syntax seems to me a bad language design smell that indicates the language authors need to rethink a bit and find something that works always and should be required.
 &lt;/p&gt;
@@ -1831,7 +1852,7 @@ Part of the impetus for this post is my annoyance when my thinking cycles are wa
     <title>Environment Variables Considered Harmful
     </title>
     <link href="http://peterlyons.com/problog/2010/02/environment-variables-considered-harmful">
-    </link><updated>2010-02-14T03:30:14.000Z</updated><id>http://localhost:9400/problog/2010/02/environment-variables-considered-harmful</id>
+    </link><updated>2010-02-14T03:30:14.000Z</updated><id>http://localhost:9000/problog/2010/02/environment-variables-considered-harmful</id>
     <content type="html">&lt;p&gt;Many projects reference environment variables at either build time, install time, or run time to handle configuration that can't be made to work across all of the target environments.  It is better to use plain text simple configuration files for the reasons that follow.  First, let's quickly review common usage of environment variables.&lt;/p&gt;
 
 &lt;ul&gt;
@@ -1868,7 +1889,7 @@ Part of the impetus for this post is my annoyance when my thinking cycles are wa
     <title>Business hours
     </title>
     <link href="http://peterlyons.com/problog/2009/09/business-hours">
-    </link><updated>2009-09-22T10:38:56.000Z</updated><id>http://localhost:9400/problog/2009/09/business-hours</id>
+    </link><updated>2009-09-22T10:38:56.000Z</updated><id>http://localhost:9000/problog/2009/09/business-hours</id>
     <content type="html">&lt;p&gt;NOTICE:  To all businesses with a single physical location and a web site.  You will put your address, phone number, and business hours on your home page.  There will not be a &quot;Contact&quot; page. There will not be an &quot;About&quot; page.  END OF NOTICE
 &lt;/p&gt;
     </content>
@@ -1877,7 +1898,7 @@ Part of the impetus for this post is my annoyance when my thinking cycles are wa
     <title>The wheel of not waiting
     </title>
     <link href="http://peterlyons.com/problog/2009/09/the-wheel-of-not-waiting">
-    </link><updated>2009-09-18T08:01:00.000Z</updated><id>http://localhost:9400/problog/2009/09/the-wheel-of-not-waiting</id>
+    </link><updated>2009-09-18T08:01:00.000Z</updated><id>http://localhost:9000/problog/2009/09/the-wheel-of-not-waiting</id>
     <content type="html">&lt;p&gt;
 So flash videos are everywhere now.  Generally as they load they show some spinning wheel type graphic.  The problem is as an end user, I have no visual differentiation between a video that is loading slowly and a video sitting there waiting for TCP from an overloaded server that is simply never going to work, and certainly not in a timeframe smaller than my attention budget.  Show me whether or not you are getting any data, and I might be willing to wait, but if you have me watching your spinner until your TCP connection times out, you are just frustrating me.
 &lt;/p&gt;
@@ -1887,7 +1908,7 @@ So flash videos are everywhere now.  Generally as they load they show some spinn
     <title>How to disable wpautop in WordPress blogs
     </title>
     <link href="http://peterlyons.com/problog/2009/05/disable-wpautop">
-    </link><updated>2009-05-23T19:53:19.000Z</updated><id>http://localhost:9400/problog/2009/05/disable-wpautop</id>
+    </link><updated>2009-05-23T19:53:19.000Z</updated><id>http://localhost:9000/problog/2009/05/disable-wpautop</id>
     <content type="html">&lt;p&gt;
 So, when creating a &lt;a href=&quot;http://wordpress.org&quot;&gt;WordPress&lt;/a&gt; blog, even if you are editing in HTML mode, WordPress includes a feature called &quot;wpautop&quot; that will replace any pair of line feed characters in your post markup with a &lt;p&gt; tag.  This is helpful I think in general  for people who blog mostly paragraphs with some links and images.  However, if you blog with more complex markup, this can invalidate your HTML.  I run my HTML through the &lt;a href=&quot;http://validator.w3.org&quot;&gt;W3C HTML Validator&lt;/a&gt; to check it and wpautop can cause validation to fail.  I hunted around online for an easy way to disable this and didn't see one, so I made the changes described below.
 &lt;/p&gt;
@@ -1913,7 +1934,7 @@ Of course, this change will be undone when you upgrade to a newer WordPress rele
     <title>Maritz: 1 - Very Dissatisfied
     </title>
     <link href="http://peterlyons.com/problog/2009/05/maritz-1-very-dissatisfied">
-    </link><updated>2009-05-17T04:27:56.000Z</updated><id>http://localhost:9400/problog/2009/05/maritz-1-very-dissatisfied</id>
+    </link><updated>2009-05-17T04:27:56.000Z</updated><id>http://localhost:9000/problog/2009/05/maritz-1-very-dissatisfied</id>
     <content type="html">&lt;p&gt;
 I bought a new car this fall and a few months later I got a follow-up survey in the mail from Maritz Research.  Having a few pieces of feedback to give, such as the orange readout on the Bose sound system being invisible through Sunglasses,  I endeavored to fill it out.  Holy SAT Test, Batman!  The survey is nine jam-packed, small-font pages long. There are 76 officially numbered questions, but many questions involve dozens of individual line-items. See the example below where question 58 asks you to rate 67 individual aspects of the vehicle! Sixty frigging seven!  I gave up in frustration long before getting there.
 &lt;/p&gt;
@@ -1940,7 +1961,7 @@ Please rate your satisfaction with this Maritz Research survey:
     <title>How to zip a directory in python
     </title>
     <link href="http://peterlyons.com/problog/2009/04/zip-dir-python">
-    </link><updated>2009-04-27T10:04:03.000Z</updated><id>http://localhost:9400/problog/2009/04/zip-dir-python</id>
+    </link><updated>2009-04-27T10:04:03.000Z</updated><id>http://localhost:9000/problog/2009/04/zip-dir-python</id>
     <content type="html">I came across this problem at work and also over on &lt;a href=&quot;http://stackoverflow.com/questions/458436/adding-folders-to-a-zip-file-using-python/792199#792199&quot;&gt;this www.stackoverflow.com thread&lt;/a&gt;.  You have a directory and you want to recursively zip it up.  Simple, right?  The equivalent of the unix command &quot;zip myDir.zip myDir&quot;.  Should be like 5 lines of code?  Python even has a built in zipfile module, sweet!  Well, as is often the case (see urllib and friends), python's &quot;batteries included&quot; slogan is more like &quot;enough batteries for 36 seconds included&quot;.  Anyway, it's more like 23 lines of functional code, which is still pretty good, but I would have expected the zipfile module to have this included and not have to use os.walk() to do this.
 
 &lt;div class=&quot;code&quot;&gt;
@@ -2041,7 +2062,7 @@ zipdir(&quot;../test1/foo&quot;, &quot;foo5pardir.zip&quot;) #Include some leadi
     <title>Thoughts on Scrum
     </title>
     <link href="http://peterlyons.com/problog/2009/04/thoughts-on-scrum">
-    </link><updated>2009-04-17T08:15:07.000Z</updated><id>http://localhost:9400/problog/2009/04/thoughts-on-scrum</id>
+    </link><updated>2009-04-17T08:15:07.000Z</updated><id>http://localhost:9000/problog/2009/04/thoughts-on-scrum</id>
     <content type="html">&lt;p&gt;
 So I had a chance to work in the &lt;a href=&quot;http://en.wikipedia.org/wiki/Scrum_(development)&quot;&gt;Scrum&lt;/a&gt; methodology for about six months recently. I thought I'd write up some of my thoughts on the experience and the process. Please note that first, this is my first experience working in the Scrum process. I am sure as I use it more these opinions will change. Second, these are strictly my personal thoughts and opinions and in no way represent the experience of my team or anyone else.  Third, my project had a specific set of tasks and particulars.  On a different project, with more sprints or shorter tasks or other relevant variations, I might have drawn (and may well draw in the future) different conclusions.
 &lt;/p&gt;
@@ -2127,7 +2148,7 @@ With regard to ordering the work queue items in the queue, and thus determining 
     <title>Code Conventions
     </title>
     <link href="http://peterlyons.com/problog/2009/03/code-conventions">
-    </link><updated>2009-03-15T03:06:23.000Z</updated><id>http://localhost:9400/problog/2009/03/code-conventions</id>
+    </link><updated>2009-03-15T03:06:23.000Z</updated><id>http://localhost:9000/problog/2009/03/code-conventions</id>
     <content type="html">Here's a link to &lt;a href=&quot;/code_conventions.html&quot;&gt;my article on code conventions&lt;/a&gt;.  Feel free to post comments here.
     </content>
   </entry>
@@ -2135,7 +2156,7 @@ With regard to ordering the work queue items in the queue, and thus determining 
     <title>How to run two wordpress blogs on one web site
     </title>
     <link href="http://peterlyons.com/problog/2009/03/how-to-run-two-wordpress-blogs-on-one-web-site">
-    </link><updated>2009-03-15T02:57:53.000Z</updated><id>http://localhost:9400/problog/2009/03/how-to-run-two-wordpress-blogs-on-one-web-site</id>
+    </link><updated>2009-03-15T02:57:53.000Z</updated><id>http://localhost:9000/problog/2009/03/how-to-run-two-wordpress-blogs-on-one-web-site</id>
     <content type="html">&lt;p&gt;
 There is ample detailed information out there on installing wordpress.  However, I wanted to just provide a small supplement about setting up two distinct wordpress blogs within a single apache2 web site. The system I am using is Ubuntu Linux 8.10, but other than the package installation, the configuration steps should be the same on other linux distributions.
 &lt;/p&gt;
@@ -2330,7 +2351,7 @@ OK, you are good to go to &lt;a href=&quot;http://localhost/blog1&quot;&gt;http:
     <title>Music subscription and Rhapsody
     </title>
     <link href="http://peterlyons.com/problog/2009/03/music-subscription-and-rhapsody">
-    </link><updated>2009-03-15T02:54:03.000Z</updated><id>http://localhost:9400/problog/2009/03/music-subscription-and-rhapsody</id>
+    </link><updated>2009-03-15T02:54:03.000Z</updated><id>http://localhost:9000/problog/2009/03/music-subscription-and-rhapsody</id>
     <content type="html">&lt;p&gt;
 Flat fee music subscription service has changed my life.  I wish there was some less dramatic way to put it, but it's the honest truth.  I don't remember exactly when, but somewhere in late 2006 probably, after reading &lt;a href=&quot;http://www.joelonsoftware.com/items/2006/11/10.html&quot;&gt;this Joel on Software - The infinite music collection&lt;/a&gt; article, I was intrigued by the idea and did a little shopping.  I know I looked at Napster, Virgin, Yahoo, and Rhapsody at least.  I think I initially went with Rhapsody because of the Sonos integration.  I experimented for a bit listening on the computer and then I think that Christmas I asked for a basic set of Sonos gear, which was and still is exorbitantly priced.
 &lt;/p&gt;
@@ -2381,7 +2402,7 @@ So if you are a big music fan, and still haven't tried a subscription service, g
     <title>Announcing Pete's Points
     </title>
     <link href="http://peterlyons.com/problog/2009/03/announcing-petes-points">
-    </link><updated>2009-03-15T02:53:24.000Z</updated><id>http://localhost:9400/problog/2009/03/announcing-petes-points</id>
+    </link><updated>2009-03-15T02:53:24.000Z</updated><id>http://localhost:9000/problog/2009/03/announcing-petes-points</id>
     <content type="html">I have decided to start a &quot;professional&quot; blog.  I use the word &quot;professional&quot; only in the sense of &quot;not personal&quot;.  I will post about software engineering, computers, consumer electronics, and music technology primarily.  You may want to read this  &lt;a href=&quot;/problog/about/&quot;&gt;description of what this blog is all about&lt;/a&gt;.  I hope you enjoy it and look forward to any conversations this generates.
     </content>
   </entry>
