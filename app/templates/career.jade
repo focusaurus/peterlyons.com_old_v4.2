@@ -1,19 +1,19 @@
-:coffeescript
-  $ ->
-   $("#reverse").click ->
-        phases = []
-        parent = $("div.phase").parent()
-        $("div.phase").each (index, div) ->
-          $(div).remove()
-          phases.unshift $(div)
-        #Make a single change to the live DOM to avoid flickers
-        tempNode = $ "<div>"
-        tempNode.append phase for phase in phases
-        parent.append tempNode.html()
 :markdown
-  I have a **[traditional resume availabe in PDF format](resume.pdf)** for those
-  looking for the lo-fi version.
+  #Recruiters Please Read This Section
 
+  * I am currently happily working a full-time work-from-anywhere position and not actively seeking additional work (accurate as of November 2012)
+  * However, if and when I am looking for work, please note these points and don't bother contacting me positions that are not a good match
+    * I am interested in work-from-anywhere positions primarily and have a long history of successfully working this way. I am not looking to relocate away from the Boulder, Colorado area.
+    * I am interested in full-stack web application development positions, with back-end architecture and development being my core strength.
+      * Positions that are not full-stack (such as "Front End Developer") are unlikely to interest me, even though I write JavaScript all day
+    * I am interested in modern and bleeding-edge technologies and progressive companies (mostly early phase startups). Yes, I used to write Java and have worked with large enterprises, but don't bother contacting me about J2EE positions building business applications for large enterprises.
+    * Please only contact me about senior/lead positions with high salaries. Don't be clueless. I have 10+ years experience, 3 patents, a broad and deep skillset, and have been a key lead developer through a $1B+ acquisition. Yes, I have done Ruby on Rails work but if you think your $70K vanilla rails development job for a Bank in Minnesota is a good fit for me, it's time for you to consider a different field.
+
+  I have a **[traditional resume availabe in PDF format](resume.pdf)** for those looking for the lo-fi version.
+
+hr.divider
+
+:markdown
   This page will chronicle my career in a more narrative and rich format than a
   standard resume can offer.
 
@@ -21,16 +21,33 @@
 
 .phase
   :markdown
+    #Phase 4C: Web Developer at stealth mode startup
+
+    I'm currently building the initial release of a new startup that is still in stealth mode.
+
+    Dates: October 2012-Present
+    ##Technologies Employed
+    * JavaScript
+    * node.js
+    * express.js
+    * handlebars.js
+    * jQuery, REST, JSON
+    * MongoDB, Redis, CouchDB
+
+.phase
+  :markdown
     #Phase 4B: Web Developer at Sococo
 
-    I joined [Social Communications Company (Sococo)](http://sococo.com) in February 2012 as a web developer. We make a virtual office product and they are looking to complement their existing native Mac and Windows clients with a modern web client built on a node.js back end. I'm excited to be doing node.js development professionally as well as a bunch of modern browser based javascript with jQuery and Backbone.
+    I joined [Social Communications Company (Sococo)](http://sococo.com) in February 2012 as a web developer. Sococo makes a virtual office product and I worked on a rewrite of their PHP administrative web site as a modern backbone.js single page application. It was front-end heavy work with the vast majority of the interesting code being browser-side JavaScript.
 
-    Dates: February 2012-Present
+    I joined for the express purpose of doing node.js development work, but the project I worked on was PHP/Backbone.js with the promise of node.js work to follow after that project completed. After 7 months of additional development taking a detour from my career's desired path, I had to throw in the towel and find a real node.js-based job.
+
+    Dates: February 2012-September 2012
     ##Technologies Employed
-    * PHP
     * JavaScript
     * backbone.js
     * jQuery, REST, JSON
+    * PHP
     * node.js
     * Python Fabric Framework
 
@@ -289,3 +306,16 @@
     * Extreme Programming (XP)
     * Object-Relational Modeling (ORM)
     * Apple Core Foundation APIs
+
+:coffeescript
+  $ ->
+   $("#reverse").click ->
+        phases = []
+        parent = $("div.phase").parent()
+        $("div.phase").each (index, div) ->
+          $(div).remove()
+          phases.unshift $(div)
+        #Make a single change to the live DOM to avoid flickers
+        tempNode = $ "<div>"
+        tempNode.append phase for phase in phases
+        parent.append tempNode.html()
