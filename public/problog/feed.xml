@@ -5,11 +5,35 @@
   <link href="http://peterlyons.com/problog/feed" rel="self">
   </link>
   <link href="http://peterlyons.com/problog/feed">
-  </link><updated>2012-10-23T03:15:05.735Z</updated><id>http://peterlyons.com/problog/feed</id>
+  </link><updated>2012-12-12T21:49:52.792Z</updated><id>http://peterlyons.com/problog/feed</id>
   <author>
     <name>Peter Lyons
     </name>
   </author>
+  <entry>
+    <title>Hilarious Recruiter Email
+    </title>
+    <link href="http://peterlyons.com/problog/2012/12/hilarious-recruiter-email">
+    </link><updated>2012-12-12T21:49:52.792Z</updated><id>http://localhost:9000/problog/2012/12/hilarious-recruiter-email</id>
+    <content type="html">&lt;p&gt;Here is the full text of a recruiter email I received today.&lt;/p&gt;
+
+&lt;hr/&gt;
+
+&lt;p&gt;Dear Pete,&lt;/p&gt;
+
+&lt;p&gt;Wouldn't it feel great to wake up each day knowing that you're part of a dynamic organization that's on the cutting edge of innovation web products? That’s what the team experiences and you could too!&lt;/p&gt;
+
+&lt;p&gt;What you will find challenging about this job is to develop revolutionary and challenging web applications using object oriented javascript frameworks like backbone.js, angular.js,  HTML, and CSS.&lt;/p&gt;
+
+&lt;p&gt;As a result, there are many exciting decisions to be made to keep it in line with demands. You won't find formulaic thinking here. As a company that specializes in innovation, they want the best and brightest creative visionaries who think so far out of the box that the box isn't even in the picture anymore. Where others say &quot;can't&quot;, you say &quot;how&quot;.&lt;/p&gt;
+
+&lt;p&gt;Keeping in mind that most successful people find opportunity not when they're looking but when it knocks,  how's my timing?&lt;/p&gt;
+
+&lt;p&gt;I'd be happy to talk to you further about it. I'm reaching out to key individuals before I go on a full scale search for this. You have an ideal background and I think it's a good match for you geographically.&lt;/p&gt;
+
+&lt;p&gt;Fortune Favors the bravo!&lt;/p&gt;
+    </content>
+  </entry>
   <entry>
     <title>Find closer OKCupid matches with this bookmarklet
     </title>
