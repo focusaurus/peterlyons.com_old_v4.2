@@ -25,11 +25,11 @@
     "mkdirp": "0.3.4"
   },
   "devDependencies": {
-    "chai": "0.1.6",
+    "chai": "1.4.x",
     "commander": "0.5.2",
-    "mocha": "0.10.2",
+    "mocha": "1.7.x",
     "node-inspector": "*",
     "nodemon": "0.6.7",
-    "superagent": "0.2.0"
+    "superagent": "0.12.x"
   }
 }
