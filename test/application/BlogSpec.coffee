@@ -1,5 +1,4 @@
 config = require "../../config"
-expect = require("chai").expect
 assert = require("chai").assert
 
 {loadPage} = require "../TestUtils"
@@ -15,7 +14,7 @@ describe "a blog post page", ->
       done()
 
   it "should have the post title", ->
-    expect($("title").text()).to.match /walkabout/i
+    assert.match $("title").text(), /walkabout/i
 
   it "should process a flickr tag", ->
     assert.lengthOf $("flickr"), 0
@@ -37,9 +36,9 @@ describe "a blog index page", ->
       done()
 
   it "should have nicely formatted dates", ->
-    expect($("li.post span.date")).not.to.be.empty
+    assert $("li.post span.date").length > 0
     date = $("li.post span.date").last().html()
-    expect(date).to.match /Mar 14, 2009/
+    assert.match date, /Mar 14, 2009/
 
 describe "a blog post preview", ->
 
