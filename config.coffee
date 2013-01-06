@@ -38,4 +38,5 @@ switch process.env.NODE_ENV
     exports.photos.serveDirect = false
   else
     exports.tests = true
+    exports.blogPreviews = true
 exports.jqueryURL = exports.baseURL + "/js/jquery.js"

@@ -11,6 +11,7 @@ middleware = require "./middleware"
 pages = require "./pages"
 path = require "path"
 util = require "util"
+config = require "../../config"
 
 {Post, leadZero} = require("../models/post")
 
@@ -63,6 +64,16 @@ previewMarkdown = (req, res, next) ->
   res.html = markdown req.body
   next()
 
+convertMiddleware = [
+  text({limit:"5mb"})
+  previewMarkdown
+  middleware.domify
+  middleware.flickr
+  middleware.youtube
+  middleware.undomify
+  middleware.send
+]
+
 previewMiddleware = [
   middleware.debugLog "@bug before text"
   text({limit:"5mb"})
@@ -100,8 +111,10 @@ class BlogIndex extends pages.Page
     app.get "/#{@URI}", (req) ->
       self.render req
 
-    app.get "/#{@URI}/post", (req, res) ->
-      res.render "post"
+    if config.blogPreviews
+      app.get "/#{@URI}/post", (req, res) ->
+        res.render "post"
+      app.post "/#{URI}/preview", previewMiddleware
 
     app.get "/#{@URI}/feed", (req, res) ->
       options =
@@ -181,6 +194,6 @@ setup = (app) ->
     next()
   .end (error) ->
     #no-op
-  app.post "/convert", previewMiddleware
+  app.post "/convert", convertMiddleware
 
 module.exports = {setup}
