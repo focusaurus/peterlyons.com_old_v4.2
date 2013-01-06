@@ -459,6 +459,9 @@ td.performers {
 .create_blog > textarea {
   margin: 0;
 }
+.create_blog > button {
+  display: block;
+}
 @media handheld and (max-width: 1156px), screen and (max-device-width: 1156px), screen and (max-width: 1156px) {
   .respond:after {
     content: "1156";
