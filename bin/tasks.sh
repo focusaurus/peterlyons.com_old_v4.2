@@ -292,9 +292,20 @@ task:start() {
     coffee app/server.coffee
 }
 
+task:devstart() {
+    cdpd
+    nodemon app/server.coffee
+}
+
 task:debug() {
   cdpd
-  ./node_modules/.bin/coffee --nodejs --debug app/server.coffee
+  ./node_modules/.bin/coffee --nodejs --debug=9001 app/server.coffee
+}
+
+task:inspector() {
+  cdpd
+  echo http://localhost:9002/debug?port=9001
+  ./node_modules/.bin/node-inspector --web-port=9002
 }
 
 task:static() {
@@ -456,7 +467,7 @@ fi
 if [ -z "${HOSTS}" ]; then
     #local mode
     case "${OP}" in
-        db:*|os:*|test:*|user:*|web:*|prereqs|test|release|debug|start|static|watch|deploy|validate|html_to_md)
+        db:*|os:*|test:*|user:*|web:*|prereqs|test|release|debug|devstart|inspector|start|static|watch|deploy|validate|html_to_md)
             #Op looks valid-ish
             if ! expr "${OP}" : '.*:' > /dev/null; then
                 OP="task:${OP}"
