@@ -27,9 +27,11 @@
         $out.html(response)
 
   handleKeys = (event) ->
-    val = event.target.value
-    localStorage.postDraft = val
-    preview val, $preview()
+    postDraft =
+      content: event.target.value
+      title: $find("[name=title]").val()
+    localStorage.postDraft = JSON.stringify postDraft
+    preview postDraft.content, $preview()
 
   save = ->
     data =
@@ -42,9 +44,18 @@
       data: JSON.stringify(data)
       success: (response) ->
         $(".notices").html("""New post saved at <a href='/#{response.URI}'>#{response.URI}</a>""")
+        window.scrollTo 0, 0
 
   $ ->
-    savedContent = localStorage.postDraft
-    $find(".content").val(savedContent).focus().on "keyup", _.debounce handleKeys, 250
-    preview savedContent, $preview()
+    try
+      savedPost = JSON.parse localStorage.postDraft
+    catch error
+      console.log localStorage.postDraft
+      savedPost =
+        title: ""
+        content: ""
+    $find(".content").val(savedPost.content)
+      .focus().on "keyup", _.debounce handleKeys, 250
+    $find("[name=title]").val(savedPost.title)
+    preview savedPost.content, $preview()
     $find("button").on "click", save
