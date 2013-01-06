@@ -445,6 +445,20 @@ td.performers {
   text-align: center;
   padding-bottom: 5px;
 }
+.create_blog > hr {
+  margin: 30px 0;
+}
+.create_blog > label {
+  display: block;
+  font-size: 20px;
+  font-size: 2rem;
+}
+.create_blog > label > input {
+  width: 30em;
+}
+.create_blog > textarea {
+  margin: 0;
+}
 @media handheld and (max-width: 1156px), screen and (max-device-width: 1156px), screen and (max-width: 1156px) {
   .respond:after {
     content: "1156";

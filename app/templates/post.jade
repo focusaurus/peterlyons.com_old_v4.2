@@ -1,16 +1,35 @@
-section.preview
-textarea.content(cols="80", rows="25")
-p Shift-ENTER to preview
+.create_blog
+  section.preview
+  hr
+  label
+    | title
+    input(name="title")
+  textarea.content(cols="80", rows="25")
 :coffeescript
+  $preview = ->
+    $ ".preview"
+
+  content = ->
+    $(".content").val()
+
+  preview = (content, $out)->
+    $.ajax
+      type: "POST"
+      url: "/convert"
+      contentType: "text/x-markdown"
+      data: content
+      success: (response) ->
+        $out.html(response)
+
+  handleKeys = (event) ->
+    localStorage.postDraft = content = event.target.value
+    preview content, $preview()
+      #if event.keyCode is 13 and event.shiftKey
+      #  event.preventDefault()
+      #  preview $content, $preview
+
   $ ->
-    $preview = $(".preview")
-    $content = $("textarea.content")
-    $content.on "keyup", (event) ->
-      if event.keyCode is 13 and event.shiftKey
-        $.ajax
-          type: "POST"
-          url: "/convert"
-          contentType: "text/x-markdown"
-          data: $content.val()
-          success: (response) ->
-            $preview.html(response)
+    savedContent = localStorage.postDraft
+    $(".content").val(savedContent).focus().on "keyup", _.debounce handleKeys, 250
+    preview savedContent, $preview()
+
