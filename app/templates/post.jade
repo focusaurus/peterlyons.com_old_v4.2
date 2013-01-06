@@ -1,16 +1,21 @@
 .create_blog
+  .notices
   section.preview
   hr
   label
     | title
     input(name="title")
   textarea.content(cols="80", rows="25")
+  button Save
 :coffeescript
+  $find = (selector) =>
+    $(".create_blog").find selector
+
   $preview = ->
-    $ ".preview"
+    $find ".preview"
 
   content = ->
-    $(".content").val()
+    $find(".content").val()
 
   preview = (content, $out)->
     $.ajax
@@ -22,14 +27,24 @@
         $out.html(response)
 
   handleKeys = (event) ->
-    localStorage.postDraft = content = event.target.value
-    preview content, $preview()
-      #if event.keyCode is 13 and event.shiftKey
-      #  event.preventDefault()
-      #  preview $content, $preview
+    val = event.target.value
+    localStorage.postDraft = val
+    preview val, $preview()
+
+  save = ->
+    data =
+      title: $find("[name=title]").val()
+      content: content()
+    $.ajax
+      type: "POST"
+      url: "post"
+      contentType: "application/json"
+      data: JSON.stringify(data)
+      success: (response) ->
+        $(".notices").html("""New post saved at <a href='/#{response.URI}'>#{response.URI}</a>""")
 
   $ ->
     savedContent = localStorage.postDraft
-    $(".content").val(savedContent).focus().on "keyup", _.debounce handleKeys, 250
+    $find(".content").val(savedContent).focus().on "keyup", _.debounce handleKeys, 250
     preview savedContent, $preview()
-
+    $find("button").on "click", save

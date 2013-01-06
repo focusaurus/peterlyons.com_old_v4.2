@@ -1,8 +1,10 @@
 _ = require "underscore"
+async = require "async"
 fs = require "fs"
 path = require "path"
 asyncjs = require "asyncjs"
 markdown = require("markdown-js").makeHtml
+mkdirp = require "mkdirp"
 
 leadZero = (value) -> if value > 9 then "#{value}" else "0#{value}"
 slug = (phrase="") ->
@@ -29,6 +31,9 @@ class Post
 
   metadataPath: =>
     "#{@URI()}.json"
+
+  dirPath: =>
+    path.dirname "#{@contentPath()}"
 
   viewPath: =>
     path.join @base, "#{@URI()}.#{@format}"
@@ -71,4 +76,16 @@ class Post
     .end (error) ->
       callback error
 
-module.exports = {Post, leadZero}
+  save: (callback) =>
+    self = this
+    contentPath = path.join @base, @contentPath()
+    metadataPath = path.join @base, @metadataPath()
+    mkdirp this.dirPath(), (error) ->
+      return callback error if error
+      work = [
+        async.apply fs.writeFile, contentPath, self.content
+        async.apply fs.writeFile, metadataPath, JSON.stringify(self.metadata())
+      ]
+      async.parallel work, callback
+
+module.exports = {Post, leadZero, slug}
