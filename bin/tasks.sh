@@ -462,6 +462,9 @@ if [ -z "${HOSTS}" ]; then
                 OP="task:${OP}"
             fi
         ;;
+        "")
+            egrep '^task:' "${0}" | cut -d : -f 2 | cut -d '(' -f 1
+        ;;
         *)
             echo "ERROR: unknown task ${OP}" 1>&2
             exit 1
