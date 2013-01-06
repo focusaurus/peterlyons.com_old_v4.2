@@ -1,5 +1,6 @@
 config = require "../../config"
 assert = require("chai").assert
+cheerio = require "cheerio"
 
 {loadPage} = require "../TestUtils"
 request = require "superagent"
@@ -43,4 +44,29 @@ describe "a blog index page", ->
 describe "a blog post preview", ->
 
   it "should convert markdown to HTML", (done) ->
-    done()
+    request
+      .post("#{config.baseURL}/convert")
+      .send("#Header One")
+      .set("Content-Type", "text/x-markdown")
+      .set("Accept", "text/html")
+      .end (res) ->
+        assert res.ok
+        assert.equal "<h1>Header One</h1>", res.text.trim()
+        done()
+
+  it "should have the flickr & youtube pipeline middleware", (done) ->
+    request
+      .post("#{config.baseURL}/convert")
+      .send("""
+        <youtube href="http://www.youtube.com/embed/K27MA8v91D4"/>
+        <flickrshow href="page_show_url=%2Fphotos%2F88096431%40N00%2Fsets%2F72157631932122934%2Fshow%2F&page_show_back_url=%2Fphotos%2F88096431%40N00%2Fsets%2F72157631932122934%2F&set_id=72157631932122934&"/>
+        """)
+      .set("Content-Type", "text/x-markdown")
+      .set("Accept", "text/html")
+      .end (res) ->
+        assert res.ok
+        $ = cheerio.load(res.text)
+        assert.lengthOf $('flickrshow'), 0
+        assert.lengthOf $('youtube'), 0
+        assert $("object").length > 0
+        done()

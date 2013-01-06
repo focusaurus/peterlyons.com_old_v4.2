@@ -1,7 +1,9 @@
 _ = require "underscore"
+text = require "../lib/text"
 asyncjs = require "asyncjs"
 date = require "../../lib/date" #Do not remove. Monkey patches Date
 errors = require "../errors"
+express = require "express"
 fs = require "fs"
 jade = require "jade"
 markdown = require("markdown-js").makeHtml
@@ -55,6 +57,23 @@ blogArticle = (req, res, next) ->
 postTitle = (req, res, next) ->
   res.$("title").text(res.post.title + " | Peter Lyons")
   next()
+
+previewMarkdown = (req, res, next) ->
+  console.log("@bug previewMarkdown", req.body)
+  res.html = markdown req.body
+  next()
+
+previewMiddleware = [
+  middleware.debugLog "@bug before text"
+  text({limit:"5mb"})
+  middleware.debugLog "@bug after text"
+  previewMarkdown
+  middleware.domify
+  middleware.flickr
+  middleware.youtube
+  middleware.undomify
+  middleware.send
+]
 
 postMiddleware = [
   loadPost
@@ -159,4 +178,6 @@ setup = (app) ->
     next()
   .end (error) ->
     #no-op
+  app.post "/convert", previewMiddleware
+
 module.exports = {setup}

@@ -3,7 +3,7 @@
   "description": "The Node/Express Web App that powers the peterlyons.com web site",
   "version": "4.1.40",
   "homepage": "http://peterlyons.com",
-  "repository": "ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com",
+  "repository": "ssh://git.peterlyons.com/home/plyons/projects/peterlyons.com.git",
   "author": "Peter Lyons <pete@peterlyons.com> (http://peterlyons.com)",
   "main": "app/server.coffee",
   "engines": {
@@ -15,6 +15,7 @@
     "asyncjs": "0.0.9",
     "coffee-script": "1.2.0",
     "express": "2.5.6",
+    "connect": "2.7.x",
     "jade": "0.20.0",
     "cheerio": "0.7.0",
     "JSONPath": "0.8.5",
