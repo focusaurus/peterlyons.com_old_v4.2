@@ -100,6 +100,9 @@ class BlogIndex extends pages.Page
     app.get "/#{@URI}", (req) ->
       self.render req
 
+    app.get "/#{@URI}/post", (req, res) ->
+      res.render "post"
+
     app.get "/#{@URI}/feed", (req, res) ->
       options =
         layout: false

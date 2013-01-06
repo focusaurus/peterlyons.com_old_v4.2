@@ -1,0 +1,16 @@
+section.preview
+textarea.content(cols="80", rows="25")
+p Shift-ENTER to preview
+:coffeescript
+  $ ->
+    $preview = $(".preview")
+    $content = $("textarea.content")
+    $content.on "keyup", (event) ->
+      if event.keyCode is 13 and event.shiftKey
+        $.ajax
+          type: "POST"
+          url: "/convert"
+          contentType: "text/x-markdown"
+          data: $content.val()
+          success: (response) ->
+            $preview.html(response)

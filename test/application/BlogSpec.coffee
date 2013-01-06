@@ -41,7 +41,7 @@ describe "a blog index page", ->
     date = $("li.post span.date").last().html()
     assert.match date, /Mar 14, 2009/
 
-describe "a blog post preview", ->
+describe "the preview converter", ->
 
   it "should convert markdown to HTML", (done) ->
     request
@@ -70,3 +70,16 @@ describe "a blog post preview", ->
         assert.lengthOf $('youtube'), 0
         assert $("object").length > 0
         done()
+
+
+describe "the blog post authoring/preview page", ->
+  $ = null
+
+  before (done) ->
+    loadPage config.baseURL + "/persblog/post", (dom)->
+      $ = dom
+      done()
+
+  it "should have a preview section and a textarea", ->
+    assert $("section.preview").length > 0
+    assert $("textarea").length > 0
