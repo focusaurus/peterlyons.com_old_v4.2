@@ -86,6 +86,8 @@ class Post
         async.apply fs.writeFile, contentPath, self.content
         async.apply fs.writeFile, metadataPath, JSON.stringify(self.metadata())
       ]
-      async.parallel work, callback
+      async.parallel work, (error) ->
+        return callback error if error
+        callback null, self
 
 module.exports = {Post, leadZero, slug}

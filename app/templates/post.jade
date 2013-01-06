@@ -6,6 +6,9 @@
     | title
     input(name="title")
   textarea.content(cols="80", rows="25")
+  label
+    | password to save
+    input(type="password")
   button Save
 :coffeescript
   $find = (selector) =>
@@ -34,17 +37,21 @@
     preview postDraft.content, $preview()
 
   save = ->
+    $find(".notices").html("")
     data =
       title: $find("[name=title]").val()
       content: content()
+      password: $find("[type=password]").val()
     $.ajax
       type: "POST"
       url: "post"
       contentType: "application/json"
       data: JSON.stringify(data)
       success: (response) ->
-        $(".notices").html("""New post saved at <a href='/#{response.URI}'>#{response.URI}</a>""")
+        $find(".notices").html("""New post saved at <a href='/#{response.URI}'>#{response.URI}</a>""")
         window.scrollTo 0, 0
+      error: (response) ->
+        $find(".notices").html("<strong>BORKED!</strong>")
 
   $ ->
     try

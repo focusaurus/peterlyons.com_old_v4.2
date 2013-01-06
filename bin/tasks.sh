@@ -294,11 +294,12 @@ task:start() {
 
 task:devstart() {
     cdpd
-    nodemon app/server.coffee
+    nodemon --debug=9001 app/server.coffee
 }
 
 task:debug() {
   cdpd
+  echo http://localhost:9002/debug?port=9001
   ./node_modules/.bin/coffee --nodejs --debug=9001 app/server.coffee
 }
 

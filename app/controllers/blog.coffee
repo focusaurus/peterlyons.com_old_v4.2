@@ -1,6 +1,7 @@
 _ = require "underscore"
-text = require "../lib/text"
+async = require "async"
 asyncjs = require "asyncjs"
+bcrypt = require "bcrypt"
 date = require "../../lib/date" #Do not remove. Monkey patches Date
 errors = require "../errors"
 express = require "express"
@@ -10,13 +11,14 @@ markdown = require("markdown-js").makeHtml
 middleware = require "./middleware"
 pages = require "./pages"
 path = require "path"
+text = require "../lib/text"
 util = require "util"
-config = require "../../config"
 
 {Post, leadZero} = require("../models/post")
 
 postLinks = {}
 blogIndicesBySlug = {}
+hashPath = path.join __dirname, "..", "data", "blog_password.bcrypt"
 
 ########## middleware ##########
 loadPost = (req, res, next) ->
@@ -64,20 +66,35 @@ previewMarkdown = (req, res, next) ->
   res.html = markdown req.body
   next()
 
-createPost = (req, res, next) ->
+verifyPassword = (password, hash, callback) ->
+  bcrypt.compare password, hash, (error, correctPassword) ->
+    return callback error if error
+    return callback "incorrect password" if not correctPassword
+    callback()
+
+savePost = (req, callback) ->
   blogSlug = req.param "blogSlug"
   post = new Post blogSlug, req.body.title, new Date(), "md"
   post.publish_date = new Date()
   post.content = (req.body.content || "").trim() + "\n"
   post.base = path.join(__dirname, "..", "posts")
-  post.save (error) ->
-    return res.send 500, error if error
+  post.save callback
+
+createPost = (req, res, next) ->
+  password = req.body.password
+  work = [
+    async.apply fs.readFile, hashPath, "utf8"
+    async.apply verifyPassword, password
+    async.apply savePost, req
+  ]
+  async.waterfall work, (error, post) ->
+    return res.status(500).send(error) if error
     response = post.metadata()
     response.URI = post.URI()
     res.send response
     #cheezy reload of the blog index
-    loadBlog blogSlug, (error,  posts) ->
-      blog = blogIndicesBySlug[blogSlug]
+    loadBlog post.blog, (error,  posts) ->
+      blog = blogIndicesBySlug[post.blog]
       blog.posts = blog.locals.posts = posts
 
 convertMiddleware = [
@@ -115,10 +132,9 @@ class BlogIndex extends pages.Page
     app.get "/#{@URI}", (req) ->
       self.render req
 
-    if config.blogPreviews
-      app.get "/#{@URI}/post", (req, res) ->
-        res.render "post"
-      app.post "/:blogSlug/post", createPost
+    app.get "/#{@URI}/post", (req, res) ->
+      res.render "post"
+    app.post "/:blogSlug/post", createPost
 
     app.get "/#{@URI}/feed", (req, res) ->
       options =
