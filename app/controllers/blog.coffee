@@ -1,18 +1,24 @@
 _ = require "underscore"
+async = require "async"
 asyncjs = require "asyncjs"
+bcrypt = require "bcrypt"
 date = require "../../lib/date" #Do not remove. Monkey patches Date
 errors = require "../errors"
+express = require "express"
 fs = require "fs"
 jade = require "jade"
 markdown = require("markdown-js").makeHtml
 middleware = require "./middleware"
 pages = require "./pages"
 path = require "path"
+text = require "../lib/text"
 util = require "util"
 
 {Post, leadZero} = require("../models/post")
 
 postLinks = {}
+blogIndicesBySlug = {}
+hashPath = path.join __dirname, "..", "data", "blog_password.bcrypt"
 
 ########## middleware ##########
 loadPost = (req, res, next) ->
@@ -43,7 +49,7 @@ markdownToHTML = (req, res, next) ->
     res.html = markdown markdownText
     next error
 
-blogArticle = (req, res, next) ->
+renderPost = (req, res, next) ->
   post = res.post
   footerPath = path.join __dirname, "..", "templates", "blog_layout.jade"
   fs.readFile footerPath, "utf8", (error, jadeText) ->
@@ -56,11 +62,56 @@ postTitle = (req, res, next) ->
   res.$("title").text(res.post.title + " | Peter Lyons")
   next()
 
-postMiddleware = [
+previewMarkdown = (req, res, next) ->
+  res.html = markdown req.body
+  next()
+
+verifyPassword = (password, hash, callback) ->
+  bcrypt.compare password, hash, (error, correctPassword) ->
+    return callback error if error
+    return callback "incorrect password" if not correctPassword
+    callback()
+
+savePost = (req, callback) ->
+  blogSlug = req.param "blogSlug"
+  post = new Post blogSlug, req.body.title, new Date(), "md"
+  post.publish_date = new Date()
+  post.content = (req.body.content || "").trim() + "\n"
+  post.base = path.join(__dirname, "..", "posts")
+  post.save callback
+
+createPost = (req, res, next) ->
+  password = req.body.password
+  work = [
+    async.apply fs.readFile, hashPath, "utf8"
+    async.apply verifyPassword, password
+    async.apply savePost, req
+  ]
+  async.waterfall work, (error, post) ->
+    return res.status(500).send(error) if error
+    response = post.metadata()
+    response.URI = post.URI()
+    res.send response
+    #cheezy reload of the blog index
+    loadBlog post.blog, (error,  posts) ->
+      blog = blogIndicesBySlug[post.blog]
+      blog.posts = blog.locals.posts = posts
+
+convertMiddleware = [
+  text({limit:"5mb"})
+  previewMarkdown
+  middleware.domify
+  middleware.flickr
+  middleware.youtube
+  middleware.undomify
+  middleware.send
+]
+
+viewPostMiddleware = [
   loadPost
   html
   markdownToHTML
-  blogArticle
+  renderPost
   middleware.layout
   middleware.domify
   postTitle
@@ -80,6 +131,10 @@ class BlogIndex extends pages.Page
     self = this
     app.get "/#{@URI}", (req) ->
       self.render req
+
+    app.get "/#{@URI}/post", (req, res) ->
+      res.render "post"
+    app.post "/:blogSlug/post", createPost
 
     app.get "/#{@URI}/feed", (req, res) ->
       options =
@@ -109,7 +164,7 @@ class BlogIndex extends pages.Page
         res.header "Content-Type", "text/xml"
         res.render "feed", options
 
-    app.get new RegExp("/(#{@URI})/\\d{4}/\\d{2}/\\w+"), postMiddleware
+    app.get new RegExp("/(#{@URI})/\\d{4}/\\d{2}/\\w+"), viewPostMiddleware
 
 presentPost = (post) ->
   date = leadZero(post.publish_date.getMonth() + 1)
@@ -150,6 +205,8 @@ loadBlog = (URI, callback) ->
 setup = (app) ->
   problog = new BlogIndex("problog", "Pete's Points")
   persblog = new BlogIndex("persblog", "The Stretch of Vitality")
+  blogIndicesBySlug[problog.URI] = problog
+  blogIndicesBySlug[persblog.URI] = persblog
   asyncjs.list([problog, persblog]).each (blog, next) ->
     loadBlog blog.URI, (error,  posts) ->
       blog.posts = blog.locals.posts = posts
@@ -159,4 +216,6 @@ setup = (app) ->
     next()
   .end (error) ->
     #no-op
+  app.post "/convert", convertMiddleware
+
 module.exports = {setup}

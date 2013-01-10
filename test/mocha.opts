@@ -1,4 +1,4 @@
 --reporter spec
---growl
 --colors
-
+--compilers coffee:coffee-script
+--recursive

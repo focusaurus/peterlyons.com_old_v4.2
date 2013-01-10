@@ -48,3 +48,8 @@ exports.youtube = (req, res, next) ->
     URL = $elem.attr "href"
     $elem.replaceWith(youtubeTemplate.replace /\{URL\}/, URL)
   next()
+
+exports.debugLog = (message) ->
+  (req, res, next) ->
+    console.log message
+    next()
